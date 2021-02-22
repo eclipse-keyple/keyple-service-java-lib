@@ -4,14 +4,14 @@ def keypleVersion
 pipeline {
     agent {
         kubernetes {
-            label ${artifactId}
+            label "${artifactId}"
             yaml javaBuilder('1')
         }
     }
     environment {
         uploadParams = "-PdoSign=true --info"
         forceBuild = false
-        PROJECT_NAME = ${artifactId}
+        PROJECT_NAME = "${artifactId}"
         PROJECT_BOT_NAME = "Eclipse Keyple Bot"
     }
     stages {
