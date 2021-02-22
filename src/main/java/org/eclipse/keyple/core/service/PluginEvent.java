@@ -39,7 +39,7 @@ import org.eclipse.keyple.core.commons.KeyplePluginEvent;
 public final class PluginEvent implements KeyplePluginEvent {
 
   private final String pluginName;
-  private final SortedSet<String> readerNames;
+  private final SortedSet<String> readersNames;
   private final EventType eventType;
 
   /**
@@ -49,13 +49,25 @@ public final class PluginEvent implements KeyplePluginEvent {
    */
   public enum EventType {
 
-    /** A reader has been connected. */
+    /**
+     * A reader has been connected.
+     *
+     * @since 2.0
+     */
     READER_CONNECTED,
 
-    /** A reader has been disconnected. */
+    /**
+     * A reader has been disconnected.
+     *
+     * @since 2.0
+     */
     READER_DISCONNECTED,
 
-    /** This plugin has been unregistered */
+    /**
+     * This plugin has been unregistered
+     *
+     * @since 2.0
+     */
     UNREGISTERED
   }
 
@@ -71,7 +83,7 @@ public final class PluginEvent implements KeyplePluginEvent {
    */
   public PluginEvent(String pluginName, String readerName, EventType eventType) {
     this.pluginName = pluginName;
-    this.readerNames = new TreeSet<String>(Collections.singleton(readerName));
+    this.readersNames = new TreeSet<String>(Collections.singleton(readerName));
     this.eventType = eventType;
   }
 
@@ -83,14 +95,14 @@ public final class PluginEvent implements KeyplePluginEvent {
    * (e.g. simultaneous disconnection of 2 readers).
    *
    * @param pluginName A string containing the name of the plugin (must be not empty).
-   * @param readerNames A set of string containing the reader names (must be not empty).
+   * @param readersNames A set of string containing the readers names (must be not empty).
    * @param eventType An event type {@link EventType#READER_CONNECTED} or {@link
    *     EventType#READER_DISCONNECTED} (must be not null).
    * @since 2.0
    */
-  public PluginEvent(String pluginName, Set<String> readerNames, EventType eventType) {
+  public PluginEvent(String pluginName, Set<String> readersNames, EventType eventType) {
     this.pluginName = pluginName;
-    this.readerNames = new TreeSet<String>(readerNames);
+    this.readersNames = new TreeSet<String>(readersNames);
     this.eventType = eventType;
   }
 
@@ -110,8 +122,8 @@ public final class PluginEvent implements KeyplePluginEvent {
    * @return A not empty sorted set of strings.
    * @since 2.0
    */
-  public SortedSet<String> getReaderNames() {
-    return readerNames;
+  public SortedSet<String> getReadersNames() {
+    return readersNames;
   }
 
   /**

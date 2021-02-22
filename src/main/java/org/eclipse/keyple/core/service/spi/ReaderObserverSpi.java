@@ -25,8 +25,8 @@ public interface ReaderObserverSpi {
    *
    * <p>Note that this method is called <b>sequentially</b> on all observers.
    *
-   * @param event The not null {@link ReaderEvent} containing all event information.
+   * @param readerEvent The not null {@link ReaderEvent} containing all event information.
    * @since 2.0
    */
-  void update(final ReaderEvent event);
+  void onReaderEvent(final ReaderEvent readerEvent);
 }

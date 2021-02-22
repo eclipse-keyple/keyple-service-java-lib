@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.keyple.core.commons.KeypleCardExtension;
 import org.eclipse.keyple.core.commons.KeypleDistributedLocalServiceExtensionFactory;
 import org.eclipse.keyple.core.commons.KeyplePluginExtensionFactory;
+import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,8 @@ import org.slf4j.LoggerFactory;
  * The Class SmartCardService. This singleton is the entry point of the card Proxy Service, its
  * instance has to be called by a ticketing application in order to establish a link with a card’s
  * application.
+ *
+ * @since 2.0
  */
 public final class SmartCardService {
 
@@ -45,6 +48,7 @@ public final class SmartCardService {
    * Gets the single instance of SmartCardService.
    *
    * @return single instance of SmartCardService
+   * @since 2.0
    */
   public static SmartCardService getInstance() {
     return uniqueInstance;
@@ -57,12 +61,11 @@ public final class SmartCardService {
    * @throws KeyplePluginInstantiationException if instantiation failed
    * @return Plugin : registered reader plugin
    * @throws IllegalStateException if the plugin has already been registered.
+   * @since 2.0
    */
   public Plugin registerPlugin(KeyplePluginExtensionFactory pluginFactory) {
 
-    if (pluginFactory == null) {
-      throw new IllegalArgumentException("Factory must not be null");
-    }
+    Assert.getInstance().notNull(pluginFactory, "pluginFactory");
 
     /*
     synchronized (MONITOR) {
@@ -91,6 +94,7 @@ public final class SmartCardService {
    *
    * @param pluginName plugin name
    * @throws IllegalStateException if the plugin or his reader(s) are already unregistered
+   * @since 2.0
    */
   public void unregisterPlugin(String pluginName) {
     /*
@@ -112,12 +116,13 @@ public final class SmartCardService {
   }
 
   /**
-   * Check weither a plugin is already registered to the platform or not
+   * Check whether a plugin is already registered to the platform or not
    *
    * @param pluginName name of the plugin to be checked
    * @return true if a plugin with matching name has been registered
+   * @since 2.0
    */
-  public synchronized boolean isRegistered(String pluginName) {
+  public synchronized boolean isPluginRegistered(String pluginName) {
     synchronized (MONITOR) {
       return plugins.containsKey(pluginName);
     }
@@ -127,6 +132,7 @@ public final class SmartCardService {
    * Gets the plugins.
    *
    * @return the plugin names and plugin instances map of interfaced reader’s plugins.
+   * @since 2.0
    */
   public synchronized Map<String, Plugin> getPlugins() {
     return plugins;
@@ -135,15 +141,16 @@ public final class SmartCardService {
   /**
    * Gets the plugin whose name is provided as an argument.
    *
-   * @param name the plugin name
+   * @param pluginName the plugin name
    * @return the plugin
    * @throws KeyplePluginNotFoundException if the wanted plugin is not found
+   * @since 2.0
    */
-  public synchronized Plugin getPlugin(String name) {
+  public synchronized Plugin getPlugin(String pluginName) {
     synchronized (MONITOR) {
-      Plugin plugin = plugins.get(name);
+      Plugin plugin = plugins.get(pluginName);
       if (plugin == null) {
-        throw new KeyplePluginNotFoundException(name);
+        throw new KeyplePluginNotFoundException(pluginName);
       }
       return plugin;
     }
@@ -155,16 +162,19 @@ public final class SmartCardService {
    * <p>The verification is based on the comparison of the respective API versions.
    *
    * @param cardExtension A not null {@link KeypleCardExtension} reference object
+   * @since 2.0
    */
   public void checkCardExtension(KeypleCardExtension cardExtension) {
     // TODO complete
   }
 
   /**
-   * TODO complete
+   * Registers a new Distributed Local Service to be available in the platform if not registered yet
    *
-   * @param distributedLocalServiceExtensionFactory
-   * @return
+   * @param distributedLocalServiceExtensionFactory Factory to use to instantiate a Distributed
+   *     Local Service extension
+   * @return A {@link DistributedLocalService} reference
+   * @since 2.0
    */
   public DistributedLocalService registerDistributedLocalService(
       KeypleDistributedLocalServiceExtensionFactory distributedLocalServiceExtensionFactory) {
@@ -176,6 +186,7 @@ public final class SmartCardService {
    * TODO complete
    *
    * @param distributedLocalServiceName
+   * @since 2.0
    */
   public void unregisterDistributedLocalService(String distributedLocalServiceName) {
     // TODO complete
@@ -185,6 +196,7 @@ public final class SmartCardService {
    * TODO complete
    *
    * @param distributedLocalServiceName
+   * @since 2.0
    */
   public void getDistributedLocalService(String distributedLocalServiceName) {
     // TODO complete

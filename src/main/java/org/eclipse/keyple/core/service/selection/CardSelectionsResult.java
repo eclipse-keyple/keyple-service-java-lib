@@ -32,6 +32,7 @@ public final class CardSelectionsResult {
   CardSelectionsResult() {}
 
   /**
+   * (package-private)<br>
    * Append a {@link SmartCard} to the internal list
    *
    * @param selectionIndex the index of the selection that resulted in the matching card

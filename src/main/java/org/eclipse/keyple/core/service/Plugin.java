@@ -47,7 +47,7 @@ public interface Plugin {
    * @throws IllegalStateException is called when plugin is no longer registered
    * @since 2.0
    */
-  Set<String> getReaderNames();
+  Set<String> getReadersNames();
 
   /**
    * Gets the readers.
@@ -62,11 +62,11 @@ public interface Plugin {
   /**
    * Gets the reader whose name is provided as an argument
    *
-   * @param name of the reader
+   * @param readerName name of the reader
    * @return the Reader object.
    * @throws KeypleReaderNotFoundException if the wanted reader is not found
    * @throws IllegalStateException is called when plugin is no longer registered
    * @since 2.0
    */
-  Reader getReader(String name);
+  Reader getReader(String readerName);
 }

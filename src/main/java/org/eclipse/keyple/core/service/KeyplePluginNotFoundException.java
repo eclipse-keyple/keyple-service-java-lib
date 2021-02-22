@@ -19,16 +19,11 @@ package org.eclipse.keyple.core.service;
  */
 public class KeyplePluginNotFoundException extends RuntimeException {
 
-  /** @param message the message to identify the exception context */
-  public KeyplePluginNotFoundException(String message) {
-    super(message);
-  }
-
   /**
    * @param message the message to identify the exception context
-   * @param cause the cause
+   * @since 2.0
    */
-  public KeyplePluginNotFoundException(String message, Throwable cause) {
-    super(message, cause);
+  public KeyplePluginNotFoundException(String message) {
+    super(message);
   }
 }

@@ -14,10 +14,15 @@ package org.eclipse.keyple.core.service;
 /**
  * Indicates that the plugin cannot be instantiated, possibly due to a problem with one of the
  * associated readers.
+ *
+ * @since 2.0
  */
 public class KeyplePluginInstantiationException extends RuntimeException {
 
-  /** @param message the message to identify the exception context */
+  /**
+   * @param message the message to identify the exception context
+   * @since 2.0
+   */
   public KeyplePluginInstantiationException(String message) {
     super(message);
   }
@@ -25,6 +30,7 @@ public class KeyplePluginInstantiationException extends RuntimeException {
   /**
    * @param message the message to identify the exception context
    * @param cause the cause
+   * @since 2.0
    */
   public KeyplePluginInstantiationException(String message, Throwable cause) {
     super(message, cause);

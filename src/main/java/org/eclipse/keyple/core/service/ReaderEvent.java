@@ -38,16 +38,32 @@ public final class ReaderEvent implements KeypleReaderEvent {
    */
   public enum EventType {
 
-    /** A card has been inserted. */
+    /**
+     * A card has been inserted.
+     *
+     * @since 2.0
+     */
     CARD_INSERTED,
 
-    /** A card has been inserted and the default requests process has been successfully operated. */
+    /**
+     * A card has been inserted and the default requests process has been successfully operated.
+     *
+     * @since 2.0
+     */
     CARD_MATCHED,
 
-    /** The card has been removed and is no longer able to communicate with the reader */
+    /**
+     * The card has been removed and is no longer able to communicate with the reader
+     *
+     * @since 2.0
+     */
     CARD_REMOVED,
 
-    /** The reader has been unregistered */
+    /**
+     * The reader has been unregistered
+     *
+     * @since 2.0
+     */
     UNREGISTERED
   }
 
@@ -115,27 +131,5 @@ public final class ReaderEvent implements KeypleReaderEvent {
    */
   public KeypleDefaultSelectionsResponse getDefaultSelectionsResponse() {
     return defaultResponses;
-  }
-
-  /**
-   * Gets the {@link Plugin} from which the reader that generated the event comes from.
-   *
-   * @return A not null reference to a Plugin object.
-   * @since 2.0
-   */
-  public Plugin getPlugin() {
-    // TODO check this
-    return SmartCardService.getInstance().getPlugin(pluginName);
-  }
-
-  /**
-   * Gets the {@link Reader} from which generated event comes from
-   *
-   * @return A not null reference to a Reader object.
-   * @since 2.0
-   */
-  public Reader getReader() {
-    // TODO check this
-    return getPlugin().getReader(readerName);
   }
 }

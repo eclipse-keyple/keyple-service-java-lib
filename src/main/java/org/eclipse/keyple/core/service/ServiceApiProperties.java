@@ -16,7 +16,7 @@ package org.eclipse.keyple.core.service;
  *
  * @since 2.0
  */
-public class ServiceApiProperties {
+public final class ServiceApiProperties {
   /**
    * API version: {@value}
    *

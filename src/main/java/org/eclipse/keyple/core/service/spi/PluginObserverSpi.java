@@ -25,8 +25,8 @@ public interface PluginObserverSpi {
    *
    * <p>Note that this method is called <b>sequentially</b> on all observers.
    *
-   * @param event The not null {@link PluginEvent} containing all event information.
+   * @param pluginEvent The not null {@link PluginEvent} containing all event information.
    * @since 2.0
    */
-  void update(final PluginEvent event);
+  void onPluginEvent(final PluginEvent pluginEvent);
 }

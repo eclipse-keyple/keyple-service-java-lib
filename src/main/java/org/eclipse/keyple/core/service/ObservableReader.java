@@ -38,11 +38,15 @@ public interface ObservableReader extends Reader {
     /**
      * All cards presented to readers are notified regardless of the result of the default
      * selection.
+     *
+     * @since 2.0
      */
     ALWAYS,
     /**
      * Only cards that have been successfully selected (logical channel open) will be notified. The
      * others will be ignored and the application will not be aware of them.
+     *
+     * @since 2.0
      */
     MATCHED_ONLY
   }

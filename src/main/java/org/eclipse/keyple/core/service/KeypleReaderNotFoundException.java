@@ -19,7 +19,10 @@ package org.eclipse.keyple.core.service;
  */
 public class KeypleReaderNotFoundException extends RuntimeException {
 
-  /** @param message the message to identify the exception context */
+  /**
+   * @param message the message to identify the exception context
+   * @since 2.0
+   */
   public KeypleReaderNotFoundException(String message) {
     super(message);
   }
@@ -27,6 +30,7 @@ public class KeypleReaderNotFoundException extends RuntimeException {
   /**
    * @param message the message to identify the exception context
    * @param cause the cause
+   * @since 2.0
    */
   public KeypleReaderNotFoundException(String message, Throwable cause) {
     super(message, cause);

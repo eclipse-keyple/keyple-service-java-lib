@@ -14,7 +14,7 @@ package org.eclipse.keyple.core.service;
 import org.eclipse.keyple.core.commons.KeypleDistributedLocalServiceExtension;
 
 /**
- * TODO complete
+ * Common Local Service API of the Keyple Distributed Solution
  *
  * @since 2.0
  */

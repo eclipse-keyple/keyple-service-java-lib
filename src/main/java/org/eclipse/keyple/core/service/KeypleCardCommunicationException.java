@@ -16,10 +16,15 @@ package org.eclipse.keyple.core.service;
  *
  * <p>The most likely reason is that the card was removed from the reader during the exchange, but
  * other technical problems may also be the origin of the failure.
+ *
+ * @since 2.0
  */
 public class KeypleCardCommunicationException extends RuntimeException {
 
-  /** @param message the message to identify the exception context */
+  /**
+   * @param message the message to identify the exception context
+   * @since 2.0
+   */
   public KeypleCardCommunicationException(String message) {
     super(message);
   }
@@ -27,6 +32,7 @@ public class KeypleCardCommunicationException extends RuntimeException {
   /**
    * @param message the message to identify the exception context
    * @param cause the cause
+   * @since 2.0
    */
   public KeypleCardCommunicationException(String message, Throwable cause) {
     super(message, cause);

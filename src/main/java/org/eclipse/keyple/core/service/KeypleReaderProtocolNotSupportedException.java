@@ -11,10 +11,17 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-/** Indicates that the current card protocol is not supported by the plugin. */
+/**
+ * Indicates that the current card protocol is not supported by the plugin.
+ *
+ * @since 2.0
+ */
 public class KeypleReaderProtocolNotSupportedException extends RuntimeException {
 
-  /** @param cardProtocol the identification data used to identify the card */
+  /**
+   * @param cardProtocol the identification data used to identify the card
+   * @since 2.0
+   */
   public KeypleReaderProtocolNotSupportedException(String cardProtocol) {
     super("The card protocol " + cardProtocol + " is not supported.");
   }

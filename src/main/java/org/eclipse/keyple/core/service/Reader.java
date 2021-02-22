@@ -42,6 +42,7 @@ public interface Reader {
    *
    * @param readerType the specific class of the reader
    * @return a {@link KeypleReaderExtension}
+   * @since 2.0
    */
   <T extends KeypleReaderExtension> T getExtension(Class<T> readerType);
 
@@ -74,8 +75,8 @@ public interface Reader {
    *   <li>Internally associates the two strings provided as arguments.
    *   <li>The #readerProtocolName argument is the name of the protocol among those supported by the
    *       reader.
-   *   <li>The #applicationProtocolName is the name of the protocol to be the plugin when a card
-   *       using this protocol is detected.
+   *   <li>The #cardProtocol is the name of the protocol to be the plugin when a card using this
+   *       protocol is detected.
    * </ul>
    *
    * Note: in the case where multiple protocols are activated, they will be checked in the selection
@@ -83,12 +84,12 @@ public interface Reader {
    * activated first.
    *
    * @param readerProtocolName A not empty String.
-   * @param applicationProtocolName A not empty String.
+   * @param cardProtocol A not empty String.
    * @throws KeypleReaderProtocolNotSupportedException if the protocol is not supported.
    * @throws IllegalStateException is called when reader is no longer registered
    * @since 2.0
    */
-  void activateProtocol(String readerProtocolName, String applicationProtocolName);
+  void activateProtocol(String readerProtocolName, String cardProtocol);
 
   /**
    * Deactivates the provided card protocol.

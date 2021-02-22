@@ -14,6 +14,7 @@ package org.eclipse.keyple.core.service.selection.spi;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
+import org.eclipse.keyple.core.commons.KeypleCardSelector;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-public class CardSelector {
+public class CardSelector implements KeypleCardSelector {
   /** logger */
   private static final Logger logger = LoggerFactory.getLogger(CardSelector.class);
 

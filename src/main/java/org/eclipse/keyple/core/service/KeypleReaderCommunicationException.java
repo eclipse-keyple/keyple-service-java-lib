@@ -16,10 +16,15 @@ package org.eclipse.keyple.core.service;
  *
  * <p>The most likely reason is a physical disconnection of the reader, but other technical problems
  * may also be the origin of the failure.
+ *
+ * @since 2.0
  */
 public class KeypleReaderCommunicationException extends RuntimeException {
 
-  /** @param message the message to identify the exception context */
+  /**
+   * @param message the message to identify the exception context
+   * @since 2.0
+   */
   public KeypleReaderCommunicationException(String message) {
     super(message);
   }
@@ -27,6 +32,7 @@ public class KeypleReaderCommunicationException extends RuntimeException {
   /**
    * @param message the message to identify the exception context
    * @param cause the cause
+   * @since 2.0
    */
   public KeypleReaderCommunicationException(String message, Throwable cause) {
     super(message, cause);
