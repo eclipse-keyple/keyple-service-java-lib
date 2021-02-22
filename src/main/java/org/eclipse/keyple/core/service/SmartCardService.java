@@ -185,7 +185,7 @@ public final class SmartCardService {
   /**
    * TODO complete
    *
-   * @param distributedLocalServiceName
+   * @param distributedLocalServiceName TODO
    * @since 2.0
    */
   public void unregisterDistributedLocalService(String distributedLocalServiceName) {
@@ -195,7 +195,7 @@ public final class SmartCardService {
   /**
    * TODO complete
    *
-   * @param distributedLocalServiceName
+   * @param distributedLocalServiceName TODO
    * @since 2.0
    */
   public void getDistributedLocalService(String distributedLocalServiceName) {

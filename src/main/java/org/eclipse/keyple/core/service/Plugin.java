@@ -35,7 +35,8 @@ public interface Plugin {
   /**
    * Returns the {@link KeyplePluginExtension} that is plugin-specific
    *
-   * @param pluginType the specific class of the plugin
+   * @param pluginType The specific class of the plugin
+   * @param <T> The type of the plugin extension
    * @return a {@link KeyplePluginExtension}
    */
   <T extends KeyplePluginExtension> T getExtension(Class<T> pluginType);

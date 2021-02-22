@@ -41,6 +41,7 @@ public interface Reader {
    * Returns the {@link KeypleReaderExtension} that is reader-specific
    *
    * @param readerType the specific class of the reader
+   * @param <T> The type of the reader extension
    * @return a {@link KeypleReaderExtension}
    * @since 2.0
    */

@@ -57,7 +57,7 @@ pipeline {
         stage('Keyple Java: Build and Test') {
             steps{
                 container('java-builder') {
-                    sh './gradlew installAll --info'
+                    sh './gradlew installArtifact --info'
                     catchError(buildResult: 'UNSTABLE', message: 'There were failing tests.', stageResult: 'UNSTABLE') {
                         sh './gradlew check --info'
                     }
@@ -96,7 +96,7 @@ pipeline {
                     container('java-builder') {
                         withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONAR_LOGIN')]) {
                             sh './gradlew --stop'
-                            sh './gradlew codeQuality --info'
+                            sh './gradlew analyzeCodeQuality --info'
                             sh './gradlew --stop'
                         }
                     }

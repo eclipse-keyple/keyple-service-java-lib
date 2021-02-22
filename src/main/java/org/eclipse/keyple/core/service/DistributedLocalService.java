@@ -33,6 +33,7 @@ public interface DistributedLocalService {
    * service-specific
    *
    * @param distributedLocalServiceType the specific class of the local service
+   * @param <T> The type of the service extension
    * @return a {@link KeypleDistributedLocalServiceExtension}
    */
   <T extends KeypleDistributedLocalServiceExtension> T getExtension(

@@ -24,8 +24,8 @@ import org.eclipse.keyple.core.commons.KeyplePluginEvent;
  * EventType#READER_DISCONNECTED} event is fired when an already registered reader is removed from
  * the system.
  *
- * <p>The {@link #getReaderNames()} and {@link #getEventType()} methods allow the event recipient to
- * retrieve the names of the readers involved and the type of the event.
+ * <p>The {@link #getReadersNames()} and {@link #getEventType()} methods allow the event recipient
+ * to retrieve the names of the readers involved and the type of the event.
  *
  * <p>There are two types of events, the connection and disconnection of readers.
  *

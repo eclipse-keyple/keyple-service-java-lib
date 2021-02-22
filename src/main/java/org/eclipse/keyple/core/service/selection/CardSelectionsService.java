@@ -87,6 +87,7 @@ public final class CardSelectionsService {
    * <p>
    *
    * @param reader the Reader on which the selection is made
+   * @return A not null {@link CardSelectionsResult} reference
    * @since 2.0
    */
   public CardSelectionsResult processExplicitSelections(Reader reader) {
@@ -115,6 +116,7 @@ public final class CardSelectionsService {
    *
    * @param defaultSelectionsResponse the response from the reader to the {@link
    *     KeypleDefaultSelectionsRequest}
+   * @return A not null {@link CardSelectionsResult} reference
    * @since 2.0
    */
   public CardSelectionsResult processDefaultSelectionsResponse(
