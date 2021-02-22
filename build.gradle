@@ -1,0 +1,316 @@
+apply plugin: "java"
+apply plugin: "java-library"
+apply plugin: "maven"
+apply plugin: "org.eclipse.keyple"
+apply plugin: "jacoco"
+apply plugin: "org.sonarqube"
+apply plugin: "com.diffplug.spotless"
+
+///////////////////////////////////////////////////////////////////////////////
+// CONFIGURATION
+///////////////////////////////////////////////////////////////////////////////
+
+group = groupId
+archivesBaseName = artifactId
+sourceCompatibility = javaSourceLevel
+
+// If your build script needs to use external libraries, you can add them to the script’s classpath in the
+// build script itself.
+// You do this using the buildscript() method, passing in a block which declares the build script classpath.
+buildscript {
+    // Repositories where to find dependencies needed by the build process
+    repositories {
+        mavenLocal()
+        jcenter()
+        //use a mirror of maven_central to speed up CI build
+        maven {
+            url "https://repo.eclipse.org/service/local/repositories/maven_central/content"
+        }
+        mavenCentral()
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots"
+        }
+    }
+    dependencies {
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:5.10.0"
+        classpath "org.eclipse.keyple:keyple-gradle:0.1.0"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2"
+        classpath "org.jacoco:org.jacoco.core:0.8.5"
+        classpath "org.jacoco:org.jacoco.agent:0.8.5"
+    }
+}
+
+// Repositories where to find dependencies needed by the project
+repositories {
+    mavenLocal()
+    //use a mirror of maven_central to speed up CI build
+    maven {
+        url "https://repo.eclipse.org/service/local/repositories/maven_central/content"
+    }
+    //to import keyple snapshots
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+    //to import keyple releases
+    maven {
+        url "https://oss.sonatype.org/content/repositories/releases"
+    }
+    google()
+    jcenter()
+    mavenCentral()
+}
+
+// Sign if needed (based on the doSign variable)
+if (project.getProperties().containsKey("doSign") && doSign == "true") {
+    apply plugin: "signing"
+    ext."signing.keyId" = "0C140E36"
+    //other properties are defined in the gradle.properties
+    signing { sign configurations.archives }
+}
+
+// Javadoc generation configuration
+javadoc.options.encoding = "UTF-8"
+javadoc.options.overview = "src/main/javadoc/overview.html"
+javadoc.options.setUse(true) // adds the "use" link to the navigation bar
+javadoc.options.setStylesheetFile(file("misc/javadoc/keyple-stylesheet.css"))
+javadoc.options.setWindowTitle(project.description + " - " + project.version)
+javadoc.options.setDocTitle(project.description + " - " + project.version)
+javadoc.options.setHeader("<a target=\"_parent\" href=\"https://keyple.org/\"><img src=\"{@docRoot}/images/keyple.png\" height=\"20px\" style=\"background-color: white; padding: 3px; margin: 0 10px -7px 3px;\"/></a><span style=\"line-height: 30px\"> " + project.description + " - " + project.version + "</span>")
+javadoc.options.setFooter("Copyright &copy; Eclipse Foundation, Inc. All Rights Reserved.")
+
+// Configures the dependency configurations for this project.
+configurations.all {
+    // Defines the strategies around dependency resolution.
+    // For example, forcing certain dependency versions, substitutions, conflict resolutions or snapshot timeouts.
+    resolutionStrategy {
+        // check for updates every build
+        cacheChangingModulesFor 0, "seconds"
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// CUSTOM TASKS
+///////////////////////////////////////////////////////////////////////////////
+
+// Copy license file from root folder to each generated artifact
+task copyLicenceFile(type: Copy) {
+    from file("${projectDir}/LICENSE")
+    into file("${buildDir}/resources/main/META-INF/")
+}
+
+// Copy notice file from root folder to each generated artifact
+task copyNoticeFile(type: Copy) {
+    from file("${projectDir}/NOTICE.md")
+    into file("${buildDir}/resources/main/META-INF/")
+}
+
+// Generate sources jar
+task generateSourcesJar(type: Jar, dependsOn: classes) {
+    group "keyple"
+    archiveClassifier.set("sources")
+    from sourceSets.main.output, sourceSets.main.java
+}
+
+// Generate javadoc jar
+task generateJavadocJar(type: Jar, dependsOn: javadoc) {
+    group "keyple"
+    archiveClassifier.set("javadoc")
+    from javadoc.destinationDir
+}
+
+// Put the generated artifact into the local maven repository
+task installArtifact {
+    group "keyple"
+    description "Builds and installs the ${artifactId} artifact into maven local repository"
+    dependsOn uploadArchives
+    doLast {
+        println "${artifactId} artifact ${project.version} has been installed into maven local repo at path : " + project.getRepositories().get(0)["url"]
+    }
+}
+
+// Remove the generated artifact from the local maven repository
+task removeArtifact(type: Delete) {
+    group "keyple"
+    def path = new URL(project.getRepositories().get(0)["url"].toString() + "org/eclipse/keyple/" + artifactId)
+    description "Removes all ${artifactId} artifacts deployed in maven local repo at path: ${path}"
+    delete path
+    doLast { println description }
+}
+
+// Execute Sonarqube and upload the result to sonarcloud.io
+task analyzeCodeQuality {
+    group "keyple"
+    description "Analyse code and send results to Sonar"
+    dependsOn installArtifact
+    dependsOn sonarqube
+    doLast { println "Keyple code has been analysed and result was sent to SonarQube." }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// DEFAULT TASKS
+///////////////////////////////////////////////////////////////////////////////
+
+// additional actions before compiling classes
+classes {
+    dependsOn copyLicenceFile, copyNoticeFile
+}
+
+// declare manifest
+jar {
+    manifest {
+        attributes("Implementation-Title": project.description,
+        "Implementation-Version": project.version)
+    }
+}
+
+// Copy static custom files (logo)
+javadoc {
+    doLast {
+        copy {
+            from "misc/javadoc/images"
+            into "$project.buildDir/docs/javadoc/images"
+            include "*.png"
+        }
+    }
+}
+
+// sonarqube plugin task
+sonarqube {
+    properties {
+        property "sonar.projectKey", "eclipse-${artifactId}"
+        property "sonar.organization", "eclipse"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.login", System.getenv("SONAR_LOGIN")
+        property "sonar.branch.name", System.getenv("BRANCH_NAME")
+    }
+}
+
+// spotless plugin task
+spotless {
+    // java files format
+    java {
+        target "src/**/*.java"
+        licenseHeaderFile "misc/license_header.txt"
+        importOrder "java", "javax", "org", "com", ""
+        removeUnusedImports()
+        googleJavaFormat()
+    }
+    // gradle files format
+    groovyGradle {
+        target "*.gradle" // default target of groovyGradle
+        greclipse()
+        indentWithSpaces()
+    }
+}
+
+// define local or remote upload repository (based on the doSign variable)
+/* from https://central.sonatype.org/pages/gradle.html */
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            if (project.getProperties().containsKey("doSign") && doSign == "true") {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+            } else {
+                repository(url: mavenLocal().url)
+            }
+            pom.project {
+                name = artifactId
+                description = project.description
+                url = "https://projects.eclipse.org/projects/iot.keyple"
+                organization("Eclipse Keyple") {
+                    name = "Eclipse Keyple"
+                    url = "https://projects.eclipse.org/projects/iot.keyple"
+                }
+                scm {
+                    connection = "scm:git:git://github.com/eclipse/${artifactId}.git"
+                    developerConnection = "scm:git:https://github.com/eclipse/${artifactId}.git"
+                    url = "http://github.com/eclipse/${artifactId}/tree/main"
+                }
+                licenses {
+                    license {
+                        name = "Eclipse Public License - v 2.0"
+                        url = "https://www.eclipse.org/legal/epl-2.0/"
+                    }
+                }
+                developers {
+                    developer {
+                        name = "Olivier Delcroix"
+                        email = "odelcroi@gmail.com"
+                    }
+                    developer {
+                        name = "Jean-Pierre Fortune"
+                        email = "jean-pierre.fortune@ialto.com"
+                    }
+                    developer {
+                        name = "Andrei Cristea"
+                        email = "andrei.cristea019@gmail.com"
+                    }
+                    developer {
+                        name = "Pierre Terrée"
+                        email = "pierre.terree@calypsonet.org"
+                    }
+                }
+                // dependencies mapping is defined manually
+                pom.scopeMappings.with {
+                    mappings.clear()
+                    addMapping(1, configurations.api, "compile")
+                    addMapping(2, configurations.implementation, "compile")
+                    addMapping(3, configurations.testImplementation, "test")
+                }
+            }
+        }
+    }
+}
+
+// publish javadoc, sources and jar
+artifacts {
+    archives generateSourcesJar, generateJavadocJar
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// JUNIT TESTS RELATED ACTIONS
+///////////////////////////////////////////////////////////////////////////////
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled false
+    }
+}
+
+test.finalizedBy jacocoTestReport
+
+
+///////////////////////////////////////////////////////////////////////////////
+// PROJECT DEPENDENCIES
+///////////////////////////////////////////////////////////////////////////////
+
+dependencies {
+    // keyple-java-commons-api
+    api "org.eclipse.keyple:keyple-java-commons-api:${keyple_java_commons_api_version}"
+
+    // keyple-java-utils
+    api "org.eclipse.keyple:keyple-java-utils:${keyple_java_utils_version}"
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    api "org.slf4j:slf4j-api:${slf4japi_version}"
+
+    /*
+     * Test
+     */
+    // https://mvnrepository.com/artifact/junit/junit
+    testImplementation "junit:junit:${junit_version}"
+    // https://search.maven.org/artifact/org.assertj/assertj-core/2.9.1/bundle
+    testImplementation "org.assertj:assertj-core:${assertj_version}"
+    // https://mvnrepository.com/artifact/org.mockito/mockito-core
+    testImplementation "org.mockito:mockito-core:${mockitocore_version}"
+    //add slf4j simple logger implementation
+    testImplementation "org.slf4j:slf4j-simple:${slf4jsimple_version}"
+}
