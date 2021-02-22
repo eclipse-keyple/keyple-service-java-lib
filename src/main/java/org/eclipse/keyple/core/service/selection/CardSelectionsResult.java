@@ -28,7 +28,10 @@ public final class CardSelectionsResult {
   private Integer activeSelectionIndex = null;
   private final Map<Integer, SmartCard> smartCardMap = new HashMap<Integer, SmartCard>();
 
-  /** Constructor */
+  /**
+   * (package-private)<br>
+   * Constructor
+   */
   CardSelectionsResult() {}
 
   /**

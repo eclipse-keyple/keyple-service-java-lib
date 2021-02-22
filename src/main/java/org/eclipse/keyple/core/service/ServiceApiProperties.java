@@ -23,4 +23,7 @@ public final class ServiceApiProperties {
    * @since 2.0
    */
   public static final String VERSION = "2.0";
+
+  /** Private constructor */
+  private ServiceApiProperties() {}
 }

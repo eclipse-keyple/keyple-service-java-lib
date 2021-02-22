@@ -58,9 +58,17 @@ public interface ObservableReader extends Reader {
    */
   enum PollingMode {
 
-    /** Continue waiting for the insertion of a next card. */
+    /**
+     * Continue waiting for the insertion of a next card.
+     *
+     * @since 2.0
+     */
     REPEATING,
-    /** Stop and wait for a restart signal. */
+    /**
+     * Stop and wait for a restart signal.
+     *
+     * @since 2.0
+     */
     SINGLESHOT
   }
 
