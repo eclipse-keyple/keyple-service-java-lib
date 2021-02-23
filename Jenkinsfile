@@ -46,7 +46,7 @@ pipeline {
             steps{
                 container('java-builder') {
                     script {
-                        keypleVersion = sh(script: 'grep version gradle.properties | cut -d= -f2 | tr -d "[:space:]"', returnStdout: true).trim()
+                        keypleVersion = sh(script: 'grep ^version gradle.properties | cut -d= -f2 | tr -d "[:space:]"', returnStdout: true).trim()
                         echo "Building version ${keypleVersion}"
                         deploySnapshot = env.GIT_URL == "https://github.com/eclipse/${artifactId}.git" && env.GIT_BRANCH == "main" && env.CHANGE_ID == null && keypleVersion ==~ /.*-SNAPSHOT$/
                         deployRelease = env.GIT_URL == "https://github.com/eclipse/${artifactId}.git" && (env.GIT_BRANCH == "main" || env.GIT_BRANCH.startsWith('release-')) && env.CHANGE_ID == null && (keypleVersion ==~ /\d+\.\d+.\d+$/ || keypleVersion ==~ /\d+\.\d+$/)
