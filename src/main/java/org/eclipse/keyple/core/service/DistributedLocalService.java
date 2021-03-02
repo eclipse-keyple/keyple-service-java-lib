@@ -11,7 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import org.eclipse.keyple.core.commons.KeypleDistributedLocalServiceExtension;
+import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
 
 /**
  * Common Local Service API of the Keyple Distributed Solution

@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import org.eclipse.keyple.core.commons.KeyplePluginEvent;
+import org.eclipse.keyple.core.common.KeyplePluginEvent;
 
 /**
  * This POJO is used to propagate a change of reader state in an {@link ObservablePlugin}.

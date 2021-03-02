@@ -11,8 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import org.eclipse.keyple.core.commons.KeypleDefaultSelectionsResponse;
-import org.eclipse.keyple.core.commons.KeypleReaderEvent;
+import org.eclipse.keyple.core.common.KeypleDefaultSelectionsResponse;
+import org.eclipse.keyple.core.common.KeypleReaderEvent;
 
 /**
  * This POJO is used to propagate a change of a card state in an {@link ObservableReader}.
@@ -76,7 +76,7 @@ public final class ReaderEvent implements KeypleReaderEvent {
    * @param pluginName the name of the current plugin (should be not null)
    * @param readerName the name of the current reader (should be not null)
    * @param eventType the type of event (should be not null)
-   * @param defaultSelectionsResponse the response to the default AbstractDefaultSelectionsRequest
+   * @param defaultSelectionsResponse the response to the default KeypleDefaultSelectionsRequest
    *     (may be null)
    * @since 2.0
    */

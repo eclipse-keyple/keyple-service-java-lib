@@ -14,7 +14,7 @@ package org.eclipse.keyple.core.service.selection.spi;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.eclipse.keyple.core.commons.KeypleCardSelector;
+import org.eclipse.keyple.core.common.KeypleCardSelector;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

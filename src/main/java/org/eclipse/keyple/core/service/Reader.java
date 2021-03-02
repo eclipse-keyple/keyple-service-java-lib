@@ -11,7 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import org.eclipse.keyple.core.commons.KeypleReaderExtension;
+import org.eclipse.keyple.core.common.KeypleReaderExtension;
 
 /**
  * Defines the high level API to access a card reader.

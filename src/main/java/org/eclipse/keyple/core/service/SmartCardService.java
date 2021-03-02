@@ -13,9 +13,9 @@ package org.eclipse.keyple.core.service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.eclipse.keyple.core.commons.KeypleCardExtension;
-import org.eclipse.keyple.core.commons.KeypleDistributedLocalServiceExtensionFactory;
-import org.eclipse.keyple.core.commons.KeyplePluginExtensionFactory;
+import org.eclipse.keyple.core.common.KeypleCardExtension;
+import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory;
+import org.eclipse.keyple.core.common.KeyplePluginExtensionFactory;
 import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

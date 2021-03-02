@@ -11,7 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.selection.spi;
 
-import org.eclipse.keyple.core.commons.KeypleSmartCard;
+import org.eclipse.keyple.core.common.KeypleSmartCard;
 
 /**
  * A POJO that contains at least the minimum information about a smart card that has established

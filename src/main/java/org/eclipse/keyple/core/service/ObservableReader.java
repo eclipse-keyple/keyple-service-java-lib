@@ -11,7 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import org.eclipse.keyple.core.commons.KeypleDefaultSelectionsRequest;
+import org.eclipse.keyple.core.common.KeypleDefaultSelectionsRequest;
 import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 
 /**

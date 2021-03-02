@@ -11,8 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.selection;
 
-import org.eclipse.keyple.core.commons.KeypleDefaultSelectionsRequest;
-import org.eclipse.keyple.core.commons.KeypleDefaultSelectionsResponse;
+import org.eclipse.keyple.core.common.KeypleDefaultSelectionsRequest;
+import org.eclipse.keyple.core.common.KeypleDefaultSelectionsResponse;
 import org.eclipse.keyple.core.service.Reader;
 import org.eclipse.keyple.core.service.selection.spi.CardSelection;
 import org.eclipse.keyple.core.service.selection.spi.SmartCard;

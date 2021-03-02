@@ -13,7 +13,7 @@ package org.eclipse.keyple.core.service;
 
 import java.util.Map;
 import java.util.Set;
-import org.eclipse.keyple.core.commons.KeyplePluginExtension;
+import org.eclipse.keyple.core.common.KeyplePluginExtension;
 
 /**
  * Defines the high level plugin API.
