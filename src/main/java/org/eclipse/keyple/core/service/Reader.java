@@ -16,8 +16,6 @@ import org.eclipse.keyple.core.common.KeypleReaderExtension;
 /**
  * Drives the underlying hardware to configure the search and check for the presence of cards.
  *
- * <p>May be extended
- *
  * @since 2.0
  */
 public interface Reader {
