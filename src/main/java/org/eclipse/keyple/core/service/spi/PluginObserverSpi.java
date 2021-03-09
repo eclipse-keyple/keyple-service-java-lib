@@ -22,9 +22,7 @@ import org.eclipse.keyple.core.service.PluginEvent;
 public interface PluginObserverSpi {
 
   /**
-   * Called when a plugin event occurs.
-   *
-   * <p>Note that this method is called <b>sequentially</b> on all registered observers.
+   * Invoked when a plugin event occurs.
    *
    * @param pluginEvent The plugin event.
    * @since 2.0

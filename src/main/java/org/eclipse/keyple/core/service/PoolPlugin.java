@@ -38,7 +38,7 @@ public interface PoolPlugin extends Plugin {
 
   /**
    * Gets a {@link Reader} and makes it exclusive to the caller until the {@link
-   * #releaseReader(Reader)} method is called.
+   * #releaseReader(Reader)} method is invoked.
    *
    * <p>The allocated reader belongs to the group targeted with provided reference.
    *
@@ -53,7 +53,7 @@ public interface PoolPlugin extends Plugin {
   /**
    * Releases a Reader previously allocated with allocateReader.
    *
-   * <p>This method must be called as soon as the reader is no longer needed by the caller of
+   * <p>This method must be invoked as soon as the reader is no longer needed by the caller of
    * allocateReader in order to free the resource.
    *
    * @param reader the Reader to be released.

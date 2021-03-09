@@ -71,7 +71,7 @@ public interface CardSelectionResult {
 
   /**
    * Get the active matching card. I.e. the card that has been selected. <br>
-   * The hasActiveSelection method should be called before.
+   * The hasActiveSelection method should be invoked before.
    *
    * @return The currently active matching card.
    * @throws IllegalStateException if no active matching card is found

@@ -22,9 +22,7 @@ import org.eclipse.keyple.core.service.ReaderEvent;
 public interface ReaderObserverSpi {
 
   /**
-   * Called when a reader event occurs.
-   *
-   * <p>Note that this method is called <b>sequentially</b> on all registered observers.
+   * Invoked when a reader event occurs.
    *
    * @param readerEvent The not null {@link ReaderEvent} containing all event information.
    * @since 2.0

@@ -31,9 +31,6 @@ public interface ObservablePlugin extends Plugin {
    * <p>The provided observer must implement the {@link PluginObserverSpi} interface to be able to
    * receive the events produced by this plugin (reader connection, disconnection).
    *
-   * <p>It is possible to add as many observers as necessary. They will be notified of events
-   * <b>sequentially</b> in the order in which they are added.
-   *
    * <p>If applicable, the observation process shall be started when the first observer is added.
    *
    * @param observer An observer object implementing the required interface (should be not null).
@@ -87,7 +84,7 @@ public interface ObservablePlugin extends Plugin {
   /**
    * Sets the exception handler.
    *
-   * <p>The invocation of this method <b>mandatory</b> when the plugin has to be observed.
+   * <p>The invocation of this method is <b>mandatory</b> when the plugin has to be observed.
    *
    * <p>In case of a fatal error during the observation, the handler will receive a notification.
    *

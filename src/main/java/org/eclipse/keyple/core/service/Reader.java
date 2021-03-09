@@ -44,7 +44,7 @@ public interface Reader {
    * Tells if the current card communication is contactless.
    *
    * @return True if the communication is contactless, false if not.
-   * @throws IllegalStateException is called when reader is no longer registered
+   * @throws IllegalStateException if reader is no longer registered
    * @since 2.0
    */
   boolean isContactless();
@@ -54,7 +54,7 @@ public interface Reader {
    *
    * @return true if a card is present in the reader
    * @throws KeypleReaderCommunicationException if the communication with the reader has failed
-   * @throws IllegalStateException is called when reader is no longer registered
+   * @throws IllegalStateException if reader is no longer registered
    * @since 2.0
    */
   boolean isCardPresent();
@@ -80,7 +80,7 @@ public interface Reader {
    * @param readerProtocolName A not empty String.
    * @param cardProtocol A not empty String.
    * @throws KeypleReaderProtocolNotSupportedException if the protocol is not supported.
-   * @throws IllegalStateException is called when reader is no longer registered
+   * @throws IllegalStateException if reader is no longer registered
    * @since 2.0
    */
   void activateProtocol(String readerProtocolName, String cardProtocol);
@@ -96,7 +96,7 @@ public interface Reader {
    *
    * @param readerProtocolName A not empty String.
    * @throws KeypleReaderProtocolNotSupportedException if the protocol is not supported.
-   * @throws IllegalStateException is called when reader is no longer registered
+   * @throws IllegalStateException if reader is no longer registered
    * @since 2.0
    */
   void deactivateProtocol(String readerProtocolName);

@@ -46,7 +46,7 @@ public interface Plugin {
    * Gets the list of names of all available readers.
    *
    * @return An empty set if there's no reader connected.
-   * @throws IllegalStateException is called when plugin is no longer registered.
+   * @throws IllegalStateException if plugin is no longer registered.
    * @since 2.0
    */
   Set<String> getReadersNames();
@@ -55,7 +55,7 @@ public interface Plugin {
    * Gets a map whose elements have a reader name as a key and a {@link Reader} as a value.
    *
    * @return An empty Map if there's no reader connected.
-   * @throws IllegalStateException is called when the plugin is no longer registered.
+   * @throws IllegalStateException if the plugin is no longer registered.
    * @since 2.0
    */
   Map<String, Reader> getReaders();
@@ -66,7 +66,7 @@ public interface Plugin {
    * @param readerName The name of the reader.
    * @return A not null reference.
    * @throws KeypleReaderNotFoundException if the wanted reader is not found
-   * @throws IllegalStateException is called when the plugin is no longer registered.
+   * @throws IllegalStateException if the plugin is no longer registered.
    * @since 2.0
    */
   Reader getReader(String readerName);
