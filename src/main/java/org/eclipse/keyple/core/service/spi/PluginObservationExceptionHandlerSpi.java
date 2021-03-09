@@ -11,23 +11,23 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.spi;
 
-import org.eclipse.keyple.core.service.ReaderEvent;
-
 /**
- * To be implemented by any object wishing to be notified of the {@link ReaderEvent} of an {@link
- * org.eclipse.keyple.core.service.ObservableReader}.
+ * Plugin observation error handler to be notified of exceptions that may occur during operations
+ * carried out by the monitoring processes.
+ *
+ * <p>These exceptions can be thrown either in the internal monitoring layers of the readers or in
+ * the application itself.
  *
  * @since 2.0
  */
-public interface ReaderObserverSpi {
+public interface PluginObservationExceptionHandlerSpi {
 
   /**
-   * Called when a reader event occurs.
+   * Invoked when a runtime exception occurs in the observed plugin.
    *
-   * <p>Note that this method is called <b>sequentially</b> on all registered observers.
-   *
-   * @param readerEvent The not null {@link ReaderEvent} containing all event information.
+   * @param pluginName The plugin name
+   * @param e The original exception
    * @since 2.0
    */
-  void onReaderEvent(final ReaderEvent readerEvent);
+  void onPluginObservationError(String pluginName, Throwable e);
 }

@@ -1,5 +1,6 @@
 /**
- * Interfaces to be implemented by applications to allow Keyple services to call particular methods.
+ * Interfaces to be implemented by applications to allow Keyple services to call the dedicated
+ * methods.
  *
  * @since 2.0
  */

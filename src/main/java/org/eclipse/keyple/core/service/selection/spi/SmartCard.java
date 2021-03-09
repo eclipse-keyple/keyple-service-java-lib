@@ -14,8 +14,8 @@ package org.eclipse.keyple.core.service.selection.spi;
 import org.eclipse.keyple.core.common.KeypleSmartCard;
 
 /**
- * A POJO that contains at least the minimum information about a smart card that has established
- * communication with a reader after a selection process.
+ * This POJO contains the information about a smart card that has established communication with a
+ * reader after a selection process.
  *
  * <p>The user of this interface has access to the information that may have been collected by the
  * selection process, i.e. the Answer to Reset (ATR) and the Answer to Selection Command (FCI).<br>
@@ -24,8 +24,9 @@ import org.eclipse.keyple.core.common.KeypleSmartCard;
  * @since 2.0
  */
 public interface SmartCard extends KeypleSmartCard {
+
   /**
-   * Tells if the card provided a FCI
+   * Tells if the card provided a FCI.
    *
    * @return true if the card has an FCI
    * @since 2.0
@@ -33,9 +34,9 @@ public interface SmartCard extends KeypleSmartCard {
   boolean hasFci();
 
   /**
-   * Gets the FCI
+   * Gets the FCI.
    *
-   * @return the FCI as a not null byte array
+   * @return A not null reference.
    * @throws IllegalStateException if no FCI is available (see hasFci)
    * @since 2.0
    */
@@ -52,7 +53,7 @@ public interface SmartCard extends KeypleSmartCard {
   /**
    * Gets the ATR
    *
-   * @return the ATR as a not null byte array
+   * @return A not null reference.
    * @throws IllegalStateException if no ATR is available (see hasAtr)
    * @since 2.0
    */

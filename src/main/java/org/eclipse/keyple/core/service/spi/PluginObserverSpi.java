@@ -14,7 +14,8 @@ package org.eclipse.keyple.core.service.spi;
 import org.eclipse.keyple.core.service.PluginEvent;
 
 /**
- * This interface has to be implemented by plugin observers.
+ * To be implemented by any object wishing to be notified of the {@link PluginEvent} of a {@link
+ * org.eclipse.keyple.core.service.ObservablePlugin}.
  *
  * @since 2.0
  */
@@ -23,9 +24,9 @@ public interface PluginObserverSpi {
   /**
    * Called when a plugin event occurs.
    *
-   * <p>Note that this method is called <b>sequentially</b> on all observers.
+   * <p>Note that this method is called <b>sequentially</b> on all registered observers.
    *
-   * @param pluginEvent The not null {@link PluginEvent} containing all event information.
+   * @param pluginEvent The plugin event.
    * @since 2.0
    */
   void onPluginEvent(final PluginEvent pluginEvent);

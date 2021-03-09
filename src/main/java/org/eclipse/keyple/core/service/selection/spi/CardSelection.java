@@ -12,15 +12,16 @@
 package org.eclipse.keyple.core.service.selection.spi;
 
 /**
- * Provides the method to retrieve the {@link CardSelector}
+ * Defines a basic card selection case based on a {@link CardSelector}.
  *
  * @since 2.0
  */
 public interface CardSelection {
+
   /**
-   * Returns the {@link CardSelector} present for the selection case
+   * Gets the {@link CardSelector} for the selection case.
    *
-   * @return A not null {@link CardSelector} reference
+   * @return A not null reference.
    * @since 2.0
    */
   CardSelector getCardSelector();

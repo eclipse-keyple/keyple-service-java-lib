@@ -14,7 +14,7 @@ package org.eclipse.keyple.core.service;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
 
 /**
- * Common Local Service API of the Keyple Distributed Solution
+ * Local Service API of the Keyple Distributed Solution
  *
  * @since 2.0
  */
@@ -29,8 +29,7 @@ public interface DistributedLocalService {
   String getName();
 
   /**
-   * Returns the {@link KeypleDistributedLocalServiceExtension} that is distributed local
-   * service-specific
+   * Returns the specific implementation of a {@link KeypleDistributedLocalServiceExtension}
    *
    * @param distributedLocalServiceType the specific class of the local service
    * @param <T> The type of the service extension

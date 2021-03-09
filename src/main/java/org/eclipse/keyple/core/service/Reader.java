@@ -14,16 +14,9 @@ package org.eclipse.keyple.core.service;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 
 /**
- * Defines the high level API to access a card reader.
+ * Drives the underlying hardware to configure the search and check for the presence of cards.
  *
- * <ul>
- *   <li>To retrieve the unique reader name
- *   <li>To check the card presence.
- *   <li>To activate and deactivate the card protocols.
- *   <li>To tell if the communication is contactless or not.
- * </ul>
- *
- * The interface is used by applications processing the card.
+ * <p>May be extended
  *
  * @since 2.0
  */

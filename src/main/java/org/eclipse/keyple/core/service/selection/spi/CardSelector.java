@@ -36,7 +36,7 @@ public class CardSelector implements KeypleCardSelector {
   private final AtrFilter atrFilter;
 
   /**
-   * Holds the AID selection data.
+   * The AID selection data.
    *
    * <p>- AID’s bytes of the card application to select. In case the card application is currently
    * not selected, a logical channel is established and the corresponding card application is
@@ -66,9 +66,29 @@ public class CardSelector implements KeypleCardSelector {
      * @since 2.0
      */
     public enum FileOccurrence {
+      /**
+       * First occurrence.
+       *
+       * @since 2.0
+       */
       FIRST((byte) 0x00),
+      /**
+       * Last occurrence.
+       *
+       * @since 2.0
+       */
       LAST((byte) 0x01),
+      /**
+       * Next occurrence.
+       *
+       * @since 2.0
+       */
       NEXT((byte) 0x02),
+      /**
+       * Previous occurrence.
+       *
+       * @since 2.0
+       */
       PREVIOUS((byte) 0x03);
 
       private final byte isoBitMask;
@@ -77,6 +97,12 @@ public class CardSelector implements KeypleCardSelector {
         this.isoBitMask = isoBitMask;
       }
 
+      /**
+       * Gets the bit mask to apply to the corresponding byte in the ISO selection application
+       * command.
+       *
+       * @return A byte.
+       */
       public byte getIsoBitMask() {
         return isoBitMask;
       }
@@ -92,9 +118,29 @@ public class CardSelector implements KeypleCardSelector {
      * @since 2.0
      */
     public enum FileControlInformation {
+      /**
+       * File control information.
+       *
+       * @since 2.0
+       */
       FCI(((byte) 0x00)),
+      /**
+       * File control parameters.
+       *
+       * @since 2.0
+       */
       FCP(((byte) 0x04)),
+      /**
+       * File management data.
+       *
+       * @since 2.0
+       */
       FMD(((byte) 0x08)),
+      /**
+       * No response expected.
+       *
+       * @since 2.0
+       */
       NO_RESPONSE(((byte) 0x0C));
 
       private final byte isoBitMask;
@@ -113,11 +159,9 @@ public class CardSelector implements KeypleCardSelector {
 
     private final byte[] aidToSelect;
 
-    /**
+    /*
      * List of status codes in response to the select application command that should be considered
      * successful although they are different from 9000
-     *
-     * @since 2.0
      */
     private Set<Integer> successfulSelectionStatusCodes;
 
@@ -130,7 +174,7 @@ public class CardSelector implements KeypleCardSelector {
     }
 
     /**
-     * Builder of {@link AidSelector}
+     * Builder of {@link AidSelector}.
      *
      * @since 2.0
      */
@@ -139,14 +183,14 @@ public class CardSelector implements KeypleCardSelector {
       private FileOccurrence fileOccurrence = FileOccurrence.FIRST;
       private FileControlInformation fileControlInformation = FileControlInformation.FCI;
 
-      /** Private constructor */
+      /* Private constructor */
       private AidSelectorBuilder() {}
 
       /**
-       * Sets the AID
+       * Sets the AID provided as an array of bytes.
        *
-       * @param aid the AID as an array of bytes
-       * @return the builder instance
+       * @param aid The AID as byte array.
+       * @return The builder instance.
        * @since 2.0
        */
       public AidSelectorBuilder aidToSelect(byte[] aid) {
@@ -164,10 +208,10 @@ public class CardSelector implements KeypleCardSelector {
       }
 
       /**
-       * Sets the AID
+       * Sets the AID provided as an hex string.
        *
-       * @param aid the AID as an hex string
-       * @return the builder instance
+       * @param aid The AID as a String.
+       * @return The builder instance..
        * @since 2.0
        */
       public AidSelectorBuilder aidToSelect(String aid) {
@@ -178,7 +222,7 @@ public class CardSelector implements KeypleCardSelector {
        * Sets the file occurence mode (see ISO7816-4)
        *
        * @param fileOccurrence the {@link FileOccurrence}
-       * @return the builder instance
+       * @return The builder instance.
        * @since 2.0
        */
       public AidSelectorBuilder fileOccurrence(FileOccurrence fileOccurrence) {
@@ -190,7 +234,7 @@ public class CardSelector implements KeypleCardSelector {
        * Sets the file control mode (see ISO7816-4)
        *
        * @param fileControlInformation the {@link FileControlInformation}
-       * @return the builder instance
+       * @return The builder instance.
        * @since 2.0
        */
       public AidSelectorBuilder fileControlInformation(
@@ -402,7 +446,7 @@ public class CardSelector implements KeypleCardSelector {
      * Sets the card protocol.
      *
      * @param cardProtocol A not empty String.
-     * @return the builder instance
+     * @return The builder instance.
      * @since 2.0
      */
     public CardSelectorBuilder cardProtocol(String cardProtocol) {
@@ -414,7 +458,7 @@ public class CardSelector implements KeypleCardSelector {
      * Sets the card ATR Filter
      *
      * @param atrFilter the {@link AtrFilter} of the targeted card
-     * @return the builder instance
+     * @return The builder instance.
      * @since 2.0
      */
     public CardSelectorBuilder atrFilter(AtrFilter atrFilter) {
@@ -426,7 +470,7 @@ public class CardSelector implements KeypleCardSelector {
      * Sets the card AID Selector
      *
      * @param aidSelector the {@link AidSelector} of the targeted card
-     * @return the builder instance
+     * @return The builder instance.
      * @since 2.0
      */
     public CardSelectorBuilder aidSelector(AidSelector aidSelector) {
