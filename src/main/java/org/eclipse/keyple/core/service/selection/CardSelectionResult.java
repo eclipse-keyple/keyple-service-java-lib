@@ -11,48 +11,15 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.selection;
 
-import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.service.selection.spi.SmartCard;
 
 /**
- * This POJO contains the result of a selection process.
- *
- * <p>Embeds a map of {@link SmartCard}.
- *
- * <p>Provides a set of methods to retrieve the active selection (getActiveSmartCard) or a
- * particular matching card specified by its index.
+ * Defines the result of a selection process.
  *
  * @since 2.0
  */
-public final class CardSelectionResult {
-
-  private Integer activeSelectionIndex = null;
-  private final Map<Integer, SmartCard> smartCardMap = new HashMap<Integer, SmartCard>();
-
-  /**
-   * (package-private)<br>
-   * Constructor
-   */
-  CardSelectionResult() {}
-
-  /**
-   * (package-private)<br>
-   * Append a {@link SmartCard} to the internal list
-   *
-   * @param selectionIndex the index of the selection that resulted in the matching card
-   * @param smartCard the matching card to add
-   * @param isActive true if the currently added matching card is selected (its logical channel is
-   *     open)
-   * @since 2.0
-   */
-  void addSmartCard(int selectionIndex, SmartCard smartCard, boolean isActive) {
-    if (smartCard != null) smartCardMap.put(selectionIndex, smartCard);
-    // if the current selection is active, we keep its index
-    if (isActive) {
-      activeSelectionIndex = selectionIndex;
-    }
-  }
+public interface CardSelectionResult {
 
   /**
    * Tells if the current selection process resulted in an active selection.
@@ -60,9 +27,8 @@ public final class CardSelectionResult {
    * @return true if an active selection is present
    * @since 2.0
    */
-  public boolean hasActiveSelection() {
-    return activeSelectionIndex != null;
-  }
+  boolean hasActiveSelection();
+
   /**
    * Gets the index of the active selection if any.
    *
@@ -70,12 +36,7 @@ public final class CardSelectionResult {
    * @throws IllegalStateException if there is no active selection
    * @since 2.0
    */
-  public int getActiveSelectionIndex() {
-    if (hasActiveSelection()) {
-      return activeSelectionIndex;
-    }
-    throw new IllegalStateException("No active Matching card is available");
-  }
+  int getActiveSelectionIndex();
 
   /**
    * Get the matching status of a selection case for which the index is provided.
@@ -86,9 +47,7 @@ public final class CardSelectionResult {
    * @return true if the selection has matched
    * @since 2.0
    */
-  public boolean hasSelectionMatched(int selectionIndex) {
-    return smartCardMap.containsKey(selectionIndex);
-  }
+  boolean hasSelectionMatched(int selectionIndex);
 
   /**
    * Gets all the {@link SmartCard} corresponding to all selection cases in a map where the key is
@@ -97,9 +56,7 @@ public final class CardSelectionResult {
    * @return A map.
    * @since 2.0
    */
-  public Map<Integer, SmartCard> getSmartCards() {
-    return smartCardMap;
-  }
+  Map<Integer, SmartCard> getSmartCards();
 
   /**
    * Gets the {@link SmartCard} for the specified index.
@@ -110,9 +67,7 @@ public final class CardSelectionResult {
    * @return the {@link SmartCard} or null
    * @since 2.0
    */
-  public SmartCard getSmartCard(int selectionIndex) {
-    return smartCardMap.get(selectionIndex);
-  }
+  SmartCard getSmartCard(int selectionIndex);
 
   /**
    * Get the active matching card. I.e. the card that has been selected. <br>
@@ -122,11 +77,5 @@ public final class CardSelectionResult {
    * @throws IllegalStateException if no active matching card is found
    * @since 2.0
    */
-  public SmartCard getActiveSmartCard() {
-    SmartCard smartCard = smartCardMap.get(activeSelectionIndex);
-    if (smartCard == null) {
-      throw new IllegalStateException("No active matching card is available");
-    }
-    return smartCard;
-  }
+  SmartCard getActiveSmartCard();
 }

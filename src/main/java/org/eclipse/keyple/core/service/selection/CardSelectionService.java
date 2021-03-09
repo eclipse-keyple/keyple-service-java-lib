@@ -91,6 +91,7 @@ public interface CardSelectionService {
    *
    * @param observableReader The reader with which the card communication is carried out.
    * @param notificationMode The card notification policy.
+   * @since 2.0
    */
   void scheduleCardSelectionScenario(
       ObservableReader observableReader, ObservableReader.NotificationMode notificationMode);
@@ -108,6 +109,7 @@ public interface CardSelectionService {
    * @param observableReader The reader with which the card communication is carried out.
    * @param notificationMode The card notification policy.
    * @param pollingMode The card polling policy.
+   * @since 2.0
    */
   void scheduleCardSelectionScenario(
       ObservableReader observableReader,
@@ -120,6 +122,7 @@ public interface CardSelectionService {
    *
    * @param cardSelectionResponses The card selection scenario execution response.
    * @return A not null reference.
+   * @since 2.0
    */
   CardSelectionResult processCardSelectionResponses(
       List<KeypleCardSelectionResponse> cardSelectionResponses);

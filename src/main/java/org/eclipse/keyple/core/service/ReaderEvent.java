@@ -18,13 +18,6 @@ import org.eclipse.keyple.core.common.KeypleReaderEvent;
 /**
  * This POJO is used to propagate a change of a card state in an {@link ObservableReader}.
  *
- * <ul>
- *   <li>{@link EventType#CARD_INSERTED} is when a card is inserted with no specific selection.
- *   <li>{@link EventType#CARD_MATCHED} is when a card is inserted and matched the selection.
- *   <li>{@link EventType#CARD_REMOVED} is when a card is removed from the reader.
- *   <li>{@link EventType#UNREGISTERED} is when the reader is unregistered.
- * </ul>
- *
  * <p>In the case of a card insertion, the responses received by the reader are included in the
  * event.
  *
@@ -45,21 +38,21 @@ public final class ReaderEvent implements KeypleReaderEvent {
   public enum EventType {
 
     /**
-     * A card has been inserted.
+     * A card has been inserted with or without specific selection.
      *
      * @since 2.0
      */
     CARD_INSERTED,
 
     /**
-     * A card has been inserted and the default requests process has been successfully operated.
+     * A card has been inserted and matched the selection.
      *
      * @since 2.0
      */
     CARD_MATCHED,
 
     /**
-     * The card has been removed and is no longer able to communicate with the reader.
+     * The card has been removed from the reader.
      *
      * @since 2.0
      */
@@ -79,10 +72,10 @@ public final class ReaderEvent implements KeypleReaderEvent {
    * ReaderEvent constructor for simple insertion notification mode
    *
    * @param pluginName The name of the current plugin (should be not null).
-   * @param readerName the name of the current reader (should be not null).
-   * @param eventType the type of event (should be not null).
-   * @param cardSelectionResponses the response to the default KeypleDefaultSelectionsRequest (can
-   *     be null)
+   * @param readerName The name of the current reader (should be not null).
+   * @param eventType The type of event (should be not null).
+   * @param cardSelectionResponses The responses received during the execution of the card selection
+   *     scenario (can be null).
    * @since 2.0
    */
   public ReaderEvent(
@@ -127,14 +120,14 @@ public final class ReaderEvent implements KeypleReaderEvent {
   }
 
   /**
-   * Gets the default selection response that may be present when the event is {@link
+   * Gets the card selection responses that may be present when the event is {@link
    * EventType#CARD_INSERTED}, always present when the event is {@link EventType#CARD_MATCHED} and
    * null in the others cases.
    *
    * @return A nullable value.
    * @since 2.0
    */
-  public List<KeypleCardSelectionResponse> getDefaultSelectionsResponse() {
+  public List<KeypleCardSelectionResponse> getCardSelectionResponses() {
     return cardSelectionResponses;
   }
 }

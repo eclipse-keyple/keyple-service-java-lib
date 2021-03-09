@@ -38,13 +38,14 @@ public interface Plugin {
    * @param pluginType The specific class of the plugin.
    * @param <T> The type of the plugin extension.
    * @return A not null reference.
+   * @since 2.0
    */
   <T extends KeyplePluginExtension> T getExtension(Class<T> pluginType);
 
   /**
    * Gets the list of names of all available readers.
    *
-   * @return a list of String.
+   * @return An empty set if there's no reader connected.
    * @throws IllegalStateException is called when plugin is no longer registered.
    * @since 2.0
    */
@@ -53,9 +54,7 @@ public interface Plugin {
   /**
    * Gets a map whose elements have a reader name as a key and a {@link Reader} as a value.
    *
-   * <p>The map cannot be null but can be empty if there is no reader.
-   *
-   * @return A not null reference.
+   * @return An empty Map if there's no reader connected.
    * @throws IllegalStateException is called when the plugin is no longer registered.
    * @since 2.0
    */

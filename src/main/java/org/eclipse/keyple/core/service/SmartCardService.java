@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Main entry for applications using Keyple.
+ * Keyple main service.
  *
  * @since 2.0
  */

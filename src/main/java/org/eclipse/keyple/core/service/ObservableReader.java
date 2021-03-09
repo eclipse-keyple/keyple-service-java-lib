@@ -149,16 +149,20 @@ public interface ObservableReader extends Reader {
    * notification can be synchronous (local plugin) or asynchronous (remote plugin) depending on the
    * type of reader.
    *
-   * @param eventNotificationExecutorService The provided by the application.
+   * @param eventNotificationExecutorService The executor service provided by the application.
+   * @since 2.0
    */
   void setEventNotificationExecutorService(ExecutorService eventNotificationExecutorService);
 
   /**
    * Sets the exception handler.
    *
+   * <p>The invocation of this method <b>mandatory</b> when the reader has to be observed.
+   *
    * <p>In case of a fatal error during the observation, the handler will receive a notification.
    *
    * @param exceptionHandler The exception handler implemented by the application.
+   * @since 2.0
    */
   void setReaderObservationExceptionHandler(ReaderObservationExceptionHandlerSpi exceptionHandler);
 }
