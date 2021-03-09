@@ -20,8 +20,6 @@ import org.eclipse.keyple.core.common.KeyplePluginEvent;
 /**
  * This POJO is used to propagate a change of reader state in an {@link ObservablePlugin}.
  *
- * <p>
- *
  * <ul>
  *   <li>{@link EventType#READER_CONNECTED} is when a new reader is detected.
  *   <li>{@link EventType#READER_DISCONNECTED} is when an already registered reader is removed from

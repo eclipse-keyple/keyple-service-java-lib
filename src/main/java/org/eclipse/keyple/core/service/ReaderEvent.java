@@ -18,8 +18,6 @@ import org.eclipse.keyple.core.common.KeypleReaderEvent;
 /**
  * This POJO is used to propagate a change of a card state in an {@link ObservableReader}.
  *
- * <p>
- *
  * <ul>
  *   <li>{@link EventType#CARD_INSERTED} is when a card is inserted with no specific selection.
  *   <li>{@link EventType#CARD_MATCHED} is when a card is inserted and matched the selection.
