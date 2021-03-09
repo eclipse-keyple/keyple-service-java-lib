@@ -67,6 +67,7 @@ public interface ObservablePlugin extends Plugin {
    * @since 2.0
    */
   int countObservers();
+
   /**
    * Configures the plugin to use a custom thread pool for events notification.
    *
@@ -79,6 +80,7 @@ public interface ObservablePlugin extends Plugin {
    * type of reader.
    *
    * @param eventNotificationExecutorService The provided by the application.
+   * @since 2.0
    */
   void setEventNotificationExecutorService(ExecutorService eventNotificationExecutorService);
 
@@ -88,6 +90,7 @@ public interface ObservablePlugin extends Plugin {
    * <p>In case of a fatal error during the observation, the handler will receive a notification.
    *
    * @param exceptionHandler The exception handler implemented by the application.
+   * @since 2.0
    */
   void setReaderObservationExceptionHandler(PluginObservationExceptionHandlerSpi exceptionHandler);
 }

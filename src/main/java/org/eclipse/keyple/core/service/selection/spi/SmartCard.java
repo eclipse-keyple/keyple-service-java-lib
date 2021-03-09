@@ -14,12 +14,14 @@ package org.eclipse.keyple.core.service.selection.spi;
 import org.eclipse.keyple.core.common.KeypleSmartCard;
 
 /**
- * This POJO contains the information about a smart card that has established communication with a
- * reader after a selection process.
+ * Defines a generic smart card that has established a communication with a reader after a selection
+ * process.
  *
- * <p>The user of this interface has access to the information that may have been collected by the
- * selection process, i.e. the Answer to Reset (ATR) and the Answer to Selection Command (FCI).<br>
+ * <p>Make available the information that may have been collected by the selection process, i.e. the
+ * Answer to Reset (ATR) and the Answer to Selection Command (FCI).<br>
  * Both are optional.
+ *
+ * <p>Must be implemented and possibly extended by a card extension to meet its specific needs.
  *
  * @since 2.0
  */

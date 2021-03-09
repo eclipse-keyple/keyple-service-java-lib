@@ -14,7 +14,7 @@ package org.eclipse.keyple.core.service.spi;
 import org.eclipse.keyple.core.service.PluginEvent;
 
 /**
- * To be implemented by any object wishing to be notified of the {@link PluginEvent} of a {@link
+ * Plugin observer recipient of the {@link PluginEvent} from a {@link
  * org.eclipse.keyple.core.service.ObservablePlugin}.
  *
  * @since 2.0

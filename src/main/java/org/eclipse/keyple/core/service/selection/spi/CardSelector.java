@@ -102,6 +102,7 @@ public class CardSelector implements KeypleCardSelector {
        * command.
        *
        * @return A byte.
+       * @since 2.0
        */
       public byte getIsoBitMask() {
         return isoBitMask;
@@ -149,6 +150,13 @@ public class CardSelector implements KeypleCardSelector {
         this.isoBitMask = isoBitMask;
       }
 
+      /**
+       * Gets the bit mask to apply to the corresponding byte in the ISO selection application
+       * command.
+       *
+       * @return A byte.
+       * @since 2.0
+       */
       public byte getIsoBitMask() {
         return isoBitMask;
       }

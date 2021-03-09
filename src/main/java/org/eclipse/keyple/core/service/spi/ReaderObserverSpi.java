@@ -14,7 +14,7 @@ package org.eclipse.keyple.core.service.spi;
 import org.eclipse.keyple.core.service.ReaderEvent;
 
 /**
- * To be implemented by any object wishing to be notified of the {@link ReaderEvent} of an {@link
+ * Reader observer recipient of the {@link ReaderEvent} from a {@link
  * org.eclipse.keyple.core.service.ObservableReader}.
  *
  * @since 2.0
