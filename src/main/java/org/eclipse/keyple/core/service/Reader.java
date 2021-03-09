@@ -14,16 +14,9 @@ package org.eclipse.keyple.core.service;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 
 /**
- * Defines the high level API to access a card reader.
+ * Drives the underlying hardware to configure the search and check for the presence of cards.
  *
- * <ul>
- *   <li>To retrieve the unique reader name
- *   <li>To check the card presence.
- *   <li>To activate and deactivate the card protocols.
- *   <li>To tell if the communication is contactless or not.
- * </ul>
- *
- * The interface is used by applications processing the card.
+ * <p>May be extended
  *
  * @since 2.0
  */
@@ -51,7 +44,7 @@ public interface Reader {
    * Tells if the current card communication is contactless.
    *
    * @return True if the communication is contactless, false if not.
-   * @throws IllegalStateException is called when reader is no longer registered
+   * @throws IllegalStateException if reader is no longer registered
    * @since 2.0
    */
   boolean isContactless();
@@ -61,7 +54,7 @@ public interface Reader {
    *
    * @return true if a card is present in the reader
    * @throws KeypleReaderCommunicationException if the communication with the reader has failed
-   * @throws IllegalStateException is called when reader is no longer registered
+   * @throws IllegalStateException if reader is no longer registered
    * @since 2.0
    */
   boolean isCardPresent();
@@ -87,7 +80,7 @@ public interface Reader {
    * @param readerProtocolName A not empty String.
    * @param cardProtocol A not empty String.
    * @throws KeypleReaderProtocolNotSupportedException if the protocol is not supported.
-   * @throws IllegalStateException is called when reader is no longer registered
+   * @throws IllegalStateException if reader is no longer registered
    * @since 2.0
    */
   void activateProtocol(String readerProtocolName, String cardProtocol);
@@ -103,7 +96,7 @@ public interface Reader {
    *
    * @param readerProtocolName A not empty String.
    * @throws KeypleReaderProtocolNotSupportedException if the protocol is not supported.
-   * @throws IllegalStateException is called when reader is no longer registered
+   * @throws IllegalStateException if reader is no longer registered
    * @since 2.0
    */
   void deactivateProtocol(String readerProtocolName);

@@ -21,9 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The Class SmartCardService. This singleton is the entry point of the card Proxy Service, its
- * instance has to be called by a ticketing application in order to establish a link with a card’s
- * application.
+ * Keyple main service.
  *
  * @since 2.0
  */

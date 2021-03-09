@@ -15,7 +15,7 @@ import org.eclipse.keyple.core.service.Reader;
 import org.eclipse.keyple.core.service.selection.spi.SmartCard;
 
 /**
- * The CardResource class groups a {@link SmartCard} and its associated {@link Reader}
+ * This POJO contains a generic {@link SmartCard} and its associated {@link Reader}.
  *
  * @since 2.0
  */

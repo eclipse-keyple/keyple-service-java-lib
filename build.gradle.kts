@@ -31,6 +31,7 @@ repositories {
 dependencies {
     implementation("org.eclipse.keyple:keyple-java-commons-api:2.0-SNAPSHOT")
     implementation("org.eclipse.keyple:keyple-java-utils:2.0.0-SNAPSHOT")
+    implementation("org.slf4j:slf4j-api:1.7.25")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.15.0")
 }

@@ -16,16 +16,16 @@ import java.util.Set;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 
 /**
- * Defines the high level plugin API.
+ * Manager for one or more {@link Reader} from the same family.
  *
- * <p>Provides methods to get the plugin name and to retrieve the readers.
+ * <p>Provides the means to get the plugin name, enumerate and retrieve the readers.
  *
  * @since 2.0
  */
 public interface Plugin {
 
   /**
-   * Gets the name of the plugin
+   * Gets the name of the plugin.
    *
    * @return A not empty string.
    * @since 2.0
@@ -33,40 +33,40 @@ public interface Plugin {
   String getName();
 
   /**
-   * Returns the {@link KeyplePluginExtension} that is plugin-specific
+   * Returns the {@link KeyplePluginExtension} that is plugin-specific.
    *
-   * @param pluginType The specific class of the plugin
-   * @param <T> The type of the plugin extension
-   * @return a {@link KeyplePluginExtension}
+   * @param pluginType The specific class of the plugin.
+   * @param <T> The type of the plugin extension.
+   * @return A not null reference.
+   * @since 2.0
    */
   <T extends KeyplePluginExtension> T getExtension(Class<T> pluginType);
 
   /**
-   * Gets the list of names of all readers
+   * Gets the list of names of all available readers.
    *
-   * @return a list of String
-   * @throws IllegalStateException is called when plugin is no longer registered
+   * @return An empty set if there's no reader connected.
+   * @throws IllegalStateException if plugin is no longer registered.
    * @since 2.0
    */
   Set<String> getReadersNames();
 
   /**
-   * Gets the readers.
+   * Gets a map whose elements have a reader name as a key and a {@link Reader} as a value.
    *
-   * @return the map of this plugin's connected reader's name and instance, can be an empty list,
-   *     can not be null;
-   * @throws IllegalStateException is called when plugin is no longer registered
+   * @return An empty Map if there's no reader connected.
+   * @throws IllegalStateException if the plugin is no longer registered.
    * @since 2.0
    */
   Map<String, Reader> getReaders();
 
   /**
-   * Gets the reader whose name is provided as an argument
+   * Gets the {@link Reader} whose name is provided.
    *
-   * @param readerName name of the reader
-   * @return the Reader object.
+   * @param readerName The name of the reader.
+   * @return A not null reference.
    * @throws KeypleReaderNotFoundException if the wanted reader is not found
-   * @throws IllegalStateException is called when plugin is no longer registered
+   * @throws IllegalStateException if the plugin is no longer registered.
    * @since 2.0
    */
   Reader getReader(String readerName);

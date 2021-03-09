@@ -11,40 +11,33 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import org.eclipse.keyple.core.common.KeypleDefaultSelectionsRequest;
+import java.util.concurrent.ExecutorService;
+import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 
 /**
- * Provides the API to observe cards insertion/removal.
- *
- * <ul>
- *   <li>Observers management
- *   <li>Starting/stopping card detection
- *   <li>Managing the default selection
- *   <li>Definition of polling and notification modes
- * </ul>
+ * Reader able to observe the insertion/removal of cards.
  *
  * @since 2.0
  */
 public interface ObservableReader extends Reader {
 
   /**
-   * Indicates the expected behavior when processing a default selection.
+   * Indicates the desired notification conditions when processing a card selection.
    *
    * @since 2.0
    */
   enum NotificationMode {
 
     /**
-     * All cards presented to readers are notified regardless of the result of the default
-     * selection.
+     * All cards presented to readers are notified regardless of the result of the selection.
      *
      * @since 2.0
      */
     ALWAYS,
     /**
-     * Only cards that have been successfully selected (logical channel open) will be notified. The
-     * others will be ignored and the application will not be aware of them.
+     * Only cards that have been successfully selected will be notified. The others will be ignored
+     * and the application will not be aware of them.
      *
      * @since 2.0
      */
@@ -73,13 +66,10 @@ public interface ObservableReader extends Reader {
   }
 
   /**
-   * Register a new reader observer to be notified when a reader event occurs.
+   * Register a new observer to be notified when a reader event occurs.
    *
-   * <p>The provided observer will receive all the events produced by this reader (card insertion,
-   * removal, etc.)
-   *
-   * <p>It is possible to add as many observers as necessary. They will be notified of events
-   * <b>sequentially</b> in the order in which they are added.
+   * <p>The provided observer must implement the {@link ReaderObserverSpi} interface to be able to
+   * receive the events produced by this reader (card insertion, removal, etc.)
    *
    * @param observer An observer object implementing the required interface (should be not null).
    * @since 2.0
@@ -115,12 +105,9 @@ public interface ObservableReader extends Reader {
    * Starts the card detection. Once activated, the application can be notified of the arrival of a
    * card.
    *
-   * <p>The {@link PollingMode} indicates the action to be followed after processing the card: if
-   * {@link PollingMode#REPEATING}, the card detection is restarted, if {@link
-   * PollingMode#SINGLESHOT}, the card detection is stopped until a new call to startCardDetection
-   * is made
+   * <p>The {@link PollingMode} indicates the action to be followed after processing the card.
    *
-   * @param pollingMode The polling mode to use (should be not null).
+   * @param pollingMode The polling mode policy.
    * @since 2.0
    */
   void startCardDetection(PollingMode pollingMode);
@@ -133,52 +120,46 @@ public interface ObservableReader extends Reader {
   void stopCardDetection();
 
   /**
-   * Defines the default selection request to be processed when a card is inserted.
+   * Terminates the card processing.
    *
-   * <p>Depending on the card and the notificationMode parameter, a {@link
-   * ReaderEvent.EventType#CARD_INSERTED EventType#CARD_INSERTED}, {@link
-   * ReaderEvent.EventType#CARD_MATCHED EventType#CARD_MATCHED} or no event at all will be notified
-   * to the application observers.
-   *
-   * @param defaultSelectionsRequest The default selection request to be operated (should be not
-   *     null).
-   * @param notificationMode The notification mode to use (should be not null).
-   * @since 2.0
-   */
-  void setDefaultSelectionRequest(
-      KeypleDefaultSelectionsRequest defaultSelectionsRequest, NotificationMode notificationMode);
-
-  /**
-   * Defines the default selection request and starts the card detection using the provided polling
-   * mode.
-   *
-   * <p>The notification mode indicates whether a {@link ReaderEvent.EventType#CARD_INSERTED} event
-   * should be notified even if the selection has failed ({@link NotificationMode#ALWAYS}) or
-   * whether the card insertion should be ignored in this case ({@link
-   * NotificationMode#MATCHED_ONLY}).
-   *
-   * <p>The polling mode indicates the action to be followed after processing the card: if {@link
-   * PollingMode#REPEATING}, the card detection is restarted, if {@link PollingMode#SINGLESHOT}, the
-   * card detection is stopped until a new call to * startCardDetection is made.
-   *
-   * @param defaultSelectionsRequest The default selection request to be operated.
-   * @param notificationMode The notification mode to use (should be not null).
-   * @param pollingMode The polling mode to use (should be not null).
-   * @since 2.0
-   */
-  void setDefaultSelectionRequest(
-      KeypleDefaultSelectionsRequest defaultSelectionsRequest,
-      NotificationMode notificationMode,
-      PollingMode pollingMode);
-
-  /**
-   * Terminates the processing of the card, in particular after an interruption by exception<br>
-   * Do nothing if the channel is already closed.<br>
-   * Channel closing is nominally managed the last transmission with the card. However, there are
-   * cases where exchanges with the card are interrupted by an exception, in which case it is
-   * necessary to explicitly close the channel using this method.
+   * <p>This method notifies the observation process that the processing of the card has been
+   * completed in order to ensure that the card monitoring cycle runs properly.<br>
+   * It is <b>mandatory</b> to invoke it when the physical communication channel with the card could
+   * not be closed. <br>
+   * This method will do nothing if the channel has already been closed.<br>
+   * The channel closing is nominally managed during the last transmission with the card. However,
+   * there are cases where exchanges with the card are interrupted by an exception, in which case it
+   * is necessary to explicitly close the channel using this method.
    *
    * @since 2.0
    */
   void finalizeCardProcessing();
+
+  /**
+   * Configures the reader to use a custom thread pool for events notification.
+   *
+   * <p>The custom pool should be flexible enough to handle many concurrent tasks as each {@link
+   * ReaderEvent} are executed asynchronously.
+   *
+   * <p>The use of this method is optional and depends on the needs of the application.<br>
+   * When used, the event notification will always be done asynchronously. Otherwise, the
+   * notification can be synchronous (local plugin) or asynchronous (remote plugin) depending on the
+   * type of reader.
+   *
+   * @param eventNotificationExecutorService The executor service provided by the application.
+   * @since 2.0
+   */
+  void setEventNotificationExecutorService(ExecutorService eventNotificationExecutorService);
+
+  /**
+   * Sets the exception handler.
+   *
+   * <p>The invocation of this method is <b>mandatory</b> when the reader has to be observed.
+   *
+   * <p>In case of a fatal error during the observation, the handler will receive a notification.
+   *
+   * @param exceptionHandler The exception handler implemented by the application.
+   * @since 2.0
+   */
+  void setReaderObservationExceptionHandler(ReaderObservationExceptionHandlerSpi exceptionHandler);
 }
