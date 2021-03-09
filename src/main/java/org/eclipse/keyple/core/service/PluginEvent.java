@@ -18,14 +18,8 @@ import java.util.TreeSet;
 import org.eclipse.keyple.core.common.KeyplePluginEvent;
 
 /**
- * This POJO is used to propagate a change of reader state in an {@link ObservablePlugin}.
- *
- * <ul>
- *   <li>{@link EventType#READER_CONNECTED} is when a new reader is detected.
- *   <li>{@link EventType#READER_DISCONNECTED} is when an already registered reader is removed from
- *       the system.
- *   <li>{@link EventType#UNREGISTERED} is when the plugin is unregistered.
- * </ul>
+ * This POJO contains all information about a change of reader state within an {@link
+ * ObservablePlugin}.
  *
  * <p>The {@link #getReadersNames()} and {@link #getEventType()} methods allow the event recipient
  * to retrieve the names of the readers involved and the type of the event.

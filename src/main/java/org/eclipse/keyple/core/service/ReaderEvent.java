@@ -16,7 +16,8 @@ import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.common.KeypleReaderEvent;
 
 /**
- * This POJO is used to propagate a change of a card state in an {@link ObservableReader}.
+ * This POJO contains all information about a change of card state within an {@link
+ * ObservableReader}.
  *
  * <p>In the case of a card insertion, the responses received by the reader are included in the
  * event.
