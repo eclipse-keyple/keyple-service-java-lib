@@ -33,12 +33,15 @@ public interface Reader {
   /**
    * Returns the {@link KeypleReaderExtension} that is reader-specific
    *
-   * @param readerType the specific class of the reader
+   * <p>Note: the provided argument is used at compile time to check the type consistency.
+   *
+   * @param readerExtensionType the specific class of the reader
    * @param <T> The type of the reader extension
    * @return a {@link KeypleReaderExtension}
+   * @throws IllegalStateException if reader is no longer registered
    * @since 2.0
    */
-  <T extends KeypleReaderExtension> T getExtension(Class<T> readerType);
+  <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionType);
 
   /**
    * Tells if the current card communication is contactless.
@@ -53,7 +56,7 @@ public interface Reader {
    * Checks if is the card present.
    *
    * @return true if a card is present in the reader
-   * @throws KeypleReaderCommunicationException if the communication with the reader has failed
+   * @throws KeypleReaderCommunicationException if the communication with the reader has failed.
    * @throws IllegalStateException if reader is no longer registered
    * @since 2.0
    */

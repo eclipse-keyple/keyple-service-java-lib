@@ -31,6 +31,8 @@ public interface DistributedLocalService {
   /**
    * Returns the specific implementation of a {@link KeypleDistributedLocalServiceExtension}
    *
+   * <p>Note: the provided argument is used at compile time to check the type consistency.
+   *
    * @param distributedLocalServiceType the specific class of the local service
    * @param <T> The type of the service extension
    * @return a {@link KeypleDistributedLocalServiceExtension}

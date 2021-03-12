@@ -74,7 +74,7 @@ public interface ObservableReader extends Reader {
    * @param observer An observer object implementing the required interface (should be not null).
    * @since 2.0
    */
-  void addObserver(final ReaderObserverSpi observer);
+  void addObserver(ReaderObserverSpi observer);
 
   /**
    * Unregister a reader observer.
@@ -84,7 +84,7 @@ public interface ObservableReader extends Reader {
    * @param observer The observer object to be removed (should be not null).
    * @since 2.0
    */
-  void removeObserver(final ReaderObserverSpi observer);
+  void removeObserver(ReaderObserverSpi observer);
 
   /**
    * Unregister all observers at once

@@ -12,18 +12,22 @@
 package org.eclipse.keyple.core.service;
 
 /**
- * Indicates that the plugin is not found, generally when it has not been previously registered to
- * the {@link SmartCardServiceAdapter}.
+ * Provider of the {@link SmartCardService}.
  *
  * @since 2.0
  */
-public class KeyplePluginNotFoundException extends RuntimeException {
+public final class SmartCardServiceProvider {
+
+  /** Private constructor */
+  private SmartCardServiceProvider() {}
 
   /**
-   * @param message the message to identify the exception context
+   * Gets the unique instance of {@link SmartCardService}.
+   *
+   * @return A not null reference.
    * @since 2.0
    */
-  public KeyplePluginNotFoundException(String message) {
-    super(message);
+  public static SmartCardService getService() {
+    return SmartCardServiceAdapter.getInstance();
   }
 }

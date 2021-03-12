@@ -91,5 +91,5 @@ public interface ObservablePlugin extends Plugin {
    * @param exceptionHandler The exception handler implemented by the application.
    * @since 2.0
    */
-  void setReaderObservationExceptionHandler(PluginObservationExceptionHandlerSpi exceptionHandler);
+  void setPluginObservationExceptionHandler(PluginObservationExceptionHandlerSpi exceptionHandler);
 }

@@ -11,19 +11,20 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-/**
- * Indicates that the plugin is not found, generally when it has not been previously registered to
- * the {@link SmartCardServiceAdapter}.
- *
- * @since 2.0
- */
-public class KeyplePluginNotFoundException extends RuntimeException {
+import java.util.Set;
+import org.eclipse.keyple.core.plugin.AutonomousObservablePluginManager;
+import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 
-  /**
-   * @param message the message to identify the exception context
-   * @since 2.0
-   */
-  public KeyplePluginNotFoundException(String message) {
-    super(message);
+final class AutonomousObservableLocalPluginAdapter extends AbstractObservablePluginAdapter
+    implements AutonomousObservablePluginManager {
+
+  AutonomousObservableLocalPluginAdapter(Object observablePluginSpi) {
+    super(observablePluginSpi);
   }
+
+  @Override
+  public void onReaderConnected(Set<ReaderSpi> readers) {}
+
+  @Override
+  public void onReaderDisconnected(Set<String> readersNames) {}
 }
