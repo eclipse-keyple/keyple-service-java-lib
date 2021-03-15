@@ -25,7 +25,8 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-final class AutonomousObservableLocalPluginAdapter extends AbstractObservablePluginAdapter
+final class AutonomousObservableLocalPluginAdapter
+    extends AbstractObservablePluginAdapter<AutonomousObservablePluginSpi>
     implements AutonomousObservablePluginManager {
   private static final Logger logger =
       LoggerFactory.getLogger(AutonomousObservableLocalPluginAdapter.class);

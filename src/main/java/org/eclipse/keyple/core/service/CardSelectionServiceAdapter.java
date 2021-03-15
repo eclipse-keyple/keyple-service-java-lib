@@ -22,8 +22,6 @@ import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.service.selection.spi.CardSelection;
 import org.eclipse.keyple.core.service.selection.spi.SmartCard;
 import org.eclipse.keyple.core.util.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * (package-private) <br>
@@ -32,8 +30,6 @@ import org.slf4j.LoggerFactory;
  * @since 2.0
  */
 final class CardSelectionServiceAdapter implements CardSelectionService {
-
-  private static final Logger logger = LoggerFactory.getLogger(CardSelectionServiceAdapter.class);
 
   private final List<CardSelectionSpi> cardSelections;
   private final List<CardSelectionRequest> cardSelectionRequests;

@@ -71,17 +71,25 @@ class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapte
       @Override
       public void run() {
         try {
-          readerSpi.waitForCardAbsentNative();
-          // timeout is already managed within the task
-          state.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
+          while (!Thread.currentThread().isInterrupted()) {
+            try {
+              readerSpi.waitForCardAbsentNative();
+              state.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
+              break;
+            } catch (ReaderIOException e) {
+              // TODO check this
+              // just warn as it can be a disconnection of the reader.
+              logger.warn(
+                  "[{}] waitForCardAbsentNative => Error while processing card insertion event",
+                  getReader().getName());
+            } catch (TaskCanceledException e) {
+              break;
+            }
+          }
         } catch (RuntimeException e) {
           getReader()
               .getObservationExceptionHandler()
               .onReaderObservationError(getReader().getPluginName(), getReader().getName(), e);
-        } catch (TaskCanceledException e) {
-          e.printStackTrace();
-        } catch (ReaderIOException e) {
-          e.printStackTrace();
         }
       }
     };
