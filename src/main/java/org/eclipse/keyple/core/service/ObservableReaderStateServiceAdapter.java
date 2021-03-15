@@ -59,7 +59,7 @@ final class ObservableReaderStateServiceAdapter {
    * (package-private)<br>
    * Initializes the states according to the interfaces implemented by the provided reader.
    *
-   * @param reader The current reader
+   * @param reader The observable local reader adapter.
    * @since 2.0
    */
   ObservableReaderStateServiceAdapter(ObservableLocalReaderAdapter reader) {
@@ -127,7 +127,7 @@ final class ObservableReaderStateServiceAdapter {
 
     } else if (readerSpi instanceof WaitForCardRemovalNonBlockingSpi) {
       CardRemovalActiveMonitoringJobAdapter cardRemovalActiveMonitoringJobAdapter =
-          new CardRemovalActiveMonitoringJobAdapter(this.reader);
+          new CardRemovalActiveMonitoringJobAdapter(this.reader, 200);
       this.states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_SE_REMOVAL,
           new WaitForCardRemovalStateAdapter(

@@ -41,7 +41,7 @@ public interface ObservablePlugin extends Plugin {
   /**
    * Unregisters a plugin observer.
    *
-   * <p>The observer will no longer receive any of the events produced by this plugin.
+   * <p>The observer will no longer receive any of the events produced by the plugin.
    *
    * <p>If applicable, the observation process shall be stopped when the last observer is removed.
    *

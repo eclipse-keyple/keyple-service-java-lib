@@ -24,10 +24,10 @@ import org.slf4j.LoggerFactory;
  * Abstract class for all observable plugin adapters.
  *
  * @param <P> The type of plugin.
+ * @since 2.0
  */
-abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter
+abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
     implements ObservablePlugin {
-  private final P observablePluginSpi;
 
   private static final Logger logger =
       LoggerFactory.getLogger(AbstractObservablePluginAdapter.class);
@@ -41,9 +41,74 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter
   private ExecutorService eventNotificationExecutorService;
   private PluginObservationExceptionHandlerSpi exceptionHandler;
 
+  /**
+   * (package-private)<br>
+   * Common constructor for all plugin adapters.
+   *
+   * @param observablePluginSpi The plugin SPI.
+   * @since 2.0
+   */
   AbstractObservablePluginAdapter(P observablePluginSpi) {
     super(observablePluginSpi);
-    this.observablePluginSpi = observablePluginSpi;
+  }
+
+  /**
+   * (package-private)<br>
+   * Gets the exception handler used to notify the application of exceptions raised during the
+   * observation process.
+   *
+   * @return null if no exception has been set.
+   * @since 2.0
+   */
+  final PluginObservationExceptionHandlerSpi getObservationExceptionHandler() {
+    return exceptionHandler;
+  }
+
+  /**
+   * (package-private)<br>
+   * Push a {@link PluginEvent} of the observable plugin to its registered observers.
+   *
+   * @param event The plugin event.
+   * @since 2.0
+   */
+  final void notifyObservers(PluginEvent event) {
+    if (logger.isTraceEnabled()) {
+      logger.trace(
+          "[{}] Notifying a plugin event to {} observers. EVENTNAME = {} ",
+          this.getName(),
+          countObservers(),
+          event.getEventType().name());
+    }
+    List<PluginObserverSpi> observersCopy;
+
+    synchronized (sync) {
+      if (observers == null) {
+        return;
+      }
+      observersCopy = new ArrayList<PluginObserverSpi>(observers);
+    }
+
+    // TODO add the asynchronous notification with the executor service if set
+    for (PluginObserverSpi observer : observersCopy) {
+      try {
+        observer.onPluginEvent(event);
+      } catch (Exception e) {
+        exceptionHandler.onPluginObservationError(getName(), e);
+      }
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  final void unregister() {
+    super.unregister();
+    // TODO check what reader name should be used.
+    notifyObservers(new PluginEvent(this.getName(), "", PluginEvent.EventType.UNREGISTERED));
+    clearObservers();
   }
 
   /**
@@ -129,49 +194,8 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter
    * @since 2.0
    */
   @Override
-  public void setPluginObservationExceptionHandler(
+  public final void setPluginObservationExceptionHandler(
       PluginObservationExceptionHandlerSpi exceptionHandler) {
     this.exceptionHandler = exceptionHandler;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  final void unregister() {
-    super.unregister();
-    // TODO check what reader name should be used.
-    notifyObservers(new PluginEvent(this.getName(), "", PluginEvent.EventType.UNREGISTERED));
-    clearObservers();
-  }
-
-  /**
-   * Push a {@link PluginEvent} of the observable plugin to its registered observers.
-   *
-   * @param event The plugin event.
-   * @since 2.0
-   */
-  final void notifyObservers(PluginEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace(
-          "[{}] Notifying a plugin event to {} observers. EVENTNAME = {} ",
-          this.getName(),
-          countObservers(),
-          event.getEventType().name());
-    }
-    List<PluginObserverSpi> observersCopy;
-
-    synchronized (sync) {
-      if (observers == null) {
-        return;
-      }
-      observersCopy = new ArrayList<PluginObserverSpi>(observers);
-    }
-
-    for (PluginObserverSpi observer : observersCopy) {
-      observer.onPluginEvent(event);
-    }
   }
 }

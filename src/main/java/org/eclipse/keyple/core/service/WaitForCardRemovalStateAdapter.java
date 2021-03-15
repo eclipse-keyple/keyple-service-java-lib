@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * (package-private)<br>
  * Wait for card removal state implementation.
  *
  * <p>The state in which the card is still present and awaiting removal.
@@ -30,26 +31,49 @@ import org.slf4j.LoggerFactory;
  */
 class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapter {
 
-  /** logger */
   private static final Logger logger =
       LoggerFactory.getLogger(WaitForCardRemovalStateAdapter.class);
 
+  /**
+   * (package-private)<br>
+   * Creates an instance.
+   *
+   * @param reader The observable local reader adapter.
+   * @since 2.0
+   */
   WaitForCardRemovalStateAdapter(ObservableLocalReaderAdapter reader) {
     super(MonitoringState.WAIT_FOR_SE_REMOVAL, reader);
   }
 
+  /**
+   * (package-private)<br>
+   * Creates an instance.
+   *
+   * @param reader The observable local reader adapter.
+   * @param monitoringJob The monitoring job.
+   * @param executorService The executor service to use.
+   * @since 2.0
+   */
   WaitForCardRemovalStateAdapter(
       ObservableLocalReaderAdapter reader,
-      AbstractMonitoringJob monitoringJob,
+      AbstractMonitoringJobAdapter monitoringJob,
       ExecutorService executorService) {
     super(MonitoringState.WAIT_FOR_SE_REMOVAL, reader, monitoringJob, executorService);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
   @Override
   void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[{}] onEvent => Event {} received in currentState {}", reader.getName(), event, state);
+          "[{}] onEvent => Event {} received in currentState {}",
+          getReader().getName(),
+          event,
+          getMonitoringState());
     }
     /*
      * Process InternalEvent
@@ -60,8 +84,8 @@ class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapter {
         // the currentState of waiting
         // for insertion
         // We notify the application of the CARD_REMOVED event.
-        reader.processCardRemoved();
-        if (reader.getPollingMode() == ObservableReader.PollingMode.REPEATING) {
+        getReader().processCardRemoved();
+        if (getReader().getPollingMode() == ObservableReader.PollingMode.REPEATING) {
           switchState(MonitoringState.WAIT_FOR_SE_INSERTION);
         } else {
           switchState(MonitoringState.WAIT_FOR_START_DETECTION);
@@ -69,13 +93,16 @@ class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapter {
         break;
 
       case STOP_DETECT:
-        reader.processCardRemoved();
+        getReader().processCardRemoved();
         switchState(MonitoringState.WAIT_FOR_START_DETECTION);
         break;
 
       default:
         logger.warn(
-            "[{}] Ignore =>  Event {} received in currentState {}", reader.getName(), event, state);
+            "[{}] Ignore =>  Event {} received in currentState {}",
+            getReader().getName(),
+            event,
+            getMonitoringState());
         break;
     }
   }

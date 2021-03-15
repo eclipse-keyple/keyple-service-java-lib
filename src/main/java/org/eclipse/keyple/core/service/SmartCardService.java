@@ -27,7 +27,7 @@ public interface SmartCardService {
    * Register a new plugin to be available in the platform if not registered yet
    *
    * @param pluginFactory plugin factory to instantiate plugin to be added
-   * @throws KeyplePluginInstantiationException if instantiation failed
+   * @throws KeyplePluginException if instantiation failed
    * @return Plugin : registered reader plugin
    * @throws IllegalStateException if the plugin has already been registered.
    * @since 2.0

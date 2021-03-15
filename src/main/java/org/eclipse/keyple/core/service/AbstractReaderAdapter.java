@@ -37,6 +37,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    *
    * @param readerName The name of the reader.
    * @param pluginName The name of the plugin.
+   * @since 2.0
    */
   AbstractReaderAdapter(String readerName, String pluginName) {
     this.readerName = readerName;
@@ -44,79 +45,14 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
   }
 
   /**
-   * Gets the reader name.
-   *
-   * @return A not empty String.
-   */
-  @Override
-  public final String getName() {
-    return readerName;
-  }
-
-  /**
+   * (package-private) <br>
    * Gets the plugin name.
    *
    * @return A not empty String.
+   * @since 2.0
    */
   final String getPluginName() {
     return pluginName;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public CardResponse transmitCardRequest(CardRequest cardRequest, ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException {
-    checkStatus();
-
-    CardResponse cardResponse;
-
-    if (logger.isDebugEnabled()) {
-      long timeStamp = System.nanoTime();
-      long elapsed10ms = (timeStamp - before) / 100000;
-      this.before = timeStamp;
-      logger.debug(
-          "[{}] transmit => {}, elapsed {} ms.", this.getName(), cardRequest, elapsed10ms / 10.0);
-    }
-
-    try {
-      cardResponse = processCardRequest(cardRequest, channelControl);
-    } catch (ReaderCommunicationException ex) {
-      if (logger.isDebugEnabled()) {
-        long timeStamp = System.nanoTime();
-        long elapsed10ms = (timeStamp - before) / 100000;
-        this.before = timeStamp;
-        logger.debug(
-            "[{}] Reader IO failure while transmitting card selection request. elapsed {}",
-            this.getName(),
-            elapsed10ms / 10.0);
-      }
-      throw ex;
-    } catch (CardCommunicationException ex) {
-      if (logger.isDebugEnabled()) {
-        long timeStamp = System.nanoTime();
-        long elapsed10ms = (timeStamp - before) / 100000;
-        this.before = timeStamp;
-        logger.debug(
-            "[{}] Card IO failure while transmitting card selection request. elapsed {}",
-            this.getName(),
-            elapsed10ms / 10.0);
-      }
-      throw ex;
-    }
-
-    if (logger.isDebugEnabled()) {
-      long timeStamp = System.nanoTime();
-      long elapsed10ms = (timeStamp - before) / 100000;
-      this.before = timeStamp;
-      logger.debug(
-          "[{}] receive => {}, elapsed {} ms.", this.getName(), cardResponse, elapsed10ms / 10.0);
-    }
-
-    return cardResponse;
   }
 
   /**
@@ -138,6 +74,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    * @return An empty list if no response was received.
    * @throws ReaderCommunicationException if the communication with the reader has failed.
    * @throws CardCommunicationException if the communication with the card has failed.
+   * @since 2.0
    */
   final List<KeypleCardSelectionResponse> transmitCardSelectionRequests(
       List<CardSelectionRequest> cardSelectionRequests,
@@ -204,37 +141,6 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
 
   /**
    * (package-private)<br>
-   * Abstract method performing the actual card selection process.
-   *
-   * @param cardSelectionRequests A list of selection cases composed of one or more {@link
-   *     CardSelectionRequest}.
-   * @param multiSelectionProcessing The multi selection policy.
-   * @param channelControl The channel control policy.
-   * @return An empty list if no response was received.
-   * @throws ReaderCommunicationException if the communication with the reader has failed.
-   * @throws CardCommunicationException if the communication with the card has failed.
-   */
-  abstract List<KeypleCardSelectionResponse> processCardSelectionRequests(
-      List<CardSelectionRequest> cardSelectionRequests,
-      MultiSelectionProcessing multiSelectionProcessing,
-      ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException;
-
-  /**
-   * (package-private)<br>
-   * Abstract method performing the actual transmission of the card request.
-   *
-   * @param cardRequest The card request.
-   * @param channelControl The channel control policy to apply.
-   * @return A not null reference.
-   * @throws ReaderCommunicationException if the communication with the reader has failed.
-   * @throws CardCommunicationException if the communication with the card has failed.
-   */
-  abstract CardResponse processCardRequest(CardRequest cardRequest, ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException;
-
-  /**
-   * (package-private)<br>
    * Check if the reader status is "registered".
    *
    * @throws IllegalStateException is thrown when reader is not (or no longer) registered.
@@ -269,5 +175,105 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
   void unregister() {
     checkStatus();
     isRegistered = false;
+  }
+
+  /**
+   * (package-private)<br>
+   * Abstract method performing the actual card selection process.
+   *
+   * @param cardSelectionRequests A list of selection cases composed of one or more {@link
+   *     CardSelectionRequest}.
+   * @param multiSelectionProcessing The multi selection policy.
+   * @param channelControl The channel control policy.
+   * @return An empty list if no response was received.
+   * @throws ReaderCommunicationException if the communication with the reader has failed.
+   * @throws CardCommunicationException if the communication with the card has failed.
+   * @since 2.0
+   */
+  abstract List<KeypleCardSelectionResponse> processCardSelectionRequests(
+      List<CardSelectionRequest> cardSelectionRequests,
+      MultiSelectionProcessing multiSelectionProcessing,
+      ChannelControl channelControl)
+      throws ReaderCommunicationException, CardCommunicationException;
+
+  /**
+   * (package-private)<br>
+   * Abstract method performing the actual transmission of the card request.
+   *
+   * @param cardRequest The card request.
+   * @param channelControl The channel control policy to apply.
+   * @return A not null reference.
+   * @throws ReaderCommunicationException if the communication with the reader has failed.
+   * @throws CardCommunicationException if the communication with the card has failed.
+   * @since 2.0
+   */
+  abstract CardResponse processCardRequest(CardRequest cardRequest, ChannelControl channelControl)
+      throws ReaderCommunicationException, CardCommunicationException;
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public final String getName() {
+    return readerName;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public CardResponse transmitCardRequest(CardRequest cardRequest, ChannelControl channelControl)
+      throws ReaderCommunicationException, CardCommunicationException {
+    checkStatus();
+
+    CardResponse cardResponse;
+
+    if (logger.isDebugEnabled()) {
+      long timeStamp = System.nanoTime();
+      long elapsed10ms = (timeStamp - before) / 100000;
+      this.before = timeStamp;
+      logger.debug(
+          "[{}] transmit => {}, elapsed {} ms.", this.getName(), cardRequest, elapsed10ms / 10.0);
+    }
+
+    try {
+      cardResponse = processCardRequest(cardRequest, channelControl);
+    } catch (ReaderCommunicationException ex) {
+      if (logger.isDebugEnabled()) {
+        long timeStamp = System.nanoTime();
+        long elapsed10ms = (timeStamp - before) / 100000;
+        this.before = timeStamp;
+        logger.debug(
+            "[{}] Reader IO failure while transmitting card selection request. elapsed {}",
+            this.getName(),
+            elapsed10ms / 10.0);
+      }
+      throw ex;
+    } catch (CardCommunicationException ex) {
+      if (logger.isDebugEnabled()) {
+        long timeStamp = System.nanoTime();
+        long elapsed10ms = (timeStamp - before) / 100000;
+        this.before = timeStamp;
+        logger.debug(
+            "[{}] Card IO failure while transmitting card selection request. elapsed {}",
+            this.getName(),
+            elapsed10ms / 10.0);
+      }
+      throw ex;
+    }
+
+    if (logger.isDebugEnabled()) {
+      long timeStamp = System.nanoTime();
+      long elapsed10ms = (timeStamp - before) / 100000;
+      this.before = timeStamp;
+      logger.debug(
+          "[{}] receive => {}, elapsed {} ms.", this.getName(), cardResponse, elapsed10ms / 10.0);
+    }
+
+    return cardResponse;
   }
 }

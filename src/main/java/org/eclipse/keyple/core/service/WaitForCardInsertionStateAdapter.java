@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * (package-private)<br>
  * Wait for card insertion state implementation.
  *
  * <p>The state during which the insertion of a card is expected.
@@ -32,26 +33,49 @@ import org.slf4j.LoggerFactory;
  */
 class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdapter {
 
-  /** logger */
   private static final Logger logger =
       LoggerFactory.getLogger(WaitForCardInsertionStateAdapter.class);
 
+  /**
+   * (package-private)<br>
+   * Creates an instance.
+   *
+   * @param reader The observable local reader adapter.
+   * @since 2.0
+   */
   WaitForCardInsertionStateAdapter(ObservableLocalReaderAdapter reader) {
     super(MonitoringState.WAIT_FOR_SE_INSERTION, reader);
   }
 
+  /**
+   * (package-private)<br>
+   * Creates an instance.
+   *
+   * @param reader The observable local reader adapter.
+   * @param monitoringJob The monitoring job.
+   * @param executorService The executor service to use.
+   * @since 2.0
+   */
   WaitForCardInsertionStateAdapter(
       ObservableLocalReaderAdapter reader,
-      AbstractMonitoringJob monitoringJob,
+      AbstractMonitoringJobAdapter monitoringJob,
       ExecutorService executorService) {
     super(MonitoringState.WAIT_FOR_SE_INSERTION, reader, monitoringJob, executorService);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
   @Override
   void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[{}] onEvent => Event {} received in currentState {}", reader.getName(), event, state);
+          "[{}] onEvent => Event {} received in currentState {}",
+          getReader().getName(),
+          event,
+          getMonitoringState());
     }
     /*
      * Process InternalEvent
@@ -59,18 +83,18 @@ class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdapter {
     switch (event) {
       case CARD_INSERTED:
         // process default selection if any, return an event, can be null
-        ReaderEvent cardEvent = this.reader.processCardInserted();
+        ReaderEvent cardEvent = this.getReader().processCardInserted();
         if (cardEvent != null) {
           // switch internal state
           switchState(MonitoringState.WAIT_FOR_SE_PROCESSING);
           // notify the external observer of the event
-          reader.notifyObservers(cardEvent);
+          getReader().notifyObservers(cardEvent);
         } else {
           // if none event was sent to the application, back to card detection
           // stay in the same state, however switch to WAIT_FOR_SE_INSERTION to relaunch
           // the monitoring job
           if (logger.isTraceEnabled()) {
-            logger.trace("[{}] onEvent => Inserted card hasn't matched", reader.getName());
+            logger.trace("[{}] onEvent => Inserted card hasn't matched", getReader().getName());
           }
           switchState(MonitoringState.WAIT_FOR_SE_REMOVAL);
         }
@@ -83,7 +107,7 @@ class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdapter {
       case CARD_REMOVED:
         // TODO Check if this case really happens (NFC?)
         // the card has been removed during default selection
-        if (reader.getPollingMode() == ObservableReader.PollingMode.REPEATING) {
+        if (getReader().getPollingMode() == ObservableReader.PollingMode.REPEATING) {
           switchState(MonitoringState.WAIT_FOR_SE_INSERTION);
         } else {
           switchState(MonitoringState.WAIT_FOR_START_DETECTION);
@@ -92,7 +116,10 @@ class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdapter {
 
       default:
         logger.warn(
-            "[{}] Ignore =>  Event {} received in currentState {}", reader.getName(), event, state);
+            "[{}] Ignore =>  Event {} received in currentState {}",
+            getReader().getName(),
+            event,
+            getMonitoringState());
         break;
     }
   }

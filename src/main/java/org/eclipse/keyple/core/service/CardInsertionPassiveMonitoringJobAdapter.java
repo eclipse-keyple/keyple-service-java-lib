@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * (package-private)<br>
  * Detect the card insertion thanks to the method {@link
  * WaitForCardInsertionBlockingSpi#waitForCardPresent()}.
  *
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJob {
+class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
 
   private static final Logger logger =
       LoggerFactory.getLogger(CardInsertionPassiveMonitoringJobAdapter.class);
@@ -45,13 +46,20 @@ class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJob {
    * Constructor.
    *
    * @param reader The reader.
+   * @since 2.0
    */
   CardInsertionPassiveMonitoringJobAdapter(ObservableLocalReaderAdapter reader) {
     super(reader);
     this.readerSpi = (WaitForCardInsertionBlockingSpi) reader.getObservableReaderSpi();
   }
 
-  /** {@inheritDoc} */
+  /**
+   * (package-private)<br>
+   * Gets the monitoring process.
+   *
+   * @return A not null reference.
+   * @since 2.0
+   */
   @Override
   Runnable getMonitoringJob(final AbstractObservableStateAdapter state) {
     /*
@@ -85,7 +93,12 @@ class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJob {
     };
   }
 
-  /** {@inheritDoc} */
+  /**
+   * (package-private)<br>
+   * Terminates the monitoring process.
+   *
+   * @since 2.0
+   */
   @Override
   void stop() {
     if (logger.isTraceEnabled()) {

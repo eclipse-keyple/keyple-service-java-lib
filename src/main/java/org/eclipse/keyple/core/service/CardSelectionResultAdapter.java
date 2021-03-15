@@ -17,11 +17,12 @@ import org.eclipse.keyple.core.service.selection.CardSelectionResult;
 import org.eclipse.keyple.core.service.selection.spi.SmartCard;
 
 /**
+ * (package-private)<br>
  * Implementation of {@link CardSelectionResult}.
  *
  * @since 2.0
  */
-public final class CardSelectionResultAdapter implements CardSelectionResult {
+final class CardSelectionResultAdapter implements CardSelectionResult {
 
   private Integer activeSelectionIndex = null;
   private final Map<Integer, SmartCard> smartCardMap = new HashMap<Integer, SmartCard>();
@@ -29,8 +30,28 @@ public final class CardSelectionResultAdapter implements CardSelectionResult {
   /**
    * (package-private)<br>
    * Constructor
+   *
+   * @since 2.0
    */
   CardSelectionResultAdapter() {}
+
+  /**
+   * (package-private)<br>
+   * Append a {@link SmartCard} to the internal list
+   *
+   * @param selectionIndex the index of the selection that resulted in the matching card
+   * @param smartCard the matching card to add
+   * @param isActive true if the currently added matching card is selected (its logical channel is
+   *     open)
+   * @since 2.0
+   */
+  void addSmartCard(int selectionIndex, SmartCard smartCard, boolean isActive) {
+    if (smartCard != null) smartCardMap.put(selectionIndex, smartCard);
+    // if the current selection is active, we keep its index
+    if (isActive) {
+      activeSelectionIndex = selectionIndex;
+    }
+  }
 
   /**
    * Tells if the current selection process resulted in an active selection.
@@ -106,23 +127,5 @@ public final class CardSelectionResultAdapter implements CardSelectionResult {
       throw new IllegalStateException("No active matching card is available");
     }
     return smartCard;
-  }
-
-  /**
-   * (package-private)<br>
-   * Append a {@link SmartCard} to the internal list
-   *
-   * @param selectionIndex the index of the selection that resulted in the matching card
-   * @param smartCard the matching card to add
-   * @param isActive true if the currently added matching card is selected (its logical channel is
-   *     open)
-   * @since 2.0
-   */
-  void addSmartCard(int selectionIndex, SmartCard smartCard, boolean isActive) {
-    if (smartCard != null) smartCardMap.put(selectionIndex, smartCard);
-    // if the current selection is active, we keep its index
-    if (isActive) {
-      activeSelectionIndex = selectionIndex;
-    }
   }
 }

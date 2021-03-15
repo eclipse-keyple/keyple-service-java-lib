@@ -54,69 +54,6 @@ class PluginAdapter<P> implements Plugin {
   }
 
   /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public String getName() {
-    return pluginName;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionType) {
-    return (T) pluginSpi;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public final Set<String> getReadersNames() {
-    checkStatus();
-    return readers.keySet();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public final Map<String, Reader> getReaders() {
-    checkStatus();
-    return readers;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public final Reader getReader(String name) {
-    checkStatus();
-    Reader reader = readers.get(name);
-    if (reader == null) {
-      throw new KeypleReaderNotFoundException(name);
-    }
-    return reader;
-  }
-
-  /**
-   * @param jsonData
-   * @since 2.0
-   */
-  public final void onReaderEvent(String jsonData) {}
-
-  /**
    * (package-private)<br>
    * Check if the plugin is registered.
    *
@@ -125,8 +62,7 @@ class PluginAdapter<P> implements Plugin {
    */
   void checkStatus() {
     if (!isRegistered)
-      throw new IllegalStateException(
-          String.format("This plugin, %s, is not registered", getName()));
+      throw new IllegalStateException("The plugin " + getName() + " is not registered");
   }
 
   /**
@@ -165,5 +101,70 @@ class PluginAdapter<P> implements Plugin {
       Reader reader = readers.remove(key);
       ((LocalReaderAdapter) reader).unregister();
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public final String getName() {
+    return pluginName;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public final <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionType) {
+    return (T) pluginSpi;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public final Map<String, Reader> getReaders() {
+    checkStatus();
+    return readers;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public final Set<String> getReadersNames() {
+    checkStatus();
+    return readers.keySet();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public final Reader getReader(String name) {
+    checkStatus();
+    Reader reader = readers.get(name);
+    if (reader == null) {
+      throw new KeypleReaderNotFoundException(name);
+    }
+    return reader;
+  }
+
+  /**
+   * @param jsonData
+   * @since 2.0
+   */
+  public final void onReaderEvent(String jsonData) {
+    // TODO Complete
   }
 }

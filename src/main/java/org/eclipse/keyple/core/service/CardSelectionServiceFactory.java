@@ -28,7 +28,7 @@ public final class CardSelectionServiceFactory {
    * @since 2.0
    */
   public static CardSelectionService getService() {
-    return null;
+    return new CardSelectionServiceAdapter();
   }
 
   /**
@@ -40,6 +40,6 @@ public final class CardSelectionServiceFactory {
    * @since 2.0
    */
   public static CardSelectionService getService(MultiSelectionProcessing multiSelectionProcessing) {
-    return null;
+    return new CardSelectionServiceAdapter(multiSelectionProcessing);
   }
 }

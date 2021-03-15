@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 class LocalReaderAdapter extends AbstractReaderAdapter {
 
   private static final Logger logger = LoggerFactory.getLogger(LocalReaderAdapter.class);
+
   /** predefined ISO values */
   private static final byte[] APDU_GET_RESPONSE = {
     (byte) 0x00, (byte) 0xC0, (byte) 0x00, (byte) 0x00, (byte) 0x00
@@ -45,7 +46,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private static final byte[] APDU_GET_DATA = {
     (byte) 0x00, (byte) 0xCA, (byte) 0x00, (byte) 0x6F, (byte) 0x00
   };
-
   private static final int SW1SW2_SUCCESSFUL = 0x9000;
 
   private final ReaderSpi readerSpi;
@@ -66,6 +66,117 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     super(readerSpi.getName(), pluginName);
     this.readerSpi = readerSpi;
     protocolAssociations = new LinkedHashMap<String, String>();
+  }
+
+  /**
+   * (package-private)<br>
+   * Gets the logical channel's opening state.
+   *
+   * @return true if the channel is open, false if not.
+   * @since 2.0
+   */
+  final boolean isLogicalChannelOpen() {
+    return logicalChannelIsOpen;
+  }
+
+  /**
+   * (package-private)<br>
+   * Close both logical and physical channels
+   *
+   * @since 2.0
+   */
+  final void closeLogicalAndPhysicalChannels() {
+
+    closeLogicalChannel();
+    try {
+      resetProtocolAndClosePhysicalChannel();
+    } catch (ReaderIOException e) {
+      if (logger.isDebugEnabled()) {
+        logger.debug(
+            "[{}] Exception occurred in releaseSeChannel. Message: {}",
+            this.getName(),
+            e.getMessage());
+      }
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  final List<KeypleCardSelectionResponse> processCardSelectionRequests(
+      List<CardSelectionRequest> cardSelectionRequests,
+      org.eclipse.keyple.core.card.MultiSelectionProcessing multiSelectionProcessing,
+      ChannelControl channelControl)
+      throws ReaderCommunicationException, CardCommunicationException {
+
+    checkStatus();
+
+    List<KeypleCardSelectionResponse> cardSelectionResponses =
+        new ArrayList<KeypleCardSelectionResponse>();
+
+    /* Open the physical channel if needed, determine the current protocol */
+    if (!readerSpi.isPhysicalChannelOpen()) {
+      try {
+        openPhysicalChannelAndSetProtocol();
+      } catch (ReaderIOException e) {
+        throw new ReaderCommunicationException(
+            null, "Reader communication failure while opening physical channel");
+      } catch (CardIOException e) {
+        throw new CardCommunicationException(
+            null, "Card communication failure while opening physical channel");
+      }
+    }
+
+    /* loop over all CardRequest provided in the list */
+    for (CardSelectionRequest cardSelectionRequest : cardSelectionRequests) {
+      /* process the CardRequest and append the CardResponse list */
+      CardSelectionResponse cardSelectionResponse =
+          processCardSelectionRequest(cardSelectionRequest);
+      cardSelectionResponses.add(cardSelectionResponse);
+      if (multiSelectionProcessing == MultiSelectionProcessing.PROCESS_ALL) {
+        /* multi CardRequest case: just close the logical channel and go on with the next selection. */
+        closeLogicalChannel();
+      } else {
+        if (logicalChannelIsOpen) {
+          /* the logical channel being open, we stop here */
+          break; // exit for loop
+        }
+      }
+    }
+
+    /* close the channel if requested */
+    if (channelControl == ChannelControl.CLOSE_AFTER) {
+      releaseChannel();
+    }
+
+    return cardSelectionResponses;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  final CardResponse processCardRequest(CardRequest cardRequest, ChannelControl channelControl)
+      throws CardCommunicationException, ReaderCommunicationException {
+
+    checkStatus();
+
+    CardResponse cardResponse;
+
+    /* process the CardRequest and keep the CardResponse */
+    cardResponse = processCardRequest(cardRequest);
+
+    /* close the channel if requested */
+    if (channelControl == ChannelControl.CLOSE_AFTER) {
+      releaseChannel();
+    }
+
+    return cardResponse;
   }
 
   /**
@@ -151,82 +262,15 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * {@inheritDoc}
+   * (private)<br>
+   * Opens the physical channel, determines and keep the current protocol.
    *
-   * @since 2.0
+   * @throws ReaderIOException if the communication with the reader has failed.
+   * @throws CardIOException if the communication with the card has failed.
    */
-  @Override
-  List<KeypleCardSelectionResponse> processCardSelectionRequests(
-      List<CardSelectionRequest> cardSelectionRequests,
-      org.eclipse.keyple.core.card.MultiSelectionProcessing multiSelectionProcessing,
-      ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException {
-
-    checkStatus();
-
-    List<KeypleCardSelectionResponse> cardSelectionResponses =
-        new ArrayList<KeypleCardSelectionResponse>();
-
-    /* Open the physical channel if needed, determine the current protocol */
-    if (!readerSpi.isPhysicalChannelOpen()) {
-      try {
-        openPhysicalChannelAndSetProtocol();
-      } catch (ReaderIOException e) {
-        throw new ReaderCommunicationException(
-            null, "Reader communication failure while opening physical channel");
-      } catch (CardIOException e) {
-        throw new CardCommunicationException(
-            null, "Card communication failure while opening physical channel");
-      }
-    }
-
-    /* loop over all CardRequest provided in the list */
-    for (CardSelectionRequest cardSelectionRequest : cardSelectionRequests) {
-      /* process the CardRequest and append the CardResponse list */
-      CardSelectionResponse cardSelectionResponse =
-          processCardSelectionRequest(cardSelectionRequest);
-      cardSelectionResponses.add(cardSelectionResponse);
-      if (multiSelectionProcessing == MultiSelectionProcessing.PROCESS_ALL) {
-        /* multi CardRequest case: just close the logical channel and go on with the next selection. */
-        closeLogicalChannel();
-      } else {
-        if (logicalChannelIsOpen) {
-          /* the logical channel being open, we stop here */
-          break; // exit for loop
-        }
-      }
-    }
-
-    /* close the channel if requested */
-    if (channelControl == ChannelControl.CLOSE_AFTER) {
-      releaseChannel();
-    }
-
-    return cardSelectionResponses;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public CardResponse processCardRequest(CardRequest cardRequest, ChannelControl channelControl)
-      throws CardCommunicationException, ReaderCommunicationException {
-
-    checkStatus();
-
-    CardResponse cardResponse;
-
-    /* process the CardRequest and keep the CardResponse */
-    cardResponse = processCardRequest(cardRequest);
-
-    /* close the channel if requested */
-    if (channelControl == ChannelControl.CLOSE_AFTER) {
-      releaseChannel();
-    }
-
-    return cardResponse;
+  private void openPhysicalChannelAndSetProtocol() throws ReaderIOException, CardIOException {
+    readerSpi.openPhysicalChannel();
+    computeCurrentProtocol();
   }
 
   /**
@@ -234,7 +278,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * Transmits a {@link CardRequest} and returns a {@link CardResponse}.
    *
    * @param cardRequest The card request to transmit.
-   * @return A not null reference. @
+   * @return A not null reference.
    */
   private CardResponse processCardRequest(CardRequest cardRequest)
       throws ReaderCommunicationException, CardCommunicationException {
@@ -629,29 +673,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (package-private)<br>
-   * Gets the logical channel's opening state.
-   *
-   * @return true if the channel is open, false if not.
-   * @since 2.0
-   */
-  final boolean isLogicalChannelOpen() {
-    return logicalChannelIsOpen;
-  }
-
-  /**
-   * (private)<br>
-   * Opens the physical channel, determines and keep the current protocol.
-   *
-   * @throws ReaderIOException if the communication with the reader has failed.
-   * @throws CardIOException if the communication with the card has failed.
-   */
-  private void openPhysicalChannelAndSetProtocol() throws ReaderIOException, CardIOException {
-    readerSpi.openPhysicalChannel();
-    computeCurrentProtocol();
-  }
-
-  /**
    * (private)<br>
    * Closes the physical channel and resets the current protocol info.
    *
@@ -661,27 +682,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     currentProtocol = null;
     useDefaultProtocol = false;
     readerSpi.closePhysicalChannel();
-  }
-
-  /**
-   * (package-private)<br>
-   * Close both logical and physical channels
-   *
-   * @since 2.0
-   */
-  void closeLogicalAndPhysicalChannels() {
-
-    closeLogicalChannel();
-    try {
-      resetProtocolAndClosePhysicalChannel();
-    } catch (ReaderIOException e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(
-            "[{}] Exception occurred in releaseSeChannel. Message: {}",
-            this.getName(),
-            e.getMessage());
-      }
-    }
   }
 
   /**

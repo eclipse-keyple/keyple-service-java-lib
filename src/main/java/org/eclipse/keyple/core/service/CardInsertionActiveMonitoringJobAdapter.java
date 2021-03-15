@@ -16,14 +16,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * (package-private)<br>
  * This monitoring job polls the {@link Reader#isCardPresent()} method to detect a card insertion or
  * a card removal.
  *
  * <p>All runtime exceptions that may occur during the monitoring process are caught and notified at
  * the application level through the {@link
  * org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi} mechanism.
+ *
+ * @since 2.0
  */
-class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJob {
+class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
 
   private static final Logger logger =
       LoggerFactory.getLogger(CardInsertionActiveMonitoringJobAdapter.class);
@@ -34,21 +37,29 @@ class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJob {
   private final AtomicBoolean loop = new AtomicBoolean();
 
   /**
+   * (package-private)<br>
    * Build a monitoring job to detect the card insertion
    *
    * @param reader reader that will be polled with the method isCardPresent()
-   * @param waitTimeout wait time during two hit of the polling
+   * @param cycleDurationInMillis time interval between two presence polls.
    * @param monitorInsertion if true, polls for CARD_INSERTED, else CARD_REMOVED
+   * @since 2.0
    */
   public CardInsertionActiveMonitoringJobAdapter(
-      ObservableLocalReaderAdapter reader, long waitTimeout, boolean monitorInsertion) {
+      ObservableLocalReaderAdapter reader, long cycleDurationInMillis, boolean monitorInsertion) {
     super(reader);
-    this.waitTimeout = waitTimeout;
+    this.waitTimeout = cycleDurationInMillis;
     this.reader = reader;
     this.monitorInsertion = monitorInsertion;
   }
 
-  /** (package-private)<br> */
+  /**
+   * (package-private)<br>
+   * Gets the monitoring process.
+   *
+   * @return A not null reference.
+   * @since 2.0
+   */
   @Override
   Runnable getMonitoringJob(final AbstractObservableStateAdapter state) {
     return new Runnable() {
@@ -107,7 +118,12 @@ class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJob {
     };
   }
 
-  /** (package-private)<br> */
+  /**
+   * (package-private)<br>
+   * Terminates the monitoring process.
+   *
+   * @since 2.0
+   */
   @Override
   void stop() {
     if (logger.isDebugEnabled()) {

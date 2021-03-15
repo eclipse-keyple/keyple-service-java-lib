@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * (package-private)<br>
  * Detect the card removal thanks to the method {@link
  * org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalBlockingSpi#waitForCardAbsentNative()}.
  *
@@ -38,19 +39,32 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob {
+class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
 
   private static final Logger logger =
       LoggerFactory.getLogger(CardRemovalPassiveMonitoringJobAdapter.class);
 
   private final WaitForCardRemovalBlockingSpi readerSpi;
 
+  /**
+   * (package-private)<br>
+   * Constructor.
+   *
+   * @param reader reference to the reader
+   * @since 2.0
+   */
   public CardRemovalPassiveMonitoringJobAdapter(ObservableLocalReaderAdapter reader) {
     super(reader);
     this.readerSpi = (WaitForCardRemovalBlockingSpi) reader.getObservableReaderSpi();
   }
 
-  /** (package-private)<br> */
+  /**
+   * (package-private)<br>
+   * Gets the monitoring process.
+   *
+   * @return A not null reference.
+   * @since 2.0
+   */
   @Override
   Runnable getMonitoringJob(final AbstractObservableStateAdapter state) {
     return new Runnable() {
@@ -73,7 +87,12 @@ class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob {
     };
   }
 
-  /** (package-private)<br> */
+  /**
+   * (package-private)<br>
+   * Terminates the monitoring process.
+   *
+   * @since 2.0
+   */
   @Override
   void stop() {
     readerSpi.stopWaitForCardRemoval();

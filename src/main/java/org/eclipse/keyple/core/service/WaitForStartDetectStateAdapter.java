@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * (package-private)<br>
  * Wait for start the card detection state implementation.
  *
  * <p>The state during which the reader does not wait for a card to be inserted but for a signal
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
  *   <li>Upon START_DETECT event, the machine changes state for WAIT_FOR_SE_INSERTION.
  * </ul>
  *
- * @since 0.9
+ * @since 2.0
  */
 class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapter {
 
@@ -33,22 +34,46 @@ class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapter {
   private static final Logger logger =
       LoggerFactory.getLogger(WaitForStartDetectStateAdapter.class);
 
+  /**
+   * (package-private)<br>
+   * Creates an instance.
+   *
+   * @param reader The observable local reader adapter.
+   * @since 2.0
+   */
   WaitForStartDetectStateAdapter(ObservableLocalReaderAdapter reader) {
     super(MonitoringState.WAIT_FOR_START_DETECTION, reader);
   }
 
+  /**
+   * (package-private)<br>
+   * Creates an instance.
+   *
+   * @param reader The observable local reader adapter.
+   * @param monitoringJob The monitoring job.
+   * @param executorService The executor service to use.
+   * @since 2.0
+   */
   WaitForStartDetectStateAdapter(
       ObservableLocalReaderAdapter reader,
-      AbstractMonitoringJob monitoringJob,
+      AbstractMonitoringJobAdapter monitoringJob,
       ExecutorService executorService) {
     super(MonitoringState.WAIT_FOR_START_DETECTION, reader, monitoringJob, executorService);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
   @Override
   void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[{}] onEvent => Event {} received in currentState {}", reader.getName(), event, state);
+          "[{}] onEvent => Event {} received in currentState {}",
+          getReader().getName(),
+          event,
+          getMonitoringState());
     }
     /*
      * Process InternalEvent
@@ -60,7 +85,10 @@ class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapter {
 
       default:
         logger.warn(
-            "[{}] Ignore =>  Event {} received in currentState {}", reader.getName(), event, state);
+            "[{}] Ignore =>  Event {} received in currentState {}",
+            getReader().getName(),
+            event,
+            getMonitoringState());
         break;
     }
   }

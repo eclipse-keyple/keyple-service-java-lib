@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * (package-private)<br>
  * Ping the card to detect removal thanks to the method {@link
  * ObservableLocalReaderAdapter#isCardPresentPing()}.
  *
@@ -34,36 +35,35 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJob {
+class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
 
   private static final Logger logger =
       LoggerFactory.getLogger(CardRemovalActiveMonitoringJobAdapter.class);
 
   private final AtomicBoolean loop = new AtomicBoolean();
-  private long removalWait = 200;
+  private final long removalWait;
 
   /**
+   * (package-private)<br>
    * Create a job monitor job that ping the card with the method isCardPresentPing()
    *
    * @param reader reference to the reader
-   */
-  public CardRemovalActiveMonitoringJobAdapter(ObservableLocalReaderAdapter reader) {
-    super(reader);
-  }
-
-  /**
-   * Create a job monitor job that ping the card with the method isCardPresentPing()
-   *
-   * @param reader reference to the reader
-   * @param removalWait delay between between each APDU sending
+   * @param cycleDurationInMillis delay between between each APDU sending
+   * @since 2.0
    */
   public CardRemovalActiveMonitoringJobAdapter(
-      ObservableLocalReaderAdapter reader, long removalWait) {
+      ObservableLocalReaderAdapter reader, long cycleDurationInMillis) {
     super(reader);
-    this.removalWait = removalWait;
+    this.removalWait = cycleDurationInMillis;
   }
 
-  /** (package-private)<br> */
+  /**
+   * (package-private)<br>
+   * Gets the monitoring process.
+   *
+   * @return A not null reference.
+   * @since 2.0
+   */
   @Override
   Runnable getMonitoringJob(final AbstractObservableStateAdapter state) {
 
@@ -118,7 +118,12 @@ class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJob {
     };
   }
 
-  /** (package-private)<br> */
+  /**
+   * (package-private)<br>
+   * Terminates the monitoring process.
+   *
+   * @since 2.0
+   */
   @Override
   void stop() {
     if (logger.isDebugEnabled()) {

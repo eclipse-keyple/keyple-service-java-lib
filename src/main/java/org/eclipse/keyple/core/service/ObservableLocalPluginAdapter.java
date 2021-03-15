@@ -21,26 +21,46 @@ import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.ObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
+import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
- * Implementation for {@link ObservablePlugin} for a local plugin.
+ * Implementation of {@link ObservablePlugin} for a local plugin.
  *
  * @since 2.0
  */
 final class ObservableLocalPluginAdapter
     extends AbstractObservablePluginAdapter<ObservablePluginSpi> {
+
   private static final Logger logger = LoggerFactory.getLogger(ObservableLocalPluginAdapter.class);
 
   private final ObservablePluginSpi observablePluginSpi;
-  Map<String, Reader> readers;
+  private final Map<String, Reader> readers;
 
+  /**
+   * (package-private)<br>
+   * Creates an instance of {@link ObservableLocalPluginAdapter}.
+   *
+   * @param observablePluginSpi The plugin SPI.
+   * @since 2.0
+   */
   ObservableLocalPluginAdapter(ObservablePluginSpi observablePluginSpi) {
     super(observablePluginSpi);
     this.observablePluginSpi = observablePluginSpi;
     readers = new ConcurrentHashMap<String, Reader>();
+  }
+
+  /**
+   * (package-private)<br>
+   * Check whether the background job is monitoring for new readers
+   *
+   * @return true, if the background job is monitoring, false in all other cases.
+   * @since 2.0
+   */
+  Boolean isMonitoring() {
+    return thread != null && thread.isAlive() && thread.isMonitoring();
   }
 
   /**
@@ -50,27 +70,26 @@ final class ObservableLocalPluginAdapter
    */
   @Override
   public void addObserver(PluginObserverSpi observer) {
-    //    Assert.getInstance().notNull(observer, "observer");
-    //
-    //    super.addObserver(observer);
-    //    if (countObservers() == 1) {
-    //      if (getPluginObservationExceptionHandler() == null) {
-    //        throw new IllegalStateException("No plugin observation exception handler has been
-    // set.");
-    //      }
-    //      if (logger.isDebugEnabled()) {
-    //        logger.debug("Start monitoring the plugin {}", this.getName());
-    //      }
-    //      thread = new EventThread(this.getName());
-    //      thread.setName("PluginEventMonitoringThread");
-    //      thread.setUncaughtExceptionHandler(
-    //              new Thread.UncaughtExceptionHandler() {
-    //                public void uncaughtException(Thread t, Throwable e) {
-    //                  getObservationExceptionHandler().onPluginObservationError(thread.pluginName,
-    // e);
-    //                }
-    //              });
-    //      thread.start(); }
+    Assert.getInstance().notNull(observer, "observer");
+
+    super.addObserver(observer);
+    if (countObservers() == 1) {
+      if (getObservationExceptionHandler() == null) {
+        throw new IllegalStateException("No plugin observation exception handler has been set.");
+      }
+      if (logger.isDebugEnabled()) {
+        logger.debug("Start monitoring the plugin {}", getName());
+      }
+      thread = new EventThread(getName());
+      thread.setName("PluginEventMonitoringThread");
+      thread.setUncaughtExceptionHandler(
+          new Thread.UncaughtExceptionHandler() {
+            public void uncaughtException(Thread t, Throwable e) {
+              getObservationExceptionHandler().onPluginObservationError(thread.pluginName, e);
+            }
+          });
+      thread.start();
+    }
   }
 
   /**
@@ -79,7 +98,17 @@ final class ObservableLocalPluginAdapter
    * @since 2.0
    */
   @Override
-  public void removeObserver(PluginObserverSpi observer) {}
+  public void removeObserver(PluginObserverSpi observer) {
+    super.removeObserver(observer);
+    if (countObservers() == 0) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Stop the plugin monitoring.");
+      }
+      if (thread != null) {
+        thread.end();
+      }
+    }
+  }
 
   /**
    * {@inheritDoc}
@@ -87,39 +116,34 @@ final class ObservableLocalPluginAdapter
    * @since 2.0
    */
   @Override
-  public void clearObservers() {}
-
-  /** @since 2.0 */
-  Boolean isMonitoring() {
-    return false;
+  public void clearObservers() {
+    super.clearObservers();
+    if (thread != null) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Stop the plugin monitoring.");
+      }
+      thread.end();
+    }
   }
-
-  /* Reader insertion/removal management */
-  private static final long SETTING_THREAD_TIMEOUT_DEFAULT = 1000;
 
   /** Local thread to monitoring readers presence */
   private EventThread thread;
 
-  /**
-   * Thread wait timeout in ms
-   *
-   * <p>This timeout value will determined the latency to detect changes
-   */
-  protected long threadWaitTimeout = SETTING_THREAD_TIMEOUT_DEFAULT;
-
   /** Thread in charge of reporting live events */
   private class EventThread extends Thread {
     private final String pluginName;
+    private final long monitoringCycleDuration;
     private boolean running = true;
 
     private EventThread(String pluginName) {
       this.pluginName = pluginName;
+      monitoringCycleDuration = observablePluginSpi.getMonitoringCycleDuration();
     }
 
     /** Marks the thread as one that should end when the last threadWaitTimeout occurs */
     void end() {
       running = false;
-      this.interrupt();
+      interrupt();
     }
 
     /**
@@ -143,7 +167,7 @@ final class ObservableLocalPluginAdapter
       if (logger.isTraceEnabled()) {
         logger.trace(
             "[{}][{}] Plugin thread => Add plugged reader to readers list.",
-            this.pluginName,
+            pluginName,
             reader.getName());
       }
     }
@@ -158,7 +182,7 @@ final class ObservableLocalPluginAdapter
       if (logger.isTraceEnabled()) {
         logger.trace(
             "[{}][{}] Plugin thread => Remove unplugged reader from readers list.",
-            this.pluginName,
+            pluginName,
             reader.getName());
       }
     }
@@ -176,7 +200,7 @@ final class ObservableLocalPluginAdapter
             eventType == PluginEvent.EventType.READER_CONNECTED ? "connection" : "disconnection",
             changedReaderNames);
       }
-      notifyObservers(new PluginEvent(this.pluginName, changedReaderNames, eventType));
+      notifyObservers(new PluginEvent(pluginName, changedReaderNames, eventType));
     }
 
     /**
@@ -248,16 +272,16 @@ final class ObservableLocalPluginAdapter
             processChanges(actualNativeReadersNames);
           }
           /* sleep for a while. */
-          Thread.sleep(threadWaitTimeout);
+          Thread.sleep(monitoringCycleDuration);
         }
       } catch (InterruptedException e) {
         logger.info(
             "[{}] The observation of this plugin is stopped, possibly because there is no more registered observer.",
-            this.pluginName);
+            pluginName);
         // Restore interrupted state...
         Thread.currentThread().interrupt();
       } catch (ReaderIOException e) {
-        // TODO add exception handler management
+        getObservationExceptionHandler().onPluginObservationError(getName(), e);
       }
     }
   }

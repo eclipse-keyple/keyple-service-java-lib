@@ -25,8 +25,16 @@ import org.eclipse.keyple.core.card.AbstractCommunicationException;
  *
  * @since 2.0
  */
-public class CardCommunicationExceptionJsonSerializerAdapter
+public class CommunicationExceptionJsonSerializerAdapter
     implements JsonSerializer<AbstractCommunicationException> {
+
+  /**
+   * (package-private)<br>
+   * Creates an instance.
+   *
+   * @since 2.0
+   */
+  CommunicationExceptionJsonSerializerAdapter() {}
 
   /**
    * {@inheritDoc}

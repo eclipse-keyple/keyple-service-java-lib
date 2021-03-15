@@ -26,11 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * (package-private) <br>
  * Implementation of the {@link CardSelectionService}.
  *
  * @since 2.0
  */
-public final class CardSelectionServiceAdapter implements CardSelectionService {
+final class CardSelectionServiceAdapter implements CardSelectionService {
 
   private static final Logger logger = LoggerFactory.getLogger(CardSelectionServiceAdapter.class);
 
@@ -97,7 +98,7 @@ public final class CardSelectionServiceAdapter implements CardSelectionService {
    */
   @Override
   public CardSelectionResult processCardSelectionScenario(Reader reader)
-      throws KeypleCardCommunicationException, KeypleCardCommunicationException {
+      throws KeypleCardCommunicationException {
 
     // Communicate with the card to make the actual selection
     List<KeypleCardSelectionResponse> cardSelectionResponses;

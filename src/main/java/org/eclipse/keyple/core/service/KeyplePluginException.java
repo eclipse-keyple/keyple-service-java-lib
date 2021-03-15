@@ -11,4 +11,28 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-public class AutonomousObservableLocalReaderAdapter {}
+/**
+ * Indicates that the plugin cannot be instantiated, possibly due to a problem with one of the
+ * associated readers.
+ *
+ * @since 2.0
+ */
+public class KeyplePluginException extends RuntimeException {
+
+  /**
+   * @param message the message to identify the exception context
+   * @since 2.0
+   */
+  public KeyplePluginException(String message) {
+    super(message);
+  }
+
+  /**
+   * @param message the message to identify the exception context
+   * @param cause the cause
+   * @since 2.0
+   */
+  public KeyplePluginException(String message, Throwable cause) {
+    super(message, cause);
+  }
+}
