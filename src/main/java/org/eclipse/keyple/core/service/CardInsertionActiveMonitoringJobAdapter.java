@@ -26,12 +26,12 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
 
   private static final Logger logger =
       LoggerFactory.getLogger(CardInsertionActiveMonitoringJobAdapter.class);
 
-  private final long waitTimeout;
+  private final long cycleDurationInMillis;
   private final boolean monitorInsertion;
   private final Reader reader;
   private final AtomicBoolean loop = new AtomicBoolean();
@@ -48,7 +48,7 @@ class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapt
   public CardInsertionActiveMonitoringJobAdapter(
       ObservableLocalReaderAdapter reader, long cycleDurationInMillis, boolean monitorInsertion) {
     super(reader);
-    this.waitTimeout = cycleDurationInMillis;
+    this.cycleDurationInMillis = cycleDurationInMillis;
     this.reader = reader;
     this.monitorInsertion = monitorInsertion;
   }
@@ -61,10 +61,19 @@ class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapt
    * @since 2.0
    */
   @Override
-  Runnable getMonitoringJob(final AbstractObservableStateAdapter state) {
+  Runnable getMonitoringJob(final AbstractObservableStateAdapter monitoringState) {
     return new Runnable() {
       long retries = 0;
 
+      /**
+       * Monitoring loop
+       *
+       * <p>Polls for the presence of a card and loops until no card responds. <br>
+       * Triggers a CARD_INSERTED event and exits as soon as a communication with a card is
+       * established.
+       *
+       * <p>Any exceptions are notified to the application using the exception handler.
+       */
       @Override
       public void run() {
         try {
@@ -79,7 +88,7 @@ class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapt
               if (logger.isDebugEnabled()) {
                 logger.debug("[{}] The card is present ", reader.getName());
               }
-              state.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
+              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
               return;
             }
             // polls for CARD_REMOVED
@@ -88,7 +97,7 @@ class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapt
                 logger.debug("[{}] The card is not present ", reader.getName());
               }
               loop.set(false);
-              state.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
+              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
               return;
             }
             retries++;
@@ -98,7 +107,7 @@ class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapt
             }
             try {
               // wait a bit
-              Thread.sleep(waitTimeout);
+              Thread.sleep(cycleDurationInMillis);
             } catch (InterruptedException ignored) {
               // Restore interrupted state...
               Thread.currentThread().interrupt();

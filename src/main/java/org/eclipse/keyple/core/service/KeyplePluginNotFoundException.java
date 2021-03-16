@@ -13,7 +13,7 @@ package org.eclipse.keyple.core.service;
 
 /**
  * Indicates that the plugin is not found, generally when it has not been previously registered to
- * the {@link SmartCardServiceAdapter}.
+ * the {@link SmartCardService}.
  *
  * @since 2.0
  */

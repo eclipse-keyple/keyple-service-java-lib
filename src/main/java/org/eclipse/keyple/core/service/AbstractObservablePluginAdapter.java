@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
+import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,7 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
    * this object will be used to synchronize the access to the observers list in order to be
    * thread safe
    */
-  private final Object sync = new Object();
+  private final Object monitor = new Object();
   private ExecutorService eventNotificationExecutorService;
   private PluginObservationExceptionHandlerSpi exceptionHandler;
 
@@ -68,6 +69,9 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
    * (package-private)<br>
    * Push a {@link PluginEvent} of the observable plugin to its registered observers.
    *
+   * <p>This method never throws an exception. Any errors at runtime are notified to the application
+   * using the exception handler.
+   *
    * @param event The plugin event.
    * @since 2.0
    */
@@ -81,7 +85,7 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
     }
     List<PluginObserverSpi> observersCopy;
 
-    synchronized (sync) {
+    synchronized (monitor) {
       if (observers == null) {
         return;
       }
@@ -106,8 +110,9 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
   @Override
   final void unregister() {
     super.unregister();
-    // TODO check what reader name should be used.
-    notifyObservers(new PluginEvent(this.getName(), "", PluginEvent.EventType.UNREGISTERED));
+    notifyObservers(
+        new PluginEvent(
+            this.getName(), this.getReadersNames(), PluginEvent.EventType.UNREGISTERED));
     clearObservers();
   }
 
@@ -118,16 +123,19 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
    */
   @Override
   public void addObserver(PluginObserverSpi observer) {
-    if (observer == null) {
-      return;
-    }
+
+    Assert.getInstance().notNull(observer, "observer");
 
     if (logger.isTraceEnabled()) {
       logger.trace(
           "Adding '{}' as an observer of '{}'.", observer.getClass().getSimpleName(), getName());
     }
 
-    synchronized (sync) {
+    if (getObservationExceptionHandler() == null) {
+      throw new IllegalStateException("No exception handler defined.");
+    }
+
+    synchronized (monitor) {
       if (observers == null) {
         observers = new ArrayList<PluginObserverSpi>(1);
       }
@@ -142,13 +150,13 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
    */
   @Override
   public void removeObserver(PluginObserverSpi observer) {
-    if (observer == null) {
-      return;
-    }
+
+    Assert.getInstance().notNull(observer, "observer");
+
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] Deleting a plugin observer", getName());
     }
-    synchronized (sync) {
+    synchronized (monitor) {
       if (observers != null) {
         observers.remove(observer);
       }
@@ -161,7 +169,7 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
    * @since 2.0
    */
   @Override
-  public void clearObservers() {
+  public synchronized void clearObservers() {
     if (observers != null) {
       this.observers.clear();
     }
@@ -173,7 +181,7 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
    * @since 2.0
    */
   @Override
-  public final int countObservers() {
+  public final synchronized int countObservers() {
     return observers == null ? 0 : observers.size();
   }
 

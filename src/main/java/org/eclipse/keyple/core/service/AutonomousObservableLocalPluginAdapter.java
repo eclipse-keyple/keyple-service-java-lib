@@ -11,8 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 import org.eclipse.keyple.core.plugin.AutonomousObservablePluginManager;
 import org.eclipse.keyple.core.plugin.spi.AutonomousObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
@@ -35,11 +35,12 @@ final class AutonomousObservableLocalPluginAdapter
    * (package-private)<br>
    * Creates an instance of {@link AutonomousObservableLocalPluginAdapter}.
    *
-   * @param observablePluginSpi The plugin SPI.
+   * @param autonomousObservablePluginSpi The plugin SPI.
    * @since 2.0
    */
-  AutonomousObservableLocalPluginAdapter(AutonomousObservablePluginSpi observablePluginSpi) {
-    super(observablePluginSpi);
+  AutonomousObservableLocalPluginAdapter(
+      AutonomousObservablePluginSpi autonomousObservablePluginSpi) {
+    super(autonomousObservablePluginSpi);
   }
 
   /**
@@ -49,7 +50,7 @@ final class AutonomousObservableLocalPluginAdapter
    */
   @Override
   public void onReaderConnected(Set<ReaderSpi> readers) {
-    Set<String> readersNames = new TreeSet<String>();
+    Set<String> readersNames = new HashSet<String>();
     for (ReaderSpi readerSpi : readers) {
       readersNames.add(readerSpi.getName());
     }

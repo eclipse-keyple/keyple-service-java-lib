@@ -146,7 +146,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    * @throws IllegalStateException is thrown when reader is not (or no longer) registered.
    * @since 2.0
    */
-  void checkStatus() {
+  final void checkStatus() {
     if (!isRegistered)
       throw new IllegalStateException(
           String.format("This reader, %s, is not registered", getName()));
@@ -158,7 +158,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    *
    * @since 2.0
    */
-  void register() {
+  final void register() {
     isRegistered = true;
   }
 

@@ -35,6 +35,8 @@ public interface ObservablePlugin extends Plugin {
    *
    * @param observer An observer object implementing the required interface (should be not null).
    * @since 2.0
+   * @throws IllegalArgumentException if observer is null.
+   * @throws IllegalStateException if no exception handler is defined.
    */
   void addObserver(final PluginObserverSpi observer);
 
@@ -47,6 +49,7 @@ public interface ObservablePlugin extends Plugin {
    *
    * @param observer The observer object to be unregistered (should be not null).
    * @since 2.0
+   * @throws IllegalArgumentException if observer is null.
    */
   void removeObserver(final PluginObserverSpi observer);
 

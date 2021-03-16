@@ -38,20 +38,22 @@ abstract class AbstractMonitoringJobAdapter {
    * @return A not null reference.
    * @since 2.0
    */
-  ObservableLocalReaderAdapter getReader() {
+  final ObservableLocalReaderAdapter getReader() {
     return reader;
   }
 
   /**
+   * (package-private)<br>
    * Gets the task of the monitoring job.
    *
-   * @param state reference to the state the monitoring job in running against.
+   * @param monitoringState reference to the state the monitoring job in running against.
    * @return A not null reference.
    * @since 2.0
    */
-  abstract Runnable getMonitoringJob(AbstractObservableStateAdapter state);
+  abstract Runnable getMonitoringJob(AbstractObservableStateAdapter monitoringState);
 
   /**
+   * (package-private)<br>
    * Stops/interrupts the monitoring job
    *
    * @since 2.0

@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
 
   private static final Logger logger =
       LoggerFactory.getLogger(CardRemovalPassiveMonitoringJobAdapter.class);
@@ -66,15 +66,23 @@ class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapte
    * @since 2.0
    */
   @Override
-  Runnable getMonitoringJob(final AbstractObservableStateAdapter state) {
+  Runnable getMonitoringJob(final AbstractObservableStateAdapter monitoringState) {
     return new Runnable() {
+      /**
+       * Monitoring loop
+       *
+       * <p>Waits for the removal of the card until no card is absent. <br>
+       * Triggers a CARD_REMOVED event and exits when the card is no longer present.
+       *
+       * <p>Any exceptions are notified to the application using the exception handler.
+       */
       @Override
       public void run() {
         try {
           while (!Thread.currentThread().isInterrupted()) {
             try {
               readerSpi.waitForCardAbsentNative();
-              state.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
+              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
               break;
             } catch (ReaderIOException e) {
               // TODO check this

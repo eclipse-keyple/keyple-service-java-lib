@@ -28,11 +28,12 @@ abstract class AbstractObservableStateAdapter {
       LoggerFactory.getLogger(AbstractObservableStateAdapter.class);
 
   /**
+   * (package-private)<br>
    * The states that the reader monitoring state machine can have
    *
    * @since 2.0
    */
-  public enum MonitoringState {
+  enum MonitoringState {
     /**
      * The reader is idle and waiting for a start signal to enter the card detection mode.
      *
@@ -60,25 +61,25 @@ abstract class AbstractObservableStateAdapter {
   }
 
   /* Identifier of the currentState */
-  private final MonitoringState state;
+  private final MonitoringState monitoringState;
 
   /* Reference to Reader */
   private final ObservableLocalReaderAdapter reader;
 
   /* Background job definition if any */
-  private AbstractMonitoringJobAdapter monitoringJob;
+  private final AbstractMonitoringJobAdapter monitoringJob;
 
   /* Result of the background job if any */
   private Future<?> monitoringEvent;
 
   /* Executor service used to execute AbstractMonitoringJobAdapter */
-  private ExecutorService executorService;
+  private final ExecutorService executorService;
 
   /**
    * (package-private)<br>
    * Create a new state with a state identifier and a monitor job
    *
-   * @param state the state identifier
+   * @param monitoringState the state identifier
    * @param reader the current reader
    * @param monitoringJob the job to be executed in background (may be null if no background job is
    *     required)
@@ -86,27 +87,27 @@ abstract class AbstractObservableStateAdapter {
    * @since 2.0
    */
   AbstractObservableStateAdapter(
-      MonitoringState state,
+      MonitoringState monitoringState,
       ObservableLocalReaderAdapter reader,
       AbstractMonitoringJobAdapter monitoringJob,
       ExecutorService executorService) {
     this.reader = reader;
-    this.state = state;
+    this.monitoringState = monitoringState;
     this.monitoringJob = monitoringJob;
     this.executorService = executorService;
   }
 
   /**
    * (package-private)<br>
-   * Create a new state with a state identifier
+   * Create a new state with a state identifier without monitoring job.
    *
    * @param reader observable reader this currentState is attached to
-   * @param state name of the currentState
+   * @param monitoringState name of the currentState
    * @since 2.0
    */
-  AbstractObservableStateAdapter(MonitoringState state, ObservableLocalReaderAdapter reader) {
-    this.reader = reader;
-    this.state = state;
+  AbstractObservableStateAdapter(
+      MonitoringState monitoringState, ObservableLocalReaderAdapter reader) {
+    this(monitoringState, reader, null, null);
   }
 
   /**
@@ -116,8 +117,8 @@ abstract class AbstractObservableStateAdapter {
    * @return the current state identifier
    * @since 2.0
    */
-  MonitoringState getMonitoringState() {
-    return state;
+  final MonitoringState getMonitoringState() {
+    return monitoringState;
   }
 
   /**
@@ -127,7 +128,7 @@ abstract class AbstractObservableStateAdapter {
    * @return A not null reference.
    * @since 2.0
    */
-  ObservableLocalReaderAdapter getReader() {
+  final ObservableLocalReaderAdapter getReader() {
     return reader;
   }
 
@@ -138,7 +139,7 @@ abstract class AbstractObservableStateAdapter {
    * @param stateId the new state
    * @since 2.0
    */
-  void switchState(AbstractObservableStateAdapter.MonitoringState stateId) {
+  final void switchState(AbstractObservableStateAdapter.MonitoringState stateId) {
     reader.switchState(stateId);
   }
 
@@ -147,15 +148,16 @@ abstract class AbstractObservableStateAdapter {
    * Invoked when activated, a custom behaviour can be added here.
    *
    * @since 2.0
+   * @thows IllegalStateException if a job is defined with a null executor service.
    */
-  void onActivate() {
+  final void onActivate() {
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] onActivate => {}", this.reader.getName(), this.getMonitoringState());
     }
     // launch the monitoringJob is necessary
     if (monitoringJob != null) {
       if (executorService == null) {
-        throw new AssertionError("ExecutorService must be set");
+        throw new IllegalStateException("ExecutorService must be set");
       }
       monitoringEvent = executorService.submit(monitoringJob.getMonitoringJob(this));
     }
@@ -167,7 +169,7 @@ abstract class AbstractObservableStateAdapter {
    *
    * @since 2.0
    */
-  void onDeactivate() {
+  final void onDeactivate() {
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] onDeactivate => {}", this.reader.getName(), this.getMonitoringState());
     }

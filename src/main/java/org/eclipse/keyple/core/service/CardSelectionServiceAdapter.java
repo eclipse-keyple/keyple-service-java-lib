@@ -43,17 +43,6 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    *
    * @since 2.0
    */
-  CardSelectionServiceAdapter() {
-    this(MultiSelectionProcessing.FIRST_MATCH);
-  }
-
-  /**
-   * (package-private) <br>
-   * Creates an instance of the service with which the selection stops as soon as a card matches a
-   * selection case.
-   *
-   * @since 2.0
-   */
   CardSelectionServiceAdapter(MultiSelectionProcessing multiSelectionProcessing) {
     this.multiSelectionProcessing =
         multiSelectionProcessing == MultiSelectionProcessing.PROCESS_ALL
@@ -123,11 +112,8 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
   @Override
   public void scheduleCardSelectionScenario(
       ObservableReader observableReader, ObservableReader.NotificationMode notificationMode) {
-    CardSelectionScenario cardSelectionScenario =
-        new CardSelectionScenario(cardSelectionRequests, multiSelectionProcessing, channelControl);
-    ((ObservableLocalReaderAdapter) observableReader)
-        .scheduleCardSelectionScenario(
-            cardSelectionScenario, notificationMode, ObservableReader.PollingMode.REPEATING);
+    scheduleCardSelectionScenario(
+        observableReader, notificationMode, ObservableReader.PollingMode.REPEATING);
   }
 
   /**

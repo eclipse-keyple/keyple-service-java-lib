@@ -41,34 +41,34 @@ final class CardSelectionResultAdapter implements CardSelectionResult {
    *
    * @param selectionIndex the index of the selection that resulted in the matching card
    * @param smartCard the matching card to add
-   * @param isActive true if the currently added matching card is selected (its logical channel is
+   * @param isSelected true if the currently added matching card is selected (its logical channel is
    *     open)
    * @since 2.0
    */
-  void addSmartCard(int selectionIndex, SmartCard smartCard, boolean isActive) {
+  void addSmartCard(int selectionIndex, SmartCard smartCard, boolean isSelected) {
     if (smartCard != null) smartCardMap.put(selectionIndex, smartCard);
     // if the current selection is active, we keep its index
-    if (isActive) {
+    if (isSelected) {
       activeSelectionIndex = selectionIndex;
     }
   }
 
   /**
-   * Tells if the current selection process resulted in an active selection.
+   * {@inheritDoc}
    *
-   * @return true if an active selection is present
    * @since 2.0
    */
+  @Override
   public boolean hasActiveSelection() {
     return activeSelectionIndex != null;
   }
+
   /**
-   * Gets the index of the active selection if any.
+   * {@inheritDoc}
    *
-   * @return A positive int.
-   * @throws IllegalStateException if there is no active selection
    * @since 2.0
    */
+  @Override
   public int getActiveSelectionIndex() {
     if (hasActiveSelection()) {
       return activeSelectionIndex;
@@ -77,50 +77,41 @@ final class CardSelectionResultAdapter implements CardSelectionResult {
   }
 
   /**
-   * Get the matching status of a selection case for which the index is provided.
+   * {@inheritDoc}
    *
-   * <p>Checks for the presence of an entry in the SmartCard Map for the given index.
-   *
-   * @param selectionIndex The selection index.
-   * @return true if the selection has matched
    * @since 2.0
    */
+  @Override
   public boolean hasSelectionMatched(int selectionIndex) {
     return smartCardMap.containsKey(selectionIndex);
   }
 
   /**
-   * Gets all the {@link SmartCard} corresponding to all selection cases in a map where the key is
-   * the selection index.
+   * {@inheritDoc}
    *
-   * @return A map.
    * @since 2.0
    */
+  @Override
   public Map<Integer, SmartCard> getSmartCards() {
     return smartCardMap;
   }
 
   /**
-   * Gets the {@link SmartCard} for the specified index.
+   * {@inheritDoc}
    *
-   * <p>Returns null if no {@link SmartCard} was found.
-   *
-   * @param selectionIndex the selection index
-   * @return the {@link SmartCard} or null
    * @since 2.0
    */
+  @Override
   public SmartCard getSmartCard(int selectionIndex) {
     return smartCardMap.get(selectionIndex);
   }
 
   /**
-   * Get the active matching card. I.e. the card that has been selected. <br>
-   * The hasActiveSelection method should be invoked before.
+   * {@inheritDoc}
    *
-   * @return The currently active matching card.
-   * @throws IllegalStateException if no active matching card is found
    * @since 2.0
    */
+  @Override
   public SmartCard getActiveSmartCard() {
     SmartCard smartCard = smartCardMap.get(activeSelectionIndex);
     if (smartCard == null) {

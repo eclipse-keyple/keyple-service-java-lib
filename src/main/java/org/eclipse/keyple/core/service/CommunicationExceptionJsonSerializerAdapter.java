@@ -17,6 +17,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
 import org.eclipse.keyple.core.card.AbstractCommunicationException;
+import org.eclipse.keyple.core.card.CardResponse;
 
 /**
  * Serializer of a {@link AbstractCommunicationException}.
@@ -49,6 +50,9 @@ public class CommunicationExceptionJsonSerializerAdapter
 
     JsonObject json = new JsonObject();
     json.addProperty("message", exception.getMessage());
+    json.add(
+        "cardResponse",
+        jsonSerializationContext.serialize(exception.getCardResponse(), CardResponse.class));
     return json;
   }
 }

@@ -34,7 +34,7 @@ public final class CardSelectionServiceFactory {
    * @since 2.0
    */
   public static CardSelectionService getService() {
-    return new CardSelectionServiceAdapter();
+    return new CardSelectionServiceAdapter(MultiSelectionProcessing.FIRST_MATCH);
   }
 
   /**

@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapter {
+final class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapter {
 
   /** logger */
   private static final Logger logger =

@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
 
   private static final Logger logger =
       LoggerFactory.getLogger(CardInsertionPassiveMonitoringJobAdapter.class);
@@ -61,18 +61,24 @@ class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdap
    * @since 2.0
    */
   @Override
-  Runnable getMonitoringJob(final AbstractObservableStateAdapter state) {
-    /*
-     * Invoke the method WaitForCardInsertionBlocking#waitForCardPresent() in another thread
-     */
+  Runnable getMonitoringJob(final AbstractObservableStateAdapter monitoringState) {
     return new Runnable() {
+      /**
+       * Monitoring loop
+       *
+       * <p>Waits for the presence of a card until no card is present. <br>
+       * Triggers a CARD_INSERTED event and exits as soon as a communication with a card is
+       * established.
+       *
+       * <p>Any exceptions are notified to the application using the exception handler.
+       */
       @Override
       public void run() {
         try {
           while (!Thread.currentThread().isInterrupted()) {
             try {
               readerSpi.waitForCardPresent();
-              state.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
+              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
               break;
             } catch (ReaderIOException e) {
               // TODO check this

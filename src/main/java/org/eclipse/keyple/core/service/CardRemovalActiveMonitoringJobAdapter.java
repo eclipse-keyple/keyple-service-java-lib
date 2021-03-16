@@ -35,13 +35,13 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
 
   private static final Logger logger =
       LoggerFactory.getLogger(CardRemovalActiveMonitoringJobAdapter.class);
 
   private final AtomicBoolean loop = new AtomicBoolean();
-  private final long removalWait;
+  private final long cycleDurationInMillis;
 
   /**
    * (package-private)<br>
@@ -54,7 +54,7 @@ class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter
   public CardRemovalActiveMonitoringJobAdapter(
       ObservableLocalReaderAdapter reader, long cycleDurationInMillis) {
     super(reader);
-    this.removalWait = cycleDurationInMillis;
+    this.cycleDurationInMillis = cycleDurationInMillis;
   }
 
   /**
@@ -65,16 +65,19 @@ class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter
    * @since 2.0
    */
   @Override
-  Runnable getMonitoringJob(final AbstractObservableStateAdapter state) {
+  Runnable getMonitoringJob(final AbstractObservableStateAdapter monitoringState) {
 
-    /*
-     * Loop until one the following condition is met : -
-     * ObservableLocalReaderAdapter#isCardPresentPing returns false, meaning that the card ping has
-     * failed - InterruptedException is caught
-     */
     return new Runnable() {
       long retries = 0;
 
+      /**
+       * Monitoring loop
+       *
+       * <p>Sends a neutral command to the card and loops as long as the card responds. <br>
+       * Triggers a CARD_REMOVED event and exits as soon as the communication with the card is lost.
+       *
+       * <p>Any exceptions are notified to the application using the exception handler.
+       */
       @Override
       public void run() {
         try {
@@ -88,7 +91,7 @@ class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter
               if (logger.isDebugEnabled()) {
                 logger.debug("[{}] the card stopped responding", getReader().getName());
               }
-              state.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
+              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
               return;
             }
             retries++;
@@ -98,7 +101,7 @@ class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter
             }
             try {
               // wait a bit
-              Thread.sleep(removalWait);
+              Thread.sleep(cycleDurationInMillis);
             } catch (InterruptedException ignored) {
               // Restore interrupted state...
               Thread.currentThread().interrupt();
