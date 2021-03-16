@@ -44,7 +44,7 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
    * @since 2.0
    */
   WaitForCardInsertionStateAdapter(ObservableLocalReaderAdapter reader) {
-    super(MonitoringState.WAIT_FOR_SE_INSERTION, reader);
+    this(reader, null, null);
   }
 
   /**

@@ -42,7 +42,7 @@ final class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapte
    * @since 2.0
    */
   WaitForStartDetectStateAdapter(ObservableLocalReaderAdapter reader) {
-    super(MonitoringState.WAIT_FOR_START_DETECTION, reader);
+    this(reader, null, null);
   }
 
   /**

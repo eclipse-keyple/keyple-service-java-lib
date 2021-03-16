@@ -42,7 +42,7 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
    * @since 2.0
    */
   WaitForCardRemovalStateAdapter(ObservableLocalReaderAdapter reader) {
-    super(MonitoringState.WAIT_FOR_SE_REMOVAL, reader);
+    this(reader, null, null);
   }
 
   /**

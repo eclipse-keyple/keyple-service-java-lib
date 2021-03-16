@@ -82,8 +82,7 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    * @since 2.0
    */
   @Override
-  public CardSelectionResult processCardSelectionScenario(Reader reader)
-      throws KeypleCardCommunicationException {
+  public CardSelectionResult processCardSelectionScenario(Reader reader) {
 
     // Communicate with the card to make the actual selection
     List<KeypleCardSelectionResponse> cardSelectionResponses;
@@ -96,7 +95,6 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
     } catch (ReaderCommunicationException e) {
       throw new KeypleReaderCommunicationException(e.getMessage(), e);
     } catch (CardCommunicationException e) {
-      // TODO check if we really need to raise this exception
       throw new KeypleCardCommunicationException(e.getMessage(), e);
     }
 

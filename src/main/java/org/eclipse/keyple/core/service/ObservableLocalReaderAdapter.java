@@ -310,7 +310,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
         getObservationExceptionHandler().onReaderObservationError(getPluginName(), getName(), e);
       } catch (CardCommunicationException e) {
         // The last transmission failed, close the logical and physical channels.
-        closeLogicalAndPhysicalChannels();
+        closeLogicalAndPhysicalChannelsSilently();
         // The card was removed or not read correctly, no exception raising or event notification,
         // just log.
         logger.debug(
@@ -343,7 +343,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   void processCardRemoved() {
-    closeLogicalAndPhysicalChannels();
+    closeLogicalAndPhysicalChannelsSilently();
     notifyObservers(
         new ReaderEvent(getPluginName(), getName(), ReaderEvent.EventType.CARD_REMOVED, null));
   }

@@ -97,7 +97,12 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
       try {
         observer.onPluginEvent(event);
       } catch (Exception e) {
-        exceptionHandler.onPluginObservationError(getName(), e);
+        try {
+          exceptionHandler.onPluginObservationError(getName(), e);
+        } catch (Exception e2) {
+          logger.error("Exception during notification", e2);
+          logger.error("Original cause", e);
+        }
       }
     }
   }

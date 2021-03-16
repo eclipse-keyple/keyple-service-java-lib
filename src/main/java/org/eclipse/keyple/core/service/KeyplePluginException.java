@@ -12,8 +12,7 @@
 package org.eclipse.keyple.core.service;
 
 /**
- * Indicates that the plugin cannot be instantiated, possibly due to a problem with one of the
- * associated readers.
+ * Indicates that an error occurred in the specific plugin.
  *
  * @since 2.0
  */

@@ -83,20 +83,24 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * (package-private)<br>
    * Close both logical and physical channels
    *
+   * <p>This method doesn't raise any exception.
+   *
    * @since 2.0
    */
-  final void closeLogicalAndPhysicalChannels() {
+  final void closeLogicalAndPhysicalChannelsSilently() {
 
     closeLogicalChannel();
+    // Closes the physical channel and resets the current protocol info.
+    currentProtocol = null;
+    useDefaultProtocol = false;
     try {
-      resetProtocolAndClosePhysicalChannel();
+      readerSpi.closePhysicalChannel();
     } catch (ReaderIOException e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(
-            "[{}] Exception occurred in releaseSeChannel. Message: {}",
-            this.getName(),
-            e.getMessage());
-      }
+      logger.error(
+          "[{}] Exception occurred in releaseSeChannel. Message: {}",
+          this.getName(),
+          e.getMessage(),
+          e);
     }
   }
 
@@ -123,10 +127,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         openPhysicalChannelAndSetProtocol();
       } catch (ReaderIOException e) {
         throw new ReaderCommunicationException(
-            null, "Reader communication failure while opening physical channel");
+            null, "Reader communication failure while opening physical channel", e);
       } catch (CardIOException e) {
         throw new CardCommunicationException(
-            null, "Card communication failure while opening physical channel");
+            null, "Card communication failure while opening physical channel", e);
       }
     }
 
@@ -207,7 +211,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   @Override
-  public boolean isCardPresent() throws KeypleReaderCommunicationException {
+  public boolean isCardPresent() {
     checkStatus();
     try {
       return readerSpi.checkCardPresence();
@@ -292,26 +296,28 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       for (ApduRequest apduRequest : cardRequest.getApduRequests()) {
         try {
           apduResponses.add(processApduRequest(apduRequest));
-        } catch (ReaderIOException ex) {
+        } catch (ReaderIOException e) {
           /*
            * The process has been interrupted. We close the logical channel and launch a
            * KeypleReaderException with the Apdu responses collected so far.
            */
-          closeLogicalAndPhysicalChannels();
+          closeLogicalAndPhysicalChannelsSilently();
 
           throw new ReaderCommunicationException(
               new CardResponse(apduResponses, false, false),
-              "Reader communication failure while transmitting a card request.");
-        } catch (CardIOException ex) {
+              "Reader communication failure while transmitting a card request.",
+              e);
+        } catch (CardIOException e) {
           /*
            * The process has been interrupted. We close the logical channel and launch a
            * KeypleReaderException with the Apdu responses collected so far.
            */
-          closeLogicalAndPhysicalChannels();
+          closeLogicalAndPhysicalChannelsSilently();
 
           throw new CardCommunicationException(
               new CardResponse(apduResponses, false, false),
-              "Card communication failure while transmitting a card request.");
+              "Card communication failure while transmitting a card request.",
+              e);
         }
       }
     }
@@ -670,18 +676,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       ((AutonomousSelectionReaderSpi) readerSpi).closeLogicalChannel();
     }
     logicalChannelIsOpen = false;
-  }
-
-  /**
-   * (private)<br>
-   * Closes the physical channel and resets the current protocol info.
-   *
-   * @throws ReaderIOException if the communication with the reader has failed.
-   */
-  private void resetProtocolAndClosePhysicalChannel() throws ReaderIOException {
-    currentProtocol = null;
-    useDefaultProtocol = false;
-    readerSpi.closePhysicalChannel();
   }
 
   /**

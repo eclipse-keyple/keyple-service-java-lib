@@ -80,8 +80,7 @@ public interface CardSelectionService {
    * @throws KeypleCardCommunicationException if the communication with the card has failed.
    * @since 2.0
    */
-  CardSelectionResult processCardSelectionScenario(Reader reader)
-      throws KeypleReaderCommunicationException, KeypleCardCommunicationException;
+  CardSelectionResult processCardSelectionScenario(Reader reader);
 
   /**
    * Schedules the execution of the prepared card selection scenario as soon as a card is presented

@@ -44,7 +44,7 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
    * @since 2.0
    */
   WaitForCardProcessingStateAdapter(ObservableLocalReaderAdapter reader) {
-    super(MonitoringState.WAIT_FOR_SE_PROCESSING, reader);
+    this(reader, null, null);
   }
 
   /**
