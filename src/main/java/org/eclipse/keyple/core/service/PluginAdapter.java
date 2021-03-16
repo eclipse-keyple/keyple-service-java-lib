@@ -60,7 +60,7 @@ class PluginAdapter<P> implements Plugin {
    * @throws IllegalStateException is thrown when plugin is not (or no longer) registered.
    * @since 2.0
    */
-  void checkStatus() {
+  final void checkStatus() {
     if (!isRegistered)
       throw new IllegalStateException("The plugin " + getName() + " is not registered");
   }
@@ -71,7 +71,7 @@ class PluginAdapter<P> implements Plugin {
    *
    * @since 2.0
    */
-  void register() throws PluginIOException {
+  final void register() throws PluginIOException {
     isRegistered = true;
     if (pluginSpi instanceof PluginSpi) {
       // retrieve the current readers of the local plugin

@@ -22,7 +22,7 @@ import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
  *
  * @since 2.0
  */
-final class PoolPluginAdapter<P> extends PluginAdapter<PoolPluginSpi> implements PoolPlugin {
+final class PoolPluginAdapter<P> extends PluginAdapter<P> implements PoolPlugin {
 
   private final P poolPluginSpi;
 
@@ -34,7 +34,7 @@ final class PoolPluginAdapter<P> extends PluginAdapter<PoolPluginSpi> implements
    * @since 2.0
    */
   PoolPluginAdapter(P poolPluginSpi) {
-    super((PoolPluginSpi) poolPluginSpi);
+    super(poolPluginSpi);
     this.poolPluginSpi = poolPluginSpi;
   }
 

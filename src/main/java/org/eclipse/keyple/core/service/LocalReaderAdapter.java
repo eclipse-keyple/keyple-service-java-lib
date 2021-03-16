@@ -223,14 +223,14 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   @Override
-  public final void activateProtocol(String readerProtocolName, String applicationProtocolName) {
+  public final void activateProtocol(String readerProtocol, String applicationProtocol) {
     checkStatus();
     Assert.getInstance()
-        .notEmpty(readerProtocolName, "readerProtocolName")
-        .notEmpty(applicationProtocolName, "applicationProtocolName");
+        .notEmpty(readerProtocol, "readerProtocol")
+        .notEmpty(applicationProtocol, "applicationProtocol");
 
-    readerSpi.activateProtocol(readerProtocolName);
-    protocolAssociations.put(readerProtocolName, applicationProtocolName);
+    readerSpi.activateProtocol(readerProtocol);
+    protocolAssociations.put(readerProtocol, applicationProtocol);
   }
 
   /**
@@ -238,12 +238,12 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *
    * @since 2.0
    */
-  public final void deactivateProtocol(String readerProtocolName) {
+  public final void deactivateProtocol(String readerProtocol) {
     checkStatus();
-    Assert.getInstance().notEmpty(readerProtocolName, "readerProtocolName");
+    Assert.getInstance().notEmpty(readerProtocol, "readerProtocol");
 
-    protocolAssociations.remove(readerProtocolName);
-    readerSpi.deactivateProtocol(readerProtocolName);
+    protocolAssociations.remove(readerProtocol);
+    readerSpi.deactivateProtocol(readerProtocol);
   }
 
   /**
@@ -257,7 +257,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     try {
       readerSpi.closePhysicalChannel();
     } catch (ReaderIOException e) {
-      throw new ReaderCommunicationException(null, "Failed to release the physical channel");
+      throw new ReaderCommunicationException(null, "Failed to release the physical channel", e);
     }
   }
 
@@ -430,10 +430,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       selectionStatus = processSelection((CardSelector) cardSelectionRequest.getCardSelector());
     } catch (ReaderIOException e) {
       throw new ReaderCommunicationException(
-          new CardResponse(new ArrayList<ApduResponse>(), false, false), e.getMessage());
+          new CardResponse(new ArrayList<ApduResponse>(), false, false), e.getMessage(), e);
     } catch (CardIOException e) {
       throw new CardCommunicationException(
-          new CardResponse(new ArrayList<ApduResponse>(), false, false), e.getMessage());
+          new CardResponse(new ArrayList<ApduResponse>(), false, false), e.getMessage(), e);
     }
     if (!selectionStatus.hasMatched()) {
       // the selection failed, return an empty response having the selection status

@@ -74,9 +74,6 @@ final class ObservableLocalPluginAdapter
 
     super.addObserver(observer);
     if (countObservers() == 1) {
-      if (getObservationExceptionHandler() == null) {
-        throw new IllegalStateException("No plugin observation exception handler has been set.");
-      }
       if (logger.isDebugEnabled()) {
         logger.debug("Start monitoring the plugin {}", getName());
       }
@@ -141,7 +138,7 @@ final class ObservableLocalPluginAdapter
     }
 
     /** Marks the thread as one that should end when the last threadWaitTimeout occurs */
-    void end() {
+    private void end() {
       running = false;
       interrupt();
     }
@@ -150,7 +147,7 @@ final class ObservableLocalPluginAdapter
      * (private)<br>
      * Indicate whether the thread is running or not
      */
-    boolean isMonitoring() {
+    private boolean isMonitoring() {
       return running;
     }
 

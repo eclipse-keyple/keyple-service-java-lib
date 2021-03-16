@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-class WaitForCardProcessingStateAdapter extends AbstractObservableStateAdapter {
+final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAdapter {
 
   private static final Logger logger =
       LoggerFactory.getLogger(WaitForCardProcessingStateAdapter.class);

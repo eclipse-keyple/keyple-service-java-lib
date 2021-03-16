@@ -61,7 +61,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * this object will be used to synchronize the access to the observers list in order to be
    * thread safe
    */
-  private final Object sync = new Object();
+  private final Object monitor = new Object();
 
   /**
    * (package-private)<br>
@@ -378,7 +378,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
     List<ReaderObserverSpi> observersCopy;
 
-    synchronized (sync) {
+    synchronized (monitor) {
       if (observers == null) {
         return;
       }
@@ -440,16 +440,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * Check the presence of a card
+   * {@inheritDoc}
    *
-   * <p>This method is recommended for non-observable readers.
-   *
-   * <p>When the card is not present the logical and physical channels status may be refreshed
-   * through a call to the processCardRemoved method.
-   *
-   * @return true if the card is present
-   * @throws KeypleReaderCommunicationException if the communication with the reader failed.
-   * @throws IllegalStateException is called when reader is no longer registered
    * @since 2.0
    */
   @Override
@@ -484,7 +476,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           "Adding '{}' as an observer of '{}'.", observer.getClass().getSimpleName(), getName());
     }
 
-    synchronized (sync) {
+    synchronized (monitor) {
       if (observers == null) {
         if (getObservationExceptionHandler() == null) {
           throw new IllegalStateException("No reader observation exception handler has been set.");
@@ -510,7 +502,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       logger.trace("[{}] Deleting a reader observer", getName());
     }
 
-    synchronized (sync) {
+    synchronized (monitor) {
       if (observers != null) {
         observers.remove(observer);
       }
@@ -523,7 +515,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public int countObservers() {
+  public synchronized int countObservers() {
     return observers == null ? 0 : observers.size();
   }
 
@@ -533,25 +525,18 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void clearObservers() {
+  public synchronized void clearObservers() {
     if (observers != null) {
       observers.clear();
     }
   }
 
   /**
-   * (package-private)<br>
-   * Starts the card detection. Once activated, the application can be notified of the arrival of a
-   * card.
+   * {@inheritDoc}
    *
-   * <p>The polling mode indicates the action to be followed after processing the card: if {@link
-   * org.eclipse.keyple.core.service.ObservableReader.PollingMode#REPEATING}, the card detection is
-   * restarted, if {@link org.eclipse.keyple.core.service.ObservableReader.PollingMode#SINGLESHOT},
-   * the card detection is stopped until a new call to startCardDetection is made.
-   *
-   * @param pollingMode The polling policy.
    * @since 2.0
    */
+  @Override
   public void startCardDetection(ObservableReader.PollingMode pollingMode) {
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] start the card Detection with pollingMode {}", getName(), pollingMode);
@@ -561,10 +546,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * Stops the card detection.
-   *
-   * <p>This method must be overloaded by readers depending on the particularity of their management
-   * of the start of card detection.
+   * {@inheritDoc}
    *
    * @since 2.0
    */
@@ -589,32 +571,22 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * Sets the optional {@link ExecutorService} to use when notifying the observers.
+   * {@inheritDoc}
    *
-   * <p>When the executor service is set, the observers are notified asynchronously using the thread
-   * pool provided by the service.
-   *
-   * <p>When the executor service is not set, the observers are notified synchronously and
-   * sequentially in the order they have been added.
-   *
-   * @param eventNotificationExecutorService The executor service provided by the application.
    * @since 2.0
    */
+  @Override
   public void setEventNotificationExecutorService(
       ExecutorService eventNotificationExecutorService) {
     this.eventNotificationExecutorService = eventNotificationExecutorService;
   }
 
   /**
-   * Sets the {@link ReaderObservationExceptionHandlerSpi} used to notify the application that an
-   * exception has been raised during the observation process.
+   * {@inheritDoc}
    *
-   * <p>After the exception handler is invoked, the observation process is terminated and no more
-   * reader events will be notified.
-   *
-   * @param exceptionHandler The exception handler implemented by the application.
    * @since 2.0
    */
+  @Override
   public void setReaderObservationExceptionHandler(
       ReaderObservationExceptionHandlerSpi exceptionHandler) {
     Assert.getInstance().notNull(exceptionHandler, "exceptionHandler");
@@ -622,23 +594,21 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * This method is invoked by a {@link
-   * org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionAutonomousSpi}
-   * reader when a card is inserted.
+   * {@inheritDoc}
    *
    * @since 2.0
    */
+  @Override
   public void onCardInserted() {
     stateService.onEvent(InternalEvent.CARD_INSERTED);
   }
 
   /**
-   * This method is invoked by a {@link
-   * org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalAutonomousSpi}
-   * reader when a card is removed.
+   * {@inheritDoc}
    *
    * @since 2.0
    */
+  @Override
   public void onCardRemoved() {
     stateService.onEvent(InternalEvent.CARD_REMOVED);
   }
