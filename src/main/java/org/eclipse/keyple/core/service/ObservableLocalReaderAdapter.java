@@ -52,7 +52,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   private final ObservableReaderSpi observableReaderSpi;
   private ReaderObservationExceptionHandlerSpi exceptionHandler;
   private final ObservableReaderStateServiceAdapter stateService;
-  private List<ReaderObserverSpi> observers;
+  private final List<ReaderObserverSpi> observers;
   private CardSelectionScenario cardSelectionScenario;
   private NotificationMode notificationMode;
   private PollingMode currentPollingMode;
@@ -122,7 +122,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   ObservableLocalReaderAdapter(ObservableReaderSpi observableReaderSpi, String pluginName) {
     super((ReaderSpi) observableReaderSpi, pluginName);
     this.observableReaderSpi = observableReaderSpi;
-    stateService = new ObservableReaderStateServiceAdapter(this);
+    this.stateService = new ObservableReaderStateServiceAdapter(this);
+    this.observers = new ArrayList<ReaderObserverSpi>(1);
   }
 
   /**
@@ -226,97 +227,64 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   ReaderEvent processCardInserted() {
+
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] process the inserted card", getName());
     }
+
     if (cardSelectionScenario == null) {
       if (logger.isTraceEnabled()) {
         logger.trace("[{}] no card selection scenario defined, notify CARD_INSERTED", getName());
       }
       /* no default request is defined, just notify the card insertion */
       return new ReaderEvent(getPluginName(), getName(), ReaderEvent.EventType.CARD_INSERTED, null);
-    } else {
-      /*
-       * a card selection scenario is defined, send it and notify according to the notification mode
-       * and the selection status
-       */
-      boolean aCardMatched = false;
-      try {
-        List<KeypleCardSelectionResponse> cardSelectionResponses =
-            transmitCardSelectionRequests(
-                cardSelectionScenario.getCardSelectionRequests(),
-                cardSelectionScenario.getMultiSelectionProcessing(),
-                cardSelectionScenario.getChannelControl());
+    }
 
-        for (KeypleCardSelectionResponse cardSelectionResponse : cardSelectionResponses) {
-          if (cardSelectionResponse != null
-              && ((CardSelectionResponse) cardSelectionResponse)
-                  .getSelectionStatus()
-                  .hasMatched()) {
-            if (logger.isTraceEnabled()) {
-              logger.trace("[{}] a default selection has matched", getName());
-            }
-            aCardMatched = true;
-            break;
-          }
-        }
+    // a card selection scenario is defined, send it and notify according to the notification mode
+    // and the selection status
+    try {
+      List<KeypleCardSelectionResponse> cardSelectionResponses =
+          transmitCardSelectionRequests(
+              cardSelectionScenario.getCardSelectionRequests(),
+              cardSelectionScenario.getMultiSelectionProcessing(),
+              cardSelectionScenario.getChannelControl());
 
-        if (notificationMode == ObservableReader.NotificationMode.MATCHED_ONLY) {
-          /* notify only if a card matched the selection, just ignore if not */
-          if (aCardMatched) {
-            return new ReaderEvent(
-                getPluginName(),
-                getName(),
-                ReaderEvent.EventType.CARD_MATCHED,
-                cardSelectionResponses);
-          } else {
-            if (logger.isTraceEnabled()) {
-              logger.trace(
-                  "[{}] selection hasn't matched"
-                      + " do not thrown any event because of MATCHED_ONLY flag",
-                  getName());
-            }
-            return null;
-          }
-        } else {
-          // ObservableReader.NotificationMode.ALWAYS
-          if (aCardMatched) {
-            /* the card matched, notify a CARD_MATCHED event with the received response */
-            return new ReaderEvent(
-                getPluginName(),
-                getName(),
-                ReaderEvent.EventType.CARD_MATCHED,
-                cardSelectionResponses);
-          } else {
-            /*
-             * the card didn't match, notify an CARD_INSERTED event with the received
-             * response
-             */
-            if (logger.isTraceEnabled()) {
-              logger.trace(
-                  "[{}] none of {} default selection matched",
-                  getName(),
-                  cardSelectionResponses.size());
-            }
-            return new ReaderEvent(
-                getPluginName(),
-                getName(),
-                ReaderEvent.EventType.CARD_INSERTED,
-                cardSelectionResponses);
-          }
-        }
-      } catch (ReaderCommunicationException e) {
-        // Notify the reader communication failure with the exception handler.
-        getObservationExceptionHandler().onReaderObservationError(getPluginName(), getName(), e);
-      } catch (CardCommunicationException e) {
-        // The last transmission failed, close the logical and physical channels.
-        closeLogicalAndPhysicalChannelsSilently();
-        // The card was removed or not read correctly, no exception raising or event notification,
-        // just log.
-        logger.debug(
-            "An card communication exception occurred while processing the card selection scenario. {}",
-            e.getMessage());
+      if (hasACardMatched(cardSelectionResponses)) {
+        return new ReaderEvent(
+            getPluginName(), getName(), ReaderEvent.EventType.CARD_MATCHED, cardSelectionResponses);
       }
+
+      if (notificationMode == ObservableReader.NotificationMode.MATCHED_ONLY) {
+        /* notify only if a card matched the selection, just ignore if not */
+        if (logger.isTraceEnabled()) {
+          logger.trace(
+              "[{}] selection hasn't matched"
+                  + " do not thrown any event because of MATCHED_ONLY flag",
+              getName());
+        }
+        return null;
+      }
+
+      // the card didn't match, notify an CARD_INSERTED event with the received response
+      if (logger.isTraceEnabled()) {
+        logger.trace(
+            "[{}] none of {} default selection matched", getName(), cardSelectionResponses.size());
+      }
+      return new ReaderEvent(
+          getPluginName(), getName(), ReaderEvent.EventType.CARD_INSERTED, cardSelectionResponses);
+
+    } catch (ReaderCommunicationException e) {
+      // Notify the reader communication failure with the exception handler.
+      getObservationExceptionHandler().onReaderObservationError(getPluginName(), getName(), e);
+
+    } catch (CardCommunicationException e) {
+      // The last transmission failed, close the logical and physical channels.
+      closeLogicalAndPhysicalChannelsSilently();
+      // The card was removed or not read correctly, no exception raising or event notification,
+      // just log.
+      logger.debug(
+          "An card communication exception occurred while processing the card selection scenario. {}",
+          e.getMessage());
     }
 
     // Here we close the physical channel in case it was opened for a card excluded by the selection
@@ -330,6 +298,25 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
     // no event returned
     return null;
+  }
+
+  /**
+   * Check if a card has matched.
+   *
+   * @param cardSelectionResponses The responses received.
+   * @return true if a card has matched, false if not.
+   */
+  private boolean hasACardMatched(List<KeypleCardSelectionResponse> cardSelectionResponses) {
+    for (KeypleCardSelectionResponse cardSelectionResponse : cardSelectionResponses) {
+      if (cardSelectionResponse != null
+          && ((CardSelectionResponse) cardSelectionResponse).getSelectionStatus().hasMatched()) {
+        if (logger.isTraceEnabled()) {
+          logger.trace("[{}] a default selection has matched", getName());
+        }
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -366,7 +353,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @param event The reader event.
    * @since 2.0
    */
-  void notifyObservers(ReaderEvent event) {
+  void notifyObservers(final ReaderEvent event) {
 
     if (logger.isTraceEnabled()) {
       logger.trace(
@@ -379,14 +366,44 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
     List<ReaderObserverSpi> observersCopy;
 
     synchronized (monitor) {
-      if (observers == null) {
-        return;
-      }
       observersCopy = new ArrayList<ReaderObserverSpi>(observers);
     }
 
-    for (ReaderObserverSpi observer : observersCopy) {
+    if (eventNotificationExecutorService == null) {
+      // synchronous notification
+      for (ReaderObserverSpi observer : observersCopy) {
+        notifyObserver(observer, event);
+      }
+    } else {
+      // asynchronous notification
+      for (final ReaderObserverSpi observer : observersCopy) {
+        eventNotificationExecutorService.execute(
+            new Runnable() {
+              @Override
+              public void run() {
+                notifyObserver(observer, event);
+              }
+            });
+      }
+    }
+  }
+
+  /**
+   * Notify a single observer of an event.
+   *
+   * @param observer The observer to notify.
+   * @param event The event.
+   */
+  private void notifyObserver(ReaderObserverSpi observer, ReaderEvent event) {
+    try {
       observer.onReaderEvent(event);
+    } catch (Exception e) {
+      try {
+        exceptionHandler.onReaderObservationError(getPluginName(), getName(), e);
+      } catch (Exception e2) {
+        logger.error("Exception during notification", e2);
+        logger.error("Original cause", e);
+      }
     }
   }
 
@@ -476,13 +493,10 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           "Adding '{}' as an observer of '{}'.", observer.getClass().getSimpleName(), getName());
     }
 
+    if (observers.isEmpty() && getObservationExceptionHandler() == null) {
+      throw new IllegalStateException("No reader observation exception handler has been set.");
+    }
     synchronized (monitor) {
-      if (observers == null) {
-        if (getObservationExceptionHandler() == null) {
-          throw new IllegalStateException("No reader observation exception handler has been set.");
-        }
-        observers = new ArrayList<ReaderObserverSpi>(1);
-      }
       observers.add(observer);
     }
   }
@@ -494,18 +508,15 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public void removeObserver(ReaderObserverSpi observer) {
-    if (observer == null) {
-      return;
-    }
+
+    Assert.getInstance().notNull(observer, "observer");
 
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] Deleting a reader observer", getName());
     }
 
     synchronized (monitor) {
-      if (observers != null) {
-        observers.remove(observer);
-      }
+      observers.remove(observer);
     }
   }
 
@@ -515,8 +526,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public synchronized int countObservers() {
-    return observers == null ? 0 : observers.size();
+  public int countObservers() {
+    return observers.size();
   }
 
   /**
@@ -525,8 +536,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public synchronized void clearObservers() {
-    if (observers != null) {
+  public void clearObservers() {
+    synchronized (monitor) {
       observers.clear();
     }
   }

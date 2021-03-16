@@ -33,7 +33,7 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
   private static final Logger logger =
       LoggerFactory.getLogger(AbstractObservablePluginAdapter.class);
 
-  private List<PluginObserverSpi> observers;
+  private final List<PluginObserverSpi> observers;
   /*
    * this object will be used to synchronize the access to the observers list in order to be
    * thread safe
@@ -51,6 +51,7 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
    */
   AbstractObservablePluginAdapter(P observablePluginSpi) {
     super(observablePluginSpi);
+    this.observers = new ArrayList<PluginObserverSpi>(1);
   }
 
   /**
@@ -75,7 +76,7 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
    * @param event The plugin event.
    * @since 2.0
    */
-  final void notifyObservers(PluginEvent event) {
+  final void notifyObservers(final PluginEvent event) {
     if (logger.isTraceEnabled()) {
       logger.trace(
           "[{}] Notifying a plugin event to {} observers. EVENTNAME = {} ",
@@ -86,23 +87,43 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
     List<PluginObserverSpi> observersCopy;
 
     synchronized (monitor) {
-      if (observers == null) {
-        return;
-      }
       observersCopy = new ArrayList<PluginObserverSpi>(observers);
     }
 
-    // TODO add the asynchronous notification with the executor service if set
-    for (PluginObserverSpi observer : observersCopy) {
+    if (eventNotificationExecutorService == null) {
+      // synchronous notification
+      for (PluginObserverSpi observer : observersCopy) {
+        notifyObserver(observer, event);
+      }
+    } else {
+      // asynchronous notification
+      for (final PluginObserverSpi observer : observersCopy) {
+        eventNotificationExecutorService.execute(
+            new Runnable() {
+              @Override
+              public void run() {
+                notifyObserver(observer, event);
+              }
+            });
+      }
+    }
+  }
+
+  /**
+   * Notify a single observer of an event.
+   *
+   * @param observer The observer to notify.
+   * @param event The event.
+   */
+  private void notifyObserver(PluginObserverSpi observer, PluginEvent event) {
+    try {
+      observer.onPluginEvent(event);
+    } catch (Exception e) {
       try {
-        observer.onPluginEvent(event);
-      } catch (Exception e) {
-        try {
-          exceptionHandler.onPluginObservationError(getName(), e);
-        } catch (Exception e2) {
-          logger.error("Exception during notification", e2);
-          logger.error("Original cause", e);
-        }
+        exceptionHandler.onPluginObservationError(getName(), e);
+      } catch (Exception e2) {
+        logger.error("Exception during notification", e2);
+        logger.error("Original cause", e);
       }
     }
   }
@@ -141,9 +162,6 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
     }
 
     synchronized (monitor) {
-      if (observers == null) {
-        observers = new ArrayList<PluginObserverSpi>(1);
-      }
       observers.add(observer);
     }
   }
@@ -162,9 +180,7 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
       logger.trace("[{}] Deleting a plugin observer", getName());
     }
     synchronized (monitor) {
-      if (observers != null) {
-        observers.remove(observer);
-      }
+      observers.remove(observer);
     }
   }
 
@@ -174,9 +190,9 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
    * @since 2.0
    */
   @Override
-  public synchronized void clearObservers() {
-    if (observers != null) {
-      this.observers.clear();
+  public void clearObservers() {
+    synchronized (monitor) {
+      observers.clear();
     }
   }
 
@@ -186,8 +202,8 @@ abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
    * @since 2.0
    */
   @Override
-  public final synchronized int countObservers() {
-    return observers == null ? 0 : observers.size();
+  public final int countObservers() {
+    return observers.size();
   }
 
   /**
