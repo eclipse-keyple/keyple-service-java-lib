@@ -35,18 +35,21 @@ public interface ObservablePlugin extends Plugin {
    *
    * @param observer An observer object implementing the required interface (should be not null).
    * @since 2.0
+   * @throws IllegalArgumentException if observer is null.
+   * @throws IllegalStateException if no exception handler is defined.
    */
   void addObserver(final PluginObserverSpi observer);
 
   /**
    * Unregisters a plugin observer.
    *
-   * <p>The observer will no longer receive any of the events produced by this plugin.
+   * <p>The observer will no longer receive any of the events produced by the plugin.
    *
    * <p>If applicable, the observation process shall be stopped when the last observer is removed.
    *
    * @param observer The observer object to be unregistered (should be not null).
    * @since 2.0
+   * @throws IllegalArgumentException if observer is null.
    */
   void removeObserver(final PluginObserverSpi observer);
 
@@ -91,5 +94,5 @@ public interface ObservablePlugin extends Plugin {
    * @param exceptionHandler The exception handler implemented by the application.
    * @since 2.0
    */
-  void setReaderObservationExceptionHandler(PluginObservationExceptionHandlerSpi exceptionHandler);
+  void setPluginObservationExceptionHandler(PluginObservationExceptionHandlerSpi exceptionHandler);
 }

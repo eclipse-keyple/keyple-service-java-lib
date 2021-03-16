@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import org.eclipse.keyple.core.common.KeypleCardSelector;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
+import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,12 +29,12 @@ import org.slf4j.LoggerFactory;
  * @since 2.0
  */
 public class CardSelector implements KeypleCardSelector {
-  /** logger */
+
   private static final Logger logger = LoggerFactory.getLogger(CardSelector.class);
 
-  private final String cardProtocol;
-  private final AidSelector aidSelector;
-  private final AtrFilter atrFilter;
+  private String cardProtocol;
+  private AidSelector aidSelector;
+  private AtrFilter atrFilter;
 
   /**
    * The AID selection data.
@@ -162,10 +163,9 @@ public class CardSelector implements KeypleCardSelector {
       }
     }
 
-    private final FileOccurrence fileOccurrence;
-    private final FileControlInformation fileControlInformation;
-
-    private final byte[] aidToSelect;
+    private byte[] aidToSelect;
+    private FileOccurrence fileOccurrence;
+    private FileControlInformation fileControlInformation;
 
     /*
      * List of status codes in response to the select application command that should be considered
@@ -173,103 +173,68 @@ public class CardSelector implements KeypleCardSelector {
      */
     private Set<Integer> successfulSelectionStatusCodes;
 
-    /** Private constructor */
-    private AidSelector(AidSelectorBuilder builder) {
-      this.aidToSelect = builder.aidToSelect;
-      this.fileOccurrence = builder.fileOccurrence;
-      this.fileControlInformation = builder.fileControlInformation;
+    /**
+     * Constructor
+     *
+     * @since 2.0
+     */
+    public AidSelector() {
+      this.fileOccurrence = FileOccurrence.FIRST;
+      this.fileControlInformation = FileControlInformation.FCI;
       this.successfulSelectionStatusCodes = null;
     }
 
     /**
-     * Builder of {@link AidSelector}.
+     * Sets the AID provided as an array of bytes.
      *
+     * @param aid The AID as byte array.
+     * @return The object instance.
      * @since 2.0
      */
-    public static class AidSelectorBuilder {
-      private byte[] aidToSelect;
-      private FileOccurrence fileOccurrence = FileOccurrence.FIRST;
-      private FileControlInformation fileControlInformation = FileControlInformation.FCI;
-
-      /* Private constructor */
-      private AidSelectorBuilder() {}
-
-      /**
-       * Sets the AID provided as an array of bytes.
-       *
-       * @param aid The AID as byte array.
-       * @return The builder instance.
-       * @since 2.0
-       */
-      public AidSelectorBuilder aidToSelect(byte[] aid) {
-        if (aid.length < AID_MIN_LENGTH || aid.length > AID_MAX_LENGTH) {
-          aidToSelect = null;
-          throw new IllegalArgumentException(
-              "Bad AID length: "
-                  + aid.length
-                  + ". The AID length should be "
-                  + "between 5 and 15.");
-        } else {
-          aidToSelect = aid;
-        }
-        return this;
+    public AidSelector setAidToSelect(byte[] aid) {
+      if (aid.length < AID_MIN_LENGTH || aid.length > AID_MAX_LENGTH) {
+        aidToSelect = null;
+        throw new IllegalArgumentException(
+            "Bad AID length: " + aid.length + ". The AID length should be " + "between 5 and 15.");
+      } else {
+        aidToSelect = aid;
       }
-
-      /**
-       * Sets the AID provided as an hex string.
-       *
-       * @param aid The AID as a String.
-       * @return The builder instance..
-       * @since 2.0
-       */
-      public AidSelectorBuilder aidToSelect(String aid) {
-        return this.aidToSelect(ByteArrayUtil.fromHex(aid));
-      }
-
-      /**
-       * Sets the file occurence mode (see ISO7816-4)
-       *
-       * @param fileOccurrence the {@link FileOccurrence}
-       * @return The builder instance.
-       * @since 2.0
-       */
-      public AidSelectorBuilder fileOccurrence(FileOccurrence fileOccurrence) {
-        this.fileOccurrence = fileOccurrence;
-        return this;
-      }
-
-      /**
-       * Sets the file control mode (see ISO7816-4)
-       *
-       * @param fileControlInformation the {@link FileControlInformation}
-       * @return The builder instance.
-       * @since 2.0
-       */
-      public AidSelectorBuilder fileControlInformation(
-          FileControlInformation fileControlInformation) {
-        this.fileControlInformation = fileControlInformation;
-        return this;
-      }
-
-      /**
-       * Build a new {@code AidSelector}.
-       *
-       * @return a new instance
-       * @since 2.0
-       */
-      public AidSelector build() {
-        return new AidSelector(this);
-      }
+      return this;
     }
 
     /**
-     * Gets a new builder.
+     * Sets the AID provided as an hex string.
      *
-     * @return a new builder instance
+     * @param aid The AID as a String.
+     * @return The object instance..
      * @since 2.0
      */
-    public static AidSelectorBuilder builder() {
-      return new AidSelectorBuilder();
+    public AidSelector setAidToSelect(String aid) {
+      return this.setAidToSelect(ByteArrayUtil.fromHex(aid));
+    }
+
+    /**
+     * Sets the file occurrence mode (see ISO7816-4)
+     *
+     * @param fileOccurrence the {@link FileOccurrence}
+     * @return The object instance.
+     * @since 2.0
+     */
+    public AidSelector setFileOccurrence(FileOccurrence fileOccurrence) {
+      this.fileOccurrence = fileOccurrence;
+      return this;
+    }
+
+    /**
+     * Sets the file control mode (see ISO7816-4)
+     *
+     * @param fileControlInformation the {@link FileControlInformation}
+     * @return The object instance.
+     * @since 2.0
+     */
+    public AidSelector setFileControlInformation(FileControlInformation fileControlInformation) {
+      this.fileControlInformation = fileControlInformation;
+      return this;
     }
 
     /**
@@ -330,16 +295,7 @@ public class CardSelector implements KeypleCardSelector {
      */
     @Override
     public String toString() {
-      return "AidSelector{"
-          + "aidToSelect="
-          + ByteArrayUtil.toHex(aidToSelect)
-          + ", fileOccurrence="
-          + fileOccurrence
-          + ", fileControlInformation="
-          + fileControlInformation
-          + ", successfulSelectionStatusCodes="
-          + successfulSelectionStatusCodes
-          + '}';
+      return "AID_SELECTOR = " + JsonUtil.toJson(this);
     }
   }
 
@@ -413,20 +369,16 @@ public class CardSelector implements KeypleCardSelector {
      */
     @Override
     public String toString() {
-      return "AtrFilter{" + "atrRegex='" + atrRegex + '\'' + '}';
+      return "ATR_FILTER = " + JsonUtil.toJson(this);
     }
   }
 
   /**
-   * Protected constructor
+   * Constructor
    *
-   * @param builder the CardSelector builder
    * @since 2.0
    */
-  protected CardSelector(CardSelectorBuilder builder) {
-    this.cardProtocol = builder.cardProtocol;
-    this.aidSelector = builder.aidSelector;
-    this.atrFilter = builder.atrFilter;
+  public CardSelector() {
     if (logger.isTraceEnabled()) {
       logger.trace(
           "Selection data: AID = {}, ATRREGEX = {}",
@@ -438,114 +390,73 @@ public class CardSelector implements KeypleCardSelector {
   }
 
   /**
-   * Create a CardSelector to perform the card selection<br>
+   * Sets the card protocol.
    *
+   * @param cardProtocol A not empty String.
+   * @return The object instance.
    * @since 2.0
    */
-  public static class CardSelectorBuilder {
-    private String cardProtocol;
-    private AtrFilter atrFilter;
-    private AidSelector aidSelector;
-
-    /** Protected constructor */
-    protected CardSelectorBuilder() {}
-
-    /**
-     * Sets the card protocol.
-     *
-     * @param cardProtocol A not empty String.
-     * @return The builder instance.
-     * @since 2.0
-     */
-    public CardSelectorBuilder cardProtocol(String cardProtocol) {
-      this.cardProtocol = cardProtocol;
-      return this;
-    }
-
-    /**
-     * Sets the card ATR Filter
-     *
-     * @param atrFilter the {@link AtrFilter} of the targeted card
-     * @return The builder instance.
-     * @since 2.0
-     */
-    public CardSelectorBuilder atrFilter(AtrFilter atrFilter) {
-      this.atrFilter = atrFilter;
-      return this;
-    }
-
-    /**
-     * Sets the card AID Selector
-     *
-     * @param aidSelector the {@link AidSelector} of the targeted card
-     * @return The builder instance.
-     * @since 2.0
-     */
-    public CardSelectorBuilder aidSelector(AidSelector aidSelector) {
-      this.aidSelector = aidSelector;
-      return this;
-    }
-
-    /**
-     * Build a new {@code CardSelector}.
-     *
-     * @return a new instance
-     * @since 2.0
-     */
-    public CardSelector build() {
-      return new CardSelector(this);
-    }
+  public final CardSelector setCardProtocol(String cardProtocol) {
+    this.cardProtocol = cardProtocol;
+    return this;
   }
 
   /**
-   * Gets a new builder.
+   * Sets the card ATR Filter
    *
-   * @return a new builder instance
+   * @param atrFilter the {@link AtrFilter} of the targeted card
+   * @return The object instance.
    * @since 2.0
    */
-  public static CardSelectorBuilder builder() {
-    return new CardSelectorBuilder();
+  public final CardSelector setAtrFilter(AtrFilter atrFilter) {
+    this.atrFilter = atrFilter;
+    return this;
+  }
+
+  /**
+   * Sets the card AID Selector
+   *
+   * @param aidSelector the {@link AidSelector} of the targeted card
+   * @return The object instance.
+   * @since 2.0
+   */
+  public final CardSelector setAidSelector(AidSelector aidSelector) {
+    this.aidSelector = aidSelector;
+    return this;
   }
 
   /**
    * Gets the card protocol name.
    *
-   * @return the {@link String} provided at construction time
+   * @return null if no card protocol has been set.
    * @since 2.0
    */
-  public String getCardProtocol() {
+  public final String getCardProtocol() {
     return cardProtocol;
   }
 
   /**
    * Gets the ATR filter
    *
-   * @return The {@link AtrFilter} (can be null)
+   * @return null if no ATR filter has been set.
    * @since 2.0
    */
-  public AtrFilter getAtrFilter() {
+  public final AtrFilter getAtrFilter() {
     return atrFilter;
   }
 
   /**
    * Gets the AID selector
    *
-   * @return The {@link AidSelector} (can be null)
+   * @return null if no AID selector has been set.
    * @since 2.0
    */
-  public AidSelector getAidSelector() {
+  public final AidSelector getAidSelector() {
     return aidSelector;
   }
 
   @Override
   public String toString() {
-    return "CardSelector{"
-        + "cardProtocol="
-        + cardProtocol
-        + ", aidSelector="
-        + aidSelector
-        + ", atrFilter="
-        + atrFilter
-        + '}';
+    return "CARD_SELECTOR = " + JsonUtil.toJson(this);
   }
 }

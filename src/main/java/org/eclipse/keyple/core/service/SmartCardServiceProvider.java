@@ -12,27 +12,22 @@
 package org.eclipse.keyple.core.service;
 
 /**
- * Indicates that the plugin cannot be instantiated, possibly due to a problem with one of the
- * associated readers.
+ * Provider of the {@link SmartCardService}.
  *
  * @since 2.0
  */
-public class KeyplePluginInstantiationException extends RuntimeException {
+public final class SmartCardServiceProvider {
+
+  /** Private constructor */
+  private SmartCardServiceProvider() {}
 
   /**
-   * @param message the message to identify the exception context
+   * Gets the unique instance of {@link SmartCardService}.
+   *
+   * @return A not null reference.
    * @since 2.0
    */
-  public KeyplePluginInstantiationException(String message) {
-    super(message);
-  }
-
-  /**
-   * @param message the message to identify the exception context
-   * @param cause the cause
-   * @since 2.0
-   */
-  public KeyplePluginInstantiationException(String message, Throwable cause) {
-    super(message, cause);
+  public static SmartCardService getService() {
+    return SmartCardServiceAdapter.getInstance();
   }
 }

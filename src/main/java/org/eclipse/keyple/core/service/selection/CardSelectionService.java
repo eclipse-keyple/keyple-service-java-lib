@@ -13,6 +13,8 @@ package org.eclipse.keyple.core.service.selection;
 
 import java.util.List;
 import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
+import org.eclipse.keyple.core.service.KeypleCardCommunicationException;
+import org.eclipse.keyple.core.service.KeypleReaderCommunicationException;
 import org.eclipse.keyple.core.service.ObservableReader;
 import org.eclipse.keyple.core.service.Reader;
 import org.eclipse.keyple.core.service.selection.spi.CardSelection;
@@ -74,6 +76,8 @@ public interface CardSelectionService {
    *
    * @param reader The reader to communicate with the card.
    * @return A not null reference.
+   * @throws KeypleReaderCommunicationException if the communication with the reader has failed.
+   * @throws KeypleCardCommunicationException if the communication with the card has failed.
    * @since 2.0
    */
   CardSelectionResult processCardSelectionScenario(Reader reader);
@@ -122,6 +126,7 @@ public interface CardSelectionService {
    *
    * @param cardSelectionResponses The card selection scenario execution response.
    * @return A not null reference.
+   * @throws IllegalArgumentException if the list is null or empty.
    * @since 2.0
    */
   CardSelectionResult processCardSelectionResponses(

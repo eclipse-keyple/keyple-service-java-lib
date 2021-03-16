@@ -22,13 +22,19 @@ import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 public final class CardSelectionServiceFactory {
 
   /**
+   * (private)<br>
+   * Constructor
+   */
+  private CardSelectionServiceFactory() {}
+
+  /**
    * Retrieves an instance of a {@link CardSelectionService} that stops as soon as a card matches.
    *
    * @return A not null reference
    * @since 2.0
    */
   public static CardSelectionService getService() {
-    return null;
+    return new CardSelectionServiceAdapter(MultiSelectionProcessing.FIRST_MATCH);
   }
 
   /**
@@ -40,6 +46,6 @@ public final class CardSelectionServiceFactory {
    * @since 2.0
    */
   public static CardSelectionService getService(MultiSelectionProcessing multiSelectionProcessing) {
-    return null;
+    return new CardSelectionServiceAdapter(multiSelectionProcessing);
   }
 }

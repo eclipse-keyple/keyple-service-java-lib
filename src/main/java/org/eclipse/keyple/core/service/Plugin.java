@@ -35,12 +35,14 @@ public interface Plugin {
   /**
    * Returns the {@link KeyplePluginExtension} that is plugin-specific.
    *
-   * @param pluginType The specific class of the plugin.
+   * <p>Note: the provided argument is used at compile time to check the type consistency.
+   *
+   * @param pluginExtensionType The specific class of the plugin.
    * @param <T> The type of the plugin extension.
    * @return A not null reference.
    * @since 2.0
    */
-  <T extends KeyplePluginExtension> T getExtension(Class<T> pluginType);
+  <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionType);
 
   /**
    * Gets the list of names of all available readers.

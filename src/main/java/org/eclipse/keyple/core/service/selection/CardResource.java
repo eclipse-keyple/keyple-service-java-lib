@@ -19,7 +19,7 @@ import org.eclipse.keyple.core.service.selection.spi.SmartCard;
  *
  * @since 2.0
  */
-public class CardResource<T extends SmartCard> {
+public final class CardResource<T extends SmartCard> {
   private final Reader reader;
   private final T smartCard;
 

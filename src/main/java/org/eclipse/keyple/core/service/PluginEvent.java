@@ -114,7 +114,7 @@ public final class PluginEvent implements KeyplePluginEvent {
   /**
    * Gets the names of the readers related to the event in the form of a sorted set.
    *
-   * @return A not empty sorted set of strings.
+   * @return A not null reference.
    * @since 2.0
    */
   public SortedSet<String> getReadersNames() {
@@ -124,7 +124,7 @@ public final class PluginEvent implements KeyplePluginEvent {
   /**
    * Gets the plugin event type.
    *
-   * @return A not null value.
+   * @return A not null reference.
    * @since 2.0
    */
   public EventType getEventType() {
