@@ -191,7 +191,12 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       ((ReaderSpi) observableReaderSpi).transmitApdu(APDU_PING_CARD_PRESENCE);
     } catch (ReaderIOException e) {
       // Notify the reader communication failure with the exception handler.
-      getObservationExceptionHandler().onReaderObservationError(getPluginName(), getName(), e);
+      getObservationExceptionHandler()
+          .onReaderObservationError(
+              getPluginName(),
+              getName(),
+              new KeypleReaderCommunicationException(
+                  "An error occurred while monitoring the reader.", e));
     } catch (CardIOException e) {
       if (logger.isTraceEnabled()) {
         logger.trace(
@@ -275,7 +280,12 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
     } catch (ReaderCommunicationException e) {
       // Notify the reader communication failure with the exception handler.
-      getObservationExceptionHandler().onReaderObservationError(getPluginName(), getName(), e);
+      getObservationExceptionHandler()
+          .onReaderObservationError(
+              getPluginName(),
+              getName(),
+              new KeypleReaderCommunicationException(
+                  "An error occurred while monitoring the reader.", e));
 
     } catch (CardCommunicationException e) {
       // The last transmission failed, close the logical and physical channels.
@@ -293,7 +303,12 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       ((ReaderSpi) observableReaderSpi).closePhysicalChannel();
     } catch (ReaderIOException e) {
       // Notify the reader communication failure with the exception handler.
-      getObservationExceptionHandler().onReaderObservationError(getPluginName(), getName(), e);
+      getObservationExceptionHandler()
+          .onReaderObservationError(
+              getPluginName(),
+              getName(),
+              new KeypleReaderCommunicationException(
+                  "An error occurred while monitoring the reader.", e));
     }
 
     // no event returned

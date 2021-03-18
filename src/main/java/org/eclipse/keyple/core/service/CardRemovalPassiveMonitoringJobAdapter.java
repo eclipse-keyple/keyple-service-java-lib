@@ -81,7 +81,7 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
         try {
           while (!Thread.currentThread().isInterrupted()) {
             try {
-              readerSpi.waitForCardAbsentNative();
+              readerSpi.waitForCardRemoval();
               monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
               break;
             } catch (ReaderIOException e) {

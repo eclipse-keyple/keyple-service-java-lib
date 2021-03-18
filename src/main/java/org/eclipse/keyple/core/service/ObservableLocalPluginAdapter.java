@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import org.eclipse.keyple.core.plugin.ReaderIOException;
+import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.ObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
@@ -154,8 +154,11 @@ final class ObservableLocalPluginAdapter
     /**
      * (private)<br>
      * Adds a reader to the list of known readers (by the plugin)
+     *
+     * @param readerName The name of the reader.
+     * @throws PluginIOException if an error occurs while searching the reader.
      */
-    private void addReader(String readerName) throws ReaderIOException {
+    private void addReader(String readerName) throws PluginIOException {
       ReaderSpi readerSpi;
       readerSpi = observablePluginSpi.searchReader(readerName);
       LocalReaderAdapter reader = new LocalReaderAdapter(readerSpi, readerName);
@@ -207,8 +210,9 @@ final class ObservableLocalPluginAdapter
      * Observers are notified of changes.
      *
      * @param actualNativeReadersNames the list of readers currently known by the system
+     * @throws PluginIOException if an error occurs while searching readers.
      */
-    private void processChanges(Set<String> actualNativeReadersNames) throws ReaderIOException {
+    private void processChanges(Set<String> actualNativeReadersNames) throws PluginIOException {
       SortedSet<String> changedReaderNames = new ConcurrentSkipListSet<String>();
       /*
        * parse the current readers list, notify for disappeared readers, update
@@ -277,8 +281,11 @@ final class ObservableLocalPluginAdapter
             pluginName);
         // Restore interrupted state...
         Thread.currentThread().interrupt();
-      } catch (ReaderIOException e) {
-        getObservationExceptionHandler().onPluginObservationError(getName(), e);
+      } catch (PluginIOException e) {
+        getObservationExceptionHandler()
+            .onPluginObservationError(
+                getName(),
+                new KeyplePluginException("An error occurred while monitoring the readers.", e));
       }
     }
   }

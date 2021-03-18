@@ -77,7 +77,7 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
         try {
           while (!Thread.currentThread().isInterrupted()) {
             try {
-              readerSpi.waitForCardPresent();
+              readerSpi.waitForCardInsertion();
               monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
               break;
             } catch (ReaderIOException e) {
@@ -110,6 +110,6 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] stopWaitForCard on reader", getReader().getName());
     }
-    readerSpi.stopWaitForCard();
+    readerSpi.stopWaitForCardInsertion();
   }
 }
