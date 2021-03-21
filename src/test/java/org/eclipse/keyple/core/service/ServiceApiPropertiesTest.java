@@ -9,14 +9,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.eclipse.keyple.core.card;
+package org.eclipse.keyple.core.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
-import org.eclipse.keyple.core.service.ServiceApiProperties;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
