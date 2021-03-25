@@ -34,7 +34,7 @@ public interface PoolPlugin extends Plugin {
    * @return a list of String
    * @since 2.0
    */
-  SortedSet<String> getReaderGroupReferences();
+  SortedSet<String> getKeyGroupReferences();
 
   /**
    * Gets a {@link Reader} and makes it exclusive to the caller until the {@link
@@ -42,13 +42,13 @@ public interface PoolPlugin extends Plugin {
    *
    * <p>The allocated reader belongs to the group targeted with provided reference.
    *
-   * @param readerGroupReference The reference of the group to which the reader belongs (may be null
+   * @param keyGroupReference The reference of the group to which the reader belongs (may be null
    *     depending on the implementation made)
    * @return a Reader object
    * @throws KeypleReaderNotFoundException if the allocation failed due to lack of available reader
    * @since 2.0
    */
-  Reader allocateReader(String readerGroupReference);
+  Reader allocateReader(String keyGroupReference);
 
   /**
    * Releases a Reader previously allocated with allocateReader.

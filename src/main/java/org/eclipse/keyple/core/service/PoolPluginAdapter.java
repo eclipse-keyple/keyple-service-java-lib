@@ -44,14 +44,14 @@ final class PoolPluginAdapter<P> extends PluginAdapter<P> implements PoolPlugin 
    * @since 2.0
    */
   @Override
-  public SortedSet<String> getReaderGroupReferences() {
-    SortedSet<String> readerGroupReferences;
+  public SortedSet<String> getKeyGroupReferences() {
+    SortedSet<String> keyGroupReferences;
     try {
-      readerGroupReferences = ((PoolPluginSpi) poolPluginSpi).getReaderGroupReferences();
+      keyGroupReferences = ((PoolPluginSpi) poolPluginSpi).getKeyGroupReferences();
     } catch (PluginIOException e) {
       throw new KeyplePluginException("Unable to get reader group references.", e);
     }
-    return readerGroupReferences;
+    return keyGroupReferences;
   }
 
   /**
@@ -60,15 +60,15 @@ final class PoolPluginAdapter<P> extends PluginAdapter<P> implements PoolPlugin 
    * @since 2.0
    */
   @Override
-  public Reader allocateReader(String readerGroupReference) {
+  public Reader allocateReader(String keyGroupReference) {
     Reader reader;
     try {
       reader =
           new LocalReaderAdapter(
-              ((PoolPluginSpi) poolPluginSpi).allocateReader(readerGroupReference), getName());
+              ((PoolPluginSpi) poolPluginSpi).allocateReader(keyGroupReference), getName());
     } catch (PluginIOException e) {
       throw new KeypleReaderNotFoundException(
-          "Unable to allocate a reader for reference " + readerGroupReference, e);
+          "Unable to allocate a reader for reference " + keyGroupReference, e);
     }
     return reader;
   }
