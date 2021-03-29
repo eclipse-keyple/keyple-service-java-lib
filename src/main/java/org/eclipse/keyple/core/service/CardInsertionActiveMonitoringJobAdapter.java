@@ -31,7 +31,7 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
   private static final Logger logger =
       LoggerFactory.getLogger(CardInsertionActiveMonitoringJobAdapter.class);
 
-  private final long cycleDurationInMillis;
+  private final long cycleDurationMillis;
   private final boolean monitorInsertion;
   private final Reader reader;
   private final AtomicBoolean loop = new AtomicBoolean();
@@ -41,14 +41,14 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
    * Build a monitoring job to detect the card insertion
    *
    * @param reader reader that will be polled with the method isCardPresent()
-   * @param cycleDurationInMillis time interval between two presence polls.
+   * @param cycleDurationMillis time interval between two presence polls.
    * @param monitorInsertion if true, polls for CARD_INSERTED, else CARD_REMOVED
    * @since 2.0
    */
   public CardInsertionActiveMonitoringJobAdapter(
-      ObservableLocalReaderAdapter reader, long cycleDurationInMillis, boolean monitorInsertion) {
+      ObservableLocalReaderAdapter reader, long cycleDurationMillis, boolean monitorInsertion) {
     super(reader);
-    this.cycleDurationInMillis = cycleDurationInMillis;
+    this.cycleDurationMillis = cycleDurationMillis;
     this.reader = reader;
     this.monitorInsertion = monitorInsertion;
   }
@@ -107,7 +107,7 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
             }
             try {
               // wait a bit
-              Thread.sleep(cycleDurationInMillis);
+              Thread.sleep(cycleDurationMillis);
             } catch (InterruptedException ignored) {
               // Restore interrupted state...
               Thread.currentThread().interrupt();
