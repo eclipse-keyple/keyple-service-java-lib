@@ -21,7 +21,7 @@ import org.eclipse.keyple.core.common.KeypleReaderExtension;
 public interface Reader {
 
   /**
-   * Gets the name of the reader
+   * Gets the name of the reader.
    *
    * @return A not empty string.
    * @since 2.0
@@ -29,14 +29,14 @@ public interface Reader {
   String getName();
 
   /**
-   * Returns the {@link KeypleReaderExtension} that is reader-specific
+   * Returns the {@link KeypleReaderExtension} that is reader-specific.
    *
    * <p>Note: the provided argument is used at compile time to check the type consistency.
    *
-   * @param readerExtensionType the specific class of the reader
-   * @param <T> The type of the reader extension
-   * @return a {@link KeypleReaderExtension}
-   * @throws IllegalStateException if reader is no longer registered
+   * @param readerExtensionType The specific class of the reader.
+   * @param <T> The type of the reader extension.
+   * @return A {@link KeypleReaderExtension}.
+   * @throws IllegalStateException If reader is no longer registered.
    * @since 2.0
    */
   <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionType);
@@ -44,8 +44,8 @@ public interface Reader {
   /**
    * Tells if the current card communication is contactless.
    *
-   * @return True if the communication is contactless, false if not.
-   * @throws IllegalStateException if reader is no longer registered
+   * @return true if the communication is contactless, false if not.
+   * @throws IllegalStateException If reader is no longer registered.
    * @since 2.0
    */
   boolean isContactless();
@@ -53,9 +53,9 @@ public interface Reader {
   /**
    * Checks if is the card present.
    *
-   * @return true if a card is present in the reader
-   * @throws KeypleReaderCommunicationException if the communication with the reader has failed.
-   * @throws IllegalStateException if reader is no longer registered
+   * @return true if a card is present in the reader.
+   * @throws KeypleReaderCommunicationException If the communication with the reader has failed.
+   * @throws IllegalStateException If reader is no longer registered.
    * @since 2.0
    */
   boolean isCardPresent();
@@ -70,18 +70,19 @@ public interface Reader {
    *   <li>Internally associates the two strings provided as arguments.
    *   <li>The #readerProtocolName argument is the name of the protocol among those supported by the
    *       reader.
-   *   <li>The #cardProtocol is the name of the protocol to be the plugin when a card using this
-   *       protocol is detected.
+   *   <li>The #cardProtocol is the protocol name shared with the application when a card
+   *       communicating with the provided reader protocol is detected.
    * </ul>
    *
    * Note: in the case where multiple protocols are activated, they will be checked in the selection
    * process in the order in which they were activated. The most likely cases should therefore be
    * activated first.
    *
-   * @param readerProtocolName A not empty String.
-   * @param cardProtocol A not empty String.
-   * @throws KeypleReaderProtocolNotSupportedException if the protocol is not supported.
-   * @throws IllegalStateException if reader is no longer registered
+   * @param readerProtocolName The name of the protocol as known by the reader.
+   * @param cardProtocol The name of the protocol as known by the application.
+   * @throws IllegalArgumentException If one of the provided protocol is null.
+   * @throws IllegalStateException If reader is no longer registered.
+   * @throws KeypleReaderProtocolNotSupportedException If the protocol is not supported.
    * @since 2.0
    */
   void activateProtocol(String readerProtocolName, String cardProtocol);
@@ -96,8 +97,9 @@ public interface Reader {
    * </ul>
    *
    * @param readerProtocolName A not empty String.
-   * @throws KeypleReaderProtocolNotSupportedException if the protocol is not supported.
-   * @throws IllegalStateException if reader is no longer registered
+   * @throws IllegalStateException If reader is no longer registered.
+   * @throws IllegalArgumentException If the provided protocol is null.
+   * @throws KeypleReaderProtocolNotSupportedException If the protocol is not supported.
    * @since 2.0
    */
   void deactivateProtocol(String readerProtocolName);
