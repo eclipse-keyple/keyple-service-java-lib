@@ -233,11 +233,11 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         .notEmpty(readerProtocol, "readerProtocol")
         .notEmpty(applicationProtocol, "applicationProtocol");
 
-    try {
-      readerSpi.activateProtocol(readerProtocol);
-    } catch(IllegalArgumentException e) {
+    if (readerSpi.isProtocolSupported(readerProtocol)) {
       throw new KeypleReaderProtocolNotSupportedException(readerProtocol);
     }
+
+    readerSpi.activateProtocol(readerProtocol);
 
     protocolAssociations.put(readerProtocol, applicationProtocol);
   }
@@ -253,11 +253,11 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     protocolAssociations.remove(readerProtocol);
 
-    try {
-      readerSpi.deactivateProtocol(readerProtocol);
-    } catch(IllegalArgumentException e) {
+    if (readerSpi.isProtocolSupported(readerProtocol)) {
       throw new KeypleReaderProtocolNotSupportedException(readerProtocol);
     }
+
+    readerSpi.deactivateProtocol(readerProtocol);
   }
 
   /**

@@ -21,8 +21,8 @@ import org.eclipse.keyple.core.card.ReaderCommunicationException;
 import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
-import org.eclipse.keyple.core.plugin.WaitForCardInsertionAutonomousReaderManager;
-import org.eclipse.keyple.core.plugin.WaitForCardRemovalAutonomousReaderManager;
+import org.eclipse.keyple.core.plugin.WaitForCardInsertionAutonomousReaderApi;
+import org.eclipse.keyple.core.plugin.WaitForCardRemovalAutonomousReaderApi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
@@ -33,15 +33,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
- * Implementation for {@link ObservableReader}, {@link WaitForCardInsertionAutonomousReaderManager}
- * and {@link WaitForCardRemovalAutonomousReaderManager}.
+ * Implementation for {@link ObservableReader}, {@link WaitForCardInsertionAutonomousReaderApi} and
+ * {@link WaitForCardRemovalAutonomousReaderApi}.
  *
  * @since 2.0
  */
 final class ObservableLocalReaderAdapter extends LocalReaderAdapter
     implements ObservableReader,
-        WaitForCardInsertionAutonomousReaderManager,
-        WaitForCardRemovalAutonomousReaderManager {
+        WaitForCardInsertionAutonomousReaderApi,
+        WaitForCardRemovalAutonomousReaderApi {
 
   private static final Logger logger = LoggerFactory.getLogger(ObservableLocalReaderAdapter.class);
 
