@@ -61,31 +61,36 @@ public interface Reader {
   boolean isCardPresent();
 
   /**
-   * Activates the provided card protocol and assigns it a name.
+   * Activates the reader protocol having the provided reader protocol name and associates it with
+   * the name used by the application.
    *
    * <ul>
    *   <li>Activates the detection of cards using this protocol (if the plugin allows it).
    *   <li>Asks the plugin to take this protocol into account if a card using this protocol is
    *       identified during the selection phase.
    *   <li>Internally associates the two strings provided as arguments.
-   *   <li>The #readerProtocolName argument is the name of the protocol among those supported by the
-   *       reader.
-   *   <li>The #cardProtocol is the protocol name shared with the application when a card
-   *       communicating with the provided reader protocol is detected.
    * </ul>
    *
-   * Note: in the case where multiple protocols are activated, they will be checked in the selection
+   * In the case where multiple protocols are activated, they will be checked in the selection
    * process in the order in which they were activated. The most likely cases should therefore be
    * activated first.
    *
-   * @param readerProtocolName The name of the protocol as known by the reader.
+   * <p>During the selection process, the application will need to use the cardProtocol to designate
+   * the targeted card type.
+   *
+   * <p>Note: a set of commonly used card protocol names is made available to applications in the
+   * protocol package of the keyple-java-utils library ({@link
+   * org.eclipse.keyple.core.util.protocol.ContactCardCommonProtocol} and {@link
+   * org.eclipse.keyple.core.util.protocol.ContactlessCardCommonProtocol}).
+   *
+   * @param readerProtocol The name of the protocol as known by the reader.
    * @param cardProtocol The name of the protocol as known by the application.
    * @throws IllegalArgumentException If one of the provided protocol is null.
    * @throws IllegalStateException If reader is no longer registered.
    * @throws KeypleReaderProtocolNotSupportedException If the protocol is not supported.
    * @since 2.0
    */
-  void activateProtocol(String readerProtocolName, String cardProtocol);
+  void activateProtocol(String readerProtocol, String cardProtocol);
 
   /**
    * Deactivates the provided card protocol.
@@ -96,11 +101,11 @@ public interface Reader {
    *       the selection phase.
    * </ul>
    *
-   * @param readerProtocolName A not empty String.
+   * @param readerProtocol The name of the protocol as known by the reader.
    * @throws IllegalStateException If reader is no longer registered.
    * @throws IllegalArgumentException If the provided protocol is null.
    * @throws KeypleReaderProtocolNotSupportedException If the protocol is not supported.
    * @since 2.0
    */
-  void deactivateProtocol(String readerProtocolName);
+  void deactivateProtocol(String readerProtocol);
 }
