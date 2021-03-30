@@ -13,7 +13,7 @@ package org.eclipse.keyple.core.service;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.eclipse.keyple.core.plugin.AutonomousObservablePluginManager;
+import org.eclipse.keyple.core.plugin.AutonomousObservablePluginApi;
 import org.eclipse.keyple.core.plugin.spi.AutonomousObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 final class AutonomousObservableLocalPluginAdapter
     extends AbstractObservablePluginAdapter<AutonomousObservablePluginSpi>
-    implements AutonomousObservablePluginManager {
+    implements AutonomousObservablePluginApi {
   private static final Logger logger =
       LoggerFactory.getLogger(AutonomousObservableLocalPluginAdapter.class);
 
