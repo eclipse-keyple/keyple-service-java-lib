@@ -313,13 +313,10 @@ final class DistributedLocalServiceAdapter
   private PoolPlugin getPoolPlugin(String readerGroupReference) {
     PoolPlugin poolPlugin;
     for (String poolPluginName : poolPluginNames) {
-      try {
-        poolPlugin = (PoolPlugin) SmartCardServiceProvider.getService().getPlugin(poolPluginName);
-        if (poolPlugin.getReaderGroupReferences().contains(readerGroupReference)) {
-          return poolPlugin;
-        }
-      } catch (KeyplePluginNotFoundException e) {
-        // The plugin is no longer register, then continue.
+      poolPlugin = (PoolPlugin) SmartCardServiceProvider.getService().getPlugin(poolPluginName);
+      if (poolPlugin != null
+          && poolPlugin.getReaderGroupReferences().contains(readerGroupReference)) {
+        return poolPlugin;
       }
     }
     return null;
@@ -818,13 +815,9 @@ final class DistributedLocalServiceAdapter
       // Execute the service on the plugins
       PoolPlugin poolPlugin;
       for (String poolPluginName : poolPluginNames) {
-        try {
-          poolPlugin = (PoolPlugin) SmartCardServiceProvider.getService().getPlugin(poolPluginName);
-          if (poolPlugin.getReadersNames().contains(readerName)) {
-            poolPlugin.releaseReader(poolPlugin.getReader(readerName));
-          }
-        } catch (KeyplePluginNotFoundException e) {
-          // The plugin is no longer register, then continue.
+        poolPlugin = (PoolPlugin) SmartCardServiceProvider.getService().getPlugin(poolPluginName);
+        if (poolPlugin != null && poolPlugin.getReadersNames().contains(readerName)) {
+          poolPlugin.releaseReader(poolPlugin.getReader(readerName));
         }
       }
     }
