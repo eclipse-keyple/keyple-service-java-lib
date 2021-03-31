@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * (package-private)<br>
- * Implementation of {@link SmartCardService}.
+ * Implementation of {@link CardResourceService}.
  *
  * @since 2.0
  */

@@ -27,7 +27,7 @@ public final class CardResourceServiceProvider {
    * @return A not null reference.
    * @since 2.0
    */
-  static CardResourceService getService() {
+  public static CardResourceService getService() {
     return CardResourceServiceAdapter.getInstance();
   }
 }

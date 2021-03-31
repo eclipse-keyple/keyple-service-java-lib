@@ -228,15 +228,15 @@ public interface CardResourceServiceConfigurator {
   interface ProfileStep {
 
     /**
-     * Creates a card profile with the provided name.
+     * Creates a card resource profile with the provided name.
      *
-     * @param name The card profile name.
+     * @param name The card resource profile name.
      * @return Next configuration step.
      * @throws IllegalArgumentException If the name is null or empty.
      * @throws IllegalStateException If the name is already in use.
      * @since 2.0
      */
-    ProfileParameterStep addCardProfile(String name);
+    ProfileParameterStep addCardResourceProfile(String name);
 
     /**
      * Terminates the creation of card profiles.
@@ -245,7 +245,7 @@ public interface CardResourceServiceConfigurator {
      * @throws IllegalStateException If no card profile has been added.
      * @since 2.0
      */
-    ConfigurationStep addNoMoreCardProfiles();
+    ConfigurationStep addNoMoreCardResourceProfiles();
   }
 
   /**

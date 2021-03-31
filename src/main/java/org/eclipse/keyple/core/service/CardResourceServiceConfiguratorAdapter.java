@@ -447,7 +447,7 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public ProfileParameterStep addCardProfile(String name) {
+  public ProfileParameterStep addCardResourceProfile(String name) {
 
     Assert.getInstance().notEmpty(name, "name");
 
@@ -467,7 +467,7 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public ConfigurationStep addNoMoreCardProfiles() {
+  public ConfigurationStep addNoMoreCardResourceProfiles() {
 
     if (cardProfiles.isEmpty()) {
       throw new IllegalStateException("No CARD profile has been added.");
