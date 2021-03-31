@@ -11,8 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import org.eclipse.keyple.core.card.CardCommunicationException;
 import org.eclipse.keyple.core.card.CardSelectionResponse;
@@ -52,7 +51,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   private final ObservableReaderSpi observableReaderSpi;
   private ReaderObservationExceptionHandlerSpi exceptionHandler;
   private final ObservableReaderStateServiceAdapter stateService;
-  private final List<ReaderObserverSpi> observers;
+  private final Set<ReaderObserverSpi> observers;
   private CardSelectionScenario cardSelectionScenario;
   private NotificationMode notificationMode;
   private PollingMode currentPollingMode;
@@ -120,10 +119,10 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   ObservableLocalReaderAdapter(ObservableReaderSpi observableReaderSpi, String pluginName) {
-    super((ReaderSpi) observableReaderSpi, pluginName);
+    super(observableReaderSpi, pluginName);
     this.observableReaderSpi = observableReaderSpi;
     this.stateService = new ObservableReaderStateServiceAdapter(this);
-    this.observers = new ArrayList<ReaderObserverSpi>(1);
+    this.observers = new LinkedHashSet<ReaderObserverSpi>(1);
   }
 
   /**

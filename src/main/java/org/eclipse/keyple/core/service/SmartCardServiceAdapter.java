@@ -19,6 +19,9 @@ import org.eclipse.keyple.core.common.CommonsApiProperties;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory;
 import org.eclipse.keyple.core.common.KeyplePluginExtensionFactory;
+import org.eclipse.keyple.core.distributed.local.DistributedLocalApiProperties;
+import org.eclipse.keyple.core.distributed.local.spi.LocalServiceFactorySpi;
+import org.eclipse.keyple.core.distributed.local.spi.LocalServiceSpi;
 import org.eclipse.keyple.core.plugin.PluginApiProperties;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.*;
@@ -27,22 +30,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * (package-private)<br>
  * Implementation of {@link SmartCardService}.
  *
  * @since 2.0
  */
-public final class SmartCardServiceAdapter implements SmartCardService {
+final class SmartCardServiceAdapter implements SmartCardService {
 
   private static final Logger logger = LoggerFactory.getLogger(SmartCardServiceAdapter.class);
 
-  /** singleton instance of SmartCardServiceAdapter */
   private static final SmartCardServiceAdapter uniqueInstance = new SmartCardServiceAdapter();
 
-  /** the list of readers’ plugins interfaced with the card Proxy Service */
   private final Map<String, Plugin> plugins = new ConcurrentHashMap<String, Plugin>();
+  private final Object pluginMonitor = new Object();
 
-  /** Field MONITOR, this is the object we will be synchronizing on ("the monitor") */
-  private final Object monitor = new Object();
+  private final Map<String, DistributedLocalService> distributedLocalServices =
+      new ConcurrentHashMap<String, DistributedLocalService>();
+  private final Object distributedLocalServiceMonitor = new Object();
 
   /** Private constructor. */
   private SmartCardServiceAdapter() {}
@@ -182,16 +186,66 @@ public final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
+   * (private)<br>
+   * Checks for consistency in the versions of external APIs shared by the distributed local service
+   * and the service.
+   *
+   * <p>Generates warnings into the log.
+   *
+   * @param localServiceFactorySpi The distributed local service factory SPI.
+   */
+  private void checkDistributedLocalServiceVersion(LocalServiceFactorySpi localServiceFactorySpi) {
+    if (compareVersions(localServiceFactorySpi.getCommonsApiVersion(), CommonsApiProperties.VERSION)
+        != 0) {
+      logger.warn(
+          "The version of Commons API used by the provided distributed local service ({}:{}) mismatches the version used by the service ({}).",
+          localServiceFactorySpi.getLocalServiceName(),
+          localServiceFactorySpi.getCommonsApiVersion(),
+          CommonsApiProperties.VERSION);
+    }
+    if (compareVersions(
+            localServiceFactorySpi.getDistributedLocalApiVersion(),
+            DistributedLocalApiProperties.VERSION)
+        != 0) {
+      logger.warn(
+          "The version of Distributed Local API used by the provided distributed local service ({}:{}) mismatches the version used by the service ({}).",
+          localServiceFactorySpi.getLocalServiceName(),
+          localServiceFactorySpi.getDistributedLocalApiVersion(),
+          PluginApiProperties.VERSION);
+    }
+  }
+
+  /**
    * Checks if the plugin is already registered.
    *
    * @param pluginName The plugin name.
    * @throws IllegalStateException if the plugin is already registered.
    */
   private void checkPluginRegistration(String pluginName) {
-    logger.info("Registering a new Plugin to the platform : {}", pluginName);
+    logger.info("Registering a new Plugin to the service : {}", pluginName);
+    Assert.getInstance().notEmpty(pluginName, "pluginName");
     if (isPluginRegistered(pluginName)) {
       throw new IllegalStateException(
-          "Plugin has already been registered to the platform : " + pluginName);
+          String.format("The plugin '%s' has already been registered to the service.", pluginName));
+    }
+  }
+
+  /**
+   * Checks if the distributed local service is already registered.
+   *
+   * @param distributedLocalServiceName The distributed local service name.
+   * @throws IllegalStateException if the distributed local service is already registered.
+   */
+  private void checkDistributedLocalServiceRegistration(String distributedLocalServiceName) {
+    logger.info(
+        "Registering a new distributed local service to the service : {}",
+        distributedLocalServiceName);
+    Assert.getInstance().notEmpty(distributedLocalServiceName, "distributedLocalServiceName");
+    if (isDistributedLocalServiceRegistered(distributedLocalServiceName)) {
+      throw new IllegalStateException(
+          String.format(
+              "The distributed local service '%s' has already been registered to the service.",
+              distributedLocalServiceName));
     }
   }
 
@@ -205,37 +259,53 @@ public final class SmartCardServiceAdapter implements SmartCardService {
     Assert.getInstance().notNull(pluginFactory, "pluginFactory");
 
     PluginAdapter<?> plugin;
-
-    synchronized (monitor) {
-      if (pluginFactory instanceof PluginFactorySpi) {
-        PluginFactorySpi pluginFactorySpi = (PluginFactorySpi) pluginFactory;
-        checkPluginRegistration(pluginFactorySpi.getPluginName());
-        checkPluginVersion(pluginFactorySpi);
-        PluginSpi pluginSpi = pluginFactorySpi.getPlugin();
-        if (pluginSpi instanceof ObservablePluginSpi) {
-          plugin = new ObservableLocalPluginAdapter((ObservablePluginSpi) pluginSpi);
-        } else if (pluginSpi instanceof AutonomousObservablePluginSpi) {
-          plugin =
-              new AutonomousObservableLocalPluginAdapter((AutonomousObservablePluginSpi) pluginSpi);
+    try {
+      synchronized (pluginMonitor) {
+        if (pluginFactory instanceof PluginFactorySpi) {
+          PluginFactorySpi pluginFactorySpi = (PluginFactorySpi) pluginFactory;
+          checkPluginRegistration(pluginFactorySpi.getPluginName());
+          checkPluginVersion(pluginFactorySpi);
+          PluginSpi pluginSpi = pluginFactorySpi.getPlugin();
+          if (!pluginSpi.getName().equals(pluginFactorySpi.getPluginName())) {
+            throw new IllegalArgumentException(
+                String.format(
+                    "The plugin name '%s' mismatches the expected name '%s' provided by the factory",
+                    pluginSpi.getName(), pluginFactorySpi.getPluginName()));
+          }
+          if (pluginSpi instanceof ObservablePluginSpi) {
+            plugin = new ObservableLocalPluginAdapter((ObservablePluginSpi) pluginSpi);
+          } else if (pluginSpi instanceof AutonomousObservablePluginSpi) {
+            plugin =
+                new AutonomousObservableLocalPluginAdapter(
+                    (AutonomousObservablePluginSpi) pluginSpi);
+          } else {
+            plugin = new PluginAdapter<PluginSpi>(pluginSpi);
+          }
+        } else if (pluginFactory instanceof PoolPluginFactorySpi) {
+          PoolPluginFactorySpi poolPluginFactorySpi = (PoolPluginFactorySpi) pluginFactory;
+          checkPluginRegistration(poolPluginFactorySpi.getPoolPluginName());
+          checkPoolPluginVersion(poolPluginFactorySpi);
+          PoolPluginSpi poolPluginSpi = poolPluginFactorySpi.getPoolPlugin();
+          if (!poolPluginSpi.getName().equals(poolPluginFactorySpi.getPoolPluginName())) {
+            throw new IllegalArgumentException(
+                String.format(
+                    "The pool plugin name '%s' mismatches the expected name '%s' provided by the factory",
+                    poolPluginSpi.getName(), poolPluginFactorySpi.getPoolPluginName()));
+          }
+          plugin = new PoolPluginAdapter<PoolPluginSpi>(poolPluginSpi);
         } else {
-          plugin = new PluginAdapter<PluginSpi>(pluginSpi);
+          throw new IllegalArgumentException("The factory doesn't implement the right SPI.");
         }
-      } else if (pluginFactory instanceof PoolPluginFactorySpi) {
-        PoolPluginFactorySpi poolPluginFactorySpi = (PoolPluginFactorySpi) pluginFactory;
-        checkPluginRegistration(poolPluginFactorySpi.getPoolPluginName());
-        checkPoolPluginVersion(poolPluginFactorySpi);
-        PoolPluginSpi poolPluginSpi = poolPluginFactorySpi.getPoolPlugin();
-        plugin = new PoolPluginAdapter<PoolPluginSpi>(poolPluginSpi);
-      } else {
-        throw new IllegalArgumentException(
-            "The provided plugin factory doesn't implement the plugin API properly.");
+        try {
+          plugin.register();
+        } catch (PluginIOException e) {
+          throw new KeyplePluginException("Unable to register plugin " + plugin.getName(), e);
+        }
+        plugins.put(plugin.getName(), plugin);
       }
-      try {
-        plugin.register();
-      } catch (PluginIOException e) {
-        throw new KeyplePluginException("Unable to register plugin " + plugin.getName(), e);
-      }
-      plugins.put(plugin.getName(), plugin);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException(
+          "The provided plugin factory doesn't implement the plugin API properly.", e);
     }
     return plugin;
   }
@@ -246,13 +316,13 @@ public final class SmartCardServiceAdapter implements SmartCardService {
    * @since 2.0
    */
   public void unregisterPlugin(String pluginName) {
-    logger.info("Unregistering a plugin from the platform : {}", pluginName);
-    synchronized (monitor) {
+    logger.info("Unregistering a plugin from the service : {}", pluginName);
+    synchronized (pluginMonitor) {
       Plugin removedPlugin = plugins.remove(pluginName);
       if (removedPlugin != null) {
         ((PluginAdapter<?>) removedPlugin).unregister();
       } else {
-        logger.warn("The plugin {} is not registered", pluginName);
+        logger.warn("The plugin '{}' is not registered", pluginName);
       }
     }
   }
@@ -263,7 +333,7 @@ public final class SmartCardServiceAdapter implements SmartCardService {
    * @since 2.0
    */
   public boolean isPluginRegistered(String pluginName) {
-    synchronized (monitor) {
+    synchronized (pluginMonitor) {
       return plugins.containsKey(pluginName);
     }
   }
@@ -273,9 +343,9 @@ public final class SmartCardServiceAdapter implements SmartCardService {
    *
    * @since 2.0
    */
-  public Map<String, Plugin> getPlugins() {
-    synchronized (monitor) {
-      return plugins;
+  public Plugin getPlugin(String pluginName) {
+    synchronized (pluginMonitor) {
+      return plugins.get(pluginName);
     }
   }
 
@@ -284,13 +354,9 @@ public final class SmartCardServiceAdapter implements SmartCardService {
    *
    * @since 2.0
    */
-  public Plugin getPlugin(String pluginName) {
-    synchronized (monitor) {
-      Plugin plugin = plugins.get(pluginName);
-      if (plugin == null) {
-        throw new KeyplePluginNotFoundException(pluginName);
-      }
-      return plugin;
+  public Map<String, Plugin> getPlugins() {
+    synchronized (pluginMonitor) {
+      return plugins;
     }
   }
 
@@ -310,8 +376,46 @@ public final class SmartCardServiceAdapter implements SmartCardService {
    */
   public DistributedLocalService registerDistributedLocalService(
       KeypleDistributedLocalServiceExtensionFactory distributedLocalServiceExtensionFactory) {
-    // TODO complete
-    return null;
+
+    Assert.getInstance()
+        .notNull(
+            distributedLocalServiceExtensionFactory, "distributedLocalServiceExtensionFactory");
+
+    DistributedLocalServiceAdapter distributedLocalService;
+    try {
+      if (!(distributedLocalServiceExtensionFactory instanceof LocalServiceFactorySpi)) {
+        throw new IllegalArgumentException("The factory doesn't implement the right SPI.");
+      }
+
+      LocalServiceFactorySpi factory =
+          (LocalServiceFactorySpi) distributedLocalServiceExtensionFactory;
+
+      synchronized (distributedLocalServiceMonitor) {
+        String localServiceName = factory.getLocalServiceName();
+
+        checkDistributedLocalServiceRegistration(localServiceName);
+        checkDistributedLocalServiceVersion(factory);
+
+        LocalServiceSpi localServiceSpi = factory.getLocalService();
+
+        if (!localServiceSpi.getName().equals(localServiceName)) {
+          throw new IllegalArgumentException(
+              String.format(
+                  "The local service name '%s' mismatches the expected name '%s' provided by the factory",
+                  localServiceSpi.getName(), localServiceName));
+        }
+
+        distributedLocalService = new DistributedLocalServiceAdapter(localServiceSpi);
+        distributedLocalService.register();
+
+        distributedLocalServices.put(localServiceName, distributedLocalService);
+      }
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException(
+          "The provided distributed local service factory doesn't implement the distributed local service API properly.",
+          e);
+    }
+    return distributedLocalService;
   }
 
   /**
@@ -320,7 +424,19 @@ public final class SmartCardServiceAdapter implements SmartCardService {
    * @since 2.0
    */
   public void unregisterDistributedLocalService(String distributedLocalServiceName) {
-    // TODO complete
+    logger.info(
+        "Unregistering a distributed local service from the service : {}",
+        distributedLocalServiceName);
+    synchronized (distributedLocalServiceMonitor) {
+      DistributedLocalService localService =
+          distributedLocalServices.remove(distributedLocalServiceName);
+      if (localService != null) {
+        ((DistributedLocalServiceAdapter) localService).unregister();
+      } else {
+        logger.warn(
+            "The distributed local service '{}' is not registered", distributedLocalServiceName);
+      }
+    }
   }
 
   /**
@@ -328,7 +444,21 @@ public final class SmartCardServiceAdapter implements SmartCardService {
    *
    * @since 2.0
    */
-  public void getDistributedLocalService(String distributedLocalServiceName) {
-    // TODO complete
+  @Override
+  public boolean isDistributedLocalServiceRegistered(String distributedLocalServiceName) {
+    synchronized (distributedLocalServiceMonitor) {
+      return distributedLocalServices.containsKey(distributedLocalServiceName);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  public DistributedLocalService getDistributedLocalService(String distributedLocalServiceName) {
+    synchronized (distributedLocalServiceMonitor) {
+      return distributedLocalServices.get(distributedLocalServiceName);
+    }
   }
 }

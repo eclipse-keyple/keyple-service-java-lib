@@ -14,14 +14,14 @@ package org.eclipse.keyple.core.service;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
 
 /**
- * Local Service API of the Keyple Distributed Solution
+ * Local Service API of the Keyple Distributed Solution.
  *
  * @since 2.0
  */
 public interface DistributedLocalService {
 
   /**
-   * Gets the name of the distributed local service
+   * Returns the name of the distributed local service.
    *
    * @return A not empty string.
    * @since 2.0
@@ -31,12 +31,12 @@ public interface DistributedLocalService {
   /**
    * Returns the specific implementation of a {@link KeypleDistributedLocalServiceExtension}
    *
-   * <p>Note: the provided argument is used at compile time to check the type consistency.
+   * <p><u>Note</u> : the provided argument is used at compile time to check the type consistency.
    *
-   * @param distributedLocalServiceType the specific class of the local service
+   * @param distributedLocalServiceExtensionType the specific class of the local service
    * @param <T> The type of the service extension
    * @return a {@link KeypleDistributedLocalServiceExtension}
    */
   <T extends KeypleDistributedLocalServiceExtension> T getExtension(
-      Class<T> distributedLocalServiceType);
+      Class<T> distributedLocalServiceExtensionType);
 }

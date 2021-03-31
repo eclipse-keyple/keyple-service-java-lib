@@ -42,8 +42,8 @@ public interface PoolPlugin extends Plugin {
    *
    * <p>The allocated reader belongs to the group targeted with provided reference.
    *
-   * @param readerGroupReference The reference of the group to which the reader belongs (may be null
-   *     depending on the implementation made)
+   * @param readerGroupReference The key reference of the group to which the reader belongs (may be
+   *     null depending on the implementation made)
    * @return a Reader object
    * @throws KeypleReaderNotFoundException if the allocation failed due to lack of available reader
    * @since 2.0
