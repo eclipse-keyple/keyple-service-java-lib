@@ -24,51 +24,49 @@ import org.eclipse.keyple.core.common.KeyplePluginExtensionFactory;
 public interface SmartCardService {
 
   /**
-   * Register a new plugin to be available in the platform if not registered yet
+   * Registers a new plugin to the service.
    *
-   * @param pluginFactory plugin factory to instantiate plugin to be added
-   * @throws KeyplePluginException if instantiation failed
-   * @return Plugin : registered reader plugin
-   * @throws IllegalStateException if the plugin has already been registered.
+   * @param pluginFactory The plugin factory.
+   * @return A not null reference to the registered {@link Plugin}.
+   * @throws KeyplePluginException If instantiation failed.
+   * @throws IllegalStateException If the plugin has already been registered.
    * @since 2.0
    */
   Plugin registerPlugin(KeyplePluginExtensionFactory pluginFactory);
 
   /**
-   * Unregister plugin from platform
+   * Attempts to unregister the plugin having the provided name from the service.
    *
-   * @param pluginName plugin name
-   * @throws IllegalStateException if the plugin or his reader(s) are already unregistered
+   * @param pluginName The plugin name.
    * @since 2.0
    */
   void unregisterPlugin(String pluginName);
 
   /**
-   * Check whether a plugin is already registered to the platform or not
+   * Checks whether a plugin is already registered to the service or not.
    *
-   * @param pluginName name of the plugin to be checked
-   * @return true if a plugin with matching name has been registered
+   * @param pluginName The name of the plugin to be checked.
+   * @return true if a plugin with the provided name is registered.
    * @since 2.0
    */
   boolean isPluginRegistered(String pluginName);
 
   /**
-   * Gets the plugins.
-   *
-   * @return the plugin names and plugin instances map of interfaced reader’s plugins.
-   * @since 2.0
-   */
-  Map<String, Plugin> getPlugins();
-
-  /**
    * Gets the plugin whose name is provided as an argument.
    *
-   * @param pluginName the plugin name
-   * @return the plugin
-   * @throws KeyplePluginNotFoundException if the wanted plugin is not found
+   * @param pluginName The plugin name.
+   * @return null if the plugin is not found or no longer registered.
    * @since 2.0
    */
   Plugin getPlugin(String pluginName);
+
+  /**
+   * Gets the plugins.
+   *
+   * @return A not null map of plugin by its name.
+   * @since 2.0
+   */
+  Map<String, Plugin> getPlugins();
 
   /**
    * Verifies the compatibility with the service of the provided card extension.
@@ -81,29 +79,40 @@ public interface SmartCardService {
   void checkCardExtension(KeypleCardExtension cardExtension);
 
   /**
-   * Registers a new Distributed Local Service to be available in the platform if not registered yet
+   * Registers a new distributed local service to the service.
    *
    * @param distributedLocalServiceExtensionFactory Factory to use to instantiate a Distributed
    *     Local Service extension
-   * @return A {@link DistributedLocalService} reference
+   * @return A not null reference to the registered {@link DistributedLocalService}.
+   * @throws IllegalStateException If the distributed local service has already been registered.
    * @since 2.0
    */
   DistributedLocalService registerDistributedLocalService(
       KeypleDistributedLocalServiceExtensionFactory distributedLocalServiceExtensionFactory);
 
   /**
-   * TODO complete
+   * Attempts to unregister the distributed local service having the provided name from the service.
    *
-   * @param distributedLocalServiceName TODO
+   * @param distributedLocalServiceName The distributed local service name.
    * @since 2.0
    */
   void unregisterDistributedLocalService(String distributedLocalServiceName);
 
   /**
-   * TODO complete
+   * Checks whether a distributed local service is already registered to the service or not.
    *
-   * @param distributedLocalServiceName TODO
+   * @param distributedLocalServiceName The name of the distributed local service to be checked.
+   * @return true if the distributed local service is registered.
    * @since 2.0
    */
-  void getDistributedLocalService(String distributedLocalServiceName);
+  boolean isDistributedLocalServiceRegistered(String distributedLocalServiceName);
+
+  /**
+   * Gets the distributed local service having the provided name.
+   *
+   * @param distributedLocalServiceName The name of the distributed local service.
+   * @return null if the distributed local service is not found or no longer registered.
+   * @since 2.0
+   */
+  DistributedLocalService getDistributedLocalService(String distributedLocalServiceName);
 }

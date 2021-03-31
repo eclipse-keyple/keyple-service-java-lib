@@ -20,13 +20,14 @@ import org.eclipse.keyple.core.card.AbstractCommunicationException;
 import org.eclipse.keyple.core.card.CardResponse;
 
 /**
+ * (package-private)<br>
  * Serializer of a {@link AbstractCommunicationException}.
  *
  * <p>Only the field "message" is serialized during the process.
  *
  * @since 2.0
  */
-public class CommunicationExceptionJsonSerializerAdapter
+class CommunicationExceptionJsonSerializerAdapter
     implements JsonSerializer<AbstractCommunicationException> {
 
   /**
