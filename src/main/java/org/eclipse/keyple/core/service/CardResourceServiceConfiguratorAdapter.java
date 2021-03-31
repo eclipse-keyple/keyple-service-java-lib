@@ -103,6 +103,7 @@ final class CardResourceServiceConfiguratorAdapter
      * (package-private)<br>
      *
      * @return A not null {@link Plugin} reference.
+     * @since 2.0
      */
     Plugin getPlugin() {
       return plugin;
@@ -112,6 +113,7 @@ final class CardResourceServiceConfiguratorAdapter
      * (package-private)<br>
      *
      * @return true if the reader monitoring is required.
+     * @since 2.0
      */
     boolean isWithReaderMonitoring() {
       return withReaderMonitoring;
@@ -121,6 +123,7 @@ final class CardResourceServiceConfiguratorAdapter
      * (package-private)<br>
      *
      * @return true if the card monitoring is required.
+     * @since 2.0
      */
     boolean isWithCardMonitoring() {
       return withCardMonitoring;
@@ -146,6 +149,7 @@ final class CardResourceServiceConfiguratorAdapter
      * (package-private)<br>
      *
      * @return A not null {@link PoolPlugin} reference.
+     * @since 2.0
      */
     PoolPlugin getPoolPlugin() {
       return poolPlugin;
@@ -155,6 +159,7 @@ final class CardResourceServiceConfiguratorAdapter
      * (package-private)<br>
      *
      * @return true if the card monitoring is required.
+     * @since 2.0
      */
     boolean isWithCardMonitoring() {
       return withCardMonitoring;
@@ -418,9 +423,7 @@ final class CardResourceServiceConfiguratorAdapter
    */
   @Override
   public ProfileStep usingDefaultAllocationTimingParameters() {
-    cycleDurationMillis = DEFAULT_CYCLE_DURATION_MILLIS;
-    timeoutMillis = DEFAULT_TIMEOUT_MILLIS;
-    return this;
+    return usingAllocationTimingParameters(DEFAULT_CYCLE_DURATION_MILLIS, DEFAULT_TIMEOUT_MILLIS);
   }
 
   /**
@@ -430,6 +433,9 @@ final class CardResourceServiceConfiguratorAdapter
    */
   @Override
   public ProfileStep usingAllocationTimingParameters(int cycleDurationMillis, int timeoutMillis) {
+    Assert.getInstance()
+        .greaterOrEqual(0, cycleDurationMillis, "cycleDurationMillis")
+        .greaterOrEqual(0, timeoutMillis, "timeoutMillis");
     this.cycleDurationMillis = cycleDurationMillis;
     this.timeoutMillis = timeoutMillis;
     return null;
@@ -580,26 +586,62 @@ final class CardResourceServiceConfiguratorAdapter
     return cardResourceAllocationStrategy;
   }
 
+  /**
+   * (package-private)<br>
+   *
+   * @return The pool allocation strategy.
+   * @since 2.0
+   */
   PoolPluginCardResourceAllocationStrategy getPoolPluginAllocationStrategy() {
     return poolPluginCardResourceAllocationStrategy;
   }
 
+  /**
+   * (package-private)<br>
+   *
+   * @return A not null list of configured regular plugins.
+   * @since 2.0
+   */
   List<ConfiguredRegularPlugin> getConfiguredRegularPlugins() {
     return configuredRegularPlugins;
   }
 
+  /**
+   * (package-private)<br>
+   *
+   * @return A not null list of configured pool plugins.
+   * @since 2.0
+   */
   List<ConfiguredPoolPlugin> getConfiguredPoolPlugins() {
     return configuredPoolPlugins;
   }
 
+  /**
+   * (package-private)<br>
+   *
+   * @return A not empty list of card profiles.
+   * @since 2.0
+   */
   List<CardProfile> getCardProfiles() {
     return cardProfiles;
   }
 
+  /**
+   * (package-private)<br>
+   *
+   * @return A positive int.
+   * @since 2.0
+   */
   int getCycleDurationMillis() {
     return cycleDurationMillis;
   }
 
+  /**
+   * (package-private)<br>
+   *
+   * @return A positive int.
+   * @since 2.0
+   */
   int getTimeoutMillis() {
     return timeoutMillis;
   }

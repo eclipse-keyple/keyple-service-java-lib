@@ -153,6 +153,7 @@ public interface CardResourceServiceConfigurator {
      * @param cycleDurationMillis A positive int.
      * @param timeoutMillis A positive int.
      * @return Next configuration step.
+     * @throws IllegalArgumentException If one of the provided values is negative.
      * @since 2.0
      */
     ProfileStep usingAllocationTimingParameters(int cycleDurationMillis, int timeoutMillis);

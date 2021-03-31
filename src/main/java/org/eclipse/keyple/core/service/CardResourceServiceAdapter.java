@@ -14,6 +14,7 @@ package org.eclipse.keyple.core.service;
 import java.util.List;
 
 /**
+ * (package-private)<br>
  * Implementation of {@link SmartCardService}.
  *
  * @since 2.0

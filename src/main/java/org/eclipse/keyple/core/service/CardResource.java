@@ -44,7 +44,7 @@ public class CardResource {
    * @return A not null reference.
    * @since 2.0
    */
-  Reader getReader() {
+  public Reader getReader() {
     return reader;
   }
 
@@ -54,7 +54,7 @@ public class CardResource {
    * @return A not null reference.
    * @since 2.0
    */
-  SmartCard getSmartCard() {
+  public SmartCard getSmartCard() {
     return smartCard;
   }
 }
