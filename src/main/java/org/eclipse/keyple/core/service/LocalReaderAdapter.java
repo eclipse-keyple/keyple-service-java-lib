@@ -495,7 +495,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     // check protocol if enabled
     if (cardSelector.getCardProtocol() == null
-        || useDefaultProtocol
         || cardSelector.getCardProtocol().equals(currentProtocol)) {
       // protocol check succeeded, check ATR if enabled
       byte[] atr = readerSpi.getATR();
@@ -577,7 +576,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     ApduResponse fciResponse;
 
     if (readerSpi instanceof AutonomousSelectionReaderSpi) {
-      byte[] dfName = aidSelector.getAidToSelect();
+      byte[] dfName = aidSelector.getAid();
       byte isoControlMask =
           (byte)
               (aidSelector.getFileOccurrence().getIsoBitMask()
@@ -639,7 +638,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private ApduResponse processExplicitAidSelection(CardSelector.AidSelector aidSelector)
       throws CardIOException, ReaderIOException {
 
-    final byte[] aid = aidSelector.getAidToSelect();
+    final byte[] aid = aidSelector.getAid();
     if (logger.isDebugEnabled()) {
       logger.debug(
           "[{}] openLogicalChannel => Select Application with AID = {}",
