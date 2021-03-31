@@ -363,7 +363,7 @@ final class DistributedLocalServiceAdapter
     if (!isRegistered) {
       throw new IllegalStateException(
           String.format(
-              "The distributed local service '%s' is not (or no longer) registered.", name));
+              "The distributed local service '%s' is not or no longer registered.", name));
     }
   }
 

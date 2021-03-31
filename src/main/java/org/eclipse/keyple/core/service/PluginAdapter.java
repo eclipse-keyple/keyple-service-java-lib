@@ -57,7 +57,7 @@ class PluginAdapter<P> implements Plugin {
    * (package-private)<br>
    * Check if the plugin is registered.
    *
-   * @throws IllegalStateException is thrown when plugin is not (or no longer) registered.
+   * @throws IllegalStateException is thrown when plugin is not or no longer registered.
    * @since 2.0
    */
   final void checkStatus() {
