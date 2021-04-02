@@ -11,6 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.selection.spi;
 
+import org.eclipse.keyple.core.service.selection.CardSelector;
+
 /**
  * Defines a basic card selection case based on a {@link CardSelector}.
  *
