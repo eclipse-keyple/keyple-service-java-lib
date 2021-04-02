@@ -53,14 +53,14 @@ public final class CardSelector implements KeypleCardSelector {
    * @since 2.0
    */
   public static final class Builder {
-    public static final int AID_MIN_LENGTH = 5;
-    public static final int AID_MAX_LENGTH = 16;
+    private static final int AID_MIN_LENGTH = 5;
+    private static final int AID_MAX_LENGTH = 16;
 
     private String cardProtocol;
     private String atrRegex;
     private byte[] aid;
-    FileOccurrence fileOccurrence;
-    FileControlInformation fileControlInformation;
+    private FileOccurrence fileOccurrence;
+    private FileControlInformation fileControlInformation;
     private final LinkedHashSet<Integer> successfulSelectionStatusCodes;
 
     /** (private) */
@@ -77,11 +77,18 @@ public final class CardSelector implements KeypleCardSelector {
      *
      * @param cardProtocol A not empty String.
      * @return The object instance.
+     * @throws IllegalArgumentException If the argument is null or empty.
+     * @throws IllegalStateException If this parameter has already been set.
      * @since 2.0
      */
     public Builder filterByCardProtocol(String cardProtocol) {
 
       Assert.getInstance().notEmpty(cardProtocol, "cardProtocol");
+
+      if (this.cardProtocol != null) {
+        throw new IllegalStateException(
+            String.format("cardProtocol has already been set to '%s'", this.cardProtocol));
+      }
 
       this.cardProtocol = cardProtocol;
       return this;
@@ -98,11 +105,18 @@ public final class CardSelector implements KeypleCardSelector {
      * @return The object instance.
      * @throws IllegalArgumentException If the provided regular expression is null, empty or
      *     invalid.
+     * @throws IllegalStateException If this parameter has already been set.
      * @since 2.0
      */
     public Builder filterByAtr(String atrRegex) {
 
       Assert.getInstance().notEmpty(atrRegex, "atrRegex");
+
+      if (this.atrRegex != null) {
+        throw new IllegalStateException(
+            String.format("atrRegex has already been set to '%s'", this.atrRegex));
+      }
+
       try {
         Pattern.compile(atrRegex);
       } catch (PatternSyntaxException exception) {
@@ -124,6 +138,7 @@ public final class CardSelector implements KeypleCardSelector {
      * @param aid A byte array containing {@value AID_MIN_LENGTH} to {@value AID_MAX_LENGTH} bytes.
      * @return The object instance.
      * @throws IllegalArgumentException If the provided array is null or out of range.
+     * @throws IllegalStateException If this parameter has already been set.
      * @since 2.0
      */
     public Builder filterByDfName(byte[] aid) {
@@ -131,6 +146,11 @@ public final class CardSelector implements KeypleCardSelector {
       Assert.getInstance()
           .notNull(aid, "aid")
           .isInRange(aid.length, AID_MIN_LENGTH, AID_MAX_LENGTH, "aid");
+
+      if (this.aid != null) {
+        throw new IllegalStateException(
+            String.format("aid has already been set to '%s'", this.aid));
+      }
 
       this.aid = aid;
       return this;
@@ -148,6 +168,7 @@ public final class CardSelector implements KeypleCardSelector {
      *     AID_MAX_LENGTH} bytes.
      * @return The object instance.
      * @throws IllegalArgumentException If the provided AID is null, invalid or out of range.
+     * @throws IllegalStateException If this parameter has already been set.
      * @since 2.0
      */
     public Builder filterByDfName(String aid) {
@@ -162,10 +183,15 @@ public final class CardSelector implements KeypleCardSelector {
      * @param fileOccurrence The {@link FileOccurrence}.
      * @return The object instance.
      * @throws IllegalArgumentException If fileOccurrence is null.
+     * @throws IllegalStateException If this parameter has already been set.
      * @since 2.0
      */
-    Builder setFileOccurrence(FileOccurrence fileOccurrence) {
+    public Builder setFileOccurrence(FileOccurrence fileOccurrence) {
       Assert.getInstance().notNull(fileOccurrence, "fileOccurrence");
+      if (this.fileOccurrence != null) {
+        throw new IllegalStateException(
+            String.format("fileOccurrence has already been set to '%s'", this.fileOccurrence));
+      }
       this.fileOccurrence = fileOccurrence;
       return this;
     }
@@ -178,10 +204,17 @@ public final class CardSelector implements KeypleCardSelector {
      * @param fileControlInformation The {@link FileControlInformation}.
      * @return The object instance.
      * @throws IllegalArgumentException If fileControlInformation is null.
+     * @throws IllegalStateException If this parameter has already been set.
      * @since 2.0
      */
-    Builder setFileControlInformation(FileControlInformation fileControlInformation) {
+    public Builder setFileControlInformation(FileControlInformation fileControlInformation) {
       Assert.getInstance().notNull(fileControlInformation, "fileControlInformation");
+      if (this.fileControlInformation != null) {
+        throw new IllegalStateException(
+            String.format(
+                "fileControlInformation has already been set to '%s'",
+                this.fileControlInformation));
+      }
       this.fileControlInformation = fileControlInformation;
       return this;
     }
@@ -193,18 +226,18 @@ public final class CardSelector implements KeypleCardSelector {
      * @return The object instance.
      * @since 2.0
      */
-    Builder addSuccessfulStatusCode(int statusCode) {
+    public Builder addSuccessfulStatusCode(int statusCode) {
       this.successfulSelectionStatusCodes.add(statusCode);
       return this;
     }
 
     /**
-     * (private)<br>
      * Creates an instance of {@link CardSelector}.
      *
      * @return A not null reference.
+     * @since 2.0
      */
-    private CardSelector build() {
+    public CardSelector build() {
       return new CardSelector(this);
     }
   }
@@ -414,7 +447,7 @@ public final class CardSelector implements KeypleCardSelector {
    * @param statusCode The status code to be accepted.
    * @since 2.0
    */
-  void addSuccessfulStatusCode(int statusCode) {
+  public void addSuccessfulStatusCode(int statusCode) {
     this.successfulSelectionStatusCodes.add(statusCode);
   }
 
