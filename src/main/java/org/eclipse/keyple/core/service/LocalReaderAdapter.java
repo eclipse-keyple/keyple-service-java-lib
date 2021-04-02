@@ -22,7 +22,7 @@ import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.AutonomousSelectionReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
-import org.eclipse.keyple.core.service.selection.spi.CardSelector;
+import org.eclipse.keyple.core.service.selection.CardSelector;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.slf4j.Logger;
@@ -499,15 +499,12 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       // protocol check succeeded, check ATR if enabled
       byte[] atr = readerSpi.getATR();
       answerToReset = new AnswerToReset(atr);
-      CardSelector.AtrFilter atrFilter = cardSelector.getAtrFilter();
-      if (atrFilter == null || checkAtr(atr, atrFilter)) {
+      if (checkAtr(atr, cardSelector)) {
         // no ATR filter or ATR check succeeded, select by AID if enabled.
-        CardSelector.AidSelector aidSelector = cardSelector.getAidSelector();
-        if (aidSelector != null) {
-          fciResponse = selectByAid(aidSelector);
+        if (cardSelector.getAid() != null) {
+          fciResponse = selectByAid(cardSelector);
           hasMatched =
               cardSelector
-                  .getAidSelector()
                   .getSuccessfulSelectionStatusCodes()
                   .contains(fciResponse.getStatusCode());
         } else {
@@ -534,25 +531,25 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * <p>Returns true if the ATR is accepted by the filter.
    *
    * @param atr A byte array.
-   * @param atrFilter A not null {@link CardSelector.AtrFilter}
+   * @param cardSelector The card selector.
    * @return True or false.
    * @throws IllegalStateException if no ATR is available and the AtrFilter is set.
    * @see #processSelection(CardSelector)
    */
-  private boolean checkAtr(byte[] atr, CardSelector.AtrFilter atrFilter) {
+  private boolean checkAtr(byte[] atr, CardSelector cardSelector) {
 
     if (logger.isDebugEnabled()) {
       logger.debug("[{}] openLogicalChannel => ATR = {}", this.getName(), ByteArrayUtil.toHex(atr));
     }
 
     // check the ATR
-    if (!atrFilter.atrMatches(atr)) {
+    if (!cardSelector.atrMatches(atr)) {
       if (logger.isInfoEnabled()) {
         logger.info(
             "[{}] openLogicalChannel => ATR didn't match. ATR = {}, regex filter = {}",
             this.getName(),
             ByteArrayUtil.toHex(atr),
-            atrFilter.getAtrRegex());
+            cardSelector.getAtrRegex());
       }
       // the ATR has been rejected
       return false;
@@ -566,26 +563,26 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * (private)<br>
    * Selects the card with the provided AID and gets the FCI response in return.
    *
-   * @param aidSelector A {@link CardSelector.AidSelector} must be not null.
+   * @param cardSelector The card selector.
    * @return An not null {@link ApduResponse} containing the FCI.
    * @see #processSelection(CardSelector)
    */
-  private ApduResponse selectByAid(CardSelector.AidSelector aidSelector)
+  private ApduResponse selectByAid(CardSelector cardSelector)
       throws CardIOException, ReaderIOException {
 
     ApduResponse fciResponse;
 
     if (readerSpi instanceof AutonomousSelectionReaderSpi) {
-      byte[] dfName = aidSelector.getAid();
+      byte[] aid = cardSelector.getAid();
       byte isoControlMask =
           (byte)
-              (aidSelector.getFileOccurrence().getIsoBitMask()
-                  | aidSelector.getFileControlInformation().getIsoBitMask());
+              (cardSelector.getFileOccurrence().getIsoBitMask()
+                  | cardSelector.getFileControlInformation().getIsoBitMask());
       byte[] selectionDataBytes =
-          ((AutonomousSelectionReaderSpi) readerSpi).openChannelForAid(dfName, isoControlMask);
+          ((AutonomousSelectionReaderSpi) readerSpi).openChannelForAid(aid, isoControlMask);
       fciResponse = new ApduResponse(selectionDataBytes);
     } else {
-      fciResponse = processExplicitAidSelection(aidSelector);
+      fciResponse = processExplicitAidSelection(cardSelector);
     }
 
     if (fciResponse.getStatusCode() == SW1SW2_SUCCESSFUL && fciResponse.getDataOut().length == 0) {
@@ -630,15 +627,15 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * Sends the select application command to the card and returns the requested data according to
    * AidSelector attributes (ISO7816-4 selection data) into an {@link ApduResponse}.
    *
-   * @param aidSelector A not null {@link CardSelector.AidSelector}
+   * @param cardSelector The card selector.
    * @return A not null {@link ApduResponse}.
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
    */
-  private ApduResponse processExplicitAidSelection(CardSelector.AidSelector aidSelector)
+  private ApduResponse processExplicitAidSelection(CardSelector cardSelector)
       throws CardIOException, ReaderIOException {
 
-    final byte[] aid = aidSelector.getAid();
+    final byte[] aid = cardSelector.getAid();
     if (logger.isDebugEnabled()) {
       logger.debug(
           "[{}] openLogicalChannel => Select Application with AID = {}",
@@ -657,8 +654,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     // we use the bitmask defined in the respective enums
     selectApplicationCommand[3] =
         (byte)
-            (aidSelector.getFileOccurrence().getIsoBitMask()
-                | aidSelector.getFileControlInformation().getIsoBitMask());
+            (cardSelector.getFileOccurrence().getIsoBitMask()
+                | cardSelector.getFileControlInformation().getIsoBitMask());
     selectApplicationCommand[4] = (byte) (aid.length); // Lc
     System.arraycopy(aid, 0, selectApplicationCommand, 5, aid.length); // data
     selectApplicationCommand[5 + aid.length] = (byte) 0x00; // Le
