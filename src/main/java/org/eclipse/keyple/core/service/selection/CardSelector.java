@@ -149,7 +149,7 @@ public final class CardSelector implements KeypleCardSelector {
 
       if (this.aid != null) {
         throw new IllegalStateException(
-            String.format("aid has already been set to '%s'", this.aid));
+            String.format("aid has already been set to '%s'", ByteArrayUtil.toHex(this.aid)));
       }
 
       this.aid = aid;
