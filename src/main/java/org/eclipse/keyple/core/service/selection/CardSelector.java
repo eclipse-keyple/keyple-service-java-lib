@@ -52,7 +52,7 @@ public final class CardSelector implements KeypleCardSelector {
    *
    * @since 2.0
    */
-  public static class Builder {
+  public static final class Builder {
     public static final int AID_MIN_LENGTH = 5;
     public static final int AID_MAX_LENGTH = 16;
 
