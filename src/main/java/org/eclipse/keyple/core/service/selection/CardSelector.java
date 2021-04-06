@@ -55,6 +55,7 @@ public final class CardSelector implements KeypleCardSelector {
   public static final class Builder {
     private static final int AID_MIN_LENGTH = 5;
     private static final int AID_MAX_LENGTH = 16;
+    private static final int STANDARD_SUCCESSFUL_CODE = 0x9000;
 
     private String cardProtocol;
     private String atrRegex;
@@ -66,6 +67,7 @@ public final class CardSelector implements KeypleCardSelector {
     /** (private) */
     private Builder() {
       this.successfulSelectionStatusCodes = new LinkedHashSet<Integer>();
+      this.successfulSelectionStatusCodes.add(STANDARD_SUCCESSFUL_CODE);
       this.fileOccurrence = FileOccurrence.FIRST;
       this.fileControlInformation = FileControlInformation.FCI;
     }

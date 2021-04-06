@@ -299,36 +299,32 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     List<ApduResponse> apduResponses = new ArrayList<ApduResponse>();
 
-    // TODO check the comment below
-    /* The ApduRequests are optional, check if null */
-    if (cardRequest.getApduRequests() != null) {
-      /* Proceeds with the APDU requests present in the CardRequest if any */
-      for (ApduRequest apduRequest : cardRequest.getApduRequests()) {
-        try {
-          apduResponses.add(processApduRequest(apduRequest));
-        } catch (ReaderIOException e) {
-          /*
-           * The process has been interrupted. We close the logical channel and launch a
-           * KeypleReaderException with the Apdu responses collected so far.
-           */
-          closeLogicalAndPhysicalChannelsSilently();
+    /* Proceeds with the APDU requests present in the CardRequest */
+    for (ApduRequest apduRequest : cardRequest.getApduRequests()) {
+      try {
+        apduResponses.add(processApduRequest(apduRequest));
+      } catch (ReaderIOException e) {
+        /*
+         * The process has been interrupted. We close the logical channel and launch a
+         * KeypleReaderException with the Apdu responses collected so far.
+         */
+        closeLogicalAndPhysicalChannelsSilently();
 
-          throw new ReaderCommunicationException(
-              new CardResponse(apduResponses, false, false),
-              "Reader communication failure while transmitting a card request.",
-              e);
-        } catch (CardIOException e) {
-          /*
-           * The process has been interrupted. We close the logical channel and launch a
-           * KeypleReaderException with the Apdu responses collected so far.
-           */
-          closeLogicalAndPhysicalChannelsSilently();
+        throw new ReaderCommunicationException(
+            new CardResponse(apduResponses, false, false),
+            "Reader communication failure while transmitting a card request.",
+            e);
+      } catch (CardIOException e) {
+        /*
+         * The process has been interrupted. We close the logical channel and launch a
+         * KeypleReaderException with the Apdu responses collected so far.
+         */
+        closeLogicalAndPhysicalChannelsSilently();
 
-          throw new CardCommunicationException(
-              new CardResponse(apduResponses, false, false),
-              "Card communication failure while transmitting a card request.",
-              e);
-        }
+        throw new CardCommunicationException(
+            new CardResponse(apduResponses, false, false),
+            "Card communication failure while transmitting a card request.",
+            e);
       }
     }
 
@@ -459,7 +455,13 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     logicalChannelIsOpen = true;
 
-    CardResponse cardResponse = processCardRequest(cardSelectionRequest.getCardRequest());
+    CardResponse cardResponse;
+
+    if (cardSelectionRequest.getCardRequest() != null) {
+      cardResponse = processCardRequest(cardSelectionRequest.getCardRequest());
+    } else {
+      cardResponse = null;
+    }
 
     return new CardSelectionResponse(selectionStatus, cardResponse);
   }
@@ -497,7 +499,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     if (cardSelector.getCardProtocol() == null
         || cardSelector.getCardProtocol().equals(currentProtocol)) {
       // protocol check succeeded, check ATR if enabled
-      byte[] atr = readerSpi.getATR();
+      byte[] atr = readerSpi.getAtr();
       answerToReset = new AnswerToReset(atr);
       if (checkAtr(atr, cardSelector)) {
         // no ATR filter or ATR check succeeded, select by AID if enabled.
