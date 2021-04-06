@@ -162,9 +162,7 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
         // determine if the current matching card is selected
         SelectionStatus selectionStatus = cardSelectionResponse.getSelectionStatus();
 
-        boolean isSelected =
-            selectionStatus.hasMatched()
-                && cardSelectionResponse.getCardResponse().isLogicalChannelOpen();
+        boolean isSelected = selectionStatus.hasMatched();
 
         cardSelectionsResult.addSmartCard(index, smartCard, isSelected);
       }
