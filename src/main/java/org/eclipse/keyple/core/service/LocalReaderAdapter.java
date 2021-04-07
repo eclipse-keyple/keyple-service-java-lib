@@ -46,7 +46,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private static final byte[] APDU_GET_DATA = {
     (byte) 0x00, (byte) 0xCA, (byte) 0x00, (byte) 0x6F, (byte) 0x00
   };
-  private static final int SW1SW2_SUCCESSFUL = 0x9000;
+  private static final int STANDARD_SUCCESSFUL_CODE = 0x9000;
 
   private final ReaderSpi readerSpi;
   private long before;
@@ -362,7 +362,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     if (apduRequest.isCase4()
         && apduResponse.getDataOut().length == 0
-        && apduResponse.getStatusCode() == SW1SW2_SUCCESSFUL) {
+        && apduResponse.getStatusCode() == STANDARD_SUCCESSFUL_CODE) {
       // do the get response command
       apduResponse = case4HackGetResponse();
     }
@@ -587,7 +587,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       fciResponse = processExplicitAidSelection(cardSelector);
     }
 
-    if (fciResponse.getStatusCode() == SW1SW2_SUCCESSFUL && fciResponse.getDataOut().length == 0) {
+    if (fciResponse.getStatusCode() == STANDARD_SUCCESSFUL_CODE && fciResponse.getDataOut().length == 0) {
       /*
        * The selection didn't provide data (e.g. OMAPI), we get the FCI using a Get Data
        * command.
