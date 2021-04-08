@@ -46,7 +46,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private static final byte[] APDU_GET_DATA = {
     (byte) 0x00, (byte) 0xCA, (byte) 0x00, (byte) 0x6F, (byte) 0x00
   };
-  private static final int STANDARD_SUCCESSFUL_CODE = 0x9000;
+  private static final int DEFAULT_SUCCESSFUL_CODE = 0x9000;
 
   private final ReaderSpi readerSpi;
   private long before;
@@ -114,7 +114,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       List<CardSelectionRequest> cardSelectionRequests,
       org.eclipse.keyple.core.card.MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException {
+      throws ReaderCommunicationException, CardCommunicationException,
+          UnexpectedStatusCodeException {
 
     checkStatus();
 
@@ -166,7 +167,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    */
   @Override
   final CardResponse processCardRequest(CardRequest cardRequest, ChannelControl channelControl)
-      throws CardCommunicationException, ReaderCommunicationException {
+      throws CardCommunicationException, ReaderCommunicationException,
+          UnexpectedStatusCodeException {
 
     checkStatus();
 
@@ -293,16 +295,31 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *
    * @param cardRequest The card request to transmit.
    * @return A not null reference.
+   * @throws ReaderCommunicationException If the communication with the reader has failed.
+   * @throws CardCommunicationException If the communication with the card has failed.
+   * @throws UnexpectedStatusCodeException If status code verification is enabled in the card
+   *     request and the card returned an unexpected code.
    */
   private CardResponse processCardRequest(CardRequest cardRequest)
-      throws ReaderCommunicationException, CardCommunicationException {
+      throws ReaderCommunicationException, CardCommunicationException,
+          UnexpectedStatusCodeException {
 
     List<ApduResponse> apduResponses = new ArrayList<ApduResponse>();
 
     /* Proceeds with the APDU requests present in the CardRequest */
     for (ApduRequest apduRequest : cardRequest.getApduRequests()) {
       try {
-        apduResponses.add(processApduRequest(apduRequest));
+        ApduResponse apduResponse = processApduRequest(apduRequest);
+        apduResponses.add(apduResponse);
+        if (cardRequest.isStatusCodesVerificationEnabled()
+            && !apduRequest.getSuccessfulStatusCodes().contains(apduResponse.getStatusCode())) {
+          throw new UnexpectedStatusCodeException(
+              new CardResponse(
+                  apduResponses,
+                  false,
+                  cardRequest.getApduRequests().size() == apduResponses.size()),
+              "Unexpected status code.");
+        }
       } catch (ReaderIOException e) {
         /*
          * The process has been interrupted. We close the logical channel and launch a
@@ -362,7 +379,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     if (apduRequest.isCase4()
         && apduResponse.getDataOut().length == 0
-        && apduResponse.getStatusCode() == STANDARD_SUCCESSFUL_CODE) {
+        && apduResponse.getStatusCode() == DEFAULT_SUCCESSFUL_CODE) {
       // do the get response command
       apduResponse = case4HackGetResponse();
     }
@@ -377,6 +394,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           apduResponse,
           elapsed10ms / 10.0);
     }
+
     return apduResponse;
   }
 
@@ -430,12 +448,15 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *
    * @param cardSelectionRequest The {@link CardSelectionRequest} to be processed.
    * @return A not null reference.
-   * @throws ReaderCommunicationException if the communication with the reader has failed.
-   * @throws CardCommunicationException if the communication with the card has failed.
+   * @throws ReaderCommunicationException If the communication with the reader has failed.
+   * @throws CardCommunicationException If the communication with the card has failed.
+   * @throws UnexpectedStatusCodeException If status code verification is enabled in the card
+   *     request and the card returned an unexpected code.
    */
   private CardSelectionResponse processCardSelectionRequest(
       CardSelectionRequest cardSelectionRequest)
-      throws ReaderCommunicationException, CardCommunicationException {
+      throws ReaderCommunicationException, CardCommunicationException,
+          UnexpectedStatusCodeException {
 
     SelectionStatus selectionStatus;
     try {
@@ -565,6 +586,9 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * (private)<br>
    * Selects the card with the provided AID and gets the FCI response in return.
    *
+   * <p>If the initial FCI response does not contain any data, a special Get Data command is issued
+   * to retrieve the FCI structure (OMAPI case).
+   *
    * @param cardSelector The card selector.
    * @return An not null {@link ApduResponse} containing the FCI.
    * @see #processSelection(CardSelector)
@@ -587,7 +611,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       fciResponse = processExplicitAidSelection(cardSelector);
     }
 
-    if (fciResponse.getStatusCode() == STANDARD_SUCCESSFUL_CODE && fciResponse.getDataOut().length == 0) {
+    if (fciResponse.getStatusCode() == DEFAULT_SUCCESSFUL_CODE
+        && fciResponse.getDataOut().length == 0) {
       /*
        * The selection didn't provide data (e.g. OMAPI), we get the FCI using a Get Data
        * command.

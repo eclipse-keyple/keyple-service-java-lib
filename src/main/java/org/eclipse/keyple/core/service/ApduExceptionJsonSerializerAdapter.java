@@ -16,19 +16,18 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
-import org.eclipse.keyple.core.card.AbstractCommunicationException;
+import org.eclipse.keyple.core.card.AbstractApduException;
 import org.eclipse.keyple.core.card.CardResponse;
 
 /**
  * (package-private)<br>
- * Serializer of a {@link AbstractCommunicationException}.
+ * Serializer of a {@link AbstractApduException}.
  *
  * <p>Only the field "message" is serialized during the process.
  *
  * @since 2.0
  */
-class CommunicationExceptionJsonSerializerAdapter
-    implements JsonSerializer<AbstractCommunicationException> {
+class ApduExceptionJsonSerializerAdapter implements JsonSerializer<AbstractApduException> {
 
   /**
    * (package-private)<br>
@@ -36,7 +35,7 @@ class CommunicationExceptionJsonSerializerAdapter
    *
    * @since 2.0
    */
-  CommunicationExceptionJsonSerializerAdapter() {}
+  ApduExceptionJsonSerializerAdapter() {}
 
   /**
    * {@inheritDoc}
@@ -45,7 +44,7 @@ class CommunicationExceptionJsonSerializerAdapter
    */
   @Override
   public JsonElement serialize(
-      AbstractCommunicationException exception,
+      AbstractApduException exception,
       Type type,
       JsonSerializationContext jsonSerializationContext) {
 

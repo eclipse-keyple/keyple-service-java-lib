@@ -293,9 +293,10 @@ final class DistributedLocalServiceAdapter
   private AbstractReaderAdapter getReader(String readerName) {
     for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins().values()) {
       try {
-        return (AbstractReaderAdapter) plugin.getReader(readerName);
-      } catch (KeypleReaderNotFoundException e) {
-        // The reader has not been found in this plugin, then continue.
+        AbstractReaderAdapter reader = (AbstractReaderAdapter) plugin.getReader(readerName);
+        if (reader != null) {
+          return reader;
+        }
       } catch (IllegalStateException e) {
         // The plugin is no longer register, then continue.
       }

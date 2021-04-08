@@ -44,8 +44,8 @@ public interface PoolPlugin extends Plugin {
    *
    * @param readerGroupReference The reference of the group to which the reader belongs (may be null
    *     depending on the implementation made).
-   * @return a Reader object
-   * @throws KeypleReaderNotFoundException if the allocation failed due to lack of available reader
+   * @return A not null reference.
+   * @throws KeyplePluginException If the allocation failed due to lack of available reader.
    * @since 2.0
    */
   Reader allocateReader(String readerGroupReference);
@@ -56,7 +56,7 @@ public interface PoolPlugin extends Plugin {
    * <p>This method must be invoked as soon as the reader is no longer needed by the caller of
    * allocateReader in order to free the resource.
    *
-   * @param reader the Reader to be released.
+   * @param reader The Reader to be released.
    * @since 2.0
    */
   void releaseReader(Reader reader);

@@ -100,7 +100,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
       cardSelectionResponses =
           processCardSelectionRequests(
               cardSelectionRequests, multiSelectionProcessing, channelControl);
-    } catch (ReaderCommunicationException ex) {
+    } catch (ReaderCommunicationException e) {
       if (logger.isErrorEnabled()) {
         long timeStamp = System.nanoTime();
         long elapsed10ms = (timeStamp - before) / 100000;
@@ -110,9 +110,8 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
             this.getName(),
             elapsed10ms / 10.0);
       }
-      throw ex;
-    } catch (CardCommunicationException ex) {
-      // in the case of a card IO error, we just log.
+      throw e;
+    } catch (CardCommunicationException e) {
       if (logger.isErrorEnabled()) {
         long timeStamp = System.nanoTime();
         long elapsed10ms = (timeStamp - before) / 100000;
@@ -122,7 +121,19 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
             this.getName(),
             elapsed10ms / 10.0);
       }
-      throw ex;
+      throw e;
+    } catch (UnexpectedStatusCodeException e) {
+      if (logger.isErrorEnabled()) {
+        long timeStamp = System.nanoTime();
+        long elapsed10ms = (timeStamp - before) / 100000;
+        this.before = timeStamp;
+        logger.debug(
+            "[{}] An unexpected status code was received while transmitting card selection request. elapsed {}",
+            this.getName(),
+            elapsed10ms / 10.0);
+      }
+      throw new CardCommunicationException(
+          e.getCardResponse(), "An unexpected status code was received.", e);
     }
 
     if (logger.isDebugEnabled()) {
@@ -188,13 +199,16 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    * @return An empty list if no response was received.
    * @throws ReaderCommunicationException if the communication with the reader has failed.
    * @throws CardCommunicationException if the communication with the card has failed.
+   * @throws UnexpectedStatusCodeException If status code verification is enabled in the card
+   *     request and the card returned an unexpected code.
    * @since 2.0
    */
   abstract List<KeypleCardSelectionResponse> processCardSelectionRequests(
       List<CardSelectionRequest> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException;
+      throws ReaderCommunicationException, CardCommunicationException,
+          UnexpectedStatusCodeException;
 
   /**
    * (package-private)<br>
@@ -205,10 +219,13 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    * @return A not null reference.
    * @throws ReaderCommunicationException if the communication with the reader has failed.
    * @throws CardCommunicationException if the communication with the card has failed.
+   * @throws UnexpectedStatusCodeException If status code verification is enabled in the card
+   *     request and the card returned an unexpected code.
    * @since 2.0
    */
   abstract CardResponse processCardRequest(CardRequest cardRequest, ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException;
+      throws ReaderCommunicationException, CardCommunicationException,
+          UnexpectedStatusCodeException;
 
   /**
    * {@inheritDoc}
@@ -264,6 +281,18 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
             elapsed10ms / 10.0);
       }
       throw ex;
+    } catch (UnexpectedStatusCodeException e) {
+      if (logger.isDebugEnabled()) {
+        long timeStamp = System.nanoTime();
+        long elapsed10ms = (timeStamp - before) / 100000;
+        this.before = timeStamp;
+        logger.debug(
+            "[{}] An unexpected status code was received while transmitting card selection request. elapsed {}",
+            this.getName(),
+            elapsed10ms / 10.0);
+      }
+      throw new CardCommunicationException(
+          e.getCardResponse(), "An unexpected status code was received.", e);
     }
 
     if (logger.isDebugEnabled()) {

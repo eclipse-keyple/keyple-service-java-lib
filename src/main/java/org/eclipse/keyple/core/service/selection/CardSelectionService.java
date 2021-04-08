@@ -76,8 +76,10 @@ public interface CardSelectionService {
    *
    * @param reader The reader to communicate with the card.
    * @return A not null reference.
-   * @throws KeypleReaderCommunicationException if the communication with the reader has failed.
-   * @throws KeypleCardCommunicationException if the communication with the card has failed.
+   * @throws KeypleReaderCommunicationException If the communication with the reader has failed.
+   * @throws KeypleCardCommunicationException If communication with the card has failed or if the
+   *     status code check is enabled in the card request and the card has returned an unexpected
+   *     code.
    * @since 2.0
    */
   CardSelectionResult processCardSelectionScenario(Reader reader);

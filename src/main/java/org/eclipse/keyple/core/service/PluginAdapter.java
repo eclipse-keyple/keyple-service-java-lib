@@ -153,11 +153,7 @@ class PluginAdapter<P> implements Plugin {
   @Override
   public final Reader getReader(String name) {
     checkStatus();
-    Reader reader = readers.get(name);
-    if (reader == null) {
-      throw new KeypleReaderNotFoundException(name);
-    }
-    return reader;
+    return readers.get(name);
   }
 
   /**
