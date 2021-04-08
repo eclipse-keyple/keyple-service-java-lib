@@ -67,7 +67,7 @@ final class PoolPluginAdapter<P> extends PluginAdapter<P> implements PoolPlugin 
           new LocalReaderAdapter(
               ((PoolPluginSpi) poolPluginSpi).allocateReader(readerGroupReference), getName());
     } catch (PluginIOException e) {
-      throw new KeypleReaderNotFoundException(
+      throw new KeyplePluginException(
           "Unable to allocate a reader for reference " + readerGroupReference, e);
     }
     return reader;

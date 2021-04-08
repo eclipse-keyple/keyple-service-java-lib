@@ -74,16 +74,13 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    * @return An empty list if no response was received.
    * @throws ReaderCommunicationException if the communication with the reader has failed.
    * @throws CardCommunicationException if the communication with the card has failed.
-   * @throws UnexpectedStatusCodeException If status code verification is enabled in the card
-   *     request and the card returned an unexpected code.
    * @since 2.0
    */
   final List<KeypleCardSelectionResponse> transmitCardSelectionRequests(
       List<CardSelectionRequest> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException,
-          UnexpectedStatusCodeException {
+      throws ReaderCommunicationException, CardCommunicationException {
     checkStatus();
 
     List<KeypleCardSelectionResponse> cardSelectionResponses = null;
@@ -131,11 +128,12 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
         long elapsed10ms = (timeStamp - before) / 100000;
         this.before = timeStamp;
         logger.debug(
-            "[{}] Unexpected status code reiceived. elapsed {}",
+            "[{}] An unexpected status code was received while transmitting card selection request. elapsed {}",
             this.getName(),
             elapsed10ms / 10.0);
       }
-      throw e;
+      throw new CardCommunicationException(
+          e.getCardResponse(), "An unexpected status code was received.", e);
     }
 
     if (logger.isDebugEnabled()) {
@@ -246,8 +244,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    */
   @Override
   public CardResponse transmitCardRequest(CardRequest cardRequest, ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException,
-          UnexpectedStatusCodeException {
+      throws ReaderCommunicationException, CardCommunicationException {
     checkStatus();
 
     CardResponse cardResponse;
@@ -294,7 +291,8 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
             this.getName(),
             elapsed10ms / 10.0);
       }
-      throw e;
+      throw new CardCommunicationException(
+          e.getCardResponse(), "An unexpected status code was received.", e);
     }
 
     if (logger.isDebugEnabled()) {

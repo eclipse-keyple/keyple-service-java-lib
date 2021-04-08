@@ -15,7 +15,6 @@ import java.util.List;
 import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.service.KeypleCardCommunicationException;
 import org.eclipse.keyple.core.service.KeypleReaderCommunicationException;
-import org.eclipse.keyple.core.service.KeypleUnexpectedStatusCodeException;
 import org.eclipse.keyple.core.service.ObservableReader;
 import org.eclipse.keyple.core.service.Reader;
 import org.eclipse.keyple.core.service.selection.spi.CardSelection;
@@ -78,9 +77,9 @@ public interface CardSelectionService {
    * @param reader The reader to communicate with the card.
    * @return A not null reference.
    * @throws KeypleReaderCommunicationException If the communication with the reader has failed.
-   * @throws KeypleCardCommunicationException If the communication with the card has failed.
-   * @throws KeypleUnexpectedStatusCodeException If status code verification is enabled in the card
-   *     request and the card returned an unexpected code.
+   * @throws KeypleCardCommunicationException If communication with the card has failed or if the
+   *     status code check is enabled in the card request and the card has returned an unexpected
+   *     code.
    * @since 2.0
    */
   CardSelectionResult processCardSelectionScenario(Reader reader);

@@ -66,8 +66,7 @@ public interface Plugin {
    * Gets the {@link Reader} whose name is provided.
    *
    * @param readerName The name of the reader.
-   * @return A not null reference.
-   * @throws KeypleReaderNotFoundException if the wanted reader is not found
+   * @return null if the reader has not been found.
    * @throws IllegalStateException if the plugin is no longer registered.
    * @since 2.0
    */

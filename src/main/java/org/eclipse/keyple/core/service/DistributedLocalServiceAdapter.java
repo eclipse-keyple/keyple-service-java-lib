@@ -294,8 +294,6 @@ final class DistributedLocalServiceAdapter
     for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins().values()) {
       try {
         return (AbstractReaderAdapter) plugin.getReader(readerName);
-      } catch (KeypleReaderNotFoundException e) {
-        // The reader has not been found in this plugin, then continue.
       } catch (IllegalStateException e) {
         // The plugin is no longer register, then continue.
       }
@@ -528,13 +526,11 @@ final class DistributedLocalServiceAdapter
      * Service {@link ReaderService#TRANSMIT_CARD_REQUEST}.
      *
      * @throws CardCommunicationException If a card communication error occurs.
-     * @throws ReaderCommunicationException If a reader communication error occurs.
-     * @throws UnexpectedStatusCodeException If status code verification is enabled in the card
-     *     request and the card returned an unexpected code.
+     * @throws ReaderCommunicationException If a reader communication error occurs. request and the
+     *     card returned an unexpected code.
      */
     private void transmitCardRequest()
-        throws CardCommunicationException, ReaderCommunicationException,
-            UnexpectedStatusCodeException {
+        throws CardCommunicationException, ReaderCommunicationException {
 
       // Extract info from the message
       ChannelControl channelControl =
@@ -556,12 +552,9 @@ final class DistributedLocalServiceAdapter
      *
      * @throws CardCommunicationException If a card communication error occurs.
      * @throws ReaderCommunicationException If a reader communication error occurs.
-     * @throws UnexpectedStatusCodeException If status code verification is enabled in the card
-     *     request and the card returned an unexpected code.
      */
     private void transmitCardSelectionRequests()
-        throws CardCommunicationException, ReaderCommunicationException,
-            UnexpectedStatusCodeException {
+        throws CardCommunicationException, ReaderCommunicationException {
 
       // Extract info from the message
       List<CardSelectionRequest> cardSelectionRequests =

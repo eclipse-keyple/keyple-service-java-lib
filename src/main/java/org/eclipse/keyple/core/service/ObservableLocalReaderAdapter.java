@@ -288,15 +288,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       // The card was removed or not read correctly, no exception raising or event notification,
       // just log.
       logger.debug(
-          "An card communication exception occurred while processing the card selection scenario. {}",
-          e.getMessage());
-    } catch (UnexpectedStatusCodeException e) {
-      // An unexpected status code was received during the processing of the card request, close the
-      // logical and physical channels.
-      closeLogicalAndPhysicalChannelsSilently();
-      // No exception raising or event notification, just log.
-      logger.debug(
-          "An unexpected status code was received while processing the card selection scenario. {}",
+          "An card error or communication exception occurred while processing the card selection scenario. {}",
           e.getMessage());
     }
 
