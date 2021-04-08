@@ -153,8 +153,7 @@ class PluginAdapter<P> implements Plugin {
   @Override
   public final Reader getReader(String name) {
     checkStatus();
-    Reader reader = readers.get(name);
-    return reader;
+    return readers.get(name);
   }
 
   /**

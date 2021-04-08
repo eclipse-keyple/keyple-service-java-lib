@@ -293,7 +293,10 @@ final class DistributedLocalServiceAdapter
   private AbstractReaderAdapter getReader(String readerName) {
     for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins().values()) {
       try {
-        return (AbstractReaderAdapter) plugin.getReader(readerName);
+        AbstractReaderAdapter reader = (AbstractReaderAdapter) plugin.getReader(readerName);
+        if(reader != null) {
+          return reader;
+        }
       } catch (IllegalStateException e) {
         // The plugin is no longer register, then continue.
       }
@@ -526,8 +529,7 @@ final class DistributedLocalServiceAdapter
      * Service {@link ReaderService#TRANSMIT_CARD_REQUEST}.
      *
      * @throws CardCommunicationException If a card communication error occurs.
-     * @throws ReaderCommunicationException If a reader communication error occurs. request and the
-     *     card returned an unexpected code.
+     * @throws ReaderCommunicationException If a reader communication error occurs.
      */
     private void transmitCardRequest()
         throws CardCommunicationException, ReaderCommunicationException {
