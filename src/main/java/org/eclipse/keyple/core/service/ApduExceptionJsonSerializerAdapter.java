@@ -27,7 +27,7 @@ import org.eclipse.keyple.core.card.CardResponse;
  *
  * @since 2.0
  */
-class CommunicationExceptionJsonSerializerAdapter implements JsonSerializer<AbstractApduException> {
+class ApduExceptionJsonSerializerAdapter implements JsonSerializer<AbstractApduException> {
 
   /**
    * (package-private)<br>
@@ -35,7 +35,7 @@ class CommunicationExceptionJsonSerializerAdapter implements JsonSerializer<Abst
    *
    * @since 2.0
    */
-  CommunicationExceptionJsonSerializerAdapter() {}
+  ApduExceptionJsonSerializerAdapter() {}
 
   /**
    * {@inheritDoc}
