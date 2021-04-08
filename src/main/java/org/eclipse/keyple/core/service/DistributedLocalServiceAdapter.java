@@ -529,9 +529,12 @@ final class DistributedLocalServiceAdapter
      *
      * @throws CardCommunicationException If a card communication error occurs.
      * @throws ReaderCommunicationException If a reader communication error occurs.
+     * @throws UnexpectedStatusCodeException If status code verification is enabled in the card
+     *     request and the card returned an unexpected code.
      */
     private void transmitCardRequest()
-        throws CardCommunicationException, ReaderCommunicationException {
+        throws CardCommunicationException, ReaderCommunicationException,
+            UnexpectedStatusCodeException {
 
       // Extract info from the message
       ChannelControl channelControl =
@@ -553,9 +556,12 @@ final class DistributedLocalServiceAdapter
      *
      * @throws CardCommunicationException If a card communication error occurs.
      * @throws ReaderCommunicationException If a reader communication error occurs.
+     * @throws UnexpectedStatusCodeException If status code verification is enabled in the card
+     *     request and the card returned an unexpected code.
      */
     private void transmitCardSelectionRequests()
-        throws CardCommunicationException, ReaderCommunicationException {
+        throws CardCommunicationException, ReaderCommunicationException,
+            UnexpectedStatusCodeException {
 
       // Extract info from the message
       List<CardSelectionRequest> cardSelectionRequests =

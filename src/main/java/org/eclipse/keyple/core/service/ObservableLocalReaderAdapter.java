@@ -13,16 +13,12 @@ package org.eclipse.keyple.core.service;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import org.eclipse.keyple.core.card.CardCommunicationException;
-import org.eclipse.keyple.core.card.CardSelectionResponse;
-import org.eclipse.keyple.core.card.CardSelectionScenario;
-import org.eclipse.keyple.core.card.ReaderCommunicationException;
+import org.eclipse.keyple.core.card.*;
 import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.WaitForCardInsertionAutonomousReaderApi;
 import org.eclipse.keyple.core.plugin.WaitForCardRemovalAutonomousReaderApi;
-import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
@@ -47,6 +43,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   private static final byte[] APDU_PING_CARD_PRESENCE = {
     (byte) 0x00, (byte) 0xC0, (byte) 0x00, (byte) 0x00, (byte) 0x00
   };
+  public static final String READER_MONITORING_ERROR =
+      "An error occurred while monitoring the reader.";
 
   private final ObservableReaderSpi observableReaderSpi;
   private ReaderObservationExceptionHandlerSpi exceptionHandler;
@@ -187,15 +185,14 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       if (logger.isTraceEnabled()) {
         logger.trace("[{}] Ping card", getName());
       }
-      ((ReaderSpi) observableReaderSpi).transmitApdu(APDU_PING_CARD_PRESENCE);
+      observableReaderSpi.transmitApdu(APDU_PING_CARD_PRESENCE);
     } catch (ReaderIOException e) {
       // Notify the reader communication failure with the exception handler.
       getObservationExceptionHandler()
           .onReaderObservationError(
               getPluginName(),
               getName(),
-              new KeypleReaderCommunicationException(
-                  "An error occurred while monitoring the reader.", e));
+              new KeypleReaderCommunicationException(READER_MONITORING_ERROR, e));
     } catch (CardIOException e) {
       if (logger.isTraceEnabled()) {
         logger.trace(
@@ -283,8 +280,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           .onReaderObservationError(
               getPluginName(),
               getName(),
-              new KeypleReaderCommunicationException(
-                  "An error occurred while monitoring the reader.", e));
+              new KeypleReaderCommunicationException(READER_MONITORING_ERROR, e));
 
     } catch (CardCommunicationException e) {
       // The last transmission failed, close the logical and physical channels.
@@ -294,20 +290,27 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       logger.debug(
           "An card communication exception occurred while processing the card selection scenario. {}",
           e.getMessage());
+    } catch (UnexpectedStatusCodeException e) {
+      // An unexpected status code was received during the processing of the card request, close the
+      // logical and physical channels.
+      closeLogicalAndPhysicalChannelsSilently();
+      // No exception raising or event notification, just log.
+      logger.debug(
+          "An unexpected status code was received while processing the card selection scenario. {}",
+          e.getMessage());
     }
 
     // Here we close the physical channel in case it was opened for a card excluded by the selection
     // scenario.
     try {
-      ((ReaderSpi) observableReaderSpi).closePhysicalChannel();
+      observableReaderSpi.closePhysicalChannel();
     } catch (ReaderIOException e) {
       // Notify the reader communication failure with the exception handler.
       getObservationExceptionHandler()
           .onReaderObservationError(
               getPluginName(),
               getName(),
-              new KeypleReaderCommunicationException(
-                  "An error occurred while monitoring the reader.", e));
+              new KeypleReaderCommunicationException(READER_MONITORING_ERROR, e));
     }
 
     // no event returned
@@ -485,7 +488,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
        * if the card is no longer present but one of the channels is still open, then the
        * card removal sequence is initiated.
        */
-      if (isLogicalChannelOpen() || ((ReaderSpi) observableReaderSpi).isPhysicalChannelOpen()) {
+      if (isLogicalChannelOpen() || observableReaderSpi.isPhysicalChannelOpen()) {
         processCardRemoved();
       }
       return false;
