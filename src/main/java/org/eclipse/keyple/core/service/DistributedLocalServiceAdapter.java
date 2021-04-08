@@ -294,7 +294,7 @@ final class DistributedLocalServiceAdapter
     for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins().values()) {
       try {
         AbstractReaderAdapter reader = (AbstractReaderAdapter) plugin.getReader(readerName);
-        if(reader != null) {
+        if (reader != null) {
           return reader;
         }
       } catch (IllegalStateException e) {
