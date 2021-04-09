@@ -38,9 +38,8 @@ final class DistributedLocalServiceAdapter
   private static final Logger logger =
       LoggerFactory.getLogger(DistributedLocalServiceAdapter.class);
 
-  private static final String SERVICE = "service";
-  private static final String RESULT = "result";
-  private static final String ERROR = "error";
+  private static final String READER_NOT_FOUND_TEMPLATE =
+      "There is no local reader registered with the name '%s' or the associated plugin is no longer registered.";
 
   private final String name;
   private final LocalServiceSpi localServiceSpi;
@@ -58,6 +57,57 @@ final class DistributedLocalServiceAdapter
   DistributedLocalServiceAdapter(LocalServiceSpi localServiceSpi) {
     this.name = localServiceSpi.getName();
     this.localServiceSpi = localServiceSpi;
+  }
+
+  /**
+   * (package-private)<br>
+   * Enumeration of all available common JSON properties.
+   *
+   * @since 2.0
+   */
+  enum JsonProperty {
+
+    /** @since 2.0 */
+    CARD_REQUEST,
+
+    /** @since 2.0 */
+    CARD_SELECTION_REQUESTS,
+
+    /** @since 2.0 */
+    CARD_SELECTION_SCENARIO,
+
+    /** @since 2.0 */
+    CHANNEL_CONTROL,
+
+    /** @since 2.0 */
+    ERROR,
+
+    /** @since 2.0 */
+    MULTI_SELECTION_PROCESSING,
+
+    /** @since 2.0 */
+    NOTIFICATION_MODE,
+
+    /** @since 2.0 */
+    PLUGIN_EVENT,
+
+    /** @since 2.0 */
+    POLLING_MODE,
+
+    /** @since 2.0 */
+    READER_EVENT,
+
+    /** @since 2.0 */
+    READER_GROUP_REFERENCE,
+
+    /** @since 2.0 */
+    READER_NAME,
+
+    /** @since 2.0 */
+    RESULT,
+
+    /** @since 2.0 */
+    SERVICE
   }
 
   /**
@@ -97,10 +147,7 @@ final class DistributedLocalServiceAdapter
     checkStatus();
     Reader reader = getReader(readerName);
     if (reader == null) {
-      throw new IllegalStateException(
-          String.format(
-              "There is no local reader registered with the name '%s' or the associated plugin is no longer registered.",
-              readerName));
+      throw new IllegalStateException(String.format(READER_NOT_FOUND_TEMPLATE, readerName));
     }
     return reader instanceof ObservableReader;
   }
@@ -123,10 +170,7 @@ final class DistributedLocalServiceAdapter
     checkStatus();
     Reader reader = getReader(readerName);
     if (reader == null) {
-      throw new IllegalStateException(
-          String.format(
-              "There is no local reader registered with the name '%s' or the associated plugin is no longer registered.",
-              readerName));
+      throw new IllegalStateException(String.format(READER_NOT_FOUND_TEMPLATE, readerName));
     }
     if (!(reader instanceof ObservableReader)) {
       throw new IllegalStateException(
@@ -233,6 +277,7 @@ final class DistributedLocalServiceAdapter
   @Override
   public <T extends KeypleDistributedLocalServiceExtension> T getExtension(
       Class<T> distributedLocalServiceExtensionType) {
+    checkStatus();
     return (T) localServiceSpi;
   }
 
@@ -254,7 +299,7 @@ final class DistributedLocalServiceAdapter
     }
 
     JsonObject body = new JsonObject();
-    body.add("pluginEvent", JsonUtil.getParser().toJsonTree(pluginEvent));
+    body.add(JsonProperty.PLUGIN_EVENT.name(), JsonUtil.getParser().toJsonTree(pluginEvent));
 
     localServiceSpi.onPluginEvent(
         pluginEvent.getReadersNames().first(), body.toString(), pluginEvent);
@@ -278,7 +323,7 @@ final class DistributedLocalServiceAdapter
     }
 
     JsonObject body = new JsonObject();
-    body.add("readerEvent", JsonUtil.getParser().toJsonTree(readerEvent));
+    body.add(JsonProperty.READER_EVENT.name(), JsonUtil.getParser().toJsonTree(readerEvent));
 
     localServiceSpi.onReaderEvent(readerEvent.getReaderName(), body.toString(), readerEvent);
   }
@@ -299,25 +344,6 @@ final class DistributedLocalServiceAdapter
         }
       } catch (IllegalStateException e) {
         // The plugin is no longer register, then continue.
-      }
-    }
-    return null;
-  }
-
-  /**
-   * (private)<br>
-   * Retrieves the pool plugin that contains the provided reader group reference.
-   *
-   * @param readerGroupReference The target reader group reference.
-   * @return null if no pool plugin is found containing the provided group reference.
-   */
-  private PoolPlugin getPoolPlugin(String readerGroupReference) {
-    PoolPlugin poolPlugin;
-    for (String poolPluginName : poolPluginNames) {
-      poolPlugin = (PoolPlugin) SmartCardServiceProvider.getService().getPlugin(poolPluginName);
-      if (poolPlugin != null
-          && poolPlugin.getReaderGroupReferences().contains(readerGroupReference)) {
-        return poolPlugin;
       }
     }
     return null;
@@ -395,8 +421,9 @@ final class DistributedLocalServiceAdapter
     /**
      * Refers to {@link
      * ObservableLocalReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenario,
-     * ObservableReader.NotificationMode, ObservableReader.PollingMode)} and TODO
-     * ObservableRemote...
+     * ObservableReader.NotificationMode, ObservableReader.PollingMode)} and {@link
+     * ObservableRemoteReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenario,
+     * ObservableReader.NotificationMode, ObservableReader.PollingMode)}
      *
      * @since 2.0
      */
@@ -442,7 +469,7 @@ final class DistributedLocalServiceAdapter
      *
      * @since 2.0
      */
-    RELEASE_CHANNEL;
+    RELEASE_CHANNEL
   }
 
   /**
@@ -466,10 +493,7 @@ final class DistributedLocalServiceAdapter
 
       this.reader = getReader(readerName);
       if (reader == null) {
-        throw new IllegalStateException(
-            String.format(
-                "There is no local reader registered with the name '%s' or the associated plugin is no longer registered.",
-                readerName));
+        throw new IllegalStateException(String.format(READER_NOT_FOUND_TEMPLATE, readerName));
       }
       this.input = JsonUtil.getParser().fromJson(jsonData, JsonObject.class);
       this.output = new JsonObject();
@@ -483,10 +507,11 @@ final class DistributedLocalServiceAdapter
      */
     private String execute() {
 
-      output.add(SERVICE, input.get(SERVICE));
+      output.add(JsonProperty.SERVICE.name(), input.get(JsonProperty.SERVICE.name()));
       try {
         checkStatus();
-        ReaderService service = ReaderService.valueOf(input.get(SERVICE).getAsString());
+        ReaderService service =
+            ReaderService.valueOf(input.get(JsonProperty.SERVICE.name()).getAsString());
         switch (service) {
           case TRANSMIT_CARD_REQUEST:
             transmitCardRequest();
@@ -519,7 +544,7 @@ final class DistributedLocalServiceAdapter
             throw new IllegalArgumentException(service.name());
         }
       } catch (Exception e) {
-        output.add(ERROR, JsonUtil.getParser().toJsonTree(new BodyError(e)));
+        output.add(JsonProperty.ERROR.name(), JsonUtil.getParser().toJsonTree(new BodyError(e)));
       }
       return output.toString();
     }
@@ -536,16 +561,20 @@ final class DistributedLocalServiceAdapter
 
       // Extract info from the message
       ChannelControl channelControl =
-          ChannelControl.valueOf(input.get("channelControl").getAsString());
+          ChannelControl.valueOf(input.get(JsonProperty.CHANNEL_CONTROL.name()).getAsString());
 
       CardRequest cardRequest =
-          JsonUtil.getParser().fromJson(input.get("cardRequest").getAsString(), CardRequest.class);
+          JsonUtil.getParser()
+              .fromJson(
+                  input.get(JsonProperty.CARD_REQUEST.name()).getAsString(), CardRequest.class);
 
       // Execute the service on the reader
       CardResponse cardResponse = reader.transmitCardRequest(cardRequest, channelControl);
 
       // Build result
-      output.add(RESULT, JsonUtil.getParser().toJsonTree(cardResponse, CardResponse.class));
+      output.add(
+          JsonProperty.RESULT.name(),
+          JsonUtil.getParser().toJsonTree(cardResponse, CardResponse.class));
     }
 
     /**
@@ -562,14 +591,15 @@ final class DistributedLocalServiceAdapter
       List<CardSelectionRequest> cardSelectionRequests =
           JsonUtil.getParser()
               .fromJson(
-                  input.get("cardSelectionRequests").getAsString(),
+                  input.get(JsonProperty.CARD_SELECTION_REQUESTS.name()).getAsString(),
                   new TypeToken<ArrayList<CardSelectionRequest>>() {}.getType());
 
       MultiSelectionProcessing multiSelectionProcessing =
-          MultiSelectionProcessing.valueOf(input.get("multiSelectionProcessing").getAsString());
+          MultiSelectionProcessing.valueOf(
+              input.get(JsonProperty.MULTI_SELECTION_PROCESSING.name()).getAsString());
 
       ChannelControl channelControl =
-          ChannelControl.valueOf(input.get("channelControl").getAsString());
+          ChannelControl.valueOf(input.get(JsonProperty.CHANNEL_CONTROL.name()).getAsString());
 
       // Execute the service on the reader
       List<KeypleCardSelectionResponse> cardSelectionResponses =
@@ -578,7 +608,7 @@ final class DistributedLocalServiceAdapter
 
       // Build result
       output.add(
-          RESULT,
+          JsonProperty.RESULT.name(),
           JsonUtil.getParser()
               .toJsonTree(
                   cardSelectionResponses,
@@ -594,24 +624,29 @@ final class DistributedLocalServiceAdapter
       // Extract info from the message
       CardSelectionScenario cardSelectionScenario =
           JsonUtil.getParser()
-              .fromJson(input.get("cardSelectionScenario"), CardSelectionScenario.class);
+              .fromJson(
+                  input.get(JsonProperty.CARD_SELECTION_SCENARIO.name()),
+                  CardSelectionScenario.class);
 
       ObservableReader.NotificationMode notificationMode =
-          ObservableReader.NotificationMode.valueOf(input.get("notificationMode").getAsString());
+          ObservableReader.NotificationMode.valueOf(
+              input.get(JsonProperty.NOTIFICATION_MODE.name()).getAsString());
 
       ObservableReader.PollingMode pollingMode = null;
-      if (input.has("pollingMode")) {
-        pollingMode = ObservableReader.PollingMode.valueOf(input.get("pollingMode").getAsString());
+      if (input.has(JsonProperty.POLLING_MODE.name())) {
+        pollingMode =
+            ObservableReader.PollingMode.valueOf(
+                input.get(JsonProperty.POLLING_MODE.name()).getAsString());
       }
 
       // Execute the service on the reader
       if (reader instanceof ObservableLocalReaderAdapter) {
         ((ObservableLocalReaderAdapter) reader)
             .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, pollingMode);
-      } // TODO else if (reader instanceof ObservableRemoteReaderAdapter) {
-      //  ((ObservableRemoteReaderAdapter) reader).scheduleCardSelectionScenario(
-      //        cardSelectionScenario, notificationMode, pollingMode);
-      // }
+      } else if (reader instanceof ObservableRemoteReaderAdapter) {
+        ((ObservableRemoteReaderAdapter) reader)
+            .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, pollingMode);
+      }
     }
 
     /**
@@ -624,7 +659,7 @@ final class DistributedLocalServiceAdapter
       boolean isCardPresent = reader.isCardPresent();
 
       // Build result
-      output.addProperty(RESULT, isCardPresent);
+      output.addProperty(JsonProperty.RESULT.name(), isCardPresent);
     }
 
     /**
@@ -637,7 +672,7 @@ final class DistributedLocalServiceAdapter
       boolean isContactless = reader.isContactless();
 
       // Build result
-      output.addProperty(RESULT, isContactless);
+      output.addProperty(JsonProperty.RESULT.name(), isContactless);
     }
 
     /**
@@ -648,7 +683,8 @@ final class DistributedLocalServiceAdapter
 
       // Extract info from the message
       ObservableReader.PollingMode pollingMode =
-          ObservableReader.PollingMode.valueOf(input.get("pollingMode").getAsString());
+          ObservableReader.PollingMode.valueOf(
+              input.get(JsonProperty.POLLING_MODE.name()).getAsString());
 
       // Execute the service on the reader
       ((ObservableReader) reader).startCardDetection(pollingMode);
@@ -697,6 +733,13 @@ final class DistributedLocalServiceAdapter
   enum PluginService {
 
     /**
+     * Refers to {@link Plugin#getReaders()}
+     *
+     * @since 2.0
+     */
+    GET_READERS,
+
+    /**
      * Refers to {@link PoolPlugin#getReaderGroupReferences()}
      *
      * @since 2.0
@@ -715,7 +758,7 @@ final class DistributedLocalServiceAdapter
      *
      * @since 2.0
      */
-    RELEASE_READER;
+    RELEASE_READER
   }
 
   /**
@@ -746,11 +789,15 @@ final class DistributedLocalServiceAdapter
      */
     private String execute() {
 
-      output.add(SERVICE, input.get(SERVICE));
+      output.add(JsonProperty.SERVICE.name(), input.get(JsonProperty.SERVICE.name()));
       try {
         checkStatus();
-        PluginService service = PluginService.valueOf(input.get(SERVICE).getAsString());
+        PluginService service =
+            PluginService.valueOf(input.get(JsonProperty.SERVICE.name()).getAsString());
         switch (service) {
+          case GET_READERS:
+            getReaders();
+            break;
           case GET_READER_GROUP_REFERENCES:
             getReaderGroupReferences();
             break;
@@ -764,9 +811,50 @@ final class DistributedLocalServiceAdapter
             throw new IllegalArgumentException(service.name());
         }
       } catch (Exception e) {
-        output.add(ERROR, JsonUtil.getParser().toJsonTree(new BodyError(e)));
+        output.add(JsonProperty.ERROR.name(), JsonUtil.getParser().toJsonTree(new BodyError(e)));
       }
       return output.toString();
+    }
+
+    /**
+     * (private)<br>
+     * Service {@link PluginService#GET_READERS}.
+     */
+    private void getReaders() {
+
+      // Execute the service on the plugins
+      Map<String, Boolean> readers = new HashMap<String, Boolean>();
+      for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins().values()) {
+        for (Reader reader : plugin.getReaders().values()) {
+          if (reader instanceof ObservableReader) {
+            readers.put(reader.getName(), true);
+          } else {
+            readers.put(reader.getName(), false);
+          }
+        }
+      }
+
+      // Build result
+      output.add(JsonProperty.RESULT.name(), JsonUtil.getParser().toJsonTree(readers));
+    }
+
+    /**
+     * (private)<br>
+     * Retrieves the pool plugin that contains the provided reader group reference.
+     *
+     * @param readerGroupReference The target reader group reference.
+     * @return null if no pool plugin is found containing the provided group reference.
+     */
+    private PoolPlugin getPoolPlugin(String readerGroupReference) {
+      PoolPlugin poolPlugin;
+      for (String poolPluginName : poolPluginNames) {
+        poolPlugin = (PoolPlugin) SmartCardServiceProvider.getService().getPlugin(poolPluginName);
+        if (poolPlugin != null
+            && poolPlugin.getReaderGroupReferences().contains(readerGroupReference)) {
+          return poolPlugin;
+        }
+      }
+      return null;
     }
 
     /**
@@ -784,7 +872,8 @@ final class DistributedLocalServiceAdapter
       }
 
       // Build result
-      output.add(RESULT, JsonUtil.getParser().toJsonTree(readerGroupReferences));
+      output.add(
+          JsonProperty.RESULT.name(), JsonUtil.getParser().toJsonTree(readerGroupReferences));
     }
 
     /**
@@ -794,14 +883,21 @@ final class DistributedLocalServiceAdapter
     private void allocateReader() {
 
       // Extract info from the message
-      String readerGroupReference = input.get("readerGroupReference").getAsString();
+      String readerGroupReference =
+          input.get(JsonProperty.READER_GROUP_REFERENCE.name()).getAsString();
 
       // Execute the service on the plugins
       PoolPlugin poolPlugin = getPoolPlugin(readerGroupReference);
+      if (poolPlugin == null) {
+        throw new IllegalStateException(
+            String.format(
+                "There is no local pool plugin registered having the reader group name '%s'.",
+                readerGroupReference));
+      }
       Reader reader = poolPlugin.allocateReader(readerGroupReference);
 
       // Build result
-      output.addProperty(RESULT, reader.getName());
+      output.addProperty(JsonProperty.RESULT.name(), reader.getName());
     }
 
     /**
@@ -811,7 +907,7 @@ final class DistributedLocalServiceAdapter
     private void releaseReader() {
 
       // Extract info from the message
-      String readerName = input.get("readerName").getAsString();
+      String readerName = input.get(JsonProperty.READER_NAME.name()).getAsString();
 
       // Execute the service on the plugins
       PoolPlugin poolPlugin;

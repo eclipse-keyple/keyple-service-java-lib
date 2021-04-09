@@ -357,19 +357,19 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   /**
    * (package-private)<br>
-   * Notify all registered observers with the provided {@link ReaderEvent}
+   * Notifies all registered observers with the provided {@link ReaderEvent}
    *
    * @param event The reader event.
    * @since 2.0
    */
   void notifyObservers(final ReaderEvent event) {
 
-    if (logger.isTraceEnabled()) {
-      logger.trace(
-          "[{}] Notifying a reader event to {} observers. EVENTNAME = {}",
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The local reader '{}' is notifying the reader event '{}' to {} observers.",
           getName(),
-          countObservers(),
-          event.getEventType().name());
+          event.getEventType().name(),
+          countObservers());
     }
 
     List<ReaderObserverSpi> observersCopy;
@@ -398,7 +398,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * Notify a single observer of an event.
+   * Notifies a single observer of an event.
    *
    * @param observer The observer to notify.
    * @param event The event.
@@ -430,7 +430,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    *
    * @param cardSelectionScenario The card selection scenario.
    * @param notificationMode The notification policy.
-   * @param pollingMode The polling policy.
+   * @param pollingMode The polling policy (optional).
    * @since 2.0
    */
   void scheduleCardSelectionScenario(
@@ -443,7 +443,6 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * (package-private)<br>
    * {@inheritDoc}
    *
    * <p>Notifies all observers of the UNREGISTERED event.<br>
@@ -495,16 +494,21 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   @Override
   public void addObserver(ReaderObserverSpi observer) {
 
-    Assert.getInstance().notNull(observer, "observer");
+    checkStatus();
 
-    if (logger.isTraceEnabled()) {
-      logger.trace(
-          "Adding '{}' as an observer of '{}'.", observer.getClass().getSimpleName(), getName());
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The reader '{}' of plugin '{}' is adding the observer '{}'.",
+          getName(),
+          getPluginName(),
+          observer != null ? observer.getClass().getSimpleName() : null);
     }
+    Assert.getInstance().notNull(observer, "observer");
 
     if (observers.isEmpty() && getObservationExceptionHandler() == null) {
       throw new IllegalStateException("No reader observation exception handler has been set.");
     }
+
     synchronized (monitor) {
       observers.add(observer);
     }
@@ -518,11 +522,14 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   @Override
   public void removeObserver(ReaderObserverSpi observer) {
 
-    Assert.getInstance().notNull(observer, "observer");
-
-    if (logger.isTraceEnabled()) {
-      logger.trace("[{}] Deleting a reader observer", getName());
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The reader '{}' of plugin '{}' is removing the observer '{}'.",
+          getName(),
+          getPluginName(),
+          observer != null ? observer.getClass().getSimpleName() : null);
     }
+    Assert.getInstance().notNull(observer, "observer");
 
     synchronized (monitor) {
       observers.remove(observer);
@@ -558,8 +565,13 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public void startCardDetection(ObservableReader.PollingMode pollingMode) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("[{}] start the card Detection with pollingMode {}", getName(), pollingMode);
+    checkStatus();
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The reader '{}' of plugin '{}' is starting the card detection with polling mode '{}'.",
+          getName(),
+          getPluginName(),
+          pollingMode);
     }
     currentPollingMode = pollingMode;
     stateService.onEvent(InternalEvent.START_DETECT);
@@ -572,8 +584,11 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public void stopCardDetection() {
-    if (logger.isTraceEnabled()) {
-      logger.trace("[{}] stop the card Detection", getName());
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The reader '{}' of plugin '{}' is stopping the card detection.",
+          getName(),
+          getPluginName());
     }
     stateService.onEvent(InternalEvent.STOP_DETECT);
   }
@@ -584,8 +599,11 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   public void finalizeCardProcessing() {
-    if (logger.isTraceEnabled()) {
-      logger.trace("[{}] start removal sequence of the reader", getName());
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The reader '{}' of plugin '{}' is starting the removal sequence of the card.",
+          getName(),
+          getPluginName());
     }
     stateService.onEvent(InternalEvent.SE_PROCESSED);
   }
@@ -598,6 +616,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   @Override
   public void setEventNotificationExecutorService(
       ExecutorService eventNotificationExecutorService) {
+    checkStatus();
     this.eventNotificationExecutorService = eventNotificationExecutorService;
   }
 
@@ -609,6 +628,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   @Override
   public void setReaderObservationExceptionHandler(
       ReaderObservationExceptionHandlerSpi exceptionHandler) {
+    checkStatus();
     Assert.getInstance().notNull(exceptionHandler, "exceptionHandler");
     this.exceptionHandler = exceptionHandler;
   }

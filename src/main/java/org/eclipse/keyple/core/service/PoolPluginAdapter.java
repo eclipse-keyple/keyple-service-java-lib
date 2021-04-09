@@ -12,7 +12,10 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.SortedSet;
+
+import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
 import org.eclipse.keyple.core.plugin.PluginIOException;
+import org.eclipse.keyple.core.plugin.spi.PluginSpi;
 import org.eclipse.keyple.core.plugin.spi.PoolPluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 

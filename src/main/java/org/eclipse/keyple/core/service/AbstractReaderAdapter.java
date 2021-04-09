@@ -175,16 +175,14 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
 
   /**
    * (package-private)<br>
-   * Change the reader status to unregistered
+   * Change the reader status to unregistered if is not already unregistered.
    *
    * <p>This method may be overridden in order to meet specific needs in certain implementations of
    * readers.
    *
-   * @throws IllegalStateException is thrown when plugin is already unregistered.
    * @since 2.0
    */
   void unregister() {
-    checkStatus();
     isRegistered = false;
   }
 

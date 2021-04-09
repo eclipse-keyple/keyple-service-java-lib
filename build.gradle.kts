@@ -31,6 +31,7 @@ repositories {
 dependencies {
     implementation("org.eclipse.keyple:keyple-java-commons-api:2.0-SNAPSHOT")
     implementation("org.eclipse.keyple:keyple-java-plugin-api:2.0-SNAPSHOT")
+    implementation("org.eclipse.keyple:keyple-java-distributed-remote-api:2.0-SNAPSHOT")
     implementation("org.eclipse.keyple:keyple-java-distributed-local-api:2.0-SNAPSHOT")
     implementation("org.eclipse.keyple:keyple-java-card-api:2.0-SNAPSHOT")
     implementation("org.eclipse.keyple:keyple-java-utils:2.0.0-SNAPSHOT")
