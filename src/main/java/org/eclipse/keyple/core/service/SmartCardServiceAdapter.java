@@ -258,7 +258,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
 
     Assert.getInstance().notNull(pluginFactory, "pluginFactory");
 
-    PluginAdapter<?> plugin;
+    AbstractPluginAdapter plugin;
     try {
       synchronized (pluginMonitor) {
         if (pluginFactory instanceof PluginFactorySpi) {
@@ -279,7 +279,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
                 new AutonomousObservableLocalPluginAdapter(
                     (AutonomousObservablePluginSpi) pluginSpi);
           } else {
-            plugin = new PluginAdapter<PluginSpi>(pluginSpi);
+            plugin = new LocalPluginAdapter(pluginSpi);
           }
         } else if (pluginFactory instanceof PoolPluginFactorySpi) {
           PoolPluginFactorySpi poolPluginFactorySpi = (PoolPluginFactorySpi) pluginFactory;
@@ -292,7 +292,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
                     "The pool plugin name '%s' mismatches the expected name '%s' provided by the factory",
                     poolPluginSpi.getName(), poolPluginFactorySpi.getPoolPluginName()));
           }
-          plugin = new PoolPluginAdapter<PoolPluginSpi>(poolPluginSpi);
+          plugin = new LocalPoolPluginAdapter(poolPluginSpi);
         } else {
           throw new IllegalArgumentException("The factory doesn't implement the right SPI.");
         }
@@ -320,7 +320,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     synchronized (pluginMonitor) {
       Plugin removedPlugin = plugins.remove(pluginName);
       if (removedPlugin != null) {
-        ((PluginAdapter<?>) removedPlugin).unregister();
+        ((AbstractPluginAdapter) removedPlugin).unregister();
       } else {
         logger.warn("The plugin '{}' is not registered", pluginName);
       }

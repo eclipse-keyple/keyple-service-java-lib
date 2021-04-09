@@ -14,12 +14,13 @@ package org.eclipse.keyple.core.service;
 import java.util.List;
 import org.eclipse.keyple.core.card.*;
 import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
+import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
- * Abstract class for all Readers.
+ * Abstract class for all readers.
  *
  * @since 2.0
  */
@@ -28,19 +29,24 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
   private static final Logger logger = LoggerFactory.getLogger(AbstractReaderAdapter.class);
 
   private final String readerName;
+  private final Object readerExtension;
   private final String pluginName;
+
   private boolean isRegistered;
   private long before;
 
   /**
-   * (package-private) <br>
+   * (package-private)<br>
+   * Constructor.
    *
    * @param readerName The name of the reader.
+   * @param readerExtension The associated reader extension SPI.
    * @param pluginName The name of the plugin.
    * @since 2.0
    */
-  AbstractReaderAdapter(String readerName, String pluginName) {
+  AbstractReaderAdapter(String readerName, Object readerExtension, String pluginName) {
     this.readerName = readerName;
+    this.readerExtension = readerExtension;
     this.pluginName = pluginName;
   }
 
@@ -165,7 +171,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
 
   /**
    * (package-private)<br>
-   * Change the reader status to registered
+   * Changes the reader status to registered.
    *
    * @since 2.0
    */
@@ -175,7 +181,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
 
   /**
    * (package-private)<br>
-   * Change the reader status to unregistered if is not already unregistered.
+   * Changes the reader status to unregistered if is not already unregistered.
    *
    * <p>This method may be overridden in order to meet specific needs in certain implementations of
    * readers.
@@ -233,6 +239,17 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
   @Override
   public final String getName() {
     return readerName;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public final <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionType) {
+    checkStatus();
+    return (T) readerExtension;
   }
 
   /**

@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.keyple.core.card.*;
 import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
-import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.AutonomousSelectionReaderSpi;
@@ -56,14 +55,15 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private final Map<String, String> protocolAssociations;
 
   /**
-   * (package-private) <br>
+   * (package-private)<br>
+   * Constructor.
    *
    * @param readerSpi The reader SPI.
    * @param pluginName The name of the plugin.
    * @since 2.0
    */
   LocalReaderAdapter(ReaderSpi readerSpi, String pluginName) {
-    super(readerSpi.getName(), pluginName);
+    super(readerSpi.getName(), readerSpi, pluginName);
     this.readerSpi = readerSpi;
     protocolAssociations = new LinkedHashMap<String, String>();
   }
@@ -196,17 +196,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     }
 
     return cardResponse;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public final <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionType) {
-    checkStatus();
-    return (T) readerSpi;
   }
 
   /**

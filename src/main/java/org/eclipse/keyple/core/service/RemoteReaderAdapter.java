@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import org.eclipse.keyple.core.card.*;
 import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
-import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
 import org.eclipse.keyple.core.util.json.BodyError;
 import org.eclipse.keyple.core.util.json.JsonUtil;
@@ -48,7 +47,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   RemoteReaderAdapter(RemoteReaderSpi remoteReaderSpi, String pluginName) {
-    super(remoteReaderSpi.getName(), pluginName);
+    super(remoteReaderSpi.getName(), remoteReaderSpi, pluginName);
     this.remoteReaderSpi = remoteReaderSpi;
   }
 
@@ -151,17 +150,6 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
       throwRuntimeException(e);
       return null;
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public final <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionType) {
-    checkStatus();
-    return (T) remoteReaderSpi;
   }
 
   /**

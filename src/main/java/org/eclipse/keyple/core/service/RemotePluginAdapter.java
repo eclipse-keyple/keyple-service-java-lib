@@ -11,21 +11,17 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.*;
+import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.JsonProperty;
+import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.PluginService;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import org.eclipse.keyple.core.common.KeyplePluginExtension;
+import java.util.HashMap;
+import java.util.Map;
 import org.eclipse.keyple.core.distributed.remote.RemotePluginApi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
 import org.eclipse.keyple.core.plugin.PluginIOException;
-import org.eclipse.keyple.core.plugin.spi.PluginSpi;
-import org.eclipse.keyple.core.plugin.spi.PoolPluginSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.BodyError;
 import org.eclipse.keyple.core.util.json.JsonUtil;
@@ -34,120 +30,39 @@ import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
- * Implementation of a local or remote {@link Plugin}.
+ * Implementation of a remote {@link Plugin}.
  *
- * @param <P> The type of plugin.
  * @since 2.0
  */
-class PluginAdapter<P> implements Plugin, RemotePluginApi {
+class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginApi {
 
-  private static final Logger logger = LoggerFactory.getLogger(PluginAdapter.class);
+  private static final Logger logger = LoggerFactory.getLogger(RemotePluginAdapter.class);
 
-  private final P pluginSpi;
-  private final PluginSpi localPluginSpi;
-  private final PoolPluginSpi localPoolPluginSpi;
   private final RemotePluginSpi remotePluginSpi;
-  private final String pluginName;
-  private boolean isRegistered;
-  private final Map<String, Reader> readers;
 
   /**
    * (package-private)<br>
-   * Creates an instance of {@link PluginAdapter}.
+   * Constructor.
    *
-   * <p>The expected plugin SPI should be either a {@link PluginSpi} or a {@link RemotePluginSpi}.
-   *
-   * @param pluginSpi The specific plugin SPI.
-   * @throws IllegalArgumentException If the SPI is null or of an unexpected type.
+   * @param remotePluginSpi The associated SPI.
    * @since 2.0
    */
-  PluginAdapter(P pluginSpi) {
-
-    this.pluginSpi = pluginSpi;
-
-    if (pluginSpi instanceof PluginSpi) {
-      this.localPluginSpi = (PluginSpi) pluginSpi;
-      this.localPoolPluginSpi = null;
-      this.remotePluginSpi = null;
-      this.pluginName = this.localPluginSpi.getName();
-
-    } else if (pluginSpi instanceof PoolPluginSpi) {
-      this.localPluginSpi = null;
-      this.localPoolPluginSpi = (PoolPluginSpi) pluginSpi;
-      this.remotePluginSpi = null;
-      this.pluginName = this.localPoolPluginSpi.getName();
-
-    } else if (pluginSpi instanceof RemotePluginSpi) {
-      this.localPluginSpi = null;
-      this.localPoolPluginSpi = null;
-      this.remotePluginSpi = (RemotePluginSpi) pluginSpi;
-      this.pluginName = this.remotePluginSpi.getName();
-
-    } else {
-      throw new IllegalArgumentException("Unexpected plugin SPI type.");
-    }
-
-    this.readers = new ConcurrentHashMap<String, Reader>();
+  RemotePluginAdapter(RemotePluginSpi remotePluginSpi) {
+    super(remotePluginSpi.getName(), remotePluginSpi);
+    this.remotePluginSpi = remotePluginSpi;
   }
 
   /**
-   * (package-private)<br>
-   * Check if the plugin is registered.
+   * {@inheritDoc}
    *
-   * @throws IllegalStateException is thrown when plugin is not or no longer registered.
+   * <p>Populates its list of available remote local readers already registered.
+   *
    * @since 2.0
    */
-  final void checkStatus() {
-    if (!isRegistered) {
-      throw new IllegalStateException(
-          String.format("The plugin '%s' is not or no longer registered.", getName()));
-    }
-  }
-
-  /**
-   * (package-private)<br>
-   * Registers the plugin, populates its list of readers and registers each of them.
-   *
-   * @throws PluginIOException If registration failed.
-   * @since 2.0
-   */
+  @Override
   final void register() throws PluginIOException {
-    isRegistered = true;
-    if (localPluginSpi != null) {
-      registerLocal();
-    } else if (remotePluginSpi != null) {
-      registerRemote();
-    }
-  }
 
-  /**
-   * (private)<br>
-   * Registers local plugin.
-   *
-   * @throws PluginIOException If registration failed.
-   */
-  private void registerLocal() throws PluginIOException {
-
-    Set<ReaderSpi> readerSpis = localPluginSpi.searchAvailableReaders();
-
-    for (ReaderSpi readerSpi : readerSpis) {
-      LocalReaderAdapter localReaderAdapter;
-      if (readerSpi instanceof ObservableReaderSpi) {
-        localReaderAdapter =
-            new ObservableLocalReaderAdapter((ObservableReaderSpi) readerSpi, pluginName);
-      } else {
-        localReaderAdapter = new LocalReaderAdapter(readerSpi, pluginName);
-      }
-      readers.put(readerSpi.getName(), localReaderAdapter);
-      localReaderAdapter.register();
-    }
-  }
-
-  /**
-   * (private)<br>
-   * Registers remote plugin.
-   */
-  private void registerRemote() {
+    super.register();
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
@@ -181,86 +96,13 @@ class PluginAdapter<P> implements Plugin, RemotePluginApi {
 
       RemoteReaderAdapter remoteReaderAdapter;
       if (remoteReaderSpi.isObservable()) {
-        remoteReaderAdapter = new ObservableRemoteReaderAdapter(remoteReaderSpi, null, pluginName);
+        remoteReaderAdapter = new ObservableRemoteReaderAdapter(remoteReaderSpi, null, getName());
       } else {
-        remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, pluginName);
+        remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName());
       }
-      readers.put(remoteReaderSpi.getName(), remoteReaderAdapter);
+      getReaders().put(remoteReaderSpi.getName(), remoteReaderAdapter);
       remoteReaderAdapter.register();
     }
-  }
-
-  /**
-   * (package-private)<br>
-   * Unregisters the plugin and the readers present in its list.
-   *
-   * @since 2.0
-   */
-  void unregister() {
-    isRegistered = false;
-    for (String key : readers.keySet()) {
-      Reader reader = readers.remove(key);
-      ((AbstractReaderAdapter) reader).unregister();
-    }
-    if (localPluginSpi != null) {
-      localPluginSpi.unregister();
-    } else if (localPoolPluginSpi != null) {
-      localPoolPluginSpi.unregister();
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public final String getName() {
-    return pluginName;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public final <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionType) {
-    checkStatus();
-    return (T) pluginSpi;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public final Map<String, Reader> getReaders() {
-    checkStatus();
-    return readers;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public final Set<String> getReadersNames() {
-    checkStatus();
-    return readers.keySet();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public final Reader getReader(String name) {
-    checkStatus();
-    return readers.get(name);
   }
 
   /**
@@ -273,7 +115,7 @@ class PluginAdapter<P> implements Plugin, RemotePluginApi {
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The plugin '{}' is receiving the following reader event : {}", pluginName, jsonData);
+          "The plugin '{}' is receiving the following reader event : {}", getName(), jsonData);
     }
 
     checkStatus();
@@ -293,7 +135,7 @@ class PluginAdapter<P> implements Plugin, RemotePluginApi {
     }
 
     // Get the target reader.
-    Reader reader = readers.get(readerEvent.getReaderName());
+    Reader reader = getReader(readerEvent.getReaderName());
     if (!(reader instanceof ObservableReader)) {
       throw new IllegalArgumentException(
           String.format(
@@ -302,7 +144,7 @@ class PluginAdapter<P> implements Plugin, RemotePluginApi {
     }
 
     // Notify the observers.
-    if (localPluginSpi != null) {
+    if (reader instanceof ObservableLocalReaderAdapter) {
       ((ObservableLocalReaderAdapter) reader).notifyObservers(readerEvent);
     } else {
       ((ObservableRemoteReaderAdapter) reader).notifyObservers(readerEvent);

@@ -14,6 +14,7 @@ package org.eclipse.keyple.core.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import org.eclipse.keyple.core.plugin.spi.PluginSpi;
 import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 import org.eclipse.keyple.core.util.Assert;
@@ -22,35 +23,31 @@ import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
- * Abstract class for all observable plugin adapters.
+ * Abstract class for all observable local plugin adapters.
  *
- * @param <P> The type of plugin.
  * @since 2.0
  */
-abstract class AbstractObservablePluginAdapter<P> extends PluginAdapter<P>
+abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
     implements ObservablePlugin {
 
   private static final Logger logger =
-      LoggerFactory.getLogger(AbstractObservablePluginAdapter.class);
+      LoggerFactory.getLogger(AbstractObservableLocalPluginAdapter.class);
 
   private final List<PluginObserverSpi> observers;
-  /*
-   * this object will be used to synchronize the access to the observers list in order to be
-   * thread safe
-   */
   private final Object monitor = new Object();
+
   private ExecutorService eventNotificationExecutorService;
   private PluginObservationExceptionHandlerSpi exceptionHandler;
 
   /**
    * (package-private)<br>
-   * Common constructor for all plugin adapters.
+   * Constructor.
    *
-   * @param observablePluginSpi The plugin SPI.
+   * @param pluginSpi The associated plugin SPI.
    * @since 2.0
    */
-  AbstractObservablePluginAdapter(P observablePluginSpi) {
-    super(observablePluginSpi);
+  AbstractObservableLocalPluginAdapter(PluginSpi pluginSpi) {
+    super(pluginSpi);
     this.observers = new ArrayList<PluginObserverSpi>(1);
   }
 

@@ -12,10 +12,8 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.ObservablePluginSpi;
@@ -27,29 +25,26 @@ import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
- * Implementation of {@link ObservablePlugin} for a local plugin.
+ * Implementation of a local {@link ObservablePlugin}.
  *
  * @since 2.0
  */
-final class ObservableLocalPluginAdapter
-    extends AbstractObservablePluginAdapter<ObservablePluginSpi> {
+final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAdapter {
 
   private static final Logger logger = LoggerFactory.getLogger(ObservableLocalPluginAdapter.class);
 
   private final ObservablePluginSpi observablePluginSpi;
-  private final Map<String, Reader> readers;
 
   /**
    * (package-private)<br>
    * Creates an instance of {@link ObservableLocalPluginAdapter}.
    *
-   * @param observablePluginSpi The plugin SPI.
+   * @param observablePluginSpi The associated plugin SPI.
    * @since 2.0
    */
   ObservableLocalPluginAdapter(ObservablePluginSpi observablePluginSpi) {
     super(observablePluginSpi);
     this.observablePluginSpi = observablePluginSpi;
-    readers = new ConcurrentHashMap<String, Reader>();
   }
 
   /**
@@ -163,7 +158,7 @@ final class ObservableLocalPluginAdapter
       readerSpi = observablePluginSpi.searchReader(readerName);
       LocalReaderAdapter reader = new LocalReaderAdapter(readerSpi, readerName);
       reader.register();
-      readers.put(reader.getName(), reader);
+      getReaders().put(reader.getName(), reader);
       if (logger.isTraceEnabled()) {
         logger.trace(
             "[{}][{}] Plugin thread => Add plugged reader to readers list.",
@@ -178,7 +173,7 @@ final class ObservableLocalPluginAdapter
      */
     private void removeReader(Reader reader) {
       ((LocalReaderAdapter) reader).unregister();
-      readers.remove(reader.getName());
+      getReaders().remove(reader.getName());
       if (logger.isTraceEnabled()) {
         logger.trace(
             "[{}][{}] Plugin thread => Remove unplugged reader from readers list.",
@@ -218,7 +213,7 @@ final class ObservableLocalPluginAdapter
        * parse the current readers list, notify for disappeared readers, update
        * readers list
        */
-      final Collection<Reader> readerCollection = readers.values();
+      final Collection<Reader> readerCollection = getReaders().values();
       for (Reader reader : readerCollection) {
         if (!actualNativeReadersNames.contains(reader.getName())) {
           changedReaderNames.add(reader.getName());
