@@ -87,9 +87,10 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
       throws ReaderCommunicationException, CardCommunicationException {
+
     checkStatus();
 
-    List<KeypleCardSelectionResponse> cardSelectionResponses = null;
+    List<KeypleCardSelectionResponse> cardSelectionResponses;
 
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
@@ -260,6 +261,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
   @Override
   public CardResponse transmitCardRequest(CardRequest cardRequest, ChannelControl channelControl)
       throws ReaderCommunicationException, CardCommunicationException {
+
     checkStatus();
 
     CardResponse cardResponse;

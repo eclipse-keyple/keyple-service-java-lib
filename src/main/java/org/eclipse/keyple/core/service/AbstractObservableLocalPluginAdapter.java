@@ -65,7 +65,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
 
   /**
    * (package-private)<br>
-   * Push a {@link PluginEvent} of the observable plugin to its registered observers.
+   * Notifies all registered observers with the provided {@link PluginEvent}.
    *
    * <p>This method never throws an exception. Any errors at runtime are notified to the application
    * using the exception handler.
@@ -74,15 +74,16 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    * @since 2.0
    */
   final void notifyObservers(final PluginEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace(
-          "[{}] Notifying a plugin event to {} observers. EVENTNAME = {} ",
-          this.getName(),
-          countObservers(),
-          event.getEventType().name());
-    }
-    List<PluginObserverSpi> observersCopy;
 
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The plugin '{}' is notifying the plugin event '{}' to {} observers.",
+          getName(),
+          event.getEventType().name(),
+          countObservers());
+    }
+
+    List<PluginObserverSpi> observersCopy;
     synchronized (monitor) {
       observersCopy = new ArrayList<PluginObserverSpi>(observers);
     }
@@ -107,7 +108,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   }
 
   /**
-   * Notify a single observer of an event.
+   * Notifies a single observer of an event.
    *
    * @param observer The observer to notify.
    * @param event The event.
@@ -147,12 +148,14 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   @Override
   public void addObserver(PluginObserverSpi observer) {
 
-    Assert.getInstance().notNull(observer, "observer");
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(
-          "Adding '{}' as an observer of '{}'.", observer.getClass().getSimpleName(), getName());
+    checkStatus();
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The plugin '{}' is adding the observer '{}'.",
+          getName(),
+          observer != null ? observer.getClass().getSimpleName() : null);
     }
+    Assert.getInstance().notNull(observer, "observer");
 
     if (getObservationExceptionHandler() == null) {
       throw new IllegalStateException("No exception handler defined.");
@@ -171,11 +174,14 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   @Override
   public void removeObserver(PluginObserverSpi observer) {
 
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The plugin '{}' is removing the observer '{}'.",
+          getName(),
+          observer != null ? observer.getClass().getSimpleName() : null);
+    }
     Assert.getInstance().notNull(observer, "observer");
 
-    if (logger.isTraceEnabled()) {
-      logger.trace("[{}] Deleting a plugin observer", getName());
-    }
     synchronized (monitor) {
       observers.remove(observer);
     }
@@ -211,6 +217,9 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   @Override
   public final void setEventNotificationExecutorService(
       ExecutorService eventNotificationExecutorService) {
+    checkStatus();
+    Assert.getInstance()
+        .notNull(eventNotificationExecutorService, "eventNotificationExecutorService");
     this.eventNotificationExecutorService = eventNotificationExecutorService;
   }
 
@@ -222,6 +231,8 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   @Override
   public final void setPluginObservationExceptionHandler(
       PluginObservationExceptionHandlerSpi exceptionHandler) {
+    checkStatus();
+    Assert.getInstance().notNull(eventNotificationExecutorService, "exceptionHandler");
     this.exceptionHandler = exceptionHandler;
   }
 }

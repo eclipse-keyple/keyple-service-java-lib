@@ -16,12 +16,10 @@ import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.Plu
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import java.util.HashMap;
-import java.util.Map;
-import org.eclipse.keyple.core.distributed.remote.RemotePluginApi;
+import java.util.SortedSet;
+import javafx.util.Pair;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
-import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.BodyError;
 import org.eclipse.keyple.core.util.json.JsonUtil;
@@ -30,13 +28,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
- * Implementation of a remote {@link Plugin}.
+ * Implementation of a remote {@link PoolPlugin}.
  *
  * @since 2.0
  */
-class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginApi {
+final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements PoolPlugin {
 
-  private static final Logger logger = LoggerFactory.getLogger(RemotePluginAdapter.class);
+  private static final Logger logger = LoggerFactory.getLogger(RemotePoolPluginAdapter.class);
 
   private final RemotePluginSpi remotePluginSpi;
 
@@ -47,124 +45,139 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
    * @param remotePluginSpi The associated SPI.
    * @since 2.0
    */
-  RemotePluginAdapter(RemotePluginSpi remotePluginSpi) {
+  RemotePoolPluginAdapter(RemotePluginSpi remotePluginSpi) {
     super(remotePluginSpi.getName(), remotePluginSpi);
     this.remotePluginSpi = remotePluginSpi;
   }
 
   /**
-   * (package-private)<br>
-   * Gets the associated SPI.
+   * {@inheritDoc}
    *
-   * @return A not null reference.
    * @since 2.0
    */
-  public RemotePluginSpi getRemotePluginSpi() {
-    return remotePluginSpi;
+  @Override
+  public SortedSet<String> getReaderGroupReferences() {
+
+    checkStatus();
+
+    // Build the input JSON data.
+    JsonObject input = new JsonObject();
+    input.addProperty(
+        JsonProperty.SERVICE.name(), PluginService.GET_READER_GROUP_REFERENCES.name());
+
+    // Execute the remote service.
+    try {
+      JsonObject output = executeRemotely(input);
+      return JsonUtil.getParser()
+          .fromJson(
+              output.get(JsonProperty.RESULT.name()).getAsString(),
+              new TypeToken<SortedSet<String>>() {}.getType());
+
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throwRuntimeException(e);
+      return null;
+    }
   }
 
   /**
    * {@inheritDoc}
    *
-   * <p>Populates its list of available remote local readers already registered.
+   * @since 2.0
+   */
+  @Override
+  public Reader allocateReader(String readerGroupReference) {
+
+    checkStatus();
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The pool plugin '{}' is allocating a reader of the group reference '{}'.",
+          getName(),
+          readerGroupReference);
+    }
+    Assert.getInstance().notEmpty(readerGroupReference, "readerGroupReference");
+
+    // Build the input JSON data.
+    JsonObject input = new JsonObject();
+    input.addProperty(JsonProperty.SERVICE.name(), PluginService.ALLOCATE_READER.name());
+    input.addProperty(JsonProperty.READER_GROUP_REFERENCE.name(), readerGroupReference);
+
+    // Execute the remote service.
+    Pair<String, Boolean> readerInfo;
+    try {
+      JsonObject output = executeRemotely(input);
+      readerInfo =
+          JsonUtil.getParser()
+              .fromJson(
+                  output.get(JsonProperty.RESULT.name()).getAsString(),
+                  new TypeToken<Pair<String, Boolean>>() {}.getType());
+
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throwRuntimeException(e);
+      return null;
+    }
+
+    // Build a remote reader and register it.
+    String readerName = readerInfo.getKey();
+    Boolean isObservable = readerInfo.getValue();
+
+    RemoteReaderSpi remoteReaderSpi = remotePluginSpi.createRemoteReader(readerName, isObservable);
+
+    RemoteReaderAdapter remoteReaderAdapter;
+    if (remoteReaderSpi.isObservable()) {
+      remoteReaderAdapter = new ObservableRemoteReaderAdapter(remoteReaderSpi, null, getName());
+    } else {
+      remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName());
+    }
+    getReaders().put(remoteReaderSpi.getName(), remoteReaderAdapter);
+    remoteReaderAdapter.register();
+    return remoteReaderAdapter;
+  }
+
+  /**
+   * {@inheritDoc}
    *
    * @since 2.0
    */
   @Override
-  final void register() throws PluginIOException {
+  public void releaseReader(Reader reader) {
 
-    super.register();
+    checkStatus();
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The pool plugin '{}' is releasing the reader '{}'.",
+          getName(),
+          reader != null ? reader.getName() : null);
+    }
+    Assert.getInstance().notNull(reader, "reader");
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
-    input.addProperty(JsonProperty.SERVICE.name(), PluginService.GET_READERS.name());
+    input.addProperty(JsonProperty.SERVICE.name(), PluginService.RELEASE_READER.name());
+    input.addProperty(JsonProperty.READER_NAME.name(), reader.getName());
 
     // Execute the remote service.
-    Map<String, Boolean> localReaders;
     try {
-      JsonObject output = executeRemotely(input);
-      if (output == null) {
-        return;
-      }
-      localReaders =
-          JsonUtil.getParser()
-              .fromJson(
-                  output.get(JsonProperty.RESULT.name()).getAsString(),
-                  new TypeToken<HashMap<String, Boolean>>() {}.getType());
+      executeRemotely(input);
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
       throwRuntimeException(e);
       return;
-    }
-
-    // Build a remote reader for each local reader
-    for (Map.Entry<String, Boolean> entry : localReaders.entrySet()) {
-
-      RemoteReaderSpi remoteReaderSpi =
-          remotePluginSpi.createRemoteReader(entry.getKey(), entry.getValue());
-
-      RemoteReaderAdapter remoteReaderAdapter;
-      if (remoteReaderSpi.isObservable()) {
-        remoteReaderAdapter = new ObservableRemoteReaderAdapter(remoteReaderSpi, null, getName());
-      } else {
-        remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName());
-      }
-      getReaders().put(remoteReaderSpi.getName(), remoteReaderAdapter);
-      remoteReaderAdapter.register();
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public final void onReaderEvent(String jsonData) {
-
-    checkStatus();
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The plugin '{}' is receiving the following reader event : {}", getName(), jsonData);
-    }
-    Assert.getInstance().notEmpty(jsonData, "jsonData");
-
-    // Extract the event.
-    ReaderEvent readerEvent;
-    try {
-      JsonObject json = JsonUtil.getParser().fromJson(jsonData, JsonObject.class);
-      readerEvent =
-          JsonUtil.getParser()
-              .fromJson(
-                  json.get(JsonProperty.READER_EVENT.name()).getAsString(), ReaderEvent.class);
-    } catch (RuntimeException e) {
-      throw new IllegalArgumentException(
-          String.format("The JSON data of the reader event is malformed : %s", e.getMessage()), e);
-    }
-
-    // Get the target reader.
-    Reader reader = getReader(readerEvent.getReaderName());
-    if (!(reader instanceof ObservableReader)) {
-      throw new IllegalArgumentException(
-          String.format(
-              "The reader '%s' does not exists or is not observable : %s",
-              readerEvent.getReaderName(), reader));
-    }
-
-    // Notify the observers.
-    if (reader instanceof ObservableLocalReaderAdapter) {
-      ((ObservableLocalReaderAdapter) reader).notifyObservers(readerEvent);
-    } else {
-      ((ObservableRemoteReaderAdapter) reader).notifyObservers(readerEvent);
+    } finally {
+      getReaders().remove(reader.getName());
+      ((LocalReaderAdapter) reader).unregister();
     }
   }
 
   /**
    * (package-private)<br>
    * Executes remotely the provided JSON input data, parses the provide JSON output data, checks if
-   * the JSON contains an error and throws the * embedded exception if exists..
+   * the JSON contains an error and throws the embedded exception if exists..
    *
    * @param input The JSON input data to process.
    * @return The JSON output data, or null if returned data are null or empty.

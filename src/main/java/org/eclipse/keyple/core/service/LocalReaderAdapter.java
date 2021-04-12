@@ -205,7 +205,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    */
   @Override
   public final boolean isContactless() {
-    checkStatus();
     return readerSpi.isContactless();
   }
 

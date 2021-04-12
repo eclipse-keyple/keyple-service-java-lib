@@ -16,6 +16,9 @@ import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.PoolPluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
+import org.eclipse.keyple.core.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
@@ -24,6 +27,8 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
  * @since 2.0
  */
 final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements PoolPlugin {
+
+  private static final Logger logger = LoggerFactory.getLogger(LocalPoolPluginAdapter.class);
 
   private final PoolPluginSpi poolPluginSpi;
 
@@ -59,6 +64,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
    */
   @Override
   public SortedSet<String> getReaderGroupReferences() {
+    checkStatus();
     try {
       return poolPluginSpi.getReaderGroupReferences();
     } catch (PluginIOException e) {
@@ -79,6 +85,13 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
   public Reader allocateReader(String readerGroupReference) {
 
     checkStatus();
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The pool plugin '{}' is allocating a reader of the group reference '{}'.",
+          getName(),
+          readerGroupReference);
+    }
+    Assert.getInstance().notEmpty(readerGroupReference, "readerGroupReference");
 
     ReaderSpi readerSpi;
     try {
@@ -91,13 +104,16 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
           e);
     }
 
-    Reader reader;
+    LocalReaderAdapter localReaderAdapter;
     if (readerSpi instanceof ObservableReaderSpi) {
-      reader = new ObservableLocalReaderAdapter((ObservableReaderSpi) readerSpi, getName());
+      localReaderAdapter =
+          new ObservableLocalReaderAdapter((ObservableReaderSpi) readerSpi, getName());
     } else {
-      reader = new LocalReaderAdapter(readerSpi, getName());
+      localReaderAdapter = new LocalReaderAdapter(readerSpi, getName());
     }
-    return reader;
+    getReaders().put(localReaderAdapter.getName(), localReaderAdapter);
+    localReaderAdapter.register();
+    return localReaderAdapter;
   }
 
   /**
@@ -107,6 +123,16 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
    */
   @Override
   public void releaseReader(Reader reader) {
+
+    checkStatus();
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The pool plugin '{}' is releasing the reader '{}'.",
+          getName(),
+          reader != null ? reader.getName() : null);
+    }
+    Assert.getInstance().notNull(reader, "reader");
+
     try {
       poolPluginSpi.releaseReader(((ReaderSpi) reader));
     } catch (PluginIOException e) {
@@ -115,6 +141,9 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
               "The pool plugin '%s' is unable to release the reader '%s' : %s",
               getName(), reader.getName(), e.getMessage()),
           e);
+    } finally {
+      getReaders().remove(reader.getName());
+      ((LocalReaderAdapter) reader).unregister();
     }
   }
 }

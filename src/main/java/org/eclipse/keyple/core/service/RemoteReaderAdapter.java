@@ -213,7 +213,6 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
    */
   @Override
   public final void activateProtocol(String readerProtocol, String applicationProtocol) {
-    checkStatus();
     throw new UnsupportedOperationException(
         "The method 'activateProtocol' is not supported by the remote reader, use it only locally.");
   }
@@ -224,7 +223,6 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   public final void deactivateProtocol(String readerProtocol) {
-    checkStatus();
     throw new UnsupportedOperationException(
         "The method 'deactivateProtocol' is not supported by the remote reader, use it only locally.");
   }

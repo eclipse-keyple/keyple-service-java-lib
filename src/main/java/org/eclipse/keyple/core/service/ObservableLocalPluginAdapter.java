@@ -19,7 +19,6 @@ import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.ObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
-import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
 
   /**
    * (package-private)<br>
-   * Creates an instance of {@link ObservableLocalPluginAdapter}.
+   * Constructor.
    *
    * @param observablePluginSpi The associated plugin SPI.
    * @since 2.0
@@ -49,12 +48,12 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
 
   /**
    * (package-private)<br>
-   * Check whether the background job is monitoring for new readers
+   * Checks whether the background job is monitoring for new readers.
    *
    * @return true, if the background job is monitoring, false in all other cases.
    * @since 2.0
    */
-  Boolean isMonitoring() {
+  boolean isMonitoring() {
     return thread != null && thread.isAlive() && thread.isMonitoring();
   }
 
@@ -65,8 +64,6 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
    */
   @Override
   public void addObserver(PluginObserverSpi observer) {
-    Assert.getInstance().notNull(observer, "observer");
-
     super.addObserver(observer);
     if (countObservers() == 1) {
       if (logger.isDebugEnabled()) {

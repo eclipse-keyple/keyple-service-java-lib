@@ -14,6 +14,7 @@ package org.eclipse.keyple.core.service;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.*;
+import javafx.util.Pair;
 import org.eclipse.keyple.core.card.*;
 import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
@@ -159,15 +160,13 @@ final class DistributedLocalServiceAdapter
    */
   @Override
   public void startReaderObservation(String readerName) {
-
+    checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
           "The distributed local service '{}' is starting the observation of the local reader '{}'.",
           name,
           readerName);
     }
-
-    checkStatus();
     Reader reader = getReader(readerName);
     if (reader == null) {
       throw new IllegalStateException(String.format(READER_NOT_FOUND_TEMPLATE, readerName));
@@ -207,14 +206,12 @@ final class DistributedLocalServiceAdapter
    */
   @Override
   public void startPluginsObservation() {
-
+    checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
           "The distributed local service '{}' is starting the observation of all local plugins.",
           name);
     }
-
-    checkStatus();
     boolean isObservationStarted = false;
     for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins().values()) {
       if (plugin instanceof ObservablePlugin) {
@@ -897,7 +894,9 @@ final class DistributedLocalServiceAdapter
       Reader reader = poolPlugin.allocateReader(readerGroupReference);
 
       // Build result
-      output.addProperty(JsonProperty.RESULT.name(), reader.getName());
+      boolean isObservable = reader instanceof ObservableReader;
+      Pair<String, Boolean> readerInfo = new Pair<String, Boolean>(reader.getName(), isObservable);
+      output.add(JsonProperty.RESULT.name(), JsonUtil.getParser().toJsonTree(readerInfo));
     }
 
     /**

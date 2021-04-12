@@ -357,7 +357,10 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   /**
    * (package-private)<br>
-   * Notifies all registered observers with the provided {@link ReaderEvent}
+   * Notifies all registered observers with the provided {@link ReaderEvent}.
+   *
+   * <p>This method never throws an exception. Any errors at runtime are notified to the application
+   * using the exception handler.
    *
    * @param event The reader event.
    * @since 2.0
@@ -366,14 +369,13 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The local reader '{}' is notifying the reader event '{}' to {} observers.",
+          "The reader '{}' is notifying the reader event '{}' to {} observers.",
           getName(),
           event.getEventType().name(),
           countObservers());
     }
 
     List<ReaderObserverSpi> observersCopy;
-
     synchronized (monitor) {
       observersCopy = new ArrayList<ReaderObserverSpi>(observers);
     }
@@ -495,7 +497,6 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   public void addObserver(ReaderObserverSpi observer) {
 
     checkStatus();
-
     if (logger.isDebugEnabled()) {
       logger.debug(
           "The reader '{}' of plugin '{}' is adding the observer '{}'.",
@@ -573,6 +574,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           getPluginName(),
           pollingMode);
     }
+    Assert.getInstance().notNull(pollingMode, "pollingMode");
     currentPollingMode = pollingMode;
     stateService.onEvent(InternalEvent.START_DETECT);
   }
@@ -617,6 +619,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   public void setEventNotificationExecutorService(
       ExecutorService eventNotificationExecutorService) {
     checkStatus();
+    Assert.getInstance()
+        .notNull(eventNotificationExecutorService, "eventNotificationExecutorService");
     this.eventNotificationExecutorService = eventNotificationExecutorService;
   }
 

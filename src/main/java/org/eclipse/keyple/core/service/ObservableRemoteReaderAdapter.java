@@ -88,7 +88,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
     } else {
       if (logger.isDebugEnabled()) {
         logger.debug(
-            "The local reader '{}' is notifying the reader event '{}' to {} observers.",
+            "The reader '{}' is notifying the reader event '{}' to {} observers.",
             getName(),
             event.getEventType().name(),
             countObservers());
