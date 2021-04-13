@@ -20,8 +20,18 @@ import org.eclipse.keyple.core.util.json.BodyError;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;
 
+/**
+ * (package-private)<br>
+ * Utility class of distributed components.
+ *
+ * @since 2.0
+ */
 final class DistributedUtilAdapter {
 
+  /**
+   * (private)<br>
+   * Constructor.
+   */
   private DistributedUtilAdapter() {}
 
   /**
@@ -36,6 +46,7 @@ final class DistributedUtilAdapter {
    * @param logger The logger to use for logging.
    * @return The JSON output data, or null if returned data are null or empty.
    * @throws Exception The embedded exception if exists.
+   * @since 2.0
    */
   static JsonObject executePluginServiceRemotely(
       JsonObject input, RemotePluginSpi remotePluginSpi, String pluginName, Logger logger)
@@ -67,6 +78,7 @@ final class DistributedUtilAdapter {
    * @param logger The logger to use for logging.
    * @return The JSON output data, or null if returned data are null or empty.
    * @throws Exception The embedded exception if exists.
+   * @since 2.0
    */
   static JsonObject executeReaderServiceRemotely(
       JsonObject input,
@@ -99,11 +111,12 @@ final class DistributedUtilAdapter {
 
   /**
    * Parses the provided JSON output data, checks if the JSON contains an error and throws the
-   * embedded exception if * exists.
+   * embedded exception if exists.
    *
    * @param outputJson The JSON to parse.
    * @return The JSON output data, or null if returned data are null or empty.
    * @throws Exception The embedded exception if exists.
+   * @since 2.0
    */
   private static JsonObject getJsonObject(String outputJson) throws Exception { // NOSONAR
 
@@ -127,6 +140,7 @@ final class DistributedUtilAdapter {
    *
    * @param e The cause.
    * @throws RuntimeException The thrown runtime exception.
+   * @since 2.0
    */
   static void throwRuntimeException(Exception e) {
     throw new RuntimeException( // NOSONAR

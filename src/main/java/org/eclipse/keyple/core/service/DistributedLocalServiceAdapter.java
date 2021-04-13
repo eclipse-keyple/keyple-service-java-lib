@@ -643,6 +643,9 @@ final class DistributedLocalServiceAdapter
       } else if (reader instanceof ObservableRemoteReaderAdapter) {
         ((ObservableRemoteReaderAdapter) reader)
             .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, pollingMode);
+      } else {
+        throw new IllegalStateException(
+            String.format("The reader '%s' is not observable", reader.getName()));
       }
     }
 

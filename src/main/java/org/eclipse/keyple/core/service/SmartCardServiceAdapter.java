@@ -22,6 +22,9 @@ import org.eclipse.keyple.core.common.KeyplePluginExtensionFactory;
 import org.eclipse.keyple.core.distributed.local.DistributedLocalApiProperties;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceFactorySpi;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceSpi;
+import org.eclipse.keyple.core.distributed.remote.DistributedRemoteApiProperties;
+import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginFactorySpi;
+import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
 import org.eclipse.keyple.core.plugin.PluginApiProperties;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.*;
@@ -39,7 +42,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
 
   private static final Logger logger = LoggerFactory.getLogger(SmartCardServiceAdapter.class);
 
-  private static final SmartCardServiceAdapter uniqueInstance = new SmartCardServiceAdapter();
+  private static final SmartCardServiceAdapter instance = new SmartCardServiceAdapter();
 
   private final Map<String, Plugin> plugins = new ConcurrentHashMap<String, Plugin>();
   private final Object pluginMonitor = new Object();
@@ -59,7 +62,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @since 2.0
    */
   static SmartCardServiceAdapter getInstance() {
-    return uniqueInstance;
+    return instance;
   }
 
   /**
@@ -122,6 +125,36 @@ final class SmartCardServiceAdapter implements SmartCardService {
           pluginFactorySpi.getPluginName(),
           pluginFactorySpi.getPluginApiVersion(),
           PluginApiProperties.VERSION);
+    }
+  }
+
+  /**
+   * (private)<br>
+   * Checks for consistency in the versions of external APIs shared by the remote plugin and the
+   * service.
+   *
+   * <p>Generates warnings into the log.
+   *
+   * @param remotePluginFactorySpi The remote plugin factory SPI.
+   */
+  private void checkRemotePluginVersion(RemotePluginFactorySpi remotePluginFactorySpi) {
+    if (compareVersions(remotePluginFactorySpi.getCommonsApiVersion(), CommonsApiProperties.VERSION)
+        != 0) {
+      logger.warn(
+          "The version of Commons API used by the provided plugin ({}:{}) mismatches the version used by the service ({}).",
+          remotePluginFactorySpi.getRemotePluginName(),
+          remotePluginFactorySpi.getCommonsApiVersion(),
+          CommonsApiProperties.VERSION);
+    }
+    if (compareVersions(
+            remotePluginFactorySpi.getDistributedRemoteApiVersion(),
+            DistributedRemoteApiProperties.VERSION)
+        != 0) {
+      logger.warn(
+          "The version of Distributed Remote Plugin API used by the provided plugin ({}:{}) mismatches the version used by the service ({}).",
+          remotePluginFactorySpi.getRemotePluginName(),
+          remotePluginFactorySpi.getDistributedRemoteApiVersion(),
+          DistributedRemoteApiProperties.VERSION);
     }
   }
 
@@ -258,54 +291,123 @@ final class SmartCardServiceAdapter implements SmartCardService {
 
     Assert.getInstance().notNull(pluginFactory, "pluginFactory");
 
-    AbstractPluginAdapter plugin;
+    AbstractPluginAdapter plugin = null;
     try {
       synchronized (pluginMonitor) {
         if (pluginFactory instanceof PluginFactorySpi) {
-          PluginFactorySpi pluginFactorySpi = (PluginFactorySpi) pluginFactory;
-          checkPluginRegistration(pluginFactorySpi.getPluginName());
-          checkPluginVersion(pluginFactorySpi);
-          PluginSpi pluginSpi = pluginFactorySpi.getPlugin();
-          if (!pluginSpi.getName().equals(pluginFactorySpi.getPluginName())) {
-            throw new IllegalArgumentException(
-                String.format(
-                    "The plugin name '%s' mismatches the expected name '%s' provided by the factory",
-                    pluginSpi.getName(), pluginFactorySpi.getPluginName()));
-          }
-          if (pluginSpi instanceof ObservablePluginSpi) {
-            plugin = new ObservableLocalPluginAdapter((ObservablePluginSpi) pluginSpi);
-          } else if (pluginSpi instanceof AutonomousObservablePluginSpi) {
-            plugin =
-                new AutonomousObservableLocalPluginAdapter(
-                    (AutonomousObservablePluginSpi) pluginSpi);
-          } else {
-            plugin = new LocalPluginAdapter(pluginSpi);
-          }
+          plugin = createLocalPlugin((PluginFactorySpi) pluginFactory);
+
         } else if (pluginFactory instanceof PoolPluginFactorySpi) {
-          PoolPluginFactorySpi poolPluginFactorySpi = (PoolPluginFactorySpi) pluginFactory;
-          checkPluginRegistration(poolPluginFactorySpi.getPoolPluginName());
-          checkPoolPluginVersion(poolPluginFactorySpi);
-          PoolPluginSpi poolPluginSpi = poolPluginFactorySpi.getPoolPlugin();
-          if (!poolPluginSpi.getName().equals(poolPluginFactorySpi.getPoolPluginName())) {
-            throw new IllegalArgumentException(
-                String.format(
-                    "The pool plugin name '%s' mismatches the expected name '%s' provided by the factory",
-                    poolPluginSpi.getName(), poolPluginFactorySpi.getPoolPluginName()));
-          }
-          plugin = new LocalPoolPluginAdapter(poolPluginSpi);
+          plugin = createLocalPoolPlugin((PoolPluginFactorySpi) pluginFactory);
+
+        } else if (pluginFactory instanceof RemotePluginFactorySpi) {
+          plugin = createRemotePlugin((RemotePluginFactorySpi) pluginFactory);
+
         } else {
           throw new IllegalArgumentException("The factory doesn't implement the right SPI.");
         }
-        try {
-          plugin.register();
-        } catch (PluginIOException e) {
-          throw new KeyplePluginException("Unable to register plugin " + plugin.getName(), e);
-        }
+
+        plugin.register();
         plugins.put(plugin.getName(), plugin);
       }
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException(
           "The provided plugin factory doesn't implement the plugin API properly.", e);
+
+    } catch (PluginIOException e) {
+      throw new KeyplePluginException(
+          String.format(
+              "Unable to register the plugin '%s' : %s", plugin.getName(), e.getMessage()),
+          e);
+    }
+    return plugin;
+  }
+
+  /**
+   * (private)<br>
+   * Creates an instance of local plugin.
+   *
+   * @param pluginFactorySpi The plugin factory SPI.
+   * @return A not null reference.
+   */
+  private AbstractPluginAdapter createLocalPlugin(PluginFactorySpi pluginFactorySpi) {
+
+    checkPluginRegistration(pluginFactorySpi.getPluginName());
+    checkPluginVersion(pluginFactorySpi);
+
+    PluginSpi pluginSpi = pluginFactorySpi.getPlugin();
+
+    if (!pluginSpi.getName().equals(pluginFactorySpi.getPluginName())) {
+      throw new IllegalArgumentException(
+          String.format(
+              "The plugin name '%s' mismatches the expected name '%s' provided by the factory",
+              pluginSpi.getName(), pluginFactorySpi.getPluginName()));
+    }
+
+    AbstractPluginAdapter plugin;
+    if (pluginSpi instanceof ObservablePluginSpi) {
+      plugin = new ObservableLocalPluginAdapter((ObservablePluginSpi) pluginSpi);
+    } else if (pluginSpi instanceof AutonomousObservablePluginSpi) {
+      plugin =
+          new AutonomousObservableLocalPluginAdapter((AutonomousObservablePluginSpi) pluginSpi);
+    } else {
+      plugin = new LocalPluginAdapter(pluginSpi);
+    }
+    return plugin;
+  }
+
+  /**
+   * (private)<br>
+   * Creates an instance of local pool plugin.
+   *
+   * @param poolPluginFactorySpi The pool plugin factory SPI.
+   * @return A not null reference.
+   */
+  private AbstractPluginAdapter createLocalPoolPlugin(PoolPluginFactorySpi poolPluginFactorySpi) {
+
+    checkPluginRegistration(poolPluginFactorySpi.getPoolPluginName());
+    checkPoolPluginVersion(poolPluginFactorySpi);
+
+    PoolPluginSpi poolPluginSpi = poolPluginFactorySpi.getPoolPlugin();
+
+    if (!poolPluginSpi.getName().equals(poolPluginFactorySpi.getPoolPluginName())) {
+      throw new IllegalArgumentException(
+          String.format(
+              "The pool plugin name '%s' mismatches the expected name '%s' provided by the factory",
+              poolPluginSpi.getName(), poolPluginFactorySpi.getPoolPluginName()));
+    }
+
+    return new LocalPoolPluginAdapter(poolPluginSpi);
+  }
+
+  /**
+   * (private)<br>
+   * Creates an instance of remote plugin.
+   *
+   * @param remotePluginFactorySpi The plugin factory SPI.
+   * @return A not null reference.
+   */
+  private AbstractPluginAdapter createRemotePlugin(RemotePluginFactorySpi remotePluginFactorySpi) {
+
+    checkPluginRegistration(remotePluginFactorySpi.getRemotePluginName());
+    checkRemotePluginVersion(remotePluginFactorySpi);
+
+    RemotePluginSpi remotePluginSpi = remotePluginFactorySpi.getRemotePlugin();
+
+    if (!remotePluginSpi.getName().equals(remotePluginFactorySpi.getRemotePluginName())) {
+      throw new IllegalArgumentException(
+          String.format(
+              "The remote plugin name '%s' mismatches the expected name '%s' provided by the factory",
+              remotePluginSpi.getName(), remotePluginFactorySpi.getRemotePluginName()));
+    }
+
+    AbstractPluginAdapter plugin;
+    if (remotePluginFactorySpi.isPoolPlugin()) {
+      plugin = new RemotePoolPluginAdapter(remotePluginSpi);
+    } else if (remotePluginSpi.isObservable()) {
+      plugin = new ObservableRemotePluginAdapter(remotePluginSpi);
+    } else {
+      plugin = new RemotePluginAdapter(remotePluginSpi);
     }
     return plugin;
   }

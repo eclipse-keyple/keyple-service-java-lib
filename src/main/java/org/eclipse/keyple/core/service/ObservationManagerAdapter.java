@@ -187,10 +187,10 @@ final class ObservationManagerAdapter<T, S> {
    * Gets the exception handler used to notify the application of exceptions raised during the
    * observation process.
    *
-   * @return null if no exception has been set.
+   * @return null if no exception handler has been set.
    * @since 2.0
    */
-  final S getObservationExceptionHandler() {
+  S getObservationExceptionHandler() {
     return exceptionHandler;
   }
 }
