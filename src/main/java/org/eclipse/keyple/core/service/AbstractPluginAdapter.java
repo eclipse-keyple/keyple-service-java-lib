@@ -16,6 +16,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
+import org.eclipse.keyple.core.plugin.spi.PluginSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 
 /**
  * (package-private)<br>
@@ -67,6 +70,24 @@ abstract class AbstractPluginAdapter implements Plugin {
    */
   void register() throws PluginIOException {
     isRegistered = true;
+//    if (pluginSpi instanceof PluginSpi) {
+//      // retrieve the current readers of the local plugin
+//      Set<ReaderSpi> readerSpis = ((PluginSpi) pluginSpi).searchAvailableReaders();
+//      // create and keep the local readers, register it
+//      for (ReaderSpi readerSpi : readerSpis) {
+//        LocalReaderAdapter localReaderAdapter = null;
+//        if(readerSpi instanceof ObservableReaderSpi){
+//          localReaderAdapter = new ObservableLocalReaderAdapter(((ObservableReaderSpi)readerSpi), pluginName);
+//        }
+//        else{
+//          localReaderAdapter = new LocalReaderAdapter(readerSpi, pluginName);
+//        }
+//        readers.put(readerSpi.getName(), localReaderAdapter);
+//        localReaderAdapter.register();
+//      }
+//    } else {
+//      // remote plugin
+//    }
   }
 
   /**

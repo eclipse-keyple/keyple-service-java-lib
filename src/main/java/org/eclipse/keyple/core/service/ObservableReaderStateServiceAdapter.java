@@ -83,6 +83,7 @@ final class ObservableReaderStateServiceAdapter {
       this.states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_SE_INSERTION,
           new WaitForCardInsertionStateAdapter(this.reader));
+      ((WaitForCardInsertionAutonomousSpi) readerSpi).connect(reader);
     } else if (readerSpi instanceof WaitForCardInsertionNonBlockingSpi) {
       CardInsertionActiveMonitoringJobAdapter cardInsertionActiveMonitoringJobAdapter =
           new CardInsertionActiveMonitoringJobAdapter(reader, 200, true);

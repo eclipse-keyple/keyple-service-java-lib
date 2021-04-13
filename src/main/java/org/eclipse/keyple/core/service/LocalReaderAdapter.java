@@ -508,7 +508,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private SelectionStatus processSelection(CardSelector cardSelector)
       throws CardIOException, ReaderIOException {
 
-    AnswerToReset answerToReset;
+    AnswerToReset answerToReset = null;
     ApduResponse fciResponse;
     boolean hasMatched = true;
 
@@ -521,9 +521,11 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     if (cardSelector.getCardProtocol() == null
         || cardSelector.getCardProtocol().equals(currentProtocol)) {
       // protocol check succeeded, check ATR if enabled
-      byte[] atr = readerSpi.getAtr();
-      answerToReset = new AnswerToReset(atr);
+      byte[] atr = readerSpi.getATR();
       if (checkAtr(atr, cardSelector)) {
+        if(atr != null){
+          answerToReset = new AnswerToReset(atr);
+        }
         // no ATR filter or ATR check succeeded, select by AID if enabled.
         if (cardSelector.getAid() != null) {
           fciResponse = selectByAid(cardSelector);
@@ -541,7 +543,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       }
     } else {
       // protocol failed
-      answerToReset = null;
       fciResponse = null;
       hasMatched = false;
     }
@@ -567,7 +568,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     }
 
     // check the ATR
-    if (!cardSelector.atrMatches(atr)) {
+    if (atr != null && !cardSelector.atrMatches(atr)) {
       if (logger.isInfoEnabled()) {
         logger.info(
             "[{}] openLogicalChannel => ATR didn't match. ATR = {}, regex filter = {}",
