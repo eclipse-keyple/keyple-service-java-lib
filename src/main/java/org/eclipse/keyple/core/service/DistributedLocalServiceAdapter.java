@@ -823,11 +823,7 @@ final class DistributedLocalServiceAdapter
       Map<String, Boolean> readers = new HashMap<String, Boolean>();
       for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins().values()) {
         for (Reader reader : plugin.getReaders().values()) {
-          if (reader instanceof ObservableReader) {
-            readers.put(reader.getName(), true);
-          } else {
-            readers.put(reader.getName(), false);
-          }
+          readers.put(reader.getName(), reader instanceof ObservableReader);
         }
       }
 

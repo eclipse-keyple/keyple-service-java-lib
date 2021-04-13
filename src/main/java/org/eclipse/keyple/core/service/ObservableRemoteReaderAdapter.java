@@ -162,12 +162,13 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Execute the remote service.
     try {
-      executeRemotely(input);
+      DistributedUtilAdapter.executeReaderServiceRemotely(
+          input, getRemoteReaderSpi(), getName(), getPluginName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      throwRuntimeException(e);
+      DistributedUtilAdapter.throwRuntimeException(e);
     }
   }
 
@@ -274,12 +275,13 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Execute the remote service.
     try {
-      executeRemotely(input);
+      DistributedUtilAdapter.executeReaderServiceRemotely(
+          input, getRemoteReaderSpi(), getName(), getPluginName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      throwRuntimeException(e);
+      DistributedUtilAdapter.throwRuntimeException(e);
     }
   }
 
@@ -304,12 +306,13 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Execute the remote service.
     try {
-      executeRemotely(input);
+      DistributedUtilAdapter.executeReaderServiceRemotely(
+          input, getRemoteReaderSpi(), getName(), getPluginName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      throwRuntimeException(e);
+      DistributedUtilAdapter.throwRuntimeException(e);
     }
   }
 
@@ -334,12 +337,13 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Execute the remote service.
     try {
-      executeRemotely(input);
+      DistributedUtilAdapter.executeReaderServiceRemotely(
+          input, getRemoteReaderSpi(), getName(), getPluginName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      throwRuntimeException(e);
+      DistributedUtilAdapter.throwRuntimeException(e);
     }
   }
 

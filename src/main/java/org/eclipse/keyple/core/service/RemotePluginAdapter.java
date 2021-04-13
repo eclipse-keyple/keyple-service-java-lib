@@ -23,7 +23,6 @@ import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.util.Assert;
-import org.eclipse.keyple.core.util.json.BodyError;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +81,9 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
     // Execute the remote service.
     Map<String, Boolean> localReaders;
     try {
-      JsonObject output = executeRemotely(input);
+      JsonObject output =
+          DistributedUtilAdapter.executePluginServiceRemotely(
+              input, remotePluginSpi, getName(), logger);
       if (output == null) {
         return;
       }
@@ -95,7 +96,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      throwRuntimeException(e);
+      DistributedUtilAdapter.throwRuntimeException(e);
       return;
     }
 
@@ -159,54 +160,5 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
     } else {
       ((ObservableRemoteReaderAdapter) reader).notifyObservers(readerEvent);
     }
-  }
-
-  /**
-   * (package-private)<br>
-   * Executes remotely the provided JSON input data, parses the provide JSON output data, checks if
-   * the JSON contains an error and throws the * embedded exception if exists..
-   *
-   * @param input The JSON input data to process.
-   * @return The JSON output data, or null if returned data are null or empty.
-   * @throws Exception The embedded exception if exists.
-   */
-  final JsonObject executeRemotely(JsonObject input) throws Exception { // NOSONAR
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("The plugin '{}' is sending the following JSON data : {}", getName(), input);
-    }
-
-    String outputJson = remotePluginSpi.executeRemotely(input.toString());
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("The plugin '{}' received the following JSON data : {}", getName(), outputJson);
-    }
-
-    if (outputJson == null || outputJson.isEmpty()) {
-      return null;
-    }
-
-    JsonObject output = JsonUtil.getParser().fromJson(outputJson, JsonObject.class);
-    if (output.has(JsonProperty.ERROR.name())) {
-      BodyError body =
-          JsonUtil.getParser()
-              .fromJson(output.get(JsonProperty.ERROR.name()).getAsString(), BodyError.class);
-      throw body.getException();
-    }
-    return output;
-  }
-
-  /**
-   * (package-private)<br>
-   * Throws a runtime exception containing the provided exception.
-   *
-   * @param e The cause.
-   * @throws RuntimeException The thrown runtime exception.
-   */
-  final void throwRuntimeException(Exception e) {
-    throw new RuntimeException( // NOSONAR
-        String.format(
-            "The plugin '%s' received an unexpected error : %s", getName(), e.getMessage()),
-        e);
   }
 }

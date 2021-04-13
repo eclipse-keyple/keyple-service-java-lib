@@ -21,7 +21,7 @@ import java.util.List;
 import org.eclipse.keyple.core.card.*;
 import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
-import org.eclipse.keyple.core.util.json.BodyError;
+import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
 class RemoteReaderAdapter extends AbstractReaderAdapter {
 
   private static final Logger logger = LoggerFactory.getLogger(RemoteReaderAdapter.class);
+
+  private static final String OUTPUT = "output";
 
   private final RemoteReaderSpi remoteReaderSpi;
 
@@ -95,7 +97,12 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Execute the remote service.
     try {
-      JsonObject output = executeRemotely(input);
+      JsonObject output =
+          DistributedUtilAdapter.executeReaderServiceRemotely(
+              input, remoteReaderSpi, getName(), getPluginName(), logger);
+
+      Assert.getInstance().notNull(output, OUTPUT);
+
       return JsonUtil.getParser()
           .fromJson(
               output.get(JsonProperty.RESULT.name()).getAsString(),
@@ -108,7 +115,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     } catch (CardCommunicationException e) {
       throw e;
     } catch (Exception e) {
-      throwRuntimeException(e);
+      DistributedUtilAdapter.throwRuntimeException(e);
       return Collections.emptyList();
     }
   }
@@ -136,7 +143,12 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Execute the remote service.
     try {
-      JsonObject output = executeRemotely(input);
+      JsonObject output =
+          DistributedUtilAdapter.executeReaderServiceRemotely(
+              input, remoteReaderSpi, getName(), getPluginName(), logger);
+
+      Assert.getInstance().notNull(output, OUTPUT);
+
       return JsonUtil.getParser()
           .fromJson(output.get(JsonProperty.RESULT.name()).getAsString(), CardResponse.class);
 
@@ -147,7 +159,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     } catch (CardCommunicationException e) {
       throw e;
     } catch (Exception e) {
-      throwRuntimeException(e);
+      DistributedUtilAdapter.throwRuntimeException(e);
       return null;
     }
   }
@@ -168,13 +180,18 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Execute the remote service.
     try {
-      JsonObject output = executeRemotely(input);
+      JsonObject output =
+          DistributedUtilAdapter.executeReaderServiceRemotely(
+              input, remoteReaderSpi, getName(), getPluginName(), logger);
+
+      Assert.getInstance().notNull(output, OUTPUT);
+
       return output.get(JsonProperty.RESULT.name()).getAsBoolean();
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      throwRuntimeException(e);
+      DistributedUtilAdapter.throwRuntimeException(e);
       return false;
     }
   }
@@ -195,13 +212,18 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Execute the remote service.
     try {
-      JsonObject output = executeRemotely(input);
+      JsonObject output =
+          DistributedUtilAdapter.executeReaderServiceRemotely(
+              input, remoteReaderSpi, getName(), getPluginName(), logger);
+
+      Assert.getInstance().notNull(output, OUTPUT);
+
       return output.get(JsonProperty.RESULT.name()).getAsBoolean();
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      throwRuntimeException(e);
+      DistributedUtilAdapter.throwRuntimeException(e);
       return false;
     }
   }
@@ -243,72 +265,15 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Execute the remote service.
     try {
-      executeRemotely(input);
+      DistributedUtilAdapter.executeReaderServiceRemotely(
+          input, remoteReaderSpi, getName(), getPluginName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
     } catch (ReaderCommunicationException e) {
       throw e;
     } catch (Exception e) {
-      throwRuntimeException(e);
+      DistributedUtilAdapter.throwRuntimeException(e);
     }
-  }
-
-  /**
-   * (package-private)<br>
-   * Executes remotely the provided JSON input data, parses the provide JSON output data, checks if
-   * the JSON contains an error and throws the embedded exception if exists.
-   *
-   * @param input The JSON input data to process.
-   * @return The JSON output data, or null if returned data are null or empty.
-   * @throws Exception The embedded exception if exists.
-   */
-  final JsonObject executeRemotely(JsonObject input) throws Exception { // NOSONAR
-
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The reader '{}' of plugin '{}' is sending the following JSON data : {}",
-          getName(),
-          getPluginName(),
-          input);
-    }
-
-    String outputJson = remoteReaderSpi.executeRemotely(input.toString());
-
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The reader '{}' of plugin '{}' received the following JSON data : {}",
-          getName(),
-          getPluginName(),
-          outputJson);
-    }
-
-    if (outputJson == null || outputJson.isEmpty()) {
-      return null;
-    }
-
-    JsonObject output = JsonUtil.getParser().fromJson(outputJson, JsonObject.class);
-    if (output.has(JsonProperty.ERROR.name())) {
-      BodyError body =
-          JsonUtil.getParser()
-              .fromJson(output.get(JsonProperty.ERROR.name()).getAsString(), BodyError.class);
-      throw body.getException();
-    }
-    return output;
-  }
-
-  /**
-   * (package-private)<br>
-   * Throws a runtime exception containing the provided exception.
-   *
-   * @param e The cause.
-   * @throws RuntimeException The thrown runtime exception.
-   */
-  final void throwRuntimeException(Exception e) {
-    throw new RuntimeException( // NOSONAR
-        String.format(
-            "The reader '%s' of plugin '%s' received an unexpected error : %s",
-            getName(), getPluginName(), e.getMessage()),
-        e);
   }
 }
