@@ -13,6 +13,7 @@ package org.eclipse.keyple.core.service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.eclipse.keyple.core.card.AbstractApduException;
 import org.eclipse.keyple.core.card.CardApiProperties;
 import org.eclipse.keyple.core.card.spi.CardExtensionSpi;
 import org.eclipse.keyple.core.common.CommonsApiProperties;
@@ -29,6 +30,7 @@ import org.eclipse.keyple.core.plugin.PluginApiProperties;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.*;
 import org.eclipse.keyple.core.util.Assert;
+import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,12 @@ final class SmartCardServiceAdapter implements SmartCardService {
   private final Map<String, DistributedLocalService> distributedLocalServices =
       new ConcurrentHashMap<String, DistributedLocalService>();
   private final Object distributedLocalServiceMonitor = new Object();
+
+  static {
+    // Register additional JSON adapters.
+    JsonUtil.registerTypeAdapter(
+        AbstractApduException.class, new ApduExceptionJsonSerializerAdapter(), true);
+  }
 
   /** Private constructor. */
   private SmartCardServiceAdapter() {}
