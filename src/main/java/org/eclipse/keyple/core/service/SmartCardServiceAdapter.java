@@ -244,7 +244,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
           "The version of Distributed Local API used by the provided distributed local service ({}:{}) mismatches the version used by the service ({}).",
           localServiceFactorySpi.getLocalServiceName(),
           localServiceFactorySpi.getDistributedLocalApiVersion(),
-          PluginApiProperties.VERSION);
+          DistributedLocalApiProperties.VERSION);
     }
   }
 
