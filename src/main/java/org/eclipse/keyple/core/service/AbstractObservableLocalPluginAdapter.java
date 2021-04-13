@@ -11,13 +11,11 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import org.eclipse.keyple.core.plugin.spi.PluginSpi;
 import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
-import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +31,8 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   private static final Logger logger =
       LoggerFactory.getLogger(AbstractObservableLocalPluginAdapter.class);
 
-  private final List<PluginObserverSpi> observers;
-  private final Object monitor = new Object();
-
-  private ExecutorService eventNotificationExecutorService;
-  private PluginObservationExceptionHandlerSpi exceptionHandler;
+  private final ObservationManagerAdapter<PluginObserverSpi, PluginObservationExceptionHandlerSpi>
+      observationManager;
 
   /**
    * (package-private)<br>
@@ -48,19 +43,21 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    */
   AbstractObservableLocalPluginAdapter(PluginSpi pluginSpi) {
     super(pluginSpi);
-    this.observers = new ArrayList<PluginObserverSpi>(1);
+    this.observationManager =
+        new ObservationManagerAdapter<PluginObserverSpi, PluginObservationExceptionHandlerSpi>(
+            getName(), null);
   }
 
   /**
    * (package-private)<br>
-   * Gets the exception handler used to notify the application of exceptions raised during the
-   * observation process.
+   * Gets the associated observation manager.
    *
-   * @return null if no exception has been set.
+   * @return A not null reference.
    * @since 2.0
    */
-  final PluginObservationExceptionHandlerSpi getObservationExceptionHandler() {
-    return exceptionHandler;
+  final ObservationManagerAdapter<PluginObserverSpi, PluginObservationExceptionHandlerSpi>
+      getObservationManager() {
+    return observationManager;
   }
 
   /**
@@ -83,26 +80,25 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
           countObservers());
     }
 
-    List<PluginObserverSpi> observersCopy;
-    synchronized (monitor) {
-      observersCopy = new ArrayList<PluginObserverSpi>(observers);
-    }
+    Set<PluginObserverSpi> observers = observationManager.getObservers();
 
-    if (eventNotificationExecutorService == null) {
+    if (observationManager.getEventNotificationExecutorService() == null) {
       // synchronous notification
-      for (PluginObserverSpi observer : observersCopy) {
+      for (PluginObserverSpi observer : observers) {
         notifyObserver(observer, event);
       }
     } else {
       // asynchronous notification
-      for (final PluginObserverSpi observer : observersCopy) {
-        eventNotificationExecutorService.execute(
-            new Runnable() {
-              @Override
-              public void run() {
-                notifyObserver(observer, event);
-              }
-            });
+      for (final PluginObserverSpi observer : observers) {
+        observationManager
+            .getEventNotificationExecutorService()
+            .execute(
+                new Runnable() {
+                  @Override
+                  public void run() {
+                    notifyObserver(observer, event);
+                  }
+                });
       }
     }
   }
@@ -118,7 +114,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
       observer.onPluginEvent(event);
     } catch (Exception e) {
       try {
-        exceptionHandler.onPluginObservationError(getName(), e);
+        observationManager.getObservationExceptionHandler().onPluginObservationError(getName(), e);
       } catch (Exception e2) {
         logger.error("Exception during notification", e2);
         logger.error("Original cause", e);
@@ -147,23 +143,8 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    */
   @Override
   public void addObserver(PluginObserverSpi observer) {
-
     checkStatus();
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The plugin '{}' is adding the observer '{}'.",
-          getName(),
-          observer != null ? observer.getClass().getSimpleName() : null);
-    }
-    Assert.getInstance().notNull(observer, "observer");
-
-    if (getObservationExceptionHandler() == null) {
-      throw new IllegalStateException("No exception handler defined.");
-    }
-
-    synchronized (monitor) {
-      observers.add(observer);
-    }
+    observationManager.addObserver(observer);
   }
 
   /**
@@ -173,18 +154,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    */
   @Override
   public void removeObserver(PluginObserverSpi observer) {
-
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The plugin '{}' is removing the observer '{}'.",
-          getName(),
-          observer != null ? observer.getClass().getSimpleName() : null);
-    }
-    Assert.getInstance().notNull(observer, "observer");
-
-    synchronized (monitor) {
-      observers.remove(observer);
-    }
+    observationManager.removeObserver(observer);
   }
 
   /**
@@ -194,9 +164,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    */
   @Override
   public void clearObservers() {
-    synchronized (monitor) {
-      observers.clear();
-    }
+    observationManager.clearObservers();
   }
 
   /**
@@ -206,7 +174,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    */
   @Override
   public final int countObservers() {
-    return observers.size();
+    return observationManager.countObservers();
   }
 
   /**
@@ -218,9 +186,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   public final void setEventNotificationExecutorService(
       ExecutorService eventNotificationExecutorService) {
     checkStatus();
-    Assert.getInstance()
-        .notNull(eventNotificationExecutorService, "eventNotificationExecutorService");
-    this.eventNotificationExecutorService = eventNotificationExecutorService;
+    observationManager.setEventNotificationExecutorService(eventNotificationExecutorService);
   }
 
   /**
@@ -232,7 +198,6 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   public final void setPluginObservationExceptionHandler(
       PluginObservationExceptionHandlerSpi exceptionHandler) {
     checkStatus();
-    Assert.getInstance().notNull(eventNotificationExecutorService, "exceptionHandler");
-    this.exceptionHandler = exceptionHandler;
+    observationManager.setObservationExceptionHandler(exceptionHandler);
   }
 }

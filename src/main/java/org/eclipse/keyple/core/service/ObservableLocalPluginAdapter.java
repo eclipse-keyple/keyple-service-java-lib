@@ -67,14 +67,16 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
     super.addObserver(observer);
     if (countObservers() == 1) {
       if (logger.isDebugEnabled()) {
-        logger.debug("Start monitoring the plugin {}", getName());
+        logger.debug("Start monitoring the plugin '{}'.", getName());
       }
       thread = new EventThread(getName());
       thread.setName("PluginEventMonitoringThread");
       thread.setUncaughtExceptionHandler(
           new Thread.UncaughtExceptionHandler() {
             public void uncaughtException(Thread t, Throwable e) {
-              getObservationExceptionHandler().onPluginObservationError(thread.pluginName, e);
+              getObservationManager()
+                  .getObservationExceptionHandler()
+                  .onPluginObservationError(thread.pluginName, e);
             }
           });
       thread.start();
@@ -274,7 +276,8 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
         // Restore interrupted state...
         Thread.currentThread().interrupt();
       } catch (PluginIOException e) {
-        getObservationExceptionHandler()
+        getObservationManager()
+            .getObservationExceptionHandler()
             .onPluginObservationError(
                 getName(),
                 new KeyplePluginException("An error occurred while monitoring the readers.", e));

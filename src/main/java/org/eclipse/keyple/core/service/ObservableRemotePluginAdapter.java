@@ -14,8 +14,7 @@ package org.eclipse.keyple.core.service;
 import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.JsonProperty;
 
 import com.google.gson.JsonObject;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import org.eclipse.keyple.core.distributed.remote.ObservableRemotePluginApi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
@@ -38,11 +37,8 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
 
   private static final Logger logger = LoggerFactory.getLogger(ObservableRemotePluginAdapter.class);
 
-  private final List<PluginObserverSpi> observers;
-  private final Object monitor = new Object();
-
-  private ExecutorService eventNotificationExecutorService;
-  private PluginObservationExceptionHandlerSpi exceptionHandler;
+  private final ObservationManagerAdapter<PluginObserverSpi, PluginObservationExceptionHandlerSpi>
+      observationManager;
 
   /**
    * (package-private)<br>
@@ -53,19 +49,9 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    */
   ObservableRemotePluginAdapter(RemotePluginSpi remotePluginSpi) {
     super(remotePluginSpi);
-    this.observers = new ArrayList<PluginObserverSpi>(1);
-  }
-
-  /**
-   * (package-private)<br>
-   * Gets the exception handler used to notify the application of exceptions raised during the
-   * observation process.
-   *
-   * @return null if no exception has been set.
-   * @since 2.0
-   */
-  PluginObservationExceptionHandlerSpi getObservationExceptionHandler() {
-    return exceptionHandler;
+    this.observationManager =
+        new ObservationManagerAdapter<PluginObserverSpi, PluginObservationExceptionHandlerSpi>(
+            getName(), null);
   }
 
   /**
@@ -88,27 +74,29 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
           countObservers());
     }
 
-    List<PluginObserverSpi> observersCopy;
-    synchronized (monitor) {
-      observersCopy = new ArrayList<PluginObserverSpi>(observers);
-    }
-    for (final PluginObserverSpi observer : observersCopy) {
-      eventNotificationExecutorService.execute(
-          new Runnable() {
-            @Override
-            public void run() {
-              try {
-                observer.onPluginEvent(event);
-              } catch (Exception e) {
-                try {
-                  exceptionHandler.onPluginObservationError(getName(), e);
-                } catch (Exception e2) {
-                  logger.error("Exception during notification", e2);
-                  logger.error("Original cause", e);
+    Set<PluginObserverSpi> observers = observationManager.getObservers();
+
+    for (final PluginObserverSpi observer : observers) {
+      observationManager
+          .getEventNotificationExecutorService()
+          .execute(
+              new Runnable() {
+                @Override
+                public void run() {
+                  try {
+                    observer.onPluginEvent(event);
+                  } catch (Exception e) {
+                    try {
+                      observationManager
+                          .getObservationExceptionHandler()
+                          .onPluginObservationError(getName(), e);
+                    } catch (Exception e2) {
+                      logger.error("Exception during notification", e2);
+                      logger.error("Original cause", e);
+                    }
+                  }
                 }
-              }
-            }
-          });
+              });
     }
   }
 
@@ -133,26 +121,12 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    */
   @Override
   public void addObserver(PluginObserverSpi observer) {
-
     checkStatus();
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The plugin '{}' is adding the observer '{}'.",
-          getName(),
-          observer != null ? observer.getClass().getSimpleName() : null);
-    }
-    Assert.getInstance().notNull(observer, "observer");
-
-    if (getObservationExceptionHandler() == null) {
-      throw new IllegalStateException("No exception handler defined.");
-    }
-
-    boolean isFirstObserver;
-    synchronized (monitor) {
-      observers.add(observer);
-      isFirstObserver = countObservers() == 1;
-    }
-    if (isFirstObserver) {
+    observationManager.addObserver(observer);
+    if (observationManager.countObservers() == 1) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Start monitoring the plugin '{}'.", getName());
+      }
       getRemotePluginSpi().startPluginsObservation();
     }
   }
@@ -164,21 +138,11 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    */
   @Override
   public void removeObserver(PluginObserverSpi observer) {
-
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The plugin '{}' is removing the observer '{}'.",
-          getName(),
-          observer != null ? observer.getClass().getSimpleName() : null);
-    }
-    Assert.getInstance().notNull(observer, "observer");
-
-    boolean isLastObserver;
-    synchronized (monitor) {
-      isLastObserver = countObservers() == 1;
-      observers.remove(observer);
-    }
-    if (isLastObserver) {
+    observationManager.removeObserver(observer);
+    if (observationManager.countObservers() == 0) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Stop the plugin monitoring.");
+      }
       getRemotePluginSpi().stopPluginsObservation();
     }
   }
@@ -190,8 +154,9 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    */
   @Override
   public void clearObservers() {
-    synchronized (monitor) {
-      observers.clear();
+    observationManager.clearObservers();
+    if (logger.isDebugEnabled()) {
+      logger.debug("Stop the plugin monitoring.");
     }
     getRemotePluginSpi().stopPluginsObservation();
   }
@@ -203,7 +168,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    */
   @Override
   public final int countObservers() {
-    return observers.size();
+    return observationManager.countObservers();
   }
 
   /**
@@ -215,9 +180,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   public final void setEventNotificationExecutorService(
       ExecutorService eventNotificationExecutorService) {
     checkStatus();
-    Assert.getInstance()
-        .notNull(eventNotificationExecutorService, "eventNotificationExecutorService");
-    this.eventNotificationExecutorService = eventNotificationExecutorService;
+    observationManager.setEventNotificationExecutorService(eventNotificationExecutorService);
   }
 
   /**
@@ -229,8 +192,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   public final void setPluginObservationExceptionHandler(
       PluginObservationExceptionHandlerSpi exceptionHandler) {
     checkStatus();
-    Assert.getInstance().notNull(eventNotificationExecutorService, "exceptionHandler");
-    this.exceptionHandler = exceptionHandler;
+    observationManager.setObservationExceptionHandler(exceptionHandler);
   }
 
   /**

@@ -47,18 +47,13 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       "An error occurred while monitoring the reader.";
 
   private final ObservableReaderSpi observableReaderSpi;
-  private ReaderObservationExceptionHandlerSpi exceptionHandler;
   private final ObservableReaderStateServiceAdapter stateService;
-  private final Set<ReaderObserverSpi> observers;
+  private final ObservationManagerAdapter<ReaderObserverSpi, ReaderObservationExceptionHandlerSpi>
+      observationManager;
+
   private CardSelectionScenario cardSelectionScenario;
   private NotificationMode notificationMode;
   private PollingMode currentPollingMode;
-  private ExecutorService eventNotificationExecutorService;
-  /*
-   * this object will be used to synchronize the access to the observers list in order to be
-   * thread safe
-   */
-  private final Object monitor = new Object();
 
   /**
    * (package-private)<br>
@@ -120,7 +115,9 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
     super(observableReaderSpi, pluginName);
     this.observableReaderSpi = observableReaderSpi;
     this.stateService = new ObservableReaderStateServiceAdapter(this);
-    this.observers = new LinkedHashSet<ReaderObserverSpi>(1);
+    this.observationManager =
+        new ObservationManagerAdapter<ReaderObserverSpi, ReaderObservationExceptionHandlerSpi>(
+            pluginName, getName());
   }
 
   /**
@@ -143,7 +140,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   ReaderObservationExceptionHandlerSpi getObservationExceptionHandler() {
-    return exceptionHandler;
+    return observationManager.getObservationExceptionHandler();
   }
 
   /**
@@ -375,26 +372,25 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           countObservers());
     }
 
-    List<ReaderObserverSpi> observersCopy;
-    synchronized (monitor) {
-      observersCopy = new ArrayList<ReaderObserverSpi>(observers);
-    }
+    Set<ReaderObserverSpi> observers = observationManager.getObservers();
 
-    if (eventNotificationExecutorService == null) {
+    if (observationManager.getEventNotificationExecutorService() == null) {
       // synchronous notification
-      for (ReaderObserverSpi observer : observersCopy) {
+      for (ReaderObserverSpi observer : observers) {
         notifyObserver(observer, event);
       }
     } else {
       // asynchronous notification
-      for (final ReaderObserverSpi observer : observersCopy) {
-        eventNotificationExecutorService.execute(
-            new Runnable() {
-              @Override
-              public void run() {
-                notifyObserver(observer, event);
-              }
-            });
+      for (final ReaderObserverSpi observer : observers) {
+        observationManager
+            .getEventNotificationExecutorService()
+            .execute(
+                new Runnable() {
+                  @Override
+                  public void run() {
+                    notifyObserver(observer, event);
+                  }
+                });
       }
     }
   }
@@ -410,7 +406,9 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       observer.onReaderEvent(event);
     } catch (Exception e) {
       try {
-        exceptionHandler.onReaderObservationError(getPluginName(), getName(), e);
+        observationManager
+            .getObservationExceptionHandler()
+            .onReaderObservationError(getPluginName(), getName(), e);
       } catch (Exception e2) {
         logger.error("Exception during notification", e2);
         logger.error("Original cause", e);
@@ -495,24 +493,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public void addObserver(ReaderObserverSpi observer) {
-
     checkStatus();
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The reader '{}' of plugin '{}' is adding the observer '{}'.",
-          getName(),
-          getPluginName(),
-          observer != null ? observer.getClass().getSimpleName() : null);
-    }
-    Assert.getInstance().notNull(observer, "observer");
-
-    if (observers.isEmpty() && getObservationExceptionHandler() == null) {
-      throw new IllegalStateException("No reader observation exception handler has been set.");
-    }
-
-    synchronized (monitor) {
-      observers.add(observer);
-    }
+    observationManager.addObserver(observer);
   }
 
   /**
@@ -522,19 +504,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public void removeObserver(ReaderObserverSpi observer) {
-
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The reader '{}' of plugin '{}' is removing the observer '{}'.",
-          getName(),
-          getPluginName(),
-          observer != null ? observer.getClass().getSimpleName() : null);
-    }
-    Assert.getInstance().notNull(observer, "observer");
-
-    synchronized (monitor) {
-      observers.remove(observer);
-    }
+    observationManager.removeObserver(observer);
   }
 
   /**
@@ -544,7 +514,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public int countObservers() {
-    return observers.size();
+    return observationManager.countObservers();
   }
 
   /**
@@ -554,9 +524,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public void clearObservers() {
-    synchronized (monitor) {
-      observers.clear();
-    }
+    observationManager.clearObservers();
   }
 
   /**
@@ -619,9 +587,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   public void setEventNotificationExecutorService(
       ExecutorService eventNotificationExecutorService) {
     checkStatus();
-    Assert.getInstance()
-        .notNull(eventNotificationExecutorService, "eventNotificationExecutorService");
-    this.eventNotificationExecutorService = eventNotificationExecutorService;
+    observationManager.setEventNotificationExecutorService(eventNotificationExecutorService);
   }
 
   /**
@@ -633,8 +599,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   public void setReaderObservationExceptionHandler(
       ReaderObservationExceptionHandlerSpi exceptionHandler) {
     checkStatus();
-    Assert.getInstance().notNull(exceptionHandler, "exceptionHandler");
-    this.exceptionHandler = exceptionHandler;
+    observationManager.setObservationExceptionHandler(exceptionHandler);
   }
 
   /**
