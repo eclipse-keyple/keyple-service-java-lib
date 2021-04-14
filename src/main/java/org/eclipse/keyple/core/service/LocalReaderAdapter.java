@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.keyple.core.card.*;
 import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
-import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.AutonomousSelectionReaderSpi;
@@ -56,14 +55,15 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private final Map<String, String> protocolAssociations;
 
   /**
-   * (package-private) <br>
+   * (package-private)<br>
+   * Constructor.
    *
    * @param readerSpi The reader SPI.
    * @param pluginName The name of the plugin.
    * @since 2.0
    */
   LocalReaderAdapter(ReaderSpi readerSpi, String pluginName) {
-    super(readerSpi.getName(), pluginName);
+    super(readerSpi.getName(), readerSpi, pluginName);
     this.readerSpi = readerSpi;
     protocolAssociations = new LinkedHashMap<String, String>();
   }
@@ -102,6 +102,19 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           e.getMessage(),
           e);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Invoke {@link ReaderSpi#unregister()} on the associated SPI.
+   *
+   * @since 2.0
+   */
+  @Override
+  void unregister() {
+    super.unregister();
+    readerSpi.unregister();
   }
 
   /**
@@ -191,19 +204,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   @Override
-  public final <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionType) {
-    checkStatus();
-    return (T) readerSpi;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
   public final boolean isContactless() {
-    checkStatus();
     return readerSpi.isContactless();
   }
 
@@ -235,7 +236,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         .notEmpty(readerProtocol, "readerProtocol")
         .notEmpty(applicationProtocol, "applicationProtocol");
 
-    if (readerSpi.isProtocolSupported(readerProtocol)) {
+    if (!readerSpi.isProtocolSupported(readerProtocol)) {
       throw new KeypleReaderProtocolNotSupportedException(readerProtocol);
     }
 
@@ -255,7 +256,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     protocolAssociations.remove(readerProtocol);
 
-    if (readerSpi.isProtocolSupported(readerProtocol)) {
+    if (!readerSpi.isProtocolSupported(readerProtocol)) {
       throw new KeypleReaderProtocolNotSupportedException(readerProtocol);
     }
 
