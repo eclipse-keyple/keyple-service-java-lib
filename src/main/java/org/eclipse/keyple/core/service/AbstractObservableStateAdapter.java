@@ -181,7 +181,7 @@ abstract class AbstractObservableStateAdapter {
       boolean canceled = monitoringEvent.cancel(false);
       if (logger.isTraceEnabled()) {
         logger.trace(
-            "[{}] onDeactivate => cancel runnable waitForCarPresent by thead interruption {}",
+            "[{}] onDeactivate => cancel runnable waitForCarPresent by thread interruption {}",
             reader.getName(),
             canceled);
       }

@@ -68,8 +68,6 @@ public final class CardSelector implements KeypleCardSelector {
     private Builder() {
       this.successfulSelectionStatusCodes = new LinkedHashSet<Integer>();
       this.successfulSelectionStatusCodes.add(DEFAULT_SUCCESSFUL_CODE);
-      this.fileOccurrence = FileOccurrence.FIRST;
-      this.fileControlInformation = FileControlInformation.FCI;
     }
 
     /**
@@ -360,8 +358,12 @@ public final class CardSelector implements KeypleCardSelector {
     this.cardProtocol = builder.cardProtocol;
     this.atrRegex = builder.atrRegex;
     this.aid = builder.aid;
-    this.fileOccurrence = builder.fileOccurrence;
-    this.fileControlInformation = builder.fileControlInformation;
+    this.fileOccurrence =
+        builder.fileOccurrence == null ? FileOccurrence.FIRST : builder.fileOccurrence;
+    this.fileControlInformation =
+        builder.fileControlInformation == null
+            ? FileControlInformation.FCI
+            : builder.fileControlInformation;
     this.successfulSelectionStatusCodes = builder.successfulSelectionStatusCodes;
   }
 

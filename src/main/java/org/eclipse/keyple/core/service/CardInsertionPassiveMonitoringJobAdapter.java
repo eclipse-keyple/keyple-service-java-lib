@@ -86,6 +86,7 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
               logger.warn(
                   "[{}] waitForCardPresent => Error while processing card insertion event",
                   getReader().getName());
+              break;
             } catch (TaskCanceledException e) {
               break;
             }

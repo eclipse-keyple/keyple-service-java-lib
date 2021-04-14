@@ -554,7 +554,8 @@ final class DistributedLocalServiceAdapter
      * @throws ReaderCommunicationException If a reader communication error occurs.
      */
     private void transmitCardRequest()
-        throws CardCommunicationException, ReaderCommunicationException {
+        throws CardCommunicationException, ReaderCommunicationException,
+            UnexpectedStatusCodeException {
 
       // Extract info from the message
       ChannelControl channelControl =
