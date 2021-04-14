@@ -20,6 +20,8 @@ import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.WaitForCardInsertionAutonomousReaderApi;
 import org.eclipse.keyple.core.plugin.WaitForCardRemovalAutonomousReaderApi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionAutonomousSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalAutonomousSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 import org.eclipse.keyple.core.util.Assert;
@@ -118,6 +120,12 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
     this.observationManager =
         new ObservationManagerAdapter<ReaderObserverSpi, ReaderObservationExceptionHandlerSpi>(
             pluginName, getName());
+    if (observableReaderSpi instanceof WaitForCardInsertionAutonomousSpi) {
+      ((WaitForCardInsertionAutonomousSpi) observableReaderSpi).connect(this);
+    }
+    if (observableReaderSpi instanceof WaitForCardRemovalAutonomousSpi) {
+      ((WaitForCardRemovalAutonomousSpi) observableReaderSpi).connect(this);
+    }
   }
 
   /**

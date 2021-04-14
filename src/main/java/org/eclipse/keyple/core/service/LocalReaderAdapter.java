@@ -236,7 +236,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         .notEmpty(readerProtocol, "readerProtocol")
         .notEmpty(applicationProtocol, "applicationProtocol");
 
-    if (readerSpi.isProtocolSupported(readerProtocol)) {
+    if (!readerSpi.isProtocolSupported(readerProtocol)) {
       throw new KeypleReaderProtocolNotSupportedException(readerProtocol);
     }
 
@@ -256,7 +256,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     protocolAssociations.remove(readerProtocol);
 
-    if (readerSpi.isProtocolSupported(readerProtocol)) {
+    if (!readerSpi.isProtocolSupported(readerProtocol)) {
       throw new KeypleReaderProtocolNotSupportedException(readerProtocol);
     }
 

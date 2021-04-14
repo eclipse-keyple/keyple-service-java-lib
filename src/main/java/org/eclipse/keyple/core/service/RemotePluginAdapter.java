@@ -49,6 +49,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
   RemotePluginAdapter(RemotePluginSpi remotePluginSpi) {
     super(remotePluginSpi.getName(), remotePluginSpi);
     this.remotePluginSpi = remotePluginSpi;
+    remotePluginSpi.connect(this);
   }
 
   /**

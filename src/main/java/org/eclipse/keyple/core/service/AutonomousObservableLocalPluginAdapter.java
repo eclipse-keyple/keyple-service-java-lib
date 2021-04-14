@@ -41,6 +41,7 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
   AutonomousObservableLocalPluginAdapter(
       AutonomousObservablePluginSpi autonomousObservablePluginSpi) {
     super(autonomousObservablePluginSpi);
+    autonomousObservablePluginSpi.connect(this);
   }
 
   /**

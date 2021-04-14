@@ -57,6 +57,7 @@ final class DistributedLocalServiceAdapter
   DistributedLocalServiceAdapter(LocalServiceSpi localServiceSpi) {
     this.name = localServiceSpi.getName();
     this.localServiceSpi = localServiceSpi;
+    localServiceSpi.connect(this);
   }
 
   /**
