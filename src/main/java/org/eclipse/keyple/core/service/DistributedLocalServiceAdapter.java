@@ -14,7 +14,6 @@ package org.eclipse.keyple.core.service;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.*;
-import javafx.util.Pair;
 import org.eclipse.keyple.core.card.*;
 import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
@@ -894,7 +893,8 @@ final class DistributedLocalServiceAdapter
 
       // Build result
       boolean isObservable = reader instanceof ObservableReader;
-      Pair<String, Boolean> readerInfo = new Pair<String, Boolean>(reader.getName(), isObservable);
+      AbstractMap.SimpleEntry<String, Boolean> readerInfo =
+          new AbstractMap.SimpleEntry<String, Boolean>(reader.getName(), isObservable);
       output.add(JsonProperty.RESULT.name(), JsonUtil.getParser().toJsonTree(readerInfo));
     }
 

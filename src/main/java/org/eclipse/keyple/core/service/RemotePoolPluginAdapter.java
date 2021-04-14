@@ -16,8 +16,8 @@ import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.Plu
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import java.util.AbstractMap;
 import java.util.SortedSet;
-import javafx.util.Pair;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
 import org.eclipse.keyple.core.util.Assert;
@@ -106,7 +106,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     input.addProperty(JsonProperty.READER_GROUP_REFERENCE.name(), readerGroupReference);
 
     // Execute the remote service.
-    Pair<String, Boolean> readerInfo;
+    AbstractMap.SimpleEntry<String, Boolean> readerInfo;
     try {
       JsonObject output =
           DistributedUtilAdapter.executePluginServiceRemotely(
@@ -116,7 +116,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
           JsonUtil.getParser()
               .fromJson(
                   output.get(JsonProperty.RESULT.name()).getAsString(),
-                  new TypeToken<Pair<String, Boolean>>() {}.getType());
+                  new TypeToken<AbstractMap.SimpleEntry<String, Boolean>>() {}.getType());
 
     } catch (RuntimeException e) {
       throw e;
