@@ -233,7 +233,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
           UnexpectedStatusCodeException {
     checkStatus();
 
-    CardResponse cardResponse;
+    CardResponse cardResponse = null;
 
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();

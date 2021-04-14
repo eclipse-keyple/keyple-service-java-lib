@@ -59,17 +59,7 @@ public class CardSelectorJsonAdapter
   public CardSelector deserialize(
       JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
       throws JsonParseException {
-
-    String className = jsonElement.getAsJsonObject().get("class").getAsString();
-    String name = jsonElement.getAsJsonObject().get("name").getAsString();
-
-    //    try {
-    //      return (CardSelector) Enum.valueOf((Class<? extends Enum>) Class.forName(className),
-    // name);
-    //    } catch (ClassNotFoundException e) {
-    //      throw new JsonParseException(
-    //          "Can not parse jsonElement as a CardCommand " + jsonElement.toString());
-    //    }
+    // TODO implement the deserialization
     return null;
   }
 }

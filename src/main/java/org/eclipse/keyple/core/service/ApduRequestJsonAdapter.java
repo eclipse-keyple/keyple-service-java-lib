@@ -22,8 +22,7 @@ import org.eclipse.keyple.core.util.ByteArrayUtil;
  *
  * @since 2.0
  */
-class ApduRequestJsonAdapter
-    implements JsonSerializer<ApduRequest>, JsonDeserializer<ApduRequest> {
+class ApduRequestJsonAdapter implements JsonSerializer<ApduRequest>, JsonDeserializer<ApduRequest> {
 
   /**
    * {@inheritDoc}
@@ -59,17 +58,7 @@ class ApduRequestJsonAdapter
   public ApduRequest deserialize(
       JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
       throws JsonParseException {
-
-    String className = jsonElement.getAsJsonObject().get("class").getAsString();
-    String name = jsonElement.getAsJsonObject().get("name").getAsString();
-
-    //    try {
-    //      return (ApduRequest) Enum.valueOf((Class<? extends Enum>) Class.forName(className),
-    // name);
-    //    } catch (ClassNotFoundException e) {
-    //      throw new JsonParseException(
-    //          "Can not parse jsonElement as a CardCommand " + jsonElement.toString());
-    //    }
+    // TODO implement the deserialization
     return null;
   }
 }
