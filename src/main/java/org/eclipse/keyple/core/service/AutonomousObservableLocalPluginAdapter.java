@@ -21,26 +21,27 @@ import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
- * Implementation of {@link ObservablePlugin} for an autonomous observable local plugin.
+ * Implementation of an autonomous local {@link ObservablePlugin}.
  *
  * @since 2.0
  */
-final class AutonomousObservableLocalPluginAdapter
-    extends AbstractObservablePluginAdapter<AutonomousObservablePluginSpi>
+final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLocalPluginAdapter
     implements AutonomousObservablePluginApi {
+
   private static final Logger logger =
       LoggerFactory.getLogger(AutonomousObservableLocalPluginAdapter.class);
 
   /**
    * (package-private)<br>
-   * Creates an instance of {@link AutonomousObservableLocalPluginAdapter}.
+   * Constructor.
    *
-   * @param autonomousObservablePluginSpi The plugin SPI.
+   * @param autonomousObservablePluginSpi The associated plugin SPI.
    * @since 2.0
    */
   AutonomousObservableLocalPluginAdapter(
       AutonomousObservablePluginSpi autonomousObservablePluginSpi) {
     super(autonomousObservablePluginSpi);
+    autonomousObservablePluginSpi.connect(this);
   }
 
   /**

@@ -16,41 +16,32 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
-import org.eclipse.keyple.core.plugin.spi.PluginSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 
 /**
  * (package-private)<br>
- * Implementation of a local or remote {@link Plugin}.
+ * Abstract class for all plugins.
  *
- * @param <P> The type of plugin.
  * @since 2.0
  */
-class PluginAdapter<P> implements Plugin {
-  private final Map<String, Reader> readers;
-  private final P pluginSpi;
+abstract class AbstractPluginAdapter implements Plugin {
+
   private final String pluginName;
+  private final Object pluginExtension;
   private boolean isRegistered;
+  private final Map<String, Reader> readers;
 
   /**
    * (package-private)<br>
-   * Creates an instance of {@link PluginAdapter}.
+   * Constructor.
    *
-   * <p>The expected plugin SPI should be either a {@link PluginSpi} or a {@link RemotePluginSpi}.
-   *
-   * @param pluginSpi The specific plugin SPI.
-   * @throws IllegalArgumentException if the SPI is null or of an unexpected type.
+   * @param pluginName The name of the plugin.
+   * @param pluginExtension The associated plugin extension SPI.
    * @since 2.0
    */
-  PluginAdapter(P pluginSpi) {
-    this.pluginSpi = pluginSpi;
-    if (pluginSpi instanceof PluginSpi) {
-      pluginName = ((PluginSpi) pluginSpi).getName();
-    } else {
-      throw new IllegalArgumentException("Unexpected plugin SPI type.");
-    }
-    // TODO add remote case
-    readers = new ConcurrentHashMap<String, Reader>();
+  AbstractPluginAdapter(String pluginName, Object pluginExtension) {
+    this.pluginName = pluginName;
+    this.pluginExtension = pluginExtension;
+    this.readers = new ConcurrentHashMap<String, Reader>();
   }
 
   /**
@@ -61,45 +52,34 @@ class PluginAdapter<P> implements Plugin {
    * @since 2.0
    */
   final void checkStatus() {
-    if (!isRegistered)
-      throw new IllegalStateException("The plugin " + getName() + " is not registered");
+    if (!isRegistered) {
+      throw new IllegalStateException(
+          String.format("The plugin '%s' is not or no longer registered.", pluginName));
+    }
   }
 
   /**
    * (package-private)<br>
-   * Registers the plugin, populates its list of readers and registers each of them.
+   * Changes the plugin status to registered.
    *
+   * @throws PluginIOException If registration failed.
    * @since 2.0
    */
-  final void register() throws PluginIOException {
+  void register() throws PluginIOException {
     isRegistered = true;
-    if (pluginSpi instanceof PluginSpi) {
-      // retrieve the current readers of the local plugin
-      Set<ReaderSpi> readerSpis = ((PluginSpi) pluginSpi).searchAvailableReaders();
-      // create and keep the local readers, register it
-      for (ReaderSpi readerSpi : readerSpis) {
-        LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, pluginName);
-        readers.put(readerSpi.getName(), localReaderAdapter);
-        localReaderAdapter.register();
-      }
-    } else {
-      // remote plugin
-    }
   }
 
   /**
    * (package-private)<br>
    * Unregisters the plugin and the readers present in its list.
    *
-   * @throws IllegalStateException is thrown when plugin is already unregistered.
    * @since 2.0
    */
   void unregister() {
-    checkStatus();
     isRegistered = false;
     for (String key : readers.keySet()) {
       Reader reader = readers.remove(key);
-      ((LocalReaderAdapter) reader).unregister();
+      ((AbstractReaderAdapter) reader).unregister();
     }
   }
 
@@ -120,7 +100,8 @@ class PluginAdapter<P> implements Plugin {
    */
   @Override
   public final <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionType) {
-    return (T) pluginSpi;
+    checkStatus();
+    return (T) pluginExtension;
   }
 
   /**
@@ -154,13 +135,5 @@ class PluginAdapter<P> implements Plugin {
   public final Reader getReader(String name) {
     checkStatus();
     return readers.get(name);
-  }
-
-  /**
-   * @param jsonData
-   * @since 2.0
-   */
-  public final void onReaderEvent(String jsonData) {
-    // TODO Complete
   }
 }

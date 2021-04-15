@@ -20,6 +20,8 @@ import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.WaitForCardInsertionAutonomousReaderApi;
 import org.eclipse.keyple.core.plugin.WaitForCardRemovalAutonomousReaderApi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionAutonomousSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalAutonomousSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 import org.eclipse.keyple.core.util.Assert;
@@ -47,18 +49,13 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       "An error occurred while monitoring the reader.";
 
   private final ObservableReaderSpi observableReaderSpi;
-  private ReaderObservationExceptionHandlerSpi exceptionHandler;
   private final ObservableReaderStateServiceAdapter stateService;
-  private final Set<ReaderObserverSpi> observers;
+  private final ObservationManagerAdapter<ReaderObserverSpi, ReaderObservationExceptionHandlerSpi>
+      observationManager;
+
   private CardSelectionScenario cardSelectionScenario;
   private NotificationMode notificationMode;
   private PollingMode currentPollingMode;
-  private ExecutorService eventNotificationExecutorService;
-  /*
-   * this object will be used to synchronize the access to the observers list in order to be
-   * thread safe
-   */
-  private final Object monitor = new Object();
 
   /**
    * (package-private)<br>
@@ -120,7 +117,15 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
     super(observableReaderSpi, pluginName);
     this.observableReaderSpi = observableReaderSpi;
     this.stateService = new ObservableReaderStateServiceAdapter(this);
-    this.observers = new LinkedHashSet<ReaderObserverSpi>(1);
+    this.observationManager =
+        new ObservationManagerAdapter<ReaderObserverSpi, ReaderObservationExceptionHandlerSpi>(
+            pluginName, getName());
+    if (observableReaderSpi instanceof WaitForCardInsertionAutonomousSpi) {
+      ((WaitForCardInsertionAutonomousSpi) observableReaderSpi).connect(this);
+    }
+    if (observableReaderSpi instanceof WaitForCardRemovalAutonomousSpi) {
+      ((WaitForCardRemovalAutonomousSpi) observableReaderSpi).connect(this);
+    }
   }
 
   /**
@@ -143,7 +148,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   ReaderObservationExceptionHandlerSpi getObservationExceptionHandler() {
-    return exceptionHandler;
+    return observationManager.getObservationExceptionHandler();
   }
 
   /**
@@ -357,48 +362,49 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   /**
    * (package-private)<br>
-   * Notify all registered observers with the provided {@link ReaderEvent}
+   * Notifies all registered observers with the provided {@link ReaderEvent}.
+   *
+   * <p>This method never throws an exception. Any errors at runtime are notified to the application
+   * using the exception handler.
    *
    * @param event The reader event.
    * @since 2.0
    */
   void notifyObservers(final ReaderEvent event) {
 
-    if (logger.isTraceEnabled()) {
-      logger.trace(
-          "[{}] Notifying a reader event to {} observers. EVENTNAME = {}",
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The reader '{}' is notifying the reader event '{}' to {} observers.",
           getName(),
-          countObservers(),
-          event.getEventType().name());
+          event.getEventType().name(),
+          countObservers());
     }
 
-    List<ReaderObserverSpi> observersCopy;
+    Set<ReaderObserverSpi> observers = observationManager.getObservers();
 
-    synchronized (monitor) {
-      observersCopy = new ArrayList<ReaderObserverSpi>(observers);
-    }
-
-    if (eventNotificationExecutorService == null) {
+    if (observationManager.getEventNotificationExecutorService() == null) {
       // synchronous notification
-      for (ReaderObserverSpi observer : observersCopy) {
+      for (ReaderObserverSpi observer : observers) {
         notifyObserver(observer, event);
       }
     } else {
       // asynchronous notification
-      for (final ReaderObserverSpi observer : observersCopy) {
-        eventNotificationExecutorService.execute(
-            new Runnable() {
-              @Override
-              public void run() {
-                notifyObserver(observer, event);
-              }
-            });
+      for (final ReaderObserverSpi observer : observers) {
+        observationManager
+            .getEventNotificationExecutorService()
+            .execute(
+                new Runnable() {
+                  @Override
+                  public void run() {
+                    notifyObserver(observer, event);
+                  }
+                });
       }
     }
   }
 
   /**
-   * Notify a single observer of an event.
+   * Notifies a single observer of an event.
    *
    * @param observer The observer to notify.
    * @param event The event.
@@ -408,7 +414,9 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       observer.onReaderEvent(event);
     } catch (Exception e) {
       try {
-        exceptionHandler.onReaderObservationError(getPluginName(), getName(), e);
+        observationManager
+            .getObservationExceptionHandler()
+            .onReaderObservationError(getPluginName(), getName(), e);
       } catch (Exception e2) {
         logger.error("Exception during notification", e2);
         logger.error("Original cause", e);
@@ -430,7 +438,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    *
    * @param cardSelectionScenario The card selection scenario.
    * @param notificationMode The notification policy.
-   * @param pollingMode The polling policy.
+   * @param pollingMode The polling policy (optional).
    * @since 2.0
    */
   void scheduleCardSelectionScenario(
@@ -443,7 +451,6 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * (package-private)<br>
    * {@inheritDoc}
    *
    * <p>Notifies all observers of the UNREGISTERED event.<br>
@@ -494,20 +501,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public void addObserver(ReaderObserverSpi observer) {
-
-    Assert.getInstance().notNull(observer, "observer");
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(
-          "Adding '{}' as an observer of '{}'.", observer.getClass().getSimpleName(), getName());
-    }
-
-    if (observers.isEmpty() && getObservationExceptionHandler() == null) {
-      throw new IllegalStateException("No reader observation exception handler has been set.");
-    }
-    synchronized (monitor) {
-      observers.add(observer);
-    }
+    checkStatus();
+    observationManager.addObserver(observer);
   }
 
   /**
@@ -517,16 +512,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public void removeObserver(ReaderObserverSpi observer) {
-
-    Assert.getInstance().notNull(observer, "observer");
-
-    if (logger.isTraceEnabled()) {
-      logger.trace("[{}] Deleting a reader observer", getName());
-    }
-
-    synchronized (monitor) {
-      observers.remove(observer);
-    }
+    observationManager.removeObserver(observer);
   }
 
   /**
@@ -536,7 +522,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public int countObservers() {
-    return observers.size();
+    return observationManager.countObservers();
   }
 
   /**
@@ -546,9 +532,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public void clearObservers() {
-    synchronized (monitor) {
-      observers.clear();
-    }
+    observationManager.clearObservers();
   }
 
   /**
@@ -558,9 +542,15 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public void startCardDetection(ObservableReader.PollingMode pollingMode) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("[{}] start the card Detection with pollingMode {}", getName(), pollingMode);
+    checkStatus();
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The reader '{}' of plugin '{}' is starting the card detection with polling mode '{}'.",
+          getName(),
+          getPluginName(),
+          pollingMode);
     }
+    Assert.getInstance().notNull(pollingMode, "pollingMode");
     currentPollingMode = pollingMode;
     stateService.onEvent(InternalEvent.START_DETECT);
   }
@@ -572,8 +562,11 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public void stopCardDetection() {
-    if (logger.isTraceEnabled()) {
-      logger.trace("[{}] stop the card Detection", getName());
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The reader '{}' of plugin '{}' is stopping the card detection.",
+          getName(),
+          getPluginName());
     }
     stateService.onEvent(InternalEvent.STOP_DETECT);
   }
@@ -584,8 +577,11 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   public void finalizeCardProcessing() {
-    if (logger.isTraceEnabled()) {
-      logger.trace("[{}] start removal sequence of the reader", getName());
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The reader '{}' of plugin '{}' is starting the removal sequence of the card.",
+          getName(),
+          getPluginName());
     }
     stateService.onEvent(InternalEvent.SE_PROCESSED);
   }
@@ -598,7 +594,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   @Override
   public void setEventNotificationExecutorService(
       ExecutorService eventNotificationExecutorService) {
-    this.eventNotificationExecutorService = eventNotificationExecutorService;
+    checkStatus();
+    observationManager.setEventNotificationExecutorService(eventNotificationExecutorService);
   }
 
   /**
@@ -609,8 +606,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   @Override
   public void setReaderObservationExceptionHandler(
       ReaderObservationExceptionHandlerSpi exceptionHandler) {
-    Assert.getInstance().notNull(exceptionHandler, "exceptionHandler");
-    this.exceptionHandler = exceptionHandler;
+    checkStatus();
+    observationManager.setObservationExceptionHandler(exceptionHandler);
   }
 
   /**
