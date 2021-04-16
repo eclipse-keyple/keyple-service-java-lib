@@ -39,7 +39,7 @@ class ApduRequestJsonAdapter implements JsonSerializer<ApduRequest>, JsonDeseria
 
     JsonObject output = new JsonObject();
 
-    output.addProperty("bytes", ByteArrayUtil.toHex(apduRequest.getBytes()));
+    output.addProperty("dataIn", ByteArrayUtil.toHex(apduRequest.getBytes()));
     output.addProperty("isCase4", apduRequest.isCase4());
     Set<String> successfulStatusCodes = new HashSet<String>();
     for (int code : apduRequest.getSuccessfulStatusCodes()) {
@@ -61,7 +61,7 @@ class ApduRequestJsonAdapter implements JsonSerializer<ApduRequest>, JsonDeseria
       JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
       throws JsonParseException {
 
-    byte[] bytes = ByteArrayUtil.fromHex(jsonElement.getAsJsonObject().get("bytes").getAsString());
+    byte[] bytes = ByteArrayUtil.fromHex(jsonElement.getAsJsonObject().get("dataIn").getAsString());
     boolean isCase4 = jsonElement.getAsJsonObject().get("isCase4").getAsBoolean();
     String name = jsonElement.getAsJsonObject().get("name").getAsString();
 
