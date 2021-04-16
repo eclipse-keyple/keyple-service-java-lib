@@ -35,8 +35,11 @@ class ApduResponseJsonAdapter
       ApduResponse apduResponse, Type type, JsonSerializationContext jsonSerializationContext) {
 
     JsonObject output = new JsonObject();
+
     output.addProperty("dataOut", ByteArrayUtil.toHex(apduResponse.getDataOut()));
-    output.addProperty("statusCode", Integer.toHexString(apduResponse.getStatusCode()) + "h");
+    output.addProperty(
+        "statusCode", Integer.toHexString(apduResponse.getStatusCode()).toUpperCase());
+
     return output;
   }
 
@@ -49,7 +52,10 @@ class ApduResponseJsonAdapter
   public ApduResponse deserialize(
       JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
       throws JsonParseException {
-    // TODO implement the deserialization
-    return null;
+
+    String dataOut = jsonElement.getAsJsonObject().get("dataOut").getAsString();
+    String statusCode = jsonElement.getAsJsonObject().get("statusCode").getAsString();
+
+    return new ApduResponse(ByteArrayUtil.fromHex(dataOut + statusCode));
   }
 }

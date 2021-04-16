@@ -12,9 +12,13 @@
 package org.eclipse.keyple.core.service;
 
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import java.util.HashSet;
+import java.util.Set;
 import org.eclipse.keyple.core.card.ApduRequest;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
+import org.eclipse.keyple.core.util.json.JsonUtil;
 
 /**
  * (package-private)<br>
@@ -34,18 +38,16 @@ class ApduRequestJsonAdapter implements JsonSerializer<ApduRequest>, JsonDeseria
       ApduRequest apduRequest, Type type, JsonSerializationContext jsonSerializationContext) {
 
     JsonObject output = new JsonObject();
+
     output.addProperty("bytes", ByteArrayUtil.toHex(apduRequest.getBytes()));
     output.addProperty("isCase4", apduRequest.isCase4());
-    StringBuilder successfulStatusCodesSb = new StringBuilder();
+    Set<String> successfulStatusCodes = new HashSet<String>();
     for (int code : apduRequest.getSuccessfulStatusCodes()) {
-      if (successfulStatusCodesSb.length() == 0) {
-        successfulStatusCodesSb.append(Integer.toHexString(code));
-      } else {
-        successfulStatusCodesSb.append(", ").append(Integer.toHexString(code));
-      }
+      successfulStatusCodes.add(Integer.toHexString(code).toUpperCase());
     }
-    output.addProperty("successfulStatusCodes", successfulStatusCodesSb.toString());
+    output.add("successfulStatusCodes", jsonSerializationContext.serialize(successfulStatusCodes));
     output.addProperty("name", apduRequest.getName());
+
     return output;
   }
 
@@ -58,7 +60,23 @@ class ApduRequestJsonAdapter implements JsonSerializer<ApduRequest>, JsonDeseria
   public ApduRequest deserialize(
       JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
       throws JsonParseException {
-    // TODO implement the deserialization
-    return null;
+
+    byte[] bytes = ByteArrayUtil.fromHex(jsonElement.getAsJsonObject().get("bytes").getAsString());
+    boolean isCase4 = jsonElement.getAsJsonObject().get("isCase4").getAsBoolean();
+    String name = jsonElement.getAsJsonObject().get("name").getAsString();
+
+    ApduRequest apduRequest = new ApduRequest(bytes, isCase4).setName(name);
+
+    Set<String> successfulStatusCodes =
+        JsonUtil.getParser()
+            .fromJson(
+                jsonElement.getAsJsonObject().get("successfulStatusCodes").getAsJsonArray(),
+                new TypeToken<Set<String>>() {}.getType());
+
+    for (String successfulStatusCode : successfulStatusCodes) {
+      apduRequest.addSuccessfulStatusCode(Integer.parseInt(successfulStatusCode, 16));
+    }
+
+    return apduRequest;
   }
 }

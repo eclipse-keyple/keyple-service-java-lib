@@ -12,9 +12,13 @@
 package org.eclipse.keyple.core.service;
 
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import java.util.HashSet;
+import java.util.Set;
 import org.eclipse.keyple.core.service.selection.CardSelector;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
+import org.eclipse.keyple.core.util.json.JsonUtil;
 
 /**
  * (package-private)<br>
@@ -35,18 +39,20 @@ public class CardSelectorJsonAdapter
       CardSelector cardSelector, Type type, JsonSerializationContext jsonSerializationContext) {
 
     JsonObject output = new JsonObject();
+
+    output.addProperty("cardProtocol", cardSelector.getCardProtocol());
+    output.addProperty("atrRegex", cardSelector.getAtrRegex());
     output.addProperty("aid", ByteArrayUtil.toHex(cardSelector.getAid()));
     output.addProperty("fileOccurrence", cardSelector.getFileOccurrence().name());
     output.addProperty("fileControlInformation", cardSelector.getFileControlInformation().name());
-    StringBuilder successfulStatusCodesSb = new StringBuilder();
+    Set<String> successfulStatusCodes = new HashSet<String>();
     for (int code : cardSelector.getSuccessfulSelectionStatusCodes()) {
-      if (successfulStatusCodesSb.length() == 0) {
-        successfulStatusCodesSb.append(Integer.toHexString(code));
-      } else {
-        successfulStatusCodesSb.append(", ").append(Integer.toHexString(code));
-      }
+      successfulStatusCodes.add(Integer.toHexString(code).toUpperCase());
     }
-    output.addProperty("successfulSelectionStatusCodes", successfulStatusCodesSb.toString());
+    output.add(
+        "successfulSelectionStatusCodes",
+        jsonSerializationContext.serialize(successfulStatusCodes));
+
     return output;
   }
 
@@ -59,7 +65,39 @@ public class CardSelectorJsonAdapter
   public CardSelector deserialize(
       JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
       throws JsonParseException {
-    // TODO implement the deserialization
-    return null;
+
+    String cardProtocol = jsonElement.getAsJsonObject().get("cardProtocol").getAsString();
+    String atrRegex = jsonElement.getAsJsonObject().get("atrRegex").getAsString();
+    String aid = jsonElement.getAsJsonObject().get("aid").getAsString();
+    CardSelector.FileOccurrence fileOccurrence =
+        CardSelector.FileOccurrence.valueOf(
+            jsonElement.getAsJsonObject().get("fileOccurrence").getAsString());
+    CardSelector.FileControlInformation fileControlInformation =
+        CardSelector.FileControlInformation.valueOf(
+            jsonElement.getAsJsonObject().get("fileControlInformation").getAsString());
+
+    CardSelector cardSelector =
+        CardSelector.builder()
+            .filterByCardProtocol(cardProtocol)
+            .filterByAtr(atrRegex)
+            .filterByDfName(aid)
+            .setFileOccurrence(fileOccurrence)
+            .setFileControlInformation(fileControlInformation)
+            .build();
+
+    Set<String> successfulStatusCodes =
+        JsonUtil.getParser()
+            .fromJson(
+                jsonElement
+                    .getAsJsonObject()
+                    .get("successfulSelectionStatusCodes")
+                    .getAsJsonArray(),
+                new TypeToken<Set<String>>() {}.getType());
+
+    for (String successfulStatusCode : successfulStatusCodes) {
+      cardSelector.addSuccessfulStatusCode(Integer.parseInt(successfulStatusCode, 16));
+    }
+
+    return cardSelector;
   }
 }
