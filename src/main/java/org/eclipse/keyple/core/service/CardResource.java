@@ -19,7 +19,8 @@ import org.eclipse.keyple.core.util.Assert;
  *
  * @since 2.0
  */
-public class CardResource {
+public final class CardResource {
+
   private final Reader reader;
   private final SmartCard smartCard;
 
