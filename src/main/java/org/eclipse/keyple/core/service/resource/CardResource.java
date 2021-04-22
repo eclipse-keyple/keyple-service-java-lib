@@ -9,8 +9,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.eclipse.keyple.core.service;
+package org.eclipse.keyple.core.service.resource;
 
+import org.eclipse.keyple.core.service.Reader;
 import org.eclipse.keyple.core.service.selection.spi.SmartCard;
 import org.eclipse.keyple.core.util.Assert;
 

@@ -9,9 +9,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.eclipse.keyple.core.service;
+package org.eclipse.keyple.core.service.resource;
 
 import org.eclipse.keyple.core.common.KeypleCardResourceProfileExtension;
+import org.eclipse.keyple.core.service.ObservablePlugin;
+import org.eclipse.keyple.core.service.Plugin;
+import org.eclipse.keyple.core.service.PoolPlugin;
 
 /**
  * Configurator of the card resource service.

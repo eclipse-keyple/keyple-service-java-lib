@@ -9,7 +9,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.eclipse.keyple.core.service;
+package org.eclipse.keyple.core.service.resource;
+
+import org.eclipse.keyple.core.service.ObservablePlugin;
+import org.eclipse.keyple.core.service.ObservableReader;
+import org.eclipse.keyple.core.service.PoolPlugin;
 
 /**
  * Card Resource Management Service.
@@ -87,7 +91,7 @@ public interface CardResourceService {
   void releaseCardResource(CardResource cardResource);
 
   /**
-   * Removes the card resource.
+   * Removes the card resource and releases it if it is in use.
    *
    * @param cardResource The card resource to remove.
    * @throws IllegalArgumentException If the provided card resource is null.

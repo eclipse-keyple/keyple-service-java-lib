@@ -9,9 +9,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.eclipse.keyple.core.service;
+package org.eclipse.keyple.core.service.resource;
 
-import static org.eclipse.keyple.core.service.CardResourceServiceConfiguratorAdapter.*;
+import static org.eclipse.keyple.core.service.resource.CardResourceServiceConfiguratorAdapter.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import org.eclipse.keyple.core.card.ProxyReader;
 import org.eclipse.keyple.core.card.spi.CardResourceProfileExtensionSpi;
 import org.eclipse.keyple.core.card.spi.SmartCardSpi;
+import org.eclipse.keyple.core.service.*;
 import org.eclipse.keyple.core.service.selection.spi.SmartCard;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
@@ -40,19 +41,40 @@ final class CardResourceServiceAdapter
   /** Singleton */
   private static final CardResourceServiceAdapter instance = new CardResourceServiceAdapter();
 
-  private final Map<Reader, ReaderManager> readerManagers =
+  /** Map an accepted reader of a "regular" plugin to a reader manager. */
+  private final Map<Reader, ReaderManager> readerToReaderManagerMap =
       new ConcurrentHashMap<Reader, ReaderManager>();
 
-  private final Map<String, CardProfileManager> cardProfileManagers =
+  /** Map a configured card profile name to a card profile manager. */
+  private final Map<String, CardProfileManager> cardProfileNameToCardProfileManagerMap =
       new ConcurrentHashMap<String, CardProfileManager>();
 
-  private final Map<CardResource, Plugin> cardResources =
+  /**
+   * Map a card resource to a "plugin" or "pool plugin".
+   *
+   * <p>A card resource associated to a "plugin" can be referenced by multiple card profile managers
+   * and is present in this map as long as the reader exists, no matter if the resource is in use or
+   * not.
+   *
+   * <p>A card resource associated to a "pool plugin" is only present in this map for the time of
+   * its use and is not referenced by any card resource manager.
+   */
+  private final Map<CardResource, Plugin> cardResourceToPluginMap =
       new ConcurrentHashMap<CardResource, Plugin>();
 
-  private final Map<Plugin, Set<ObservableReader>> usedObservableReaders =
+  /**
+   * Map a "regular" plugin to its accepted observable readers referenced by at least one card
+   * profile manager.
+   *
+   * <p>This map allows to observe only the readers used in case of a card monitoring request.
+   */
+  private final Map<Plugin, Set<ObservableReader>> pluginToUsedObservableReadersMap =
       new ConcurrentHashMap<Plugin, Set<ObservableReader>>();
 
+  /** The current configuration. */
   private CardResourceServiceConfiguratorAdapter configurator;
+
+  /** The current status of the card resource service. */
   private boolean isStarted;
 
   /**
@@ -71,13 +93,14 @@ final class CardResourceServiceAdapter
    * Configures the card resource service.
    *
    * <p>If service is started, then stops the service, applies the configuration and starts the
-   * service.<br>
-   * If not, then only applies the configuration.
+   * service.
+   *
+   * <p>If not, then only applies the configuration.
    *
    * @since 2.0
    */
   void configure(CardResourceServiceConfiguratorAdapter configurator) {
-    logger.info("The card resource service is applying a new configuration.");
+    logger.info("Applying a new configuration...");
     if (isStarted) {
       stop();
       this.configurator = configurator;
@@ -85,6 +108,7 @@ final class CardResourceServiceAdapter
     } else {
       this.configurator = configurator;
     }
+    logger.info("New configuration applied");
   }
 
   /**
@@ -110,28 +134,14 @@ final class CardResourceServiceAdapter
     if (isStarted) {
       stop();
     }
+    logger.info("Starting...");
     for (CardProfile cardProfile : configurator.getCardProfiles()) {
-      cardProfileManagers.put(cardProfile.getName(), new CardProfileManager(cardProfile));
+      cardProfileNameToCardProfileManagerMap.put(
+          cardProfile.getName(), new CardProfileManager(cardProfile));
     }
     startMonitoring();
     isStarted = true;
-  }
-
-  private void startMonitoring() {
-    for (ConfiguredRegularPlugin configuredRegularPlugin :
-        configurator.getConfiguredRegularPlugins()) {
-      if (configuredRegularPlugin.isWithReaderMonitoring()
-          && configuredRegularPlugin.getPlugin() instanceof ObservablePlugin) {
-        ((ObservablePlugin) configuredRegularPlugin.getPlugin()).addObserver(this);
-      }
-      if (configuredRegularPlugin.isWithCardMonitoring()
-          && usedObservableReaders.containsKey(configuredRegularPlugin.getPlugin())) {
-        for (ObservableReader reader :
-            usedObservableReaders.get(configuredRegularPlugin.getPlugin())) {
-          reader.addObserver(this);
-        }
-      }
-    }
+    logger.info("Started");
   }
 
   /**
@@ -143,27 +153,11 @@ final class CardResourceServiceAdapter
   public void stop() {
     isStarted = false;
     stopMonitoring();
-    readerManagers.clear();
-    cardProfileManagers.clear();
-    cardResources.clear();
-    usedObservableReaders.clear();
-  }
-
-  private void stopMonitoring() {
-    for (ConfiguredRegularPlugin configuredRegularPlugin :
-        configurator.getConfiguredRegularPlugins()) {
-      if (configuredRegularPlugin.isWithReaderMonitoring()
-          && configuredRegularPlugin.getPlugin() instanceof ObservablePlugin) {
-        ((ObservablePlugin) configuredRegularPlugin.getPlugin()).removeObserver(this);
-      }
-      if (configuredRegularPlugin.isWithCardMonitoring()
-          && usedObservableReaders.containsKey(configuredRegularPlugin.getPlugin())) {
-        for (ObservableReader reader :
-            usedObservableReaders.get(configuredRegularPlugin.getPlugin())) {
-          reader.removeObserver(this);
-        }
-      }
-    }
+    readerToReaderManagerMap.clear();
+    cardProfileNameToCardProfileManagerMap.clear();
+    cardResourceToPluginMap.clear();
+    pluginToUsedObservableReadersMap.clear();
+    logger.info("Stopped");
   }
 
   /**
@@ -174,15 +168,26 @@ final class CardResourceServiceAdapter
   @Override
   public CardResource getCardResource(String cardResourceProfileName) {
 
+    if (logger.isDebugEnabled()) {
+      logger.debug("Searching a card resource for profile '{}'...", cardResourceProfileName);
+    }
     if (!isStarted) {
       throw new IllegalStateException("The card resource service is not started.");
     }
     Assert.getInstance().notEmpty(cardResourceProfileName, "cardResourceProfileName");
 
-    CardProfileManager cardProfileManager = cardProfileManagers.get(cardResourceProfileName);
+    CardProfileManager cardProfileManager =
+        cardProfileNameToCardProfileManagerMap.get(cardResourceProfileName);
+
     Assert.getInstance().notNull(cardProfileManager, "cardResourceProfileName");
 
-    return cardProfileManager.getCardResource();
+    CardResource cardResource = cardProfileManager.getCardResource();
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("Found : {}", getCardResourceInfo(cardResource));
+    }
+
+    return cardResource;
   }
 
   /**
@@ -192,20 +197,35 @@ final class CardResourceServiceAdapter
    */
   @Override
   public void releaseCardResource(CardResource cardResource) {
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("Releasing {}...", getCardResourceInfo(cardResource));
+    }
+    if (!isStarted) {
+      throw new IllegalStateException("The card resource service is not started.");
+    }
     Assert.getInstance().notNull(cardResource, "cardResource");
-    final Reader reader = cardResource.getReader();
+
+    Reader reader = cardResource.getReader(); // NOSONAR cardResource not nullable here
+
     synchronized (reader) {
-      Plugin plugin = cardResources.get(cardResource);
+      Plugin plugin = cardResourceToPluginMap.get(cardResource);
       if (plugin == null) {
-        // Unknown card resource.
+        if (logger.isDebugEnabled()) {
+          logger.debug("Card resource unknown or no longer referenced");
+        }
         return;
       }
       if (plugin instanceof PoolPlugin) {
         ((PoolPlugin) plugin).releaseReader(reader);
-        cardResources.remove(cardResource);
+        cardResourceToPluginMap.remove(cardResource);
       } else {
-        readerManagers.get(reader).unlock();
+        readerToReaderManagerMap.get(reader).unlock();
       }
+    }
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("Card resource released");
     }
   }
 
@@ -216,29 +236,29 @@ final class CardResourceServiceAdapter
    */
   @Override
   public void removeCardResource(CardResource cardResource) {
-    releaseCardResource(cardResource);
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("Removing {}...", getCardResourceInfo(cardResource));
+    }
+
+    releaseCardResource(cardResource); // NOSONAR cardResource not nullable here
+
     final Reader reader = cardResource.getReader();
+
     synchronized (reader) {
-      Plugin plugin = cardResources.get(cardResource);
-      if (plugin == null) {
-        // Pool plugin or unknown card resource.
-        return;
-      }
-      // Regular plugin.
-      cardResources.remove(cardResource);
-      for (CardProfileManager cardProfileManager : cardProfileManagers.values()) {
-        cardProfileManager.removeCardResource(cardResource);
-      }
-      boolean removeReader = true;
-      for (CardResource cr : cardResources.keySet()) {
-        if (cr.getReader() == reader) {
-          removeReader = false;
-          break;
+      Plugin plugin = cardResourceToPluginMap.get(cardResource);
+      if (plugin != null) {
+        // Regular plugin.
+        cardResourceToPluginMap.remove(cardResource);
+        for (CardProfileManager cardProfileManager :
+            cardProfileNameToCardProfileManagerMap.values()) {
+          cardProfileManager.removeCardResource(cardResource);
         }
       }
-      if (removeReader) {
-        unregisterReader(reader, plugin);
-      }
+    }
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("Card resource removed");
     }
   }
 
@@ -249,6 +269,9 @@ final class CardResourceServiceAdapter
    */
   @Override
   public void onPluginEvent(PluginEvent pluginEvent) {
+    if (!isStarted) {
+      return;
+    }
     Plugin plugin = SmartCardServiceProvider.getService().getPlugin(pluginEvent.getPluginName());
     if (pluginEvent.getEventType() == PluginEvent.EventType.READER_CONNECTED) {
       for (String readerName : pluginEvent.getReadersNames()) {
@@ -271,26 +294,6 @@ final class CardResourceServiceAdapter
     }
   }
 
-  private void onReaderConnected(Reader reader, Plugin plugin) {
-    ReaderManager readerManager = getOrCreateReaderManager(reader, plugin);
-    for (CardProfileManager cardProfileManager : cardProfileManagers.values()) {
-      cardProfileManager.onReaderConnected(readerManager);
-    }
-    if (!readerManager.isActive()) {
-      unregisterReader(reader, plugin);
-    }
-  }
-
-  private void onReaderDisconnected(Reader reader, Plugin plugin) {
-    ReaderManager readerManager = readerManagers.get(reader);
-    if (readerManager != null) {
-      for (CardProfileManager cardProfileManager : cardProfileManagers.values()) {
-        cardProfileManager.onReaderDisconnected(readerManager);
-      }
-      unregisterReader(readerManager.getReader(), plugin);
-    }
-  }
-
   /**
    * {@inheritDoc}
    *
@@ -298,15 +301,24 @@ final class CardResourceServiceAdapter
    */
   @Override
   public void onReaderEvent(ReaderEvent readerEvent) {
-    final Reader reader = getReader(readerEvent.getReaderName());
+    if (!isStarted) {
+      return;
+    }
+    Reader reader = getReader(readerEvent.getReaderName());
     if (reader != null) {
       synchronized (reader) {
-        ReaderManager readerManager = readerManagers.get(reader);
+        ReaderManager readerManager = readerToReaderManagerMap.get(reader);
         if (readerManager != null) {
           if (readerEvent.getEventType() == ReaderEvent.EventType.CARD_INSERTED
               || readerEvent.getEventType() == ReaderEvent.EventType.CARD_MATCHED) {
+            if (logger.isDebugEnabled()) {
+              logger.debug("Remove disconnected reader '{}'", reader.getName());
+            }
             onCardInserted(readerManager);
           } else {
+            if (logger.isDebugEnabled()) {
+              // TODO logger.debug("Remove all card resources associated with reader '{}'", reader.getName());
+            }
             onCardRemoved(readerManager);
           }
         }
@@ -314,17 +326,102 @@ final class CardResourceServiceAdapter
     }
   }
 
+  /**
+   * (private)<br>
+   * Starts the observation of observable plugins and/or observable readers used if requested.
+   */
+  private void startMonitoring() {
+    for (ConfiguredRegularPlugin configuredRegularPlugin :
+        configurator.getConfiguredRegularPlugins()) {
+      if (configuredRegularPlugin.isWithReaderMonitoring()
+          && configuredRegularPlugin.getPlugin() instanceof ObservablePlugin) {
+        ((ObservablePlugin) configuredRegularPlugin.getPlugin()).addObserver(this);
+      }
+      if (configuredRegularPlugin.isWithCardMonitoring()
+          && pluginToUsedObservableReadersMap.containsKey(configuredRegularPlugin.getPlugin())) {
+        for (ObservableReader reader :
+            pluginToUsedObservableReadersMap.get(configuredRegularPlugin.getPlugin())) {
+          reader.addObserver(this);
+        }
+      }
+    }
+  }
+
+  /**
+   * (private)<br>
+   * Stops the observation of all observable plugins and observable readers used.
+   */
+  private void stopMonitoring() {
+    for (ConfiguredRegularPlugin configuredRegularPlugin :
+        configurator.getConfiguredRegularPlugins()) {
+      if (configuredRegularPlugin.isWithReaderMonitoring()
+          && configuredRegularPlugin.getPlugin() instanceof ObservablePlugin) {
+        ((ObservablePlugin) configuredRegularPlugin.getPlugin()).removeObserver(this);
+      }
+      if (configuredRegularPlugin.isWithCardMonitoring()
+          && pluginToUsedObservableReadersMap.containsKey(configuredRegularPlugin.getPlugin())) {
+        for (ObservableReader reader :
+            pluginToUsedObservableReadersMap.get(configuredRegularPlugin.getPlugin())) {
+          reader.removeObserver(this);
+        }
+      }
+    }
+  }
+
+  /**
+   * (private)<br>
+   * Invoked when a new reader is connected.<br>
+   * Notifies all card profile managers about the new available reader.<br>
+   * If the new reader is accepted by at least one card profile manager, then a new reader manager
+   * is registered to the service.
+   *
+   * @param reader The new reader.
+   * @param plugin The associated plugin.
+   */
+  private void onReaderConnected(Reader reader, Plugin plugin) {
+    ReaderManager readerManager = getOrCreateReaderManager(reader, plugin);
+    for (CardProfileManager cardProfileManager : cardProfileNameToCardProfileManagerMap.values()) {
+      cardProfileManager.onReaderConnected(readerManager);
+    }
+    if (!readerManager.isActive()) {
+      unregisterReader(reader, plugin);
+    }
+  }
+
+  /**
+   * (private)<br>
+   * Invoked when a new reader is no more available because it was disconnected or unregistered.
+   *
+   * @param reader
+   * @param plugin
+   */
+  private void onReaderDisconnected(Reader reader, Plugin plugin) {
+    ReaderManager readerManager = readerToReaderManagerMap.get(reader);
+    if (readerManager != null) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Remove disconnected reader '{}' and all associated card resources", reader.getName());
+      }
+      onCardRemoved(readerManager);
+      unregisterReader(reader, plugin);
+    }
+  }
+
   private void onCardInserted(ReaderManager readerManager) {
-    for (CardProfileManager cardProfileManager : cardProfileManagers.values()) {
+    for (CardProfileManager cardProfileManager : cardProfileNameToCardProfileManagerMap.values()) {
       cardProfileManager.onCardInserted(readerManager);
     }
   }
 
   private void onCardRemoved(ReaderManager readerManager) {
-    for (CardProfileManager cardProfileManager : cardProfileManagers.values()) {
-      cardProfileManager.onCardRemoved(readerManager);
+    List<CardResource> cardResourcesToRemove = new ArrayList<CardResource>();
+    for (CardResource cardResource : cardResourceToPluginMap.keySet()) {
+      if (cardResource.getReader() == readerManager.getReader()) {
+        cardResourcesToRemove.add(cardResource);
+      }
     }
-    readerManager.unlock();
+    for (CardResource cardResource : cardResourcesToRemove) {
+      removeCardResource(cardResource);
+    }
   }
 
   private class ReaderManager {
@@ -396,7 +493,7 @@ final class CardResourceServiceAdapter
 
     private CardResource getOrCreateCardResource(SmartCard smartCard) {
       // Check if an identical card resource is already created.
-      for (CardResource cardResource : cardResources.keySet()) {
+      for (CardResource cardResource : cardResourceToPluginMap.keySet()) {
         if (cardResource.getReader() == reader
             && Arrays.equals(cardResource.getSmartCard().getAtrBytes(), smartCard.getAtrBytes())
             && Arrays.equals(cardResource.getSmartCard().getFciBytes(), smartCard.getFciBytes())) {
@@ -405,7 +502,7 @@ final class CardResourceServiceAdapter
       }
       // If none, then create a new one.
       CardResource cardResource = new CardResource(reader, smartCard);
-      cardResources.put(cardResource, plugin);
+      cardResourceToPluginMap.put(cardResource, plugin);
       return cardResource;
     }
   }
@@ -485,7 +582,13 @@ final class CardResourceServiceAdapter
         CardResource cardResource =
             readerManager.matches(cardProfile.getCardResourceProfileExtension());
         if (cardResource != null) {
-          profileCardResources.add(cardResource); // TODO improve insertion index
+          profileCardResources.add(cardResource);
+          if (logger.isDebugEnabled()) {
+            logger.debug(
+                "Add {} to card resource profile '{}'",
+                getCardResourceInfo(cardResource),
+                cardProfile.getName());
+          }
         }
       }
     }
@@ -496,7 +599,13 @@ final class CardResourceServiceAdapter
     }
 
     private void removeCardResource(CardResource cardResource) {
-      profileCardResources.remove(cardResource);
+      boolean isRemoved = profileCardResources.remove(cardResource);
+      if (logger.isDebugEnabled() && isRemoved) {
+        logger.debug(
+            "Remove {} from card resource profile '{}'",
+            getCardResourceInfo(cardResource),
+            cardProfile.getName());
+      }
     }
 
     private void onReaderConnected(ReaderManager readerManager) {
@@ -512,25 +621,8 @@ final class CardResourceServiceAdapter
       }
     }
 
-    private void onReaderDisconnected(ReaderManager readerManager) {
-      CardResource cardResourceToRemove = null;
-      for (CardResource cardResource : profileCardResources) {
-        if (cardResource.getReader() == readerManager.getReader()) {
-          cardResourceToRemove = cardResource;
-          break;
-        }
-      }
-      if (cardResourceToRemove != null) {
-        profileCardResources.remove(cardResourceToRemove);
-      }
-    }
-
     private void onCardInserted(ReaderManager readerManager) {
       onReaderConnected(readerManager);
-    }
-
-    private void onCardRemoved(ReaderManager readerManager) {
-      onReaderDisconnected(readerManager);
     }
 
     private CardResource getCardResource() {
@@ -586,7 +678,7 @@ final class CardResourceServiceAdapter
       for (CardResource cardResource : profileCardResources) {
         Reader reader = cardResource.getReader();
         synchronized (reader) {
-          ReaderManager readerManager = readerManagers.get(reader);
+          ReaderManager readerManager = readerToReaderManagerMap.get(reader);
           if (readerManager != null) {
             try {
               if (readerManager.lock(cardResource, cardProfile.getCardResourceProfileExtension())) {
@@ -627,7 +719,7 @@ final class CardResourceServiceAdapter
                 cardProfile.getCardResourceProfileExtension().matches((ProxyReader) reader);
             if (smartCardSpi != null) {
               CardResource cardResource = new CardResource(reader, (SmartCard) smartCardSpi);
-              cardResources.put(cardResource, poolPlugin);
+              cardResourceToPluginMap.put(cardResource, poolPlugin);
               return cardResource;
             }
           }
@@ -640,7 +732,7 @@ final class CardResourceServiceAdapter
   }
 
   private Reader getReader(String readerName) {
-    for (Reader reader : readerManagers.keySet()) {
+    for (Reader reader : readerToReaderManagerMap.keySet()) {
       if (reader.getName().equals(readerName)) {
         return reader;
       }
@@ -649,7 +741,7 @@ final class CardResourceServiceAdapter
   }
 
   private ReaderManager getOrCreateReaderManager(Reader reader, Plugin plugin) {
-    ReaderManager readerManager = readerManagers.get(reader);
+    ReaderManager readerManager = readerToReaderManagerMap.get(reader);
     if (readerManager == null) {
       readerManager = registerReader(reader, plugin);
     }
@@ -658,13 +750,13 @@ final class CardResourceServiceAdapter
 
   private ReaderManager registerReader(Reader reader, Plugin plugin) {
     ReaderManager readerManager = new ReaderManager(reader, plugin);
-    readerManagers.put(reader, readerManager);
+    readerToReaderManagerMap.put(reader, readerManager);
     if (reader instanceof ObservableReader) {
-      Set<ObservableReader> usedReaders = usedObservableReaders.get(plugin);
+      Set<ObservableReader> usedReaders = pluginToUsedObservableReadersMap.get(plugin);
       if (usedReaders == null) {
         usedReaders =
             Collections.newSetFromMap(new ConcurrentHashMap<ObservableReader, Boolean>(1));
-        usedObservableReaders.put(plugin, usedReaders);
+        pluginToUsedObservableReadersMap.put(plugin, usedReaders);
       }
       usedReaders.add((ObservableReader) reader);
     }
@@ -672,11 +764,28 @@ final class CardResourceServiceAdapter
   }
 
   private void unregisterReader(Reader reader, Plugin plugin) {
-    readerManagers.remove(reader);
-    Set<ObservableReader> usedReaders = usedObservableReaders.get(plugin);
+    readerToReaderManagerMap.remove(reader);
+    Set<ObservableReader> usedReaders = pluginToUsedObservableReadersMap.get(plugin);
     if (usedReaders != null && reader instanceof ObservableReader) {
       ((ObservableReader) reader).removeObserver(this);
       usedReaders.remove(reader);
     }
+  }
+
+  private String getCardResourceInfo(CardResource cardResource) {
+    if (cardResource != null) {
+      return new StringBuilder()
+          .append("card resource (")
+          .append(cardResource)
+          .append(") - reader '")
+          .append(cardResource.getReader().getName())
+          .append("' (")
+          .append(cardResource.getReader())
+          .append(") - smart card (")
+          .append(cardResource.getSmartCard())
+          .append(")")
+          .toString();
+    }
+    return null;
   }
 }
