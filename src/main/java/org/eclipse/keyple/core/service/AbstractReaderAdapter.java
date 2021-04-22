@@ -90,7 +90,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
 
     checkStatus();
 
-    List<KeypleCardSelectionResponse> cardSelectionResponses;
+    List<KeypleCardSelectionResponse> cardSelectionResponses = null;
 
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
@@ -107,51 +107,20 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
       cardSelectionResponses =
           processCardSelectionRequests(
               cardSelectionRequests, multiSelectionProcessing, channelControl);
-    } catch (ReaderCommunicationException e) {
-      if (logger.isErrorEnabled()) {
-        long timeStamp = System.nanoTime();
-        long elapsed10ms = (timeStamp - before) / 100000;
-        this.before = timeStamp;
-        logger.debug(
-            "[{}] Reader IO failure while transmitting card selection request. elapsed {}",
-            this.getName(),
-            elapsed10ms / 10.0);
-      }
-      throw e;
-    } catch (CardCommunicationException e) {
-      if (logger.isErrorEnabled()) {
-        long timeStamp = System.nanoTime();
-        long elapsed10ms = (timeStamp - before) / 100000;
-        this.before = timeStamp;
-        logger.debug(
-            "[{}] Card IO failure while transmitting card selection request. elapsed {}",
-            this.getName(),
-            elapsed10ms / 10.0);
-      }
-      throw e;
     } catch (UnexpectedStatusCodeException e) {
-      if (logger.isErrorEnabled()) {
-        long timeStamp = System.nanoTime();
-        long elapsed10ms = (timeStamp - before) / 100000;
-        this.before = timeStamp;
-        logger.debug(
-            "[{}] An unexpected status code was received while transmitting card selection request. elapsed {}",
-            this.getName(),
-            elapsed10ms / 10.0);
-      }
       throw new CardCommunicationException(
           e.getCardResponse(), "An unexpected status code was received.", e);
-    }
-
-    if (logger.isDebugEnabled()) {
-      long timeStamp = System.nanoTime();
-      long elapsed10ms = (timeStamp - before) / 100000;
-      this.before = timeStamp;
-      logger.debug(
-          "[{}] received => {}, elapsed {} ms.",
-          this.getName(),
-          cardSelectionResponses,
-          elapsed10ms / 10.0);
+    } finally {
+      if (logger.isDebugEnabled()) {
+        long timeStamp = System.nanoTime();
+        long elapsed10ms = (timeStamp - before) / 100000;
+        this.before = timeStamp;
+        logger.debug(
+            "[{}] received => {}, elapsed {} ms.",
+            this.getName(),
+            cardSelectionResponses,
+            elapsed10ms / 10.0);
+      }
     }
 
     return cardSelectionResponses;
@@ -260,11 +229,11 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    */
   @Override
   public CardResponse transmitCardRequest(CardRequest cardRequest, ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException {
-
+      throws ReaderCommunicationException, CardCommunicationException,
+          UnexpectedStatusCodeException {
     checkStatus();
 
-    CardResponse cardResponse;
+    CardResponse cardResponse = null;
 
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
@@ -276,48 +245,14 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
 
     try {
       cardResponse = processCardRequest(cardRequest, channelControl);
-    } catch (ReaderCommunicationException ex) {
+    } finally {
       if (logger.isDebugEnabled()) {
         long timeStamp = System.nanoTime();
         long elapsed10ms = (timeStamp - before) / 100000;
         this.before = timeStamp;
         logger.debug(
-            "[{}] Reader IO failure while transmitting card selection request. elapsed {}",
-            this.getName(),
-            elapsed10ms / 10.0);
+            "[{}] receive => {}, elapsed {} ms.", this.getName(), cardResponse, elapsed10ms / 10.0);
       }
-      throw ex;
-    } catch (CardCommunicationException ex) {
-      if (logger.isDebugEnabled()) {
-        long timeStamp = System.nanoTime();
-        long elapsed10ms = (timeStamp - before) / 100000;
-        this.before = timeStamp;
-        logger.debug(
-            "[{}] Card IO failure while transmitting card selection request. elapsed {}",
-            this.getName(),
-            elapsed10ms / 10.0);
-      }
-      throw ex;
-    } catch (UnexpectedStatusCodeException e) {
-      if (logger.isDebugEnabled()) {
-        long timeStamp = System.nanoTime();
-        long elapsed10ms = (timeStamp - before) / 100000;
-        this.before = timeStamp;
-        logger.debug(
-            "[{}] An unexpected status code was received while transmitting card selection request. elapsed {}",
-            this.getName(),
-            elapsed10ms / 10.0);
-      }
-      throw new CardCommunicationException(
-          e.getCardResponse(), "An unexpected status code was received.", e);
-    }
-
-    if (logger.isDebugEnabled()) {
-      long timeStamp = System.nanoTime();
-      long elapsed10ms = (timeStamp - before) / 100000;
-      this.before = timeStamp;
-      logger.debug(
-          "[{}] receive => {}, elapsed {} ms.", this.getName(), cardResponse, elapsed10ms / 10.0);
     }
 
     return cardResponse;

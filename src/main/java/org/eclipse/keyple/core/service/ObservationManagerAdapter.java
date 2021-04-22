@@ -154,7 +154,7 @@ final class ObservationManagerAdapter<T, S> {
    * @since 2.0
    */
   void setObservationExceptionHandler(S exceptionHandler) {
-    Assert.getInstance().notNull(eventNotificationExecutorService, "exceptionHandler");
+    Assert.getInstance().notNull(exceptionHandler, "exceptionHandler");
     this.exceptionHandler = exceptionHandler;
   }
 

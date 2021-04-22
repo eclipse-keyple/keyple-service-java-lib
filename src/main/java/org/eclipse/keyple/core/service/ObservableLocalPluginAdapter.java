@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.ObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,14 +156,19 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
     private void addReader(String readerName) throws PluginIOException {
       ReaderSpi readerSpi;
       readerSpi = observablePluginSpi.searchReader(readerName);
-      LocalReaderAdapter reader = new LocalReaderAdapter(readerSpi, readerName);
+      LocalReaderAdapter reader;
+      if (readerSpi instanceof ObservableReaderSpi) {
+        reader = new ObservableLocalReaderAdapter((ObservableReaderSpi) readerSpi, pluginName);
+      } else {
+        reader = new LocalReaderAdapter(readerSpi, pluginName);
+      }
       reader.register();
       getReaders().put(reader.getName(), reader);
       if (logger.isTraceEnabled()) {
         logger.trace(
             "[{}][{}] Plugin thread => Add plugged reader to readers list.",
             pluginName,
-            reader.getName());
+            readerName);
       }
     }
 

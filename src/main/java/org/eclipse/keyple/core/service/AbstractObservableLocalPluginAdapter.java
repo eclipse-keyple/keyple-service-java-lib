@@ -11,6 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import org.eclipse.keyple.core.plugin.spi.PluginSpi;
@@ -129,10 +130,11 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    */
   @Override
   final void unregister() {
+    Set<String> unregisteredReadersNames = new HashSet<String>(this.getReadersNames());
     super.unregister();
     notifyObservers(
         new PluginEvent(
-            this.getName(), this.getReadersNames(), PluginEvent.EventType.UNREGISTERED));
+            this.getName(), unregisteredReadersNames, PluginEvent.EventType.UNREGISTERED));
     clearObservers();
   }
 

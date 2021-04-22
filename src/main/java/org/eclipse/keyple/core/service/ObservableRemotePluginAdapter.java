@@ -14,6 +14,7 @@ package org.eclipse.keyple.core.service;
 import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.JsonProperty;
 
 import com.google.gson.JsonObject;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import org.eclipse.keyple.core.distributed.remote.ObservableRemotePluginApi;
@@ -107,10 +108,11 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    */
   @Override
   final void unregister() {
+    Set<String> unregisteredReadersNames = new HashSet<String>(this.getReadersNames());
     super.unregister();
     notifyObservers(
         new PluginEvent(
-            this.getName(), this.getReadersNames(), PluginEvent.EventType.UNREGISTERED));
+            this.getName(), unregisteredReadersNames, PluginEvent.EventType.UNREGISTERED));
     clearObservers();
   }
 

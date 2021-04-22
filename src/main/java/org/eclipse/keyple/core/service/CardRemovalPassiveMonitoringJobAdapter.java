@@ -88,8 +88,9 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
               // TODO check this
               // just warn as it can be a disconnection of the reader.
               logger.warn(
-                  "[{}] waitForCardAbsentNative => Error while processing card insertion event",
+                  "[{}] waitForCardAbsentNative => Error while processing card removal event",
                   getReader().getName());
+              break;
             } catch (TaskCanceledException e) {
               break;
             }

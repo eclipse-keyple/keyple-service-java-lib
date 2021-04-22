@@ -97,6 +97,10 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
     } catch (CardCommunicationException e) {
       throw new KeypleCardCommunicationException(e.getMessage(), e);
     }
+
+    // clear the selection requests list
+    cardSelectionRequests.clear();
+
     // Analyze the received responses
     return processCardSelectionResponses(cardSelectionResponses);
   }
