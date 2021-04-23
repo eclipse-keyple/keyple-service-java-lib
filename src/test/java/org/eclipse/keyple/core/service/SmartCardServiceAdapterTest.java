@@ -203,8 +203,7 @@ public class SmartCardServiceAdapterTest {
   @Test
   public void registerPlugin_whenPluginIsCorrect_shouldProducePlugin_BeRegistered_withoutWarning() {
     Plugin p = service.registerPlugin(pluginFactory);
-    assertThat(p).isInstanceOf(Plugin.class);
-    assertThat(p).isInstanceOf(LocalPluginAdapter.class);
+    assertThat(p).isInstanceOf(Plugin.class).isInstanceOf(LocalPluginAdapter.class);
     assertThat(service.isPluginRegistered(PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
@@ -213,8 +212,9 @@ public class SmartCardServiceAdapterTest {
   public void
       registerPlugin_whenPluginIsObservable_shouldProduceObservablePlugin_BeRegistered_withoutWarning() {
     Plugin p = service.registerPlugin(observablePluginFactory);
-    assertThat(p).isInstanceOf(ObservablePlugin.class);
-    assertThat(p).isInstanceOf(ObservableLocalPluginAdapter.class);
+    assertThat(p)
+        .isInstanceOf(ObservablePlugin.class)
+        .isInstanceOf(ObservableLocalPluginAdapter.class);
     assertThat(service.isPluginRegistered(OBSERVABLE_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
@@ -223,8 +223,9 @@ public class SmartCardServiceAdapterTest {
   public void
       registerPlugin_whenPluginIsAutonomousObservable_shouldProduceAutonomousObservablePlugin_BeRegistered_withoutWarning() {
     Plugin p = service.registerPlugin(autonomousObservablePluginFactory);
-    assertThat(p).isInstanceOf(ObservablePlugin.class);
-    assertThat(p).isInstanceOf(AutonomousObservableLocalPluginAdapter.class);
+    assertThat(p)
+        .isInstanceOf(ObservablePlugin.class)
+        .isInstanceOf(AutonomousObservableLocalPluginAdapter.class);
     assertThat(service.isPluginRegistered(AUTONOMOUS_OBSERVABLE_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
@@ -237,13 +238,11 @@ public class SmartCardServiceAdapterTest {
   @Test
   public void registerPlugin_whenFactoryPluginNameMismatchesPluginName_shouldIAE_and_notRegister() {
     when(pluginFactory.getPluginName()).thenReturn("otherPluginName");
-    boolean iaeThrown = false;
     try {
       service.registerPlugin(pluginFactory);
+      shouldHaveThrown(IllegalArgumentException.class);
     } catch (IllegalArgumentException e) {
-      iaeThrown = true;
     }
-    assertThat(iaeThrown).isTrue();
     assertThat(service.isPluginRegistered(PLUGIN_NAME)).isFalse();
   }
 
@@ -281,8 +280,7 @@ public class SmartCardServiceAdapterTest {
   public void
       registerPlugin_Pool_whenPluginIsCorrect_shouldProducePlugin_BeRegistered_withoutWarning() {
     Plugin p = service.registerPlugin(poolPluginFactory);
-    assertThat(p).isInstanceOf(PoolPlugin.class);
-    assertThat(p).isInstanceOf(LocalPoolPluginAdapter.class);
+    assertThat(p).isInstanceOf(PoolPlugin.class).isInstanceOf(LocalPoolPluginAdapter.class);
     assertThat(service.isPluginRegistered(POOL_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
@@ -298,13 +296,11 @@ public class SmartCardServiceAdapterTest {
   public void
       registerPlugin_Pool_whenFactoryPluginNameMismatchesPluginName_shouldIAE_and_notRegister() {
     when(poolPluginFactory.getPoolPluginName()).thenReturn("otherPluginName");
-    boolean iaeThrown = false;
     try {
       service.registerPlugin(poolPluginFactory);
+      shouldHaveThrown(IllegalArgumentException.class);
     } catch (IllegalArgumentException e) {
-      iaeThrown = true;
     }
-    assertThat(iaeThrown).isTrue();
     assertThat(service.isPluginRegistered(POOL_PLUGIN_NAME)).isFalse();
   }
 
@@ -335,8 +331,7 @@ public class SmartCardServiceAdapterTest {
   @Test
   public void registerPlugin_Remote_whenPluginIsCorrect_shouldBeRegistered_withoutWarning() {
     Plugin p = service.registerPlugin(remotePluginFactory);
-    assertThat(p).isInstanceOf(Plugin.class);
-    assertThat(p).isInstanceOf(RemotePluginAdapter.class);
+    assertThat(p).isInstanceOf(Plugin.class).isInstanceOf(RemotePluginAdapter.class);
     assertThat(service.isPluginRegistered(REMOTE_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
@@ -346,8 +341,9 @@ public class SmartCardServiceAdapterTest {
       registerPlugin_Remote_whenPluginIsObservable_shouldProduceObservablePlugin_BeRegistered_withoutWarning() {
     when(remotePlugin.isObservable()).thenReturn(true);
     Plugin p = service.registerPlugin(remotePluginFactory);
-    assertThat(p).isInstanceOf(ObservablePlugin.class);
-    assertThat(p).isInstanceOf(ObservableRemotePluginAdapter.class);
+    assertThat(p)
+        .isInstanceOf(ObservablePlugin.class)
+        .isInstanceOf(ObservableRemotePluginAdapter.class);
     assertThat(service.isPluginRegistered(REMOTE_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
@@ -357,8 +353,7 @@ public class SmartCardServiceAdapterTest {
       registerPlugin_Remote_whenPluginIsPool_shouldProducePoolPlugin_BeRegistered_withoutWarning() {
     when(remotePluginFactory.isPoolPlugin()).thenReturn(true);
     Plugin p = service.registerPlugin(remotePluginFactory);
-    assertThat(p).isInstanceOf(PoolPlugin.class);
-    assertThat(p).isInstanceOf(RemotePoolPluginAdapter.class);
+    assertThat(p).isInstanceOf(PoolPlugin.class).isInstanceOf(RemotePoolPluginAdapter.class);
     assertThat(service.isPluginRegistered(REMOTE_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
@@ -367,13 +362,11 @@ public class SmartCardServiceAdapterTest {
   public void
       registerPlugin_Remote_whenFactoryPluginNameMismatchesPluginName_shouldIAE_and_notRegister() {
     when(remotePluginFactory.getRemotePluginName()).thenReturn("otherPluginName");
-    boolean iaeThrown = false;
     try {
       service.registerPlugin(remotePluginFactory);
+      shouldHaveThrown(IllegalArgumentException.class);
     } catch (IllegalArgumentException e) {
-      iaeThrown = true;
     }
-    assertThat(iaeThrown).isTrue();
     assertThat(service.isPluginRegistered(REMOTE_PLUGIN_NAME)).isFalse();
   }
 
@@ -475,14 +468,14 @@ public class SmartCardServiceAdapterTest {
 
   @Test
   public void getPlugins_whenNoPluginRegistered_shouldReturnEmptyList() {
-    assertThat(service.getPlugins().isEmpty()).isTrue();
+    assertThat(service.getPlugins()).isEmpty();
   }
 
   @Test
   public void getPlugins_whenTwoPluginsRegistered_shouldTwoPlugins() {
     service.registerPlugin(pluginFactory);
     service.registerPlugin(poolPluginFactory);
-    assertThat(service.getPlugins().size()).isEqualTo(2);
+    assertThat(service.getPlugins()).hasSize(2);
     assertThat(service.getPlugins().get(PLUGIN_NAME)).isNotNull();
     assertThat(service.getPlugins().get(POOL_PLUGIN_NAME)).isNotNull();
   }
