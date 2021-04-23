@@ -9,7 +9,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.eclipse.keyple.core.service;
+package org.eclipse.keyple.core.service.resource;
 
 /**
  * Provider of the {@link CardResourceService}.

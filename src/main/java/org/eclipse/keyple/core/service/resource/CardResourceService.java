@@ -9,9 +9,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.eclipse.keyple.core.service;
+package org.eclipse.keyple.core.service.resource;
 
-import java.util.List;
+import org.eclipse.keyple.core.service.ObservablePlugin;
+import org.eclipse.keyple.core.service.ObservableReader;
+import org.eclipse.keyple.core.service.PoolPlugin;
 
 /**
  * Card Resource Management Service.
@@ -48,13 +50,15 @@ public interface CardResourceService {
    * Starts the service using the current configuration, initializes the list of card resources,
    * activates the required monitoring, if any.
    *
+   * <p>The service is restarted if it is already started.
+   *
    * @throws IllegalStateException If no configuration was done.
    * @since 2.0
    */
   void start();
 
   /**
-   * Stops the service.
+   * Stops the service if it is started.
    *
    * <p>All monitoring processes are stopped, all card resources are released.
    *
@@ -63,12 +67,35 @@ public interface CardResourceService {
   void stop();
 
   /**
-   * Gets the current card resources available for the provided card resource profile name.
+   * Gets the first card resource available for the provided card resource profile name using the
+   * configured allocation strategy.
+   *
+   * <p><u>Note</u> : The returned resource is then no longer available to other users until the
+   * {@link #releaseCardResource(CardResource)} method is called or the service restarted.
    *
    * @param cardResourceProfileName The name of the card resource profile.
-   * @return An empty list if no card resource is available.
+   * @return Null if no card resource is available.
+   * @throws IllegalArgumentException If the profile name is null, empty or not configured.
    * @throws IllegalStateException If the service is not started.
    * @since 2.0
    */
-  List<CardResource> getCardResources(String cardResourceProfileName);
+  CardResource getCardResource(String cardResourceProfileName);
+
+  /**
+   * Releases the card resource to make it available to other users.
+   *
+   * @param cardResource The card resource to release.
+   * @throws IllegalArgumentException If the provided card resource is null.
+   * @since 2.0
+   */
+  void releaseCardResource(CardResource cardResource);
+
+  /**
+   * Removes the card resource and releases it if it is in use.
+   *
+   * @param cardResource The card resource to remove.
+   * @throws IllegalArgumentException If the provided card resource is null.
+   * @since 2.0
+   */
+  void removeCardResource(CardResource cardResource);
 }

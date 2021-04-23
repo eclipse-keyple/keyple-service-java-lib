@@ -9,9 +9,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.eclipse.keyple.core.service;
+package org.eclipse.keyple.core.service.resource;
 
 import org.eclipse.keyple.core.common.KeypleCardResourceProfileExtension;
+import org.eclipse.keyple.core.service.ObservablePlugin;
+import org.eclipse.keyple.core.service.Plugin;
+import org.eclipse.keyple.core.service.PoolPlugin;
 
 /**
  * Configurator of the card resource service.
@@ -54,7 +57,7 @@ public interface CardResourceServiceConfigurator {
    * @throws IllegalStateException If no plugin has been added.
    * @since 2.0
    */
-  AllocationTimingParameterStep endPluginsConfiguration();
+  AllocationModeStep endPluginsConfiguration();
 
   /**
    * Step to add pool plugins to the card resource service.
@@ -102,17 +105,15 @@ public interface CardResourceServiceConfigurator {
     /**
      * Adds a {@link PoolPlugin} to the default list of all card profiles.
      *
-     * <p><u>Note:</u> The order of the plugins is importan because it will be kept during the
+     * <p><u>Note:</u> The order of the plugins is important because it will be kept during the
      * allocation process unless redefined by card profiles.
      *
      * @param poolPlugin The pool plugin to add.
-     * @param withCardMonitoring true if the readers must be observed to automatically detect card
-     *     insertions/removals, false otherwise.
      * @throws IllegalArgumentException If the provided pool plugin is null.
      * @return Next configuration step.
      * @since 2.0
      */
-    PoolPluginStep addPoolPlugin(PoolPlugin poolPlugin, boolean withCardMonitoring);
+    PoolPluginStep addPoolPlugin(PoolPlugin poolPlugin);
 
     /**
      * Terminates the addition of pool plugins.
@@ -125,25 +126,25 @@ public interface CardResourceServiceConfigurator {
   }
 
   /**
-   * Step to configure the card resource service with allocation timeouts.
+   * Step to configure the card resource service allocation mode.
    *
    * @since 2.0
    */
-  interface AllocationTimingParameterStep {
+  interface AllocationModeStep {
 
     /**
-     * Configures the card resource service with the default timing parameters used during the
-     * allocation process.
+     * Configures the card resource service to use a blocking allocation mode with the default
+     * timing parameters used during the allocation process.
      *
      * @return Next configuration step.
-     * @see #usingAllocationTimingParameters(int, int)
+     * @see #usingBlockingAllocationMode(int, int)
      * @since 2.0
      */
-    ProfileStep usingDefaultAllocationTimingParameters();
+    ProfileStep usingBlockingAllocationMode();
 
     /**
-     * Configures the card resource service with the provided timing parameters used during the
-     * allocation process.
+     * Configures the card resource service to use a blocking allocation mode with the provided
+     * timing parameters used during the allocation process.
      *
      * <p>The cycle duration is the time between two attempts to find an available card.
      *
@@ -156,7 +157,15 @@ public interface CardResourceServiceConfigurator {
      * @throws IllegalArgumentException If one of the provided values is negative.
      * @since 2.0
      */
-    ProfileStep usingAllocationTimingParameters(int cycleDurationMillis, int timeoutMillis);
+    ProfileStep usingBlockingAllocationMode(int cycleDurationMillis, int timeoutMillis);
+
+    /**
+     * Configures the card resource service to use a non blocking allocation mode.
+     *
+     * @return Next configuration step.
+     * @since 2.0
+     */
+    ProfileStep usingNonBlockingAllocationMode();
   }
 
   /**
@@ -228,15 +237,18 @@ public interface CardResourceServiceConfigurator {
   interface ProfileStep {
 
     /**
-     * Creates a card resource profile with the provided name.
+     * Creates a card resource profile with the provided name and a card resource profile extension
+     * to handle specific card operations to be performed at allocation time.
      *
      * @param name The card resource profile name.
+     * @param cardResourceProfileExtension The associated specific extension able to select a card.
      * @return Next configuration step.
-     * @throws IllegalArgumentException If the name is null or empty.
+     * @throws IllegalArgumentException If the name or the card profile extension is null or empty.
      * @throws IllegalStateException If the name is already in use.
      * @since 2.0
      */
-    ProfileParameterStep addCardResourceProfile(String name);
+    ProfileParameterStep addCardResourceProfile(
+        String name, KeypleCardResourceProfileExtension cardResourceProfileExtension);
 
     /**
      * Terminates the creation of card profiles.
@@ -262,7 +274,8 @@ public interface CardResourceServiceConfigurator {
      * the allocation process.
      *
      * <p><u>Note:</u> The order of the plugins is important because it will be kept during the
-     * allocation process.
+     * allocation process, but the pool plugins allocation strategy is defined by {@link
+     * PoolAllocationStrategyStep}.
      *
      * @param plugins An ordered list of plugins.
      * @return Next configuration step.
@@ -295,18 +308,6 @@ public interface CardResourceServiceConfigurator {
      * @since 2.0
      */
     ProfileParameterStep setReaderGroupReference(String readerGroupReference);
-
-    /**
-     * Defines a card resource profile extension to handle specific card operations to be performed
-     * at allocation time.
-     *
-     * @param cardResourceProfileExtension A specific extension.
-     * @return Next configuration step.
-     * @throws IllegalArgumentException If cardResourceProfileExtension is null or invalid.
-     * @since 2.0
-     */
-    ProfileParameterStep setCardResourceProfileExtension(
-        KeypleCardResourceProfileExtension cardResourceProfileExtension);
 
     /**
      * Terminates the addition of parameters.

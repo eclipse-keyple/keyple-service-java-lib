@@ -9,14 +9,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.eclipse.keyple.core.service;
+package org.eclipse.keyple.core.service.resource;
 
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.eclipse.keyple.core.card.spi.CardResourceProfileExtensionSpi;
 import org.eclipse.keyple.core.common.KeypleCardResourceProfileExtension;
+import org.eclipse.keyple.core.service.Plugin;
+import org.eclipse.keyple.core.service.PoolPlugin;
 import org.eclipse.keyple.core.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
@@ -28,30 +32,39 @@ final class CardResourceServiceConfiguratorAdapter
     implements CardResourceServiceConfigurator,
         CardResourceServiceConfigurator.PluginStep,
         CardResourceServiceConfigurator.PoolPluginStep,
-        CardResourceServiceConfigurator.AllocationTimingParameterStep,
+        CardResourceServiceConfigurator.AllocationModeStep,
         CardResourceServiceConfigurator.AllocationStrategyStep,
         CardResourceServiceConfigurator.PoolAllocationStrategyStep,
         CardResourceServiceConfigurator.ProfileStep,
         CardResourceServiceConfigurator.ProfileParameterStep,
         CardResourceServiceConfigurator.ConfigurationStep {
 
+  private static final Logger logger =
+      LoggerFactory.getLogger(CardResourceServiceConfiguratorAdapter.class);
+
   private static final int DEFAULT_CYCLE_DURATION_MILLIS = 100;
   private static final int DEFAULT_TIMEOUT_MILLIS = 10000;
 
-  private CardResourceAllocationStrategy cardResourceAllocationStrategy;
-  private PoolPluginCardResourceAllocationStrategy poolPluginCardResourceAllocationStrategy;
+  private AllocationStrategy allocationStrategy;
+  private PoolAllocationStrategy poolAllocationStrategy;
   private final Set<Plugin> configuredPlugins;
   private final List<ConfiguredRegularPlugin> configuredRegularPlugins;
   private final List<ConfiguredPoolPlugin> configuredPoolPlugins;
   private final List<CardProfile> cardProfiles;
-  private int cycleDurationMillis;
-  private int timeoutMillis;
+  private boolean isBlockingAllocationMode;
+  private Integer cycleDurationMillis;
+  private Integer timeoutMillis;
   private CardProfile cardProfile;
 
-  /** (private) */
-  private CardResourceServiceConfiguratorAdapter() {
-    cardResourceAllocationStrategy = CardResourceAllocationStrategy.FIRST;
-    poolPluginCardResourceAllocationStrategy = PoolPluginCardResourceAllocationStrategy.POOL_FIRST;
+  /**
+   * (package-private)<br>
+   * Constructor.
+   *
+   * @since 2.0
+   */
+  CardResourceServiceConfiguratorAdapter() {
+    allocationStrategy = AllocationStrategy.FIRST;
+    poolAllocationStrategy = PoolAllocationStrategy.POOL_FIRST;
     configuredPlugins = new HashSet<Plugin>();
     configuredRegularPlugins = new ArrayList<ConfiguredRegularPlugin>();
     configuredPoolPlugins = new ArrayList<ConfiguredPoolPlugin>();
@@ -64,7 +77,7 @@ final class CardResourceServiceConfiguratorAdapter
    *
    * @since 2.0
    */
-  enum CardResourceAllocationStrategy {
+  enum AllocationStrategy {
     FIRST,
     CYCLIC,
     RANDOM
@@ -76,7 +89,7 @@ final class CardResourceServiceConfiguratorAdapter
    *
    * @since 2.0
    */
-  enum PoolPluginCardResourceAllocationStrategy {
+  enum PoolAllocationStrategy {
     POOL_FIRST,
     POOL_LAST
   }
@@ -138,11 +151,9 @@ final class CardResourceServiceConfiguratorAdapter
    */
   static class ConfiguredPoolPlugin {
     private final PoolPlugin poolPlugin;
-    private final boolean withCardMonitoring;
 
-    private ConfiguredPoolPlugin(PoolPlugin poolPlugin, boolean withCardMonitoring) {
+    private ConfiguredPoolPlugin(PoolPlugin poolPlugin) {
       this.poolPlugin = poolPlugin;
-      this.withCardMonitoring = withCardMonitoring;
     }
 
     /**
@@ -154,16 +165,6 @@ final class CardResourceServiceConfiguratorAdapter
     PoolPlugin getPoolPlugin() {
       return poolPlugin;
     }
-
-    /**
-     * (package-private)<br>
-     *
-     * @return true if the card monitoring is required.
-     * @since 2.0
-     */
-    boolean isWithCardMonitoring() {
-      return withCardMonitoring;
-    }
   }
 
   /**
@@ -173,15 +174,20 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   static class CardProfile {
+
     private final String name;
+    private final CardResourceProfileExtensionSpi cardResourceProfileExtension;
+
     private List<Plugin> plugins;
     private String readerNameRegex;
     private String readerGroupReference;
-    private CardResourceProfileExtensionSpi cardResourceProfileExtension;
 
     /** (private) */
-    private CardProfile(String name) {
+    private CardProfile(
+        String name, KeypleCardResourceProfileExtension cardResourceProfileExtension) {
       this.name = name;
+      this.cardResourceProfileExtension =
+          (CardResourceProfileExtensionSpi) cardResourceProfileExtension;
     }
 
     /** (private) */
@@ -197,13 +203,6 @@ final class CardResourceServiceConfiguratorAdapter
     /** (private) */
     private void setReaderGroupReference(String readerGroupReference) {
       this.readerGroupReference = readerGroupReference;
-    }
-
-    /** (private) */
-    private void setCardResourceProfileExtension(
-        KeypleCardResourceProfileExtension cardResourceProfileExtension) {
-      this.cardResourceProfileExtension =
-          (CardResourceProfileExtensionSpi) cardResourceProfileExtension;
     }
 
     /**
@@ -225,7 +224,7 @@ final class CardResourceServiceConfiguratorAdapter
      */
     List<Plugin> getPlugins() {
       if (plugins == null) {
-        plugins = new ArrayList<Plugin>(0);
+        plugins = Collections.emptyList();
       }
       return plugins;
     }
@@ -282,7 +281,7 @@ final class CardResourceServiceConfiguratorAdapter
    */
   @Override
   public PluginStep usingFirstAllocationStrategy() {
-    cardResourceAllocationStrategy = CardResourceAllocationStrategy.FIRST;
+    allocationStrategy = AllocationStrategy.FIRST;
     return this;
   }
 
@@ -293,7 +292,7 @@ final class CardResourceServiceConfiguratorAdapter
    */
   @Override
   public PluginStep usingCyclicAllocationStrategy() {
-    cardResourceAllocationStrategy = CardResourceAllocationStrategy.CYCLIC;
+    allocationStrategy = AllocationStrategy.CYCLIC;
     return this;
   }
 
@@ -304,7 +303,7 @@ final class CardResourceServiceConfiguratorAdapter
    */
   @Override
   public PluginStep usingRandomAllocationStrategy() {
-    cardResourceAllocationStrategy = CardResourceAllocationStrategy.RANDOM;
+    allocationStrategy = AllocationStrategy.RANDOM;
     return this;
   }
 
@@ -357,7 +356,7 @@ final class CardResourceServiceConfiguratorAdapter
    */
   @Override
   public PoolPluginStep usingPoolPluginFirstAllocationStrategy() {
-    poolPluginCardResourceAllocationStrategy = PoolPluginCardResourceAllocationStrategy.POOL_FIRST;
+    poolAllocationStrategy = PoolAllocationStrategy.POOL_FIRST;
     return this;
   }
 
@@ -368,7 +367,7 @@ final class CardResourceServiceConfiguratorAdapter
    */
   @Override
   public PoolPluginStep usingPoolPluginLastAllocationStrategy() {
-    poolPluginCardResourceAllocationStrategy = PoolPluginCardResourceAllocationStrategy.POOL_LAST;
+    poolAllocationStrategy = PoolAllocationStrategy.POOL_LAST;
     return this;
   }
 
@@ -378,12 +377,12 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public PoolPluginStep addPoolPlugin(PoolPlugin poolPlugin, boolean withCardMonitoring) {
+  public PoolPluginStep addPoolPlugin(PoolPlugin poolPlugin) {
 
     Assert.getInstance().notNull(poolPlugin, "poolPlugin");
 
     configuredPlugins.add(poolPlugin);
-    configuredPoolPlugins.add(new ConfiguredPoolPlugin(poolPlugin, withCardMonitoring));
+    configuredPoolPlugins.add(new ConfiguredPoolPlugin(poolPlugin));
 
     return this;
   }
@@ -408,7 +407,7 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public AllocationTimingParameterStep endPluginsConfiguration() {
+  public AllocationModeStep endPluginsConfiguration() {
 
     if (configuredRegularPlugins.isEmpty() && configuredPoolPlugins.isEmpty()) {
       throw new IllegalStateException("No plugin has been added.");
@@ -422,8 +421,8 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public ProfileStep usingDefaultAllocationTimingParameters() {
-    return usingAllocationTimingParameters(DEFAULT_CYCLE_DURATION_MILLIS, DEFAULT_TIMEOUT_MILLIS);
+  public ProfileStep usingBlockingAllocationMode() {
+    return usingBlockingAllocationMode(DEFAULT_CYCLE_DURATION_MILLIS, DEFAULT_TIMEOUT_MILLIS);
   }
 
   /**
@@ -432,13 +431,14 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public ProfileStep usingAllocationTimingParameters(int cycleDurationMillis, int timeoutMillis) {
+  public ProfileStep usingBlockingAllocationMode(int cycleDurationMillis, int timeoutMillis) {
     Assert.getInstance()
         .greaterOrEqual(0, cycleDurationMillis, "cycleDurationMillis")
         .greaterOrEqual(0, timeoutMillis, "timeoutMillis");
+    this.isBlockingAllocationMode = true;
     this.cycleDurationMillis = cycleDurationMillis;
     this.timeoutMillis = timeoutMillis;
-    return null;
+    return this;
   }
 
   /**
@@ -447,9 +447,23 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public ProfileParameterStep addCardResourceProfile(String name) {
+  public ProfileStep usingNonBlockingAllocationMode() {
+    this.isBlockingAllocationMode = false;
+    return this;
+  }
 
-    Assert.getInstance().notEmpty(name, "name");
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public ProfileParameterStep addCardResourceProfile(
+      String name, KeypleCardResourceProfileExtension cardResourceProfileExtension) {
+
+    Assert.getInstance()
+        .notEmpty(name, "name")
+        .notNull(cardResourceProfileExtension, "cardResourceProfileExtension");
 
     for (CardProfile profile : cardProfiles) {
       if (name.equals(profile.getName())) {
@@ -457,7 +471,7 @@ final class CardResourceServiceConfiguratorAdapter
       }
     }
 
-    cardProfile = new CardProfile(name);
+    cardProfile = new CardProfile(name, cardResourceProfileExtension);
     return this;
   }
 
@@ -470,7 +484,7 @@ final class CardResourceServiceConfiguratorAdapter
   public ConfigurationStep addNoMoreCardResourceProfiles() {
 
     if (cardProfiles.isEmpty()) {
-      throw new IllegalStateException("No CARD profile has been added.");
+      throw new IllegalStateException("No card profile has been added.");
     }
 
     return this;
@@ -487,7 +501,7 @@ final class CardResourceServiceConfiguratorAdapter
     Assert.getInstance().notEmpty(readerGroupReference, "readerGroupReference");
 
     if (cardProfile.getReaderGroupReference() != null) {
-      throw new IllegalStateException("CARD reader group reference has already been set.");
+      throw new IllegalStateException("Card reader group reference has already been set.");
     }
 
     cardProfile.setReaderGroupReference(readerGroupReference);
@@ -547,18 +561,6 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public ProfileParameterStep setCardResourceProfileExtension(
-      KeypleCardResourceProfileExtension cardResourceProfileExtension) {
-    cardProfile.setCardResourceProfileExtension(cardResourceProfileExtension);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
   public ProfileStep addNoMoreParameters() {
 
     cardProfiles.add(cardProfile);
@@ -573,7 +575,88 @@ final class CardResourceServiceConfiguratorAdapter
    */
   @Override
   public void configure() {
-    ((CardResourceServiceAdapter) CardResourceServiceProvider.getService()).configure(this);
+
+    // Remove plugins not used by a least one card profile.
+    Set<Plugin> usedPlugins = computeUsedPlugins();
+
+    if (configuredPlugins.size() != usedPlugins.size()) {
+
+      Set<Plugin> unusedPlugins = new HashSet<Plugin>(configuredPlugins);
+      unusedPlugins.removeAll(usedPlugins);
+
+      List<ConfiguredRegularPlugin> unusedConfiguredRegularPlugins =
+          getConfiguredRegularPlugins(unusedPlugins);
+
+      List<ConfiguredPoolPlugin> unusedConfiguredPoolPlugins =
+          getConfiguredPoolPlugins(unusedPlugins);
+
+      configuredPlugins.removeAll(unusedPlugins);
+      configuredRegularPlugins.removeAll(unusedConfiguredRegularPlugins);
+      configuredPoolPlugins.removeAll(unusedConfiguredPoolPlugins);
+    }
+
+    // Apply the configuration.
+    CardResourceServiceAdapter.getInstance().configure(this);
+  }
+
+  /**
+   * (private)<br>
+   * Gets all {@link ConfiguredRegularPlugin} associated to a plugin contained in the provided
+   * collection.
+   *
+   * @param plugins The reference collection.
+   * @return A not null collection.
+   */
+  private List<ConfiguredRegularPlugin> getConfiguredRegularPlugins(Set<Plugin> plugins) {
+    List<ConfiguredRegularPlugin> results = new ArrayList<ConfiguredRegularPlugin>();
+    for (ConfiguredRegularPlugin configuredRegularPlugin : configuredRegularPlugins) {
+      if (plugins.contains(configuredRegularPlugin.getPlugin())) {
+        logger.warn(
+            "The card resource configurator removes the unused regular plugin '{}'.",
+            configuredRegularPlugin.getPlugin().getName());
+        results.add(configuredRegularPlugin);
+      }
+    }
+    return results;
+  }
+
+  /**
+   * (private)<br>
+   * Gets all {@link ConfiguredPoolPlugin} associated to a pool plugin contained in the provided
+   * collection.
+   *
+   * @param plugins The reference collection.
+   * @return A not null collection.
+   */
+  private List<ConfiguredPoolPlugin> getConfiguredPoolPlugins(Set<Plugin> plugins) {
+    List<ConfiguredPoolPlugin> results = new ArrayList<ConfiguredPoolPlugin>();
+    for (ConfiguredPoolPlugin configuredPoolPlugin : configuredPoolPlugins) {
+      if (plugins.contains(configuredPoolPlugin.getPoolPlugin())) {
+        logger.warn(
+            "The card resource configurator removes the unused pool plugin '{}'.",
+            configuredPoolPlugin.getPoolPlugin().getName());
+        results.add(configuredPoolPlugin);
+      }
+    }
+    return results;
+  }
+
+  /**
+   * (private)<br>
+   * Computes the collection of the plugins used by at least one card profile.
+   *
+   * @return A not null collection.
+   */
+  private Set<Plugin> computeUsedPlugins() {
+    Set<Plugin> usedPlugins = new HashSet<Plugin>();
+    for (CardProfile profile : cardProfiles) {
+      if (!profile.getPlugins().isEmpty()) {
+        usedPlugins.addAll(profile.getPlugins());
+      } else {
+        return configuredPlugins;
+      }
+    }
+    return usedPlugins;
   }
 
   /**
@@ -582,8 +665,8 @@ final class CardResourceServiceConfiguratorAdapter
    * @return The selected card resource allocation strategy.
    * @since 2.0
    */
-  CardResourceAllocationStrategy getCardResourceAllocationStrategy() {
-    return cardResourceAllocationStrategy;
+  AllocationStrategy getAllocationStrategy() {
+    return allocationStrategy;
   }
 
   /**
@@ -592,8 +675,8 @@ final class CardResourceServiceConfiguratorAdapter
    * @return The pool allocation strategy.
    * @since 2.0
    */
-  PoolPluginCardResourceAllocationStrategy getPoolPluginAllocationStrategy() {
-    return poolPluginCardResourceAllocationStrategy;
+  PoolAllocationStrategy getPoolAllocationStrategy() {
+    return poolAllocationStrategy;
   }
 
   /**
@@ -624,6 +707,16 @@ final class CardResourceServiceConfiguratorAdapter
    */
   List<CardProfile> getCardProfiles() {
     return cardProfiles;
+  }
+
+  /**
+   * (package-private)<br>
+   *
+   * @return A not null boolean.
+   * @since 2.0
+   */
+  public boolean isBlockingAllocationMode() {
+    return isBlockingAllocationMode;
   }
 
   /**
