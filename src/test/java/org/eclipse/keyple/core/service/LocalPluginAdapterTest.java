@@ -25,7 +25,6 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.Wait
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.DontWaitForCardRemovalDuringProcessingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalBlockingSpi;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class LocalPluginAdapterTest {
@@ -46,9 +45,6 @@ public class LocalPluginAdapterTest {
           WaitForCardInsertionBlockingSpi,
           WaitForCardRemovalBlockingSpi,
           DontWaitForCardRemovalDuringProcessingSpi {}
-
-  @BeforeClass
-  public static void beforeClass() throws Exception {}
 
   @Before
   public void setUp() throws Exception {
