@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-class CardProfileManagerAdapter {
+final class CardProfileManagerAdapter {
 
   private static final Logger logger = LoggerFactory.getLogger(CardProfileManagerAdapter.class);
 
