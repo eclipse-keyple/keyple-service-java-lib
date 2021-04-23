@@ -134,7 +134,8 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
     Assert.getInstance().notNull(reader, "reader");
 
     try {
-      poolPluginSpi.releaseReader(((ReaderSpi) reader));
+      poolPluginSpi.releaseReader(
+          ((LocalReaderAdapter) reader).getReaderSpi()); // NOSONAR nullity check is done above
     } catch (PluginIOException e) {
       throw new KeyplePluginException(
           String.format(
