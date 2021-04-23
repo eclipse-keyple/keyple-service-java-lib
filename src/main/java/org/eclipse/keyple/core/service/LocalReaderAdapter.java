@@ -70,6 +70,17 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
   /**
    * (package-private)<br>
+   * Gets {@link ReaderSpi} associated to this reader.
+   *
+   * @return A not null reference.
+   * @since 2.0
+   */
+  public ReaderSpi getReaderSpi() {
+    return readerSpi;
+  }
+
+  /**
+   * (package-private)<br>
    * Gets the logical channel's opening state.
    *
    * @return true if the channel is open, false if not.
