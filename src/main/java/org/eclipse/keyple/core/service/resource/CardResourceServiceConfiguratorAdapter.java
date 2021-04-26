@@ -18,6 +18,9 @@ import org.eclipse.keyple.core.card.spi.CardResourceProfileExtensionSpi;
 import org.eclipse.keyple.core.common.KeypleCardResourceProfileExtension;
 import org.eclipse.keyple.core.service.Plugin;
 import org.eclipse.keyple.core.service.PoolPlugin;
+import org.eclipse.keyple.core.service.resource.spi.ReaderConfiguratorSpi;
+import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
+import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +34,7 @@ import org.slf4j.LoggerFactory;
 final class CardResourceServiceConfiguratorAdapter
     implements CardResourceServiceConfigurator,
         CardResourceServiceConfigurator.PluginStep,
+        CardResourceServiceConfigurator.PluginMonitoringStep,
         CardResourceServiceConfigurator.PoolPluginStep,
         CardResourceServiceConfigurator.AllocationModeStep,
         CardResourceServiceConfigurator.AllocationStrategyStep,
@@ -44,6 +48,7 @@ final class CardResourceServiceConfiguratorAdapter
 
   private static final int DEFAULT_CYCLE_DURATION_MILLIS = 100;
   private static final int DEFAULT_TIMEOUT_MILLIS = 10000;
+  private static final String PLUGIN = "plugin";
 
   private AllocationStrategy allocationStrategy;
   private PoolAllocationStrategy poolAllocationStrategy;
@@ -55,6 +60,7 @@ final class CardResourceServiceConfiguratorAdapter
   private Integer cycleDurationMillis;
   private Integer timeoutMillis;
   private CardProfile cardProfile;
+  private ConfiguredRegularPlugin currentConfiguredRegularPlugin;
 
   /**
    * (package-private)<br>
@@ -69,6 +75,45 @@ final class CardResourceServiceConfiguratorAdapter
     configuredRegularPlugins = new ArrayList<ConfiguredRegularPlugin>();
     configuredPoolPlugins = new ArrayList<ConfiguredPoolPlugin>();
     cardProfiles = new ArrayList<CardProfile>();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public PluginMonitoringStep withReaderMonitoring(
+      PluginObservationExceptionHandlerSpi exceptionHandlerSpi,
+      ReaderConfiguratorSpi readerConfiguratorSpi) {
+    Assert.getInstance()
+        .notNull(exceptionHandlerSpi, "exceptionHandlerSpi")
+        .notNull(readerConfiguratorSpi, "readerConfiguratorSpi");
+    currentConfiguredRegularPlugin.setReaderMonitoring(exceptionHandlerSpi, readerConfiguratorSpi);
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public PluginMonitoringStep withCardMonitoring(
+      ReaderObservationExceptionHandlerSpi exceptionHandlerSpi) {
+    Assert.getInstance().notNull(exceptionHandlerSpi, "exceptionHandlerSpi");
+    currentConfiguredRegularPlugin.setCardMonitoring(exceptionHandlerSpi);
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public PluginStep endMonitoringConfiguration() {
+    return this;
   }
 
   /**
@@ -102,14 +147,39 @@ final class CardResourceServiceConfiguratorAdapter
    */
   static class ConfiguredRegularPlugin {
     private final Plugin plugin;
-    private final boolean withReaderMonitoring;
-    private final boolean withCardMonitoring;
+    private boolean withReaderMonitoring;
+    private PluginObservationExceptionHandlerSpi pluginObservationExceptionHandlerSpi;
+    private ReaderConfiguratorSpi readerConfiguratorSpi;
+    private boolean withCardMonitoring;
+    private ReaderObservationExceptionHandlerSpi readerObservationExceptionHandlerSpi;
 
-    private ConfiguredRegularPlugin(
-        Plugin plugin, boolean withReaderMonitoring, boolean withCardMonitoring) {
+    private ConfiguredRegularPlugin(Plugin plugin) {
       this.plugin = plugin;
-      this.withReaderMonitoring = withReaderMonitoring;
-      this.withCardMonitoring = withCardMonitoring;
+    }
+
+    /**
+     * (private)<br>
+     *
+     * @param pluginObservationExceptionHandlerSpi The exception handler.
+     * @param readerConfiguratorSpi The reader configurator.
+     */
+    private void setReaderMonitoring(
+        PluginObservationExceptionHandlerSpi pluginObservationExceptionHandlerSpi,
+        ReaderConfiguratorSpi readerConfiguratorSpi) {
+      this.withReaderMonitoring = true;
+      this.pluginObservationExceptionHandlerSpi = pluginObservationExceptionHandlerSpi;
+      this.readerConfiguratorSpi = readerConfiguratorSpi;
+    }
+
+    /**
+     * (private)<br>
+     *
+     * @param readerObservationExceptionHandlerSpi The exception handler.
+     */
+    private void setCardMonitoring(
+        ReaderObservationExceptionHandlerSpi readerObservationExceptionHandlerSpi) {
+      this.withCardMonitoring = true;
+      this.readerObservationExceptionHandlerSpi = readerObservationExceptionHandlerSpi;
     }
 
     /**
@@ -135,11 +205,43 @@ final class CardResourceServiceConfiguratorAdapter
     /**
      * (package-private)<br>
      *
+     * @return A not null {@link PluginObservationExceptionHandlerSpi} reference if reader
+     *     monitoring is requested.
+     * @since 2.0
+     */
+    PluginObservationExceptionHandlerSpi getPluginObservationExceptionHandlerSpi() {
+      return pluginObservationExceptionHandlerSpi;
+    }
+
+    /**
+     * (package-private)<br>
+     *
+     * @return A not null {@link ReaderConfiguratorSpi} reference if reader monitoring is requested.
+     * @since 2.0
+     */
+    ReaderConfiguratorSpi getReaderConfiguratorSpi() {
+      return readerConfiguratorSpi;
+    }
+
+    /**
+     * (package-private)<br>
+     *
      * @return true if the card monitoring is required.
      * @since 2.0
      */
     boolean isWithCardMonitoring() {
       return withCardMonitoring;
+    }
+
+    /**
+     * (package-private)<br>
+     *
+     * @return A not null {@link ReaderObservationExceptionHandlerSpi} reference if card monitoring
+     *     is requested.
+     * @since 2.0
+     */
+    ReaderObservationExceptionHandlerSpi getReaderObservationExceptionHandlerSpi() {
+      return readerObservationExceptionHandlerSpi;
     }
   }
 
@@ -313,14 +415,24 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public PluginStep addPlugin(
-      Plugin plugin, boolean withReaderMonitoring, boolean withCardMonitoring) {
-
-    Assert.getInstance().notNull(plugin, "plugin");
-
+  public PluginStep addPlugin(Plugin plugin) {
+    Assert.getInstance().notNull(plugin, PLUGIN);
     configuredPlugins.add(plugin);
-    configuredRegularPlugins.add(
-        new ConfiguredRegularPlugin(plugin, withReaderMonitoring, withCardMonitoring));
+    configuredRegularPlugins.add(new ConfiguredRegularPlugin(plugin));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public PluginMonitoringStep addPluginWithMonitoring(Plugin plugin) {
+    Assert.getInstance().notNull(plugin, PLUGIN);
+    configuredPlugins.add(plugin);
+    currentConfiguredRegularPlugin = new ConfiguredRegularPlugin(plugin);
+    configuredRegularPlugins.add(currentConfiguredRegularPlugin);
     return this;
   }
 
@@ -433,8 +545,8 @@ final class CardResourceServiceConfiguratorAdapter
   @Override
   public ProfileStep usingBlockingAllocationMode(int cycleDurationMillis, int timeoutMillis) {
     Assert.getInstance()
-        .greaterOrEqual(0, cycleDurationMillis, "cycleDurationMillis")
-        .greaterOrEqual(0, timeoutMillis, "timeoutMillis");
+        .greaterOrEqual(cycleDurationMillis, 0, "cycleDurationMillis")
+        .greaterOrEqual(timeoutMillis, 0, "timeoutMillis");
     this.isBlockingAllocationMode = true;
     this.cycleDurationMillis = cycleDurationMillis;
     this.timeoutMillis = timeoutMillis;
@@ -519,7 +631,7 @@ final class CardResourceServiceConfiguratorAdapter
 
     // check if all provided plugins are valid and known as configured regular or pool plugins.
     for (Plugin plugin : plugins) {
-      Assert.getInstance().notNull(plugin, "plugin");
+      Assert.getInstance().notNull(plugin, PLUGIN);
       if (!configuredPlugins.contains(plugin)) {
         throw new IllegalStateException("Plugin not configured: " + plugin.getName());
       }

@@ -15,6 +15,9 @@ import org.eclipse.keyple.core.common.KeypleCardResourceProfileExtension;
 import org.eclipse.keyple.core.service.ObservablePlugin;
 import org.eclipse.keyple.core.service.Plugin;
 import org.eclipse.keyple.core.service.PoolPlugin;
+import org.eclipse.keyple.core.service.resource.spi.ReaderConfiguratorSpi;
+import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
+import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
 
 /**
  * Configurator of the card resource service.
@@ -72,18 +75,29 @@ public interface CardResourceServiceConfigurator {
      * <p><u>Note:</u> The order of the plugins is important because it will be kept during the
      * allocation process unless redefined by card profiles.
      *
-     * <p>The plugin or readers must be observable for the monitoring operations to have an effect.
-     *
      * @param plugin The plugin to add.
-     * @param withReaderMonitoring true if the plugin must be observed to automatically detect
-     *     reader connections/disconnections, false otherwise.
-     * @param withCardMonitoring true if the readers must be observed to automatically detect card
-     *     insertions/removals, false otherwise.
      * @return Next configuration step.
      * @throws IllegalArgumentException If the provided plugin is null.
      * @since 2.0
      */
-    PluginStep addPlugin(Plugin plugin, boolean withReaderMonitoring, boolean withCardMonitoring);
+    PluginStep addPlugin(Plugin plugin);
+
+    /**
+     * Adds a {@link Plugin} or {@link ObservablePlugin} to the default list of all card profiles
+     * with background auto monitoring of reader connections/disconnections and/or card
+     * insertions/removals.
+     *
+     * <p><u>Note:</u> The order of the plugins is important because it will be kept during the
+     * allocation process unless redefined by card profiles.
+     *
+     * <p>The plugin or readers must be observable for the monitoring operations to have an effect.
+     *
+     * @param plugin The plugin to add.
+     * @return Next configuration step.
+     * @throws IllegalArgumentException If the provided plugin is null.
+     * @since 2.0
+     */
+    PluginMonitoringStep addPluginWithMonitoring(Plugin plugin);
 
     /**
      * Terminates the addition of plugins.
@@ -93,6 +107,55 @@ public interface CardResourceServiceConfigurator {
      * @since 2.0
      */
     CardResourceServiceConfigurator addNoMorePlugins();
+  }
+
+  /**
+   * Step to configure the monitoring settings of a plugin.
+   *
+   * @since 2.0
+   */
+  interface PluginMonitoringStep {
+
+    /**
+     * Configures the service to observe the plugin to automatically detect reader
+     * connections/disconnections.
+     *
+     * <p>The plugin must be observable for the monitoring operations to have an effect.
+     *
+     * @param exceptionHandlerSpi The exception handler to use when an exception occurs during the
+     *     asynchronous observation process.
+     * @param readerConfiguratorSpi The reader configurator to use when a new reader is connected
+     *     and accepted by at leas one card resource profile.
+     * @return Next configuration step.
+     * @throws IllegalArgumentException If the provided exception handler or reader configurator are
+     *     null.
+     * @since 2.0
+     */
+    PluginMonitoringStep withReaderMonitoring(
+        PluginObservationExceptionHandlerSpi exceptionHandlerSpi,
+        ReaderConfiguratorSpi readerConfiguratorSpi);
+
+    /**
+     * Configures the service to observe the reader to automatically detect card insertions/removals
+     *
+     * <p>The reader must be observable for the monitoring operations to have an effect.
+     *
+     * @param exceptionHandlerSpi The exception handler to use when an exception occurs during the
+     *     asynchronous observation process.
+     * @return Next configuration step.
+     * @throws IllegalArgumentException If the provided exception handler is null.
+     * @since 2.0
+     */
+    PluginMonitoringStep withCardMonitoring(
+        ReaderObservationExceptionHandlerSpi exceptionHandlerSpi);
+
+    /**
+     * Terminates the monitoring configuration of the current plugin.
+     *
+     * @return Next configuration step.
+     * @since 2.0
+     */
+    PluginStep endMonitoringConfiguration();
   }
 
   /**

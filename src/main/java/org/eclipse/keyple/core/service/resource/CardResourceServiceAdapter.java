@@ -16,6 +16,7 @@ import static org.eclipse.keyple.core.service.resource.CardResourceServiceConfig
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.keyple.core.service.*;
+import org.eclipse.keyple.core.service.resource.spi.ReaderConfiguratorSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 import org.eclipse.keyple.core.util.Assert;
@@ -209,7 +210,18 @@ final class CardResourceServiceAdapter
    */
   private ReaderManagerAdapter registerReader(Reader reader, Plugin plugin) {
 
-    ReaderManagerAdapter readerManager = new ReaderManagerAdapter(reader, plugin);
+    // Get the reader configurator if a monitoring is requested for this reader.
+    ReaderConfiguratorSpi readerConfiguratorSpi = null;
+    for (ConfiguredRegularPlugin configuredRegularPlugin :
+        configurator.getConfiguredRegularPlugins()) {
+      if (configuredRegularPlugin.getPlugin() == plugin) {
+        readerConfiguratorSpi = configuredRegularPlugin.getReaderConfiguratorSpi();
+        break;
+      }
+    }
+
+    ReaderManagerAdapter readerManager =
+        new ReaderManagerAdapter(reader, plugin, readerConfiguratorSpi);
     readerToReaderManagerMap.put(reader, readerManager);
 
     if (reader instanceof ObservableReader) {
@@ -286,9 +298,10 @@ final class CardResourceServiceAdapter
 
       if (configuredRegularPlugin.isWithReaderMonitoring()
           && configuredRegularPlugin.getPlugin() instanceof ObservablePlugin) {
+
         logger.info(
             "Start the monitoring of plugin '{}'", configuredRegularPlugin.getPlugin().getName());
-        ((ObservablePlugin) configuredRegularPlugin.getPlugin()).addObserver(this);
+        startPluginObservation(configuredRegularPlugin);
       }
 
       if (configuredRegularPlugin.isWithCardMonitoring()
@@ -296,8 +309,9 @@ final class CardResourceServiceAdapter
 
         for (ObservableReader reader :
             pluginToObservableReadersMap.get(configuredRegularPlugin.getPlugin())) {
+
           logger.info("Start the monitoring of reader '{}'", reader.getName());
-          reader.addObserver(this);
+          startReaderObservation(reader, configuredRegularPlugin);
         }
       }
     }
@@ -330,6 +344,7 @@ final class CardResourceServiceAdapter
 
       if (configuredRegularPlugin.isWithReaderMonitoring()
           && configuredRegularPlugin.getPlugin() instanceof ObservablePlugin) {
+
         logger.info(
             "Stop the monitoring of plugin '{}'", configuredRegularPlugin.getPlugin().getName());
         ((ObservablePlugin) configuredRegularPlugin.getPlugin()).removeObserver(this);
@@ -340,6 +355,7 @@ final class CardResourceServiceAdapter
 
         for (ObservableReader reader :
             pluginToObservableReadersMap.get(configuredRegularPlugin.getPlugin())) {
+
           logger.info("Stop the monitoring of reader '{}'", reader.getName());
           reader.removeObserver(this);
         }
@@ -537,10 +553,38 @@ final class CardResourceServiceAdapter
             && configuredRegularPlugin.isWithCardMonitoring()) {
 
           logger.info("Start the monitoring of reader '{}'", reader.getName());
-          ((ObservableReader) reader).addObserver(this);
+          startReaderObservation((ObservableReader) reader, configuredRegularPlugin);
         }
       }
     }
+  }
+
+  /**
+   * (private)<br>
+   * Starts the observation of the plugin.
+   *
+   * @param configuredRegularPlugin The associated configuration.
+   */
+  private void startPluginObservation(ConfiguredRegularPlugin configuredRegularPlugin) {
+    ObservablePlugin observablePlugin = (ObservablePlugin) configuredRegularPlugin.getPlugin();
+    observablePlugin.setPluginObservationExceptionHandler(
+        configuredRegularPlugin.getPluginObservationExceptionHandlerSpi());
+    observablePlugin.addObserver(this);
+  }
+
+  /**
+   * (private)<br>
+   * Starts the observation of the reader.
+   *
+   * @param observableReader The observable reader to observe.
+   * @param configuredRegularPlugin The associated configuration.
+   */
+  private void startReaderObservation(
+      ObservableReader observableReader, ConfiguredRegularPlugin configuredRegularPlugin) {
+    observableReader.setReaderObservationExceptionHandler(
+        configuredRegularPlugin.getReaderObservationExceptionHandlerSpi());
+    observableReader.addObserver(this);
+    observableReader.startCardDetection(ObservableReader.PollingMode.REPEATING);
   }
 
   /**
