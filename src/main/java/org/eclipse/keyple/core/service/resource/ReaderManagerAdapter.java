@@ -20,6 +20,7 @@ import org.eclipse.keyple.core.card.spi.CardResourceProfileExtensionSpi;
 import org.eclipse.keyple.core.card.spi.SmartCardSpi;
 import org.eclipse.keyple.core.service.Plugin;
 import org.eclipse.keyple.core.service.Reader;
+import org.eclipse.keyple.core.service.resource.spi.ReaderConfiguratorSpi;
 import org.eclipse.keyple.core.service.selection.spi.SmartCard;
 
 /**
@@ -42,6 +43,9 @@ class ReaderManagerAdapter {
   /** Collection of all created card resources. */
   private final Set<CardResource> cardResources;
 
+  /** The reader configurator, not null if the monitoring is activated for the associated reader. */
+  private final ReaderConfiguratorSpi readerConfiguratorSpi;
+
   /** Current selected card resource. */
   private CardResource selectedCardResource;
 
@@ -57,11 +61,14 @@ class ReaderManagerAdapter {
    *
    * @param reader The associated reader.
    * @param plugin The associated plugin.
+   * @param readerConfiguratorSpi The reader configurator to use if the monitoring is activated for
+   *     the associated reader (optional).
    * @since 2.0
    */
-  ReaderManagerAdapter(Reader reader, Plugin plugin) {
+  ReaderManagerAdapter(Reader reader, Plugin plugin, ReaderConfiguratorSpi readerConfiguratorSpi) {
     this.reader = reader;
     this.plugin = plugin;
+    this.readerConfiguratorSpi = readerConfiguratorSpi;
     this.cardResources = Collections.newSetFromMap(new ConcurrentHashMap<CardResource, Boolean>());
     this.selectedCardResource = null;
     this.isBusy = false;
@@ -114,12 +121,15 @@ class ReaderManagerAdapter {
 
   /**
    * (package-private)<br>
-   * Activates the reader manager.
+   * Activates the reader manager and setup the reader if needed.
    *
    * @since 2.0
    */
   void activate() {
-    this.isActive = true;
+    if (!isActive && readerConfiguratorSpi != null) {
+      readerConfiguratorSpi.setupReader(reader);
+    }
+    isActive = true;
   }
 
   /**
