@@ -76,11 +76,13 @@ public interface CardResourceServiceConfigurator {
      * allocation process unless redefined by card profiles.
      *
      * @param plugin The plugin to add.
+     * @param readerConfiguratorSpi The reader configurator to use when a reader is connected and
+     *     accepted by at leas one card resource profile.
      * @return Next configuration step.
-     * @throws IllegalArgumentException If the provided plugin is null.
+     * @throws IllegalArgumentException If the provided plugin or reader configurator is null.
      * @since 2.0
      */
-    PluginStep addPlugin(Plugin plugin);
+    PluginStep addPlugin(Plugin plugin, ReaderConfiguratorSpi readerConfiguratorSpi);
 
     /**
      * Adds a {@link Plugin} or {@link ObservablePlugin} to the default list of all card profiles
@@ -93,11 +95,14 @@ public interface CardResourceServiceConfigurator {
      * <p>The plugin or readers must be observable for the monitoring operations to have an effect.
      *
      * @param plugin The plugin to add.
+     * @param readerConfiguratorSpi The reader configurator to use when a reader is connected and
+     *     accepted by at leas one card resource profile.
      * @return Next configuration step.
-     * @throws IllegalArgumentException If the provided plugin is null.
+     * @throws IllegalArgumentException If the provided plugin or reader configurator is null.
      * @since 2.0
      */
-    PluginMonitoringStep addPluginWithMonitoring(Plugin plugin);
+    PluginMonitoringStep addPluginWithMonitoring(
+        Plugin plugin, ReaderConfiguratorSpi readerConfiguratorSpi);
 
     /**
      * Terminates the addition of plugins.
@@ -122,40 +127,47 @@ public interface CardResourceServiceConfigurator {
      *
      * <p>The plugin must be observable for the monitoring operations to have an effect.
      *
-     * @param exceptionHandlerSpi The exception handler to use when an exception occurs during the
-     *     asynchronous observation process.
-     * @param readerConfiguratorSpi The reader configurator to use when a new reader is connected
-     *     and accepted by at leas one card resource profile.
+     * @param pluginObservationExceptionHandlerSpi The exception handler to use when an exception
+     *     occurs during the asynchronous observation process.
      * @return Next configuration step.
-     * @throws IllegalArgumentException If the provided exception handler or reader configurator are
-     *     null.
+     * @throws IllegalArgumentException If the provided exception handler is null.
      * @since 2.0
      */
-    PluginMonitoringStep withReaderMonitoring(
-        PluginObservationExceptionHandlerSpi exceptionHandlerSpi,
-        ReaderConfiguratorSpi readerConfiguratorSpi);
+    PluginStep withPluginMonitoring(
+        PluginObservationExceptionHandlerSpi pluginObservationExceptionHandlerSpi);
 
     /**
      * Configures the service to observe the reader to automatically detect card insertions/removals
      *
      * <p>The reader must be observable for the monitoring operations to have an effect.
      *
-     * @param exceptionHandlerSpi The exception handler to use when an exception occurs during the
-     *     asynchronous observation process.
+     * @param readerObservationExceptionHandlerSpi The exception handler to use when an exception
+     *     occurs during the asynchronous observation process.
      * @return Next configuration step.
      * @throws IllegalArgumentException If the provided exception handler is null.
      * @since 2.0
      */
-    PluginMonitoringStep withCardMonitoring(
-        ReaderObservationExceptionHandlerSpi exceptionHandlerSpi);
+    PluginStep withReaderMonitoring(
+        ReaderObservationExceptionHandlerSpi readerObservationExceptionHandlerSpi);
 
     /**
-     * Terminates the monitoring configuration of the current plugin.
+     * Configures the service to observe the plugin to automatically detect reader
+     * connections/disconnections and the reader to automatically detect card insertions/removals.
      *
+     * <p>The plugin and the reader must be observable for the monitoring operations to have an
+     * effect.
+     *
+     * @param pluginObservationExceptionHandlerSpi The exception handler to use when an exception
+     *     occurs during the asynchronous plugin observation process.
+     * @param readerObservationExceptionHandlerSpi The exception handler to use when an exception
+     *     occurs during the asynchronous reader observation process.
      * @return Next configuration step.
+     * @throws IllegalArgumentException If one of the provided exception handler is null.
      * @since 2.0
      */
-    PluginStep endMonitoringConfiguration();
+    PluginStep withPluginAndReaderMonitoring(
+        PluginObservationExceptionHandlerSpi pluginObservationExceptionHandlerSpi,
+        ReaderObservationExceptionHandlerSpi readerObservationExceptionHandlerSpi);
   }
 
   /**
@@ -199,6 +211,9 @@ public interface CardResourceServiceConfigurator {
      * Configures the card resource service to use a blocking allocation mode with the default
      * timing parameters used during the allocation process.
      *
+     * <p>The default cycle duration is set to 100 milliseconds.<br>
+     * The default timeout duration is set to 15 seconds.
+     *
      * @return Next configuration step.
      * @see #usingBlockingAllocationMode(int, int)
      * @since 2.0
@@ -217,7 +232,7 @@ public interface CardResourceServiceConfigurator {
      * @param cycleDurationMillis A positive int.
      * @param timeoutMillis A positive int.
      * @return Next configuration step.
-     * @throws IllegalArgumentException If one of the provided values is negative.
+     * @throws IllegalArgumentException If one of the provided values is less or equal to 0.
      * @since 2.0
      */
     ProfileStep usingBlockingAllocationMode(int cycleDurationMillis, int timeoutMillis);
@@ -245,7 +260,7 @@ public interface CardResourceServiceConfigurator {
      * @return Next configuration step.
      * @since 2.0
      */
-    PluginStep usingFirstAllocationStrategy();
+    MaxUsageDurationStep usingFirstAllocationStrategy();
 
     /**
      * Configures the card resource service to provide available cards on a cyclical basis to avoid
@@ -254,7 +269,7 @@ public interface CardResourceServiceConfigurator {
      * @return Next configuration step.
      * @since 2.0
      */
-    PluginStep usingCyclicAllocationStrategy();
+    MaxUsageDurationStep usingCyclicAllocationStrategy();
 
     /**
      * Configures the card resource service to provide available cards randomly to avoid always
@@ -263,7 +278,34 @@ public interface CardResourceServiceConfigurator {
      * @return Next configuration step.
      * @since 2.0
      */
-    PluginStep usingRandomAllocationStrategy();
+    MaxUsageDurationStep usingRandomAllocationStrategy();
+  }
+
+  /**
+   * Step to configure the max usage duration of a card resource associated to reader of a "regular"
+   * plugin before it will be automatically released.
+   *
+   * @since 2.0
+   */
+  interface MaxUsageDurationStep {
+
+    /**
+     * Uses the default card resource max usage duration of 10 seconds.
+     *
+     * @return Next configuration step.
+     * @since 2.0
+     */
+    PluginStep usingDefaultMaxUsageDuration();
+
+    /**
+     * Uses the provided card resource max usage duration.
+     *
+     * @param maxUsageDurationMillis The max usage duration of a card resource (in milliseconds).
+     * @return Next configuration step.
+     * @throws IllegalArgumentException if the provided value is less or equal to 0.
+     * @since 2.0
+     */
+    PluginStep usingMaxUsageDuration(int maxUsageDurationMillis);
   }
 
   /**

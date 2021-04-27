@@ -221,7 +221,8 @@ final class CardResourceServiceAdapter
     }
 
     ReaderManagerAdapter readerManager =
-        new ReaderManagerAdapter(reader, plugin, readerConfiguratorSpi);
+        new ReaderManagerAdapter(
+            reader, plugin, readerConfiguratorSpi, configurator.getMaxUsageDurationMillis());
     readerToReaderManagerMap.put(reader, readerManager);
 
     if (reader instanceof ObservableReader) {
@@ -296,7 +297,7 @@ final class CardResourceServiceAdapter
     for (ConfiguredRegularPlugin configuredRegularPlugin :
         configurator.getConfiguredRegularPlugins()) {
 
-      if (configuredRegularPlugin.isWithReaderMonitoring()
+      if (configuredRegularPlugin.isWithPluginMonitoring()
           && configuredRegularPlugin.getPlugin() instanceof ObservablePlugin) {
 
         logger.info(
@@ -304,7 +305,7 @@ final class CardResourceServiceAdapter
         startPluginObservation(configuredRegularPlugin);
       }
 
-      if (configuredRegularPlugin.isWithCardMonitoring()
+      if (configuredRegularPlugin.isWithReaderMonitoring()
           && pluginToObservableReadersMap.containsKey(configuredRegularPlugin.getPlugin())) {
 
         for (ObservableReader reader :
@@ -342,7 +343,7 @@ final class CardResourceServiceAdapter
     for (ConfiguredRegularPlugin configuredRegularPlugin :
         configurator.getConfiguredRegularPlugins()) {
 
-      if (configuredRegularPlugin.isWithReaderMonitoring()
+      if (configuredRegularPlugin.isWithPluginMonitoring()
           && configuredRegularPlugin.getPlugin() instanceof ObservablePlugin) {
 
         logger.info(
@@ -350,7 +351,7 @@ final class CardResourceServiceAdapter
         ((ObservablePlugin) configuredRegularPlugin.getPlugin()).removeObserver(this);
       }
 
-      if (configuredRegularPlugin.isWithCardMonitoring()
+      if (configuredRegularPlugin.isWithReaderMonitoring()
           && pluginToObservableReadersMap.containsKey(configuredRegularPlugin.getPlugin())) {
 
         for (ObservableReader reader :
@@ -550,7 +551,7 @@ final class CardResourceServiceAdapter
           configurator.getConfiguredRegularPlugins()) {
 
         if (configuredRegularPlugin.getPlugin() == plugin
-            && configuredRegularPlugin.isWithCardMonitoring()) {
+            && configuredRegularPlugin.isWithReaderMonitoring()) {
 
           logger.info("Start the monitoring of reader '{}'", reader.getName());
           startReaderObservation((ObservableReader) reader, configuredRegularPlugin);

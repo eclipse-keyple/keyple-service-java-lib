@@ -22,6 +22,8 @@ import org.eclipse.keyple.core.service.Plugin;
 import org.eclipse.keyple.core.service.Reader;
 import org.eclipse.keyple.core.service.resource.spi.ReaderConfiguratorSpi;
 import org.eclipse.keyple.core.service.selection.spi.SmartCard;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
@@ -34,6 +36,8 @@ import org.eclipse.keyple.core.service.selection.spi.SmartCard;
  */
 class ReaderManagerAdapter {
 
+  private static final Logger logger = LoggerFactory.getLogger(ReaderManagerAdapter.class);
+
   /** The associated reader */
   private final Reader reader;
 
@@ -45,6 +49,15 @@ class ReaderManagerAdapter {
 
   /** The reader configurator, not null if the monitoring is activated for the associated reader. */
   private final ReaderConfiguratorSpi readerConfiguratorSpi;
+
+  /** The max usage duration of a card resource before it will be automatically release. */
+  private final int maxUsageDurationMillis;
+
+  /**
+   * Indicates the time after which the reader will be automatically unlocked if a new lock is
+   * requested.
+   */
+  private long lockMaxTimeMillis;
 
   /** Current selected card resource. */
   private CardResource selectedCardResource;
@@ -61,14 +74,20 @@ class ReaderManagerAdapter {
    *
    * @param reader The associated reader.
    * @param plugin The associated plugin.
-   * @param readerConfiguratorSpi The reader configurator to use if the monitoring is activated for
-   *     the associated reader (optional).
+   * @param readerConfiguratorSpi The reader configurator to use.
+   * @param maxUsageDurationMillis The max usage duration of a card resource before it will be
+   *     automatically release.
    * @since 2.0
    */
-  ReaderManagerAdapter(Reader reader, Plugin plugin, ReaderConfiguratorSpi readerConfiguratorSpi) {
+  ReaderManagerAdapter(
+      Reader reader,
+      Plugin plugin,
+      ReaderConfiguratorSpi readerConfiguratorSpi,
+      int maxUsageDurationMillis) {
     this.reader = reader;
     this.plugin = plugin;
     this.readerConfiguratorSpi = readerConfiguratorSpi;
+    this.maxUsageDurationMillis = maxUsageDurationMillis;
     this.cardResources = Collections.newSetFromMap(new ConcurrentHashMap<CardResource, Boolean>());
     this.selectedCardResource = null;
     this.isBusy = false;
@@ -126,7 +145,7 @@ class ReaderManagerAdapter {
    * @since 2.0
    */
   void activate() {
-    if (!isActive && readerConfiguratorSpi != null) {
+    if (!isActive) {
       readerConfiguratorSpi.setupReader(reader);
     }
     isActive = true;
@@ -174,7 +193,13 @@ class ReaderManagerAdapter {
    */
   boolean lock(CardResource cardResource, CardResourceProfileExtensionSpi extension) {
     if (isBusy) {
-      return false;
+      if (System.currentTimeMillis() < lockMaxTimeMillis) {
+        return false;
+      }
+      logger.warn(
+          "Reader '{}' automatically unlocked due to a usage duration over than {} milliseconds.",
+          reader.getName(),
+          maxUsageDurationMillis);
     }
     if (selectedCardResource != cardResource) {
       SmartCardSpi smartCard = extension.matches((ProxyReader) reader);
@@ -189,6 +214,7 @@ class ReaderManagerAdapter {
       }
       selectedCardResource = cardResource;
     }
+    lockMaxTimeMillis = System.currentTimeMillis() + maxUsageDurationMillis;
     isBusy = true;
     return true;
   }
