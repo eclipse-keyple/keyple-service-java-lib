@@ -252,13 +252,23 @@ class ReaderManagerAdapter {
    * @return A not null reference.
    */
   private CardResource getOrCreateCardResource(SmartCard smartCard) {
+
     // Check if an identical card resource is already created.
     for (CardResource cardResource : cardResources) {
-      if (Arrays.equals(cardResource.getSmartCard().getAtrBytes(), smartCard.getAtrBytes())
-          && Arrays.equals(cardResource.getSmartCard().getFciBytes(), smartCard.getFciBytes())) {
+
+      boolean hasSameAtr =
+          (!cardResource.getSmartCard().hasAtr() && !smartCard.hasAtr())
+              || Arrays.equals(cardResource.getSmartCard().getAtrBytes(), smartCard.getAtrBytes());
+
+      boolean hasSameFci =
+          (!cardResource.getSmartCard().hasFci() && !smartCard.hasFci())
+              || Arrays.equals(cardResource.getSmartCard().getFciBytes(), smartCard.getFciBytes());
+
+      if (hasSameAtr && hasSameFci) {
         return cardResource;
       }
     }
+
     // If none, then create a new one.
     CardResource cardResource = new CardResource(reader, smartCard);
     cardResources.add(cardResource);
