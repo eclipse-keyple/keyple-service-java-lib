@@ -158,12 +158,20 @@ class CardProfileManagerAdapter {
       CardResource cardResource =
           readerManager.matches(cardProfile.getCardResourceProfileExtension());
 
+      // The returned card resource may already be present in the current list if the service starts
+      // with an observable reader in which a card has been inserted.
       if (cardResource != null) {
-        cardResources.add(cardResource);
-
-        if (logger.isDebugEnabled()) {
+        if (!cardResources.contains(cardResource)) {
+          cardResources.add(cardResource);
+          if (logger.isDebugEnabled()) {
+            logger.debug(
+                "Add {} to card resource profile '{}'",
+                CardResourceServiceAdapter.getCardResourceInfo(cardResource),
+                cardProfile.getName());
+          }
+        } else if (logger.isDebugEnabled()) {
           logger.debug(
-              "Add {} to card resource profile '{}'",
+              "{} already present in card resource profile '{}'",
               CardResourceServiceAdapter.getCardResourceInfo(cardResource),
               cardProfile.getName());
         }
