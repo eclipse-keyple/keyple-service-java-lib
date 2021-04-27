@@ -90,13 +90,13 @@ final class CardResourceServiceAdapter
     if (cardResource != null) {
       return new StringBuilder()
           .append("card resource (")
-          .append(cardResource)
+          .append(System.identityHashCode(cardResource))
           .append(") - reader '")
           .append(cardResource.getReader().getName())
           .append("' (")
-          .append(cardResource.getReader())
+          .append(System.identityHashCode(cardResource.getReader()))
           .append(") - smart card (")
-          .append(cardResource.getSmartCard())
+          .append(System.identityHashCode(cardResource.getSmartCard()))
           .append(")")
           .toString();
     }
