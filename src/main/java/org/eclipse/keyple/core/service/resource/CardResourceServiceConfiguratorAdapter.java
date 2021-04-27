@@ -38,6 +38,7 @@ final class CardResourceServiceConfiguratorAdapter
         CardResourceServiceConfigurator.PoolPluginStep,
         CardResourceServiceConfigurator.AllocationModeStep,
         CardResourceServiceConfigurator.AllocationStrategyStep,
+        CardResourceServiceConfigurator.MaxUsageDurationStep,
         CardResourceServiceConfigurator.PoolAllocationStrategyStep,
         CardResourceServiceConfigurator.ProfileStep,
         CardResourceServiceConfigurator.ProfileParameterStep,
@@ -46,8 +47,9 @@ final class CardResourceServiceConfiguratorAdapter
   private static final Logger logger =
       LoggerFactory.getLogger(CardResourceServiceConfiguratorAdapter.class);
 
+  private static final int DEFAULT_MAX_USAGE_DURATION_MILLIS = 10000;
   private static final int DEFAULT_CYCLE_DURATION_MILLIS = 100;
-  private static final int DEFAULT_TIMEOUT_MILLIS = 10000;
+  private static final int DEFAULT_TIMEOUT_MILLIS = 15000;
   private static final String PLUGIN = "plugin";
 
   private AllocationStrategy allocationStrategy;
@@ -57,8 +59,9 @@ final class CardResourceServiceConfiguratorAdapter
   private final List<ConfiguredPoolPlugin> configuredPoolPlugins;
   private final List<CardProfile> cardProfiles;
   private boolean isBlockingAllocationMode;
-  private Integer cycleDurationMillis;
-  private Integer timeoutMillis;
+  private int maxUsageDurationMillis;
+  private int cycleDurationMillis;
+  private int timeoutMillis;
   private CardProfile cardProfile;
   private ConfiguredRegularPlugin currentConfiguredRegularPlugin;
 
@@ -83,13 +86,11 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public PluginMonitoringStep withReaderMonitoring(
-      PluginObservationExceptionHandlerSpi exceptionHandlerSpi,
-      ReaderConfiguratorSpi readerConfiguratorSpi) {
+  public PluginStep withPluginMonitoring(
+      PluginObservationExceptionHandlerSpi pluginObservationExceptionHandlerSpi) {
     Assert.getInstance()
-        .notNull(exceptionHandlerSpi, "exceptionHandlerSpi")
-        .notNull(readerConfiguratorSpi, "readerConfiguratorSpi");
-    currentConfiguredRegularPlugin.setReaderMonitoring(exceptionHandlerSpi, readerConfiguratorSpi);
+        .notNull(pluginObservationExceptionHandlerSpi, "pluginObservationExceptionHandlerSpi");
+    currentConfiguredRegularPlugin.setPluginMonitoring(pluginObservationExceptionHandlerSpi);
     return this;
   }
 
@@ -99,10 +100,11 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public PluginMonitoringStep withCardMonitoring(
-      ReaderObservationExceptionHandlerSpi exceptionHandlerSpi) {
-    Assert.getInstance().notNull(exceptionHandlerSpi, "exceptionHandlerSpi");
-    currentConfiguredRegularPlugin.setCardMonitoring(exceptionHandlerSpi);
+  public PluginStep withReaderMonitoring(
+      ReaderObservationExceptionHandlerSpi readerObservationExceptionHandlerSpi) {
+    Assert.getInstance()
+        .notNull(readerObservationExceptionHandlerSpi, "readerObservationExceptionHandlerSpi");
+    currentConfiguredRegularPlugin.setReaderMonitoring(readerObservationExceptionHandlerSpi);
     return this;
   }
 
@@ -112,7 +114,11 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public PluginStep endMonitoringConfiguration() {
+  public PluginStep withPluginAndReaderMonitoring(
+      PluginObservationExceptionHandlerSpi pluginObservationExceptionHandlerSpi,
+      ReaderObservationExceptionHandlerSpi readerObservationExceptionHandlerSpi) {
+    withPluginMonitoring(pluginObservationExceptionHandlerSpi);
+    withReaderMonitoring(readerObservationExceptionHandlerSpi);
     return this;
   }
 
@@ -146,29 +152,30 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   static class ConfiguredRegularPlugin {
+
     private final Plugin plugin;
-    private boolean withReaderMonitoring;
+    private final ReaderConfiguratorSpi readerConfiguratorSpi;
+
+    private boolean withPluginMonitoring;
     private PluginObservationExceptionHandlerSpi pluginObservationExceptionHandlerSpi;
-    private ReaderConfiguratorSpi readerConfiguratorSpi;
-    private boolean withCardMonitoring;
+
+    private boolean withReaderMonitoring;
     private ReaderObservationExceptionHandlerSpi readerObservationExceptionHandlerSpi;
 
-    private ConfiguredRegularPlugin(Plugin plugin) {
+    private ConfiguredRegularPlugin(Plugin plugin, ReaderConfiguratorSpi readerConfiguratorSpi) {
       this.plugin = plugin;
+      this.readerConfiguratorSpi = readerConfiguratorSpi;
     }
 
     /**
      * (private)<br>
      *
      * @param pluginObservationExceptionHandlerSpi The exception handler.
-     * @param readerConfiguratorSpi The reader configurator.
      */
-    private void setReaderMonitoring(
-        PluginObservationExceptionHandlerSpi pluginObservationExceptionHandlerSpi,
-        ReaderConfiguratorSpi readerConfiguratorSpi) {
-      this.withReaderMonitoring = true;
+    private void setPluginMonitoring(
+        PluginObservationExceptionHandlerSpi pluginObservationExceptionHandlerSpi) {
+      this.withPluginMonitoring = true;
       this.pluginObservationExceptionHandlerSpi = pluginObservationExceptionHandlerSpi;
-      this.readerConfiguratorSpi = readerConfiguratorSpi;
     }
 
     /**
@@ -176,9 +183,9 @@ final class CardResourceServiceConfiguratorAdapter
      *
      * @param readerObservationExceptionHandlerSpi The exception handler.
      */
-    private void setCardMonitoring(
+    private void setReaderMonitoring(
         ReaderObservationExceptionHandlerSpi readerObservationExceptionHandlerSpi) {
-      this.withCardMonitoring = true;
+      this.withReaderMonitoring = true;
       this.readerObservationExceptionHandlerSpi = readerObservationExceptionHandlerSpi;
     }
 
@@ -198,8 +205,8 @@ final class CardResourceServiceConfiguratorAdapter
      * @return true if the reader monitoring is required.
      * @since 2.0
      */
-    boolean isWithReaderMonitoring() {
-      return withReaderMonitoring;
+    boolean isWithPluginMonitoring() {
+      return withPluginMonitoring;
     }
 
     /**
@@ -229,8 +236,8 @@ final class CardResourceServiceConfiguratorAdapter
      * @return true if the card monitoring is required.
      * @since 2.0
      */
-    boolean isWithCardMonitoring() {
-      return withCardMonitoring;
+    boolean isWithReaderMonitoring() {
+      return withReaderMonitoring;
     }
 
     /**
@@ -382,7 +389,7 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public PluginStep usingFirstAllocationStrategy() {
+  public MaxUsageDurationStep usingFirstAllocationStrategy() {
     allocationStrategy = AllocationStrategy.FIRST;
     return this;
   }
@@ -393,7 +400,7 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public PluginStep usingCyclicAllocationStrategy() {
+  public MaxUsageDurationStep usingCyclicAllocationStrategy() {
     allocationStrategy = AllocationStrategy.CYCLIC;
     return this;
   }
@@ -404,7 +411,7 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public PluginStep usingRandomAllocationStrategy() {
+  public MaxUsageDurationStep usingRandomAllocationStrategy() {
     allocationStrategy = AllocationStrategy.RANDOM;
     return this;
   }
@@ -415,10 +422,19 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public PluginStep addPlugin(Plugin plugin) {
-    Assert.getInstance().notNull(plugin, PLUGIN);
-    configuredPlugins.add(plugin);
-    configuredRegularPlugins.add(new ConfiguredRegularPlugin(plugin));
+  public PluginStep usingDefaultMaxUsageDuration() {
+    return usingMaxUsageDuration(DEFAULT_MAX_USAGE_DURATION_MILLIS);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public PluginStep usingMaxUsageDuration(int maxUsageDurationMillis) {
+    Assert.getInstance().greaterOrEqual(maxUsageDurationMillis, 1, "maxUsageDurationMillis");
+    this.maxUsageDurationMillis = maxUsageDurationMillis;
     return this;
   }
 
@@ -428,10 +444,28 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public PluginMonitoringStep addPluginWithMonitoring(Plugin plugin) {
-    Assert.getInstance().notNull(plugin, PLUGIN);
+  public PluginStep addPlugin(Plugin plugin, ReaderConfiguratorSpi readerConfiguratorSpi) {
+    Assert.getInstance()
+        .notNull(plugin, PLUGIN)
+        .notNull(readerConfiguratorSpi, "readerConfiguratorSpi");
     configuredPlugins.add(plugin);
-    currentConfiguredRegularPlugin = new ConfiguredRegularPlugin(plugin);
+    configuredRegularPlugins.add(new ConfiguredRegularPlugin(plugin, readerConfiguratorSpi));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public PluginMonitoringStep addPluginWithMonitoring(
+      Plugin plugin, ReaderConfiguratorSpi readerConfiguratorSpi) {
+    Assert.getInstance()
+        .notNull(plugin, PLUGIN)
+        .notNull(readerConfiguratorSpi, "readerConfiguratorSpi");
+    configuredPlugins.add(plugin);
+    currentConfiguredRegularPlugin = new ConfiguredRegularPlugin(plugin, readerConfiguratorSpi);
     configuredRegularPlugins.add(currentConfiguredRegularPlugin);
     return this;
   }
@@ -545,8 +579,8 @@ final class CardResourceServiceConfiguratorAdapter
   @Override
   public ProfileStep usingBlockingAllocationMode(int cycleDurationMillis, int timeoutMillis) {
     Assert.getInstance()
-        .greaterOrEqual(cycleDurationMillis, 0, "cycleDurationMillis")
-        .greaterOrEqual(timeoutMillis, 0, "timeoutMillis");
+        .greaterOrEqual(cycleDurationMillis, 1, "cycleDurationMillis")
+        .greaterOrEqual(timeoutMillis, 1, "timeoutMillis");
     this.isBlockingAllocationMode = true;
     this.cycleDurationMillis = cycleDurationMillis;
     this.timeoutMillis = timeoutMillis;
@@ -829,6 +863,16 @@ final class CardResourceServiceConfiguratorAdapter
    */
   public boolean isBlockingAllocationMode() {
     return isBlockingAllocationMode;
+  }
+
+  /**
+   * (package-private)<br>
+   *
+   * @return A positive int.
+   * @since 2.0
+   */
+  int getMaxUsageDurationMillis() {
+    return maxUsageDurationMillis;
   }
 
   /**
