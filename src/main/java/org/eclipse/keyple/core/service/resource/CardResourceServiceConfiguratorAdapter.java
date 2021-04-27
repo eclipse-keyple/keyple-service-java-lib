@@ -27,12 +27,14 @@ import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
- * Implementation of {@link CardResourceServiceConfigurator}.
+ * Implementation of {@link CardResourceServiceConfigurator} and {@link
+ * MinimalCardResourceServiceConfigurator}.
  *
  * @since 2.0
  */
 final class CardResourceServiceConfiguratorAdapter
     implements CardResourceServiceConfigurator,
+        MinimalCardResourceServiceConfigurator,
         CardResourceServiceConfigurator.PluginStep,
         CardResourceServiceConfigurator.PluginMonitoringStep,
         CardResourceServiceConfigurator.PoolPluginStep,
@@ -50,6 +52,7 @@ final class CardResourceServiceConfiguratorAdapter
   private static final int DEFAULT_USAGE_TIMEOUT_MILLIS = 10000;
   private static final int DEFAULT_CYCLE_DURATION_MILLIS = 100;
   private static final int DEFAULT_TIMEOUT_MILLIS = 15000;
+  private static final String DEFAULT_PROFILE_NAME = "DEFAULT_PROFILE_NAME";
   private static final String PLUGIN = "plugin";
 
   private AllocationStrategy allocationStrategy;
@@ -120,6 +123,58 @@ final class CardResourceServiceConfiguratorAdapter
     withPluginMonitoring(pluginObservationExceptionHandlerSpi);
     withReaderMonitoring(readerObservationExceptionHandlerSpi);
     return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public ConfigurationStep withPlugin(
+      Plugin plugin,
+      ReaderConfiguratorSpi readerConfiguratorSpi,
+      KeypleCardResourceProfileExtension cardResourceProfileExtension,
+      String readerNameRegex) {
+
+    if (readerNameRegex == null || readerNameRegex.isEmpty()) {
+      readerNameRegex = ".*";
+    }
+
+    return withPlugins()
+        .usingFirstAllocationStrategy()
+        .usingDefaultUsageTimeout()
+        .addPlugin(plugin, readerConfiguratorSpi)
+        .addNoMorePlugins()
+        .endPluginsConfiguration()
+        .usingNonBlockingAllocationMode()
+        .addCardResourceProfile(DEFAULT_PROFILE_NAME, cardResourceProfileExtension)
+        .setReaderNameRegex(readerNameRegex)
+        .addNoMoreParameters()
+        .addNoMoreCardResourceProfiles();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public ConfigurationStep withPoolPlugin(
+      PoolPlugin poolPlugin,
+      KeypleCardResourceProfileExtension cardResourceProfileExtension,
+      String readerGroupReference) {
+
+    return withPoolPlugins()
+        .usingPoolPluginFirstAllocationStrategy()
+        .addPoolPlugin(poolPlugin)
+        .addNoMorePoolPlugins()
+        .endPluginsConfiguration()
+        .usingNonBlockingAllocationMode()
+        .addCardResourceProfile(DEFAULT_PROFILE_NAME, cardResourceProfileExtension)
+        .setReaderGroupReference(readerGroupReference)
+        .addNoMoreParameters()
+        .addNoMoreCardResourceProfiles();
   }
 
   /**

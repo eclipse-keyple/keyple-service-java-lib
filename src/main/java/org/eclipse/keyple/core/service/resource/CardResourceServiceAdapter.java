@@ -166,6 +166,16 @@ final class CardResourceServiceAdapter
    * @since 2.0
    */
   @Override
+  public MinimalCardResourceServiceConfigurator getMinimalConfigurator() {
+    return new CardResourceServiceConfiguratorAdapter();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
   public void start() {
     if (configurator == null) {
       throw new IllegalStateException("The card resource service is not configured.");
@@ -392,6 +402,22 @@ final class CardResourceServiceAdapter
     }
 
     return cardResource;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public CardResource getCardResource() {
+    for (String cardProfileName : cardProfileNameToCardProfileManagerMap.keySet()) {
+      CardResource cardResource = getCardResource(cardProfileName);
+      if (cardResource != null) {
+        return cardResource;
+      }
+    }
+    return null;
   }
 
   /**
