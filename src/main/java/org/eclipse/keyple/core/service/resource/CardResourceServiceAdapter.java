@@ -222,7 +222,7 @@ final class CardResourceServiceAdapter
 
     ReaderManagerAdapter readerManager =
         new ReaderManagerAdapter(
-            reader, plugin, readerConfiguratorSpi, configurator.getMaxUsageDurationMillis());
+            reader, plugin, readerConfiguratorSpi, configurator.getUsageTimeoutMillis());
     readerToReaderManagerMap.put(reader, readerManager);
 
     if (reader instanceof ObservableReader) {

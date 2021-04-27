@@ -51,7 +51,7 @@ class ReaderManagerAdapter {
   private final ReaderConfiguratorSpi readerConfiguratorSpi;
 
   /** The max usage duration of a card resource before it will be automatically release. */
-  private final int maxUsageDurationMillis;
+  private final int usageTimeoutMillis;
 
   /**
    * Indicates the time after which the reader will be automatically unlocked if a new lock is
@@ -75,7 +75,7 @@ class ReaderManagerAdapter {
    * @param reader The associated reader.
    * @param plugin The associated plugin.
    * @param readerConfiguratorSpi The reader configurator to use.
-   * @param maxUsageDurationMillis The max usage duration of a card resource before it will be
+   * @param usageTimeoutMillis The max usage duration of a card resource before it will be
    *     automatically release.
    * @since 2.0
    */
@@ -83,11 +83,11 @@ class ReaderManagerAdapter {
       Reader reader,
       Plugin plugin,
       ReaderConfiguratorSpi readerConfiguratorSpi,
-      int maxUsageDurationMillis) {
+      int usageTimeoutMillis) {
     this.reader = reader;
     this.plugin = plugin;
     this.readerConfiguratorSpi = readerConfiguratorSpi;
-    this.maxUsageDurationMillis = maxUsageDurationMillis;
+    this.usageTimeoutMillis = usageTimeoutMillis;
     this.cardResources = Collections.newSetFromMap(new ConcurrentHashMap<CardResource, Boolean>());
     this.selectedCardResource = null;
     this.isBusy = false;
@@ -199,7 +199,7 @@ class ReaderManagerAdapter {
       logger.warn(
           "Reader '{}' automatically unlocked due to a usage duration over than {} milliseconds.",
           reader.getName(),
-          maxUsageDurationMillis);
+          usageTimeoutMillis);
     }
     if (selectedCardResource != cardResource) {
       SmartCardSpi smartCard = extension.matches((ProxyReader) reader);
@@ -214,7 +214,7 @@ class ReaderManagerAdapter {
       }
       selectedCardResource = cardResource;
     }
-    lockMaxTimeMillis = System.currentTimeMillis() + maxUsageDurationMillis;
+    lockMaxTimeMillis = System.currentTimeMillis() + usageTimeoutMillis;
     isBusy = true;
     return true;
   }

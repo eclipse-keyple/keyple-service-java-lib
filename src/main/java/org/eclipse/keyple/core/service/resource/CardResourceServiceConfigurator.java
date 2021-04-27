@@ -260,7 +260,7 @@ public interface CardResourceServiceConfigurator {
      * @return Next configuration step.
      * @since 2.0
      */
-    MaxUsageDurationStep usingFirstAllocationStrategy();
+    UsageTimeoutStep usingFirstAllocationStrategy();
 
     /**
      * Configures the card resource service to provide available cards on a cyclical basis to avoid
@@ -269,7 +269,7 @@ public interface CardResourceServiceConfigurator {
      * @return Next configuration step.
      * @since 2.0
      */
-    MaxUsageDurationStep usingCyclicAllocationStrategy();
+    UsageTimeoutStep usingCyclicAllocationStrategy();
 
     /**
      * Configures the card resource service to provide available cards randomly to avoid always
@@ -278,7 +278,7 @@ public interface CardResourceServiceConfigurator {
      * @return Next configuration step.
      * @since 2.0
      */
-    MaxUsageDurationStep usingRandomAllocationStrategy();
+    UsageTimeoutStep usingRandomAllocationStrategy();
   }
 
   /**
@@ -287,7 +287,7 @@ public interface CardResourceServiceConfigurator {
    *
    * @since 2.0
    */
-  interface MaxUsageDurationStep {
+  interface UsageTimeoutStep {
 
     /**
      * Uses the default card resource max usage duration of 10 seconds.
@@ -295,17 +295,17 @@ public interface CardResourceServiceConfigurator {
      * @return Next configuration step.
      * @since 2.0
      */
-    PluginStep usingDefaultMaxUsageDuration();
+    PluginStep usingDefaultUsageTimeout();
 
     /**
      * Uses the provided card resource max usage duration.
      *
-     * @param maxUsageDurationMillis The max usage duration of a card resource (in milliseconds).
+     * @param usageTimeoutMillis The max usage duration of a card resource (in milliseconds).
      * @return Next configuration step.
      * @throws IllegalArgumentException if the provided value is less or equal to 0.
      * @since 2.0
      */
-    PluginStep usingMaxUsageDuration(int maxUsageDurationMillis);
+    PluginStep usingUsageTimeout(int usageTimeoutMillis);
   }
 
   /**

@@ -38,7 +38,7 @@ final class CardResourceServiceConfiguratorAdapter
         CardResourceServiceConfigurator.PoolPluginStep,
         CardResourceServiceConfigurator.AllocationModeStep,
         CardResourceServiceConfigurator.AllocationStrategyStep,
-        CardResourceServiceConfigurator.MaxUsageDurationStep,
+        CardResourceServiceConfigurator.UsageTimeoutStep,
         CardResourceServiceConfigurator.PoolAllocationStrategyStep,
         CardResourceServiceConfigurator.ProfileStep,
         CardResourceServiceConfigurator.ProfileParameterStep,
@@ -47,7 +47,7 @@ final class CardResourceServiceConfiguratorAdapter
   private static final Logger logger =
       LoggerFactory.getLogger(CardResourceServiceConfiguratorAdapter.class);
 
-  private static final int DEFAULT_MAX_USAGE_DURATION_MILLIS = 10000;
+  private static final int DEFAULT_USAGE_TIMEOUT_MILLIS = 10000;
   private static final int DEFAULT_CYCLE_DURATION_MILLIS = 100;
   private static final int DEFAULT_TIMEOUT_MILLIS = 15000;
   private static final String PLUGIN = "plugin";
@@ -59,7 +59,7 @@ final class CardResourceServiceConfiguratorAdapter
   private final List<ConfiguredPoolPlugin> configuredPoolPlugins;
   private final List<CardProfile> cardProfiles;
   private boolean isBlockingAllocationMode;
-  private int maxUsageDurationMillis;
+  private int usageTimeoutMillis;
   private int cycleDurationMillis;
   private int timeoutMillis;
   private CardProfile cardProfile;
@@ -389,7 +389,7 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public MaxUsageDurationStep usingFirstAllocationStrategy() {
+  public UsageTimeoutStep usingFirstAllocationStrategy() {
     allocationStrategy = AllocationStrategy.FIRST;
     return this;
   }
@@ -400,7 +400,7 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public MaxUsageDurationStep usingCyclicAllocationStrategy() {
+  public UsageTimeoutStep usingCyclicAllocationStrategy() {
     allocationStrategy = AllocationStrategy.CYCLIC;
     return this;
   }
@@ -411,7 +411,7 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public MaxUsageDurationStep usingRandomAllocationStrategy() {
+  public UsageTimeoutStep usingRandomAllocationStrategy() {
     allocationStrategy = AllocationStrategy.RANDOM;
     return this;
   }
@@ -422,8 +422,8 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public PluginStep usingDefaultMaxUsageDuration() {
-    return usingMaxUsageDuration(DEFAULT_MAX_USAGE_DURATION_MILLIS);
+  public PluginStep usingDefaultUsageTimeout() {
+    return usingUsageTimeout(DEFAULT_USAGE_TIMEOUT_MILLIS);
   }
 
   /**
@@ -432,9 +432,9 @@ final class CardResourceServiceConfiguratorAdapter
    * @since 2.0
    */
   @Override
-  public PluginStep usingMaxUsageDuration(int maxUsageDurationMillis) {
-    Assert.getInstance().greaterOrEqual(maxUsageDurationMillis, 1, "maxUsageDurationMillis");
-    this.maxUsageDurationMillis = maxUsageDurationMillis;
+  public PluginStep usingUsageTimeout(int usageTimeoutMillis) {
+    Assert.getInstance().greaterOrEqual(usageTimeoutMillis, 1, "usageTimeoutMillis");
+    this.usageTimeoutMillis = usageTimeoutMillis;
     return this;
   }
 
@@ -871,8 +871,8 @@ final class CardResourceServiceConfiguratorAdapter
    * @return A positive int.
    * @since 2.0
    */
-  int getMaxUsageDurationMillis() {
-    return maxUsageDurationMillis;
+  int getUsageTimeoutMillis() {
+    return usageTimeoutMillis;
   }
 
   /**
