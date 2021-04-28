@@ -22,6 +22,7 @@ import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.AutonomousSelectionReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.service.selection.CardSelector;
+import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.slf4j.Logger;
@@ -136,7 +137,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   @Override
   final List<KeypleCardSelectionResponse> processCardSelectionRequests(
       List<CardSelectionRequest> cardSelectionRequests,
-      org.eclipse.keyple.core.card.MultiSelectionProcessing multiSelectionProcessing,
+      MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
       throws ReaderCommunicationException, CardCommunicationException,
           UnexpectedStatusCodeException {

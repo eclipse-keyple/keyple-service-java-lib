@@ -19,6 +19,7 @@ import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
 import org.eclipse.keyple.core.distributed.local.LocalServiceApi;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceSpi;
+import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 import org.eclipse.keyple.core.util.json.BodyError;
@@ -417,9 +418,9 @@ final class DistributedLocalServiceAdapter
 
     /**
      * Refers to {@link
-     * ObservableLocalReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenario,
+     * ObservableLocalReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
      * ObservableReader.NotificationMode, ObservableReader.PollingMode)} and {@link
-     * ObservableRemoteReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenario,
+     * ObservableRemoteReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
      * ObservableReader.NotificationMode, ObservableReader.PollingMode)}
      *
      * @since 2.0
@@ -620,11 +621,11 @@ final class DistributedLocalServiceAdapter
     private void scheduleCardSelectionScenario() {
 
       // Extract info from the message
-      CardSelectionScenario cardSelectionScenario =
+      CardSelectionScenarioAdapter cardSelectionScenario =
           JsonUtil.getParser()
               .fromJson(
                   input.get(JsonProperty.CARD_SELECTION_SCENARIO.name()),
-                  CardSelectionScenario.class);
+                  CardSelectionScenarioAdapter.class);
 
       ObservableReader.NotificationMode notificationMode =
           ObservableReader.NotificationMode.valueOf(

@@ -123,9 +123,9 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
   /**
    * (package-private)<br>
-   * If defined, the prepared {@link CardSelectionScenario} will be processed as soon as a card is
-   * inserted. The result of this request set will be added to the reader event notified to the
-   * application.
+   * If defined, the prepared {@link CardSelectionScenarioAdapter} will be processed as soon as a
+   * card is inserted. The result of this request set will be added to the reader event notified to
+   * the application.
    *
    * <p>If it is not defined (set to null), a simple card detection will be notified in the end.
    *
@@ -139,7 +139,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    * @since 2.0
    */
   void scheduleCardSelectionScenario(
-      CardSelectionScenario cardSelectionScenario,
+      CardSelectionScenarioAdapter cardSelectionScenario,
       ObservableReader.NotificationMode notificationMode,
       ObservableReader.PollingMode pollingMode) {
 

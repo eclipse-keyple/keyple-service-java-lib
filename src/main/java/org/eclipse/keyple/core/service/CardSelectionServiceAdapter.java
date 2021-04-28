@@ -33,7 +33,7 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
 
   private final List<CardSelectionSpi> cardSelections;
   private final List<CardSelectionRequest> cardSelectionRequests;
-  private final org.eclipse.keyple.core.card.MultiSelectionProcessing multiSelectionProcessing;
+  private final MultiSelectionProcessing multiSelectionProcessing;
   private ChannelControl channelControl = ChannelControl.KEEP_OPEN;
 
   /**
@@ -44,10 +44,7 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    * @since 2.0
    */
   CardSelectionServiceAdapter(MultiSelectionProcessing multiSelectionProcessing) {
-    this.multiSelectionProcessing =
-        multiSelectionProcessing == MultiSelectionProcessing.PROCESS_ALL
-            ? org.eclipse.keyple.core.card.MultiSelectionProcessing.PROCESS_ALL
-            : org.eclipse.keyple.core.card.MultiSelectionProcessing.FIRST_MATCH;
+    this.multiSelectionProcessing = multiSelectionProcessing;
     cardSelections = new ArrayList<CardSelectionSpi>();
     cardSelectionRequests = new ArrayList<CardSelectionRequest>();
   }
@@ -127,8 +124,9 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
       ObservableReader observableReader,
       ObservableReader.NotificationMode notificationMode,
       ObservableReader.PollingMode pollingMode) {
-    CardSelectionScenario cardSelectionScenario =
-        new CardSelectionScenario(cardSelectionRequests, multiSelectionProcessing, channelControl);
+    CardSelectionScenarioAdapter cardSelectionScenario =
+        new CardSelectionScenarioAdapter(
+            cardSelectionRequests, multiSelectionProcessing, channelControl);
     ((ObservableLocalReaderAdapter) observableReader)
         .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, pollingMode);
   }

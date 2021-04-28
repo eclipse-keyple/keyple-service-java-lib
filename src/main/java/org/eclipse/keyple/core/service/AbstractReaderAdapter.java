@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.keyple.core.card.*;
 import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
+import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
