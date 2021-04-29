@@ -15,7 +15,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.*;
 import org.eclipse.keyple.core.card.*;
-import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
 import org.eclipse.keyple.core.distributed.local.LocalServiceApi;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceSpi;
@@ -601,7 +600,7 @@ final class DistributedLocalServiceAdapter
           ChannelControl.valueOf(input.get(JsonProperty.CHANNEL_CONTROL.name()).getAsString());
 
       // Execute the service on the reader
-      List<KeypleCardSelectionResponse> cardSelectionResponses =
+      List<CardSelectionResponse> cardSelectionResponses =
           reader.transmitCardSelectionRequests(
               cardSelectionRequests, multiSelectionProcessing, channelControl);
 
@@ -611,7 +610,7 @@ final class DistributedLocalServiceAdapter
           JsonUtil.getParser()
               .toJsonTree(
                   cardSelectionResponses,
-                  new TypeToken<ArrayList<KeypleCardSelectionResponse>>() {}.getType()));
+                  new TypeToken<ArrayList<CardSelectionResponse>>() {}.getType()));
     }
 
     /**

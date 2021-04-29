@@ -11,9 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import java.util.List;
-import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.common.KeypleReaderEvent;
+import org.eclipse.keyple.core.service.selection.ScheduledCardSelectionsResponse;
 
 /**
  * This POJO contains all information about a change of card state within an {@link
@@ -28,7 +27,7 @@ public final class ReaderEvent implements KeypleReaderEvent {
 
   private final String pluginName;
   private final String readerName;
-  private final List<KeypleCardSelectionResponse> cardSelectionResponses;
+  private final ScheduledCardSelectionsResponse scheduledCardSelectionsResponse;
 
   /**
    * The different types of reader events, reflecting the status of the reader regarding the
@@ -75,19 +74,19 @@ public final class ReaderEvent implements KeypleReaderEvent {
    * @param pluginName The name of the current plugin (should be not null).
    * @param readerName The name of the current reader (should be not null).
    * @param eventType The type of event (should be not null).
-   * @param cardSelectionResponses The responses received during the execution of the card selection
-   *     scenario (can be null).
+   * @param scheduledCardSelectionsResponse The responses received during the execution of the card
+   *     selection scenario (can be null).
    * @since 2.0
    */
   public ReaderEvent(
       String pluginName,
       String readerName,
       EventType eventType,
-      List<KeypleCardSelectionResponse> cardSelectionResponses) {
+      ScheduledCardSelectionsResponse scheduledCardSelectionsResponse) {
     this.pluginName = pluginName;
     this.readerName = readerName;
     this.eventType = eventType;
-    this.cardSelectionResponses = cardSelectionResponses;
+    this.scheduledCardSelectionsResponse = scheduledCardSelectionsResponse;
   }
 
   /**
@@ -125,10 +124,10 @@ public final class ReaderEvent implements KeypleReaderEvent {
    * EventType#CARD_INSERTED}, always present when the event is {@link EventType#CARD_MATCHED} and
    * null in the others cases.
    *
-   * @return A nullable value.
+   * @return null if the event is not carrying a {@link ScheduledCardSelectionsResponse}.
    * @since 2.0
    */
-  public List<KeypleCardSelectionResponse> getCardSelectionResponses() {
-    return cardSelectionResponses;
+  public ScheduledCardSelectionsResponse getScheduledCardSelectionsResponse() {
+    return scheduledCardSelectionsResponse;
   }
 }

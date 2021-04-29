@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.eclipse.keyple.core.card.*;
-import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
@@ -105,7 +104,7 @@ public class LocalReaderAdapterTest {
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<KeypleCardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponse> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
             new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
             MultiSelectionProcessing.FIRST_MATCH,
@@ -135,7 +134,7 @@ public class LocalReaderAdapterTest {
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<KeypleCardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponse> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
             new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
             MultiSelectionProcessing.PROCESS_ALL,
@@ -165,7 +164,7 @@ public class LocalReaderAdapterTest {
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<KeypleCardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponse> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
             new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
             MultiSelectionProcessing.FIRST_MATCH,
@@ -196,7 +195,7 @@ public class LocalReaderAdapterTest {
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<KeypleCardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponse> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
             new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
             MultiSelectionProcessing.FIRST_MATCH,
@@ -230,7 +229,7 @@ public class LocalReaderAdapterTest {
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<KeypleCardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponse> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
             new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
             MultiSelectionProcessing.FIRST_MATCH,
@@ -270,7 +269,7 @@ public class LocalReaderAdapterTest {
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<KeypleCardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponse> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
             new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
             MultiSelectionProcessing.FIRST_MATCH,
@@ -311,7 +310,7 @@ public class LocalReaderAdapterTest {
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<KeypleCardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponse> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
             new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
             MultiSelectionProcessing.FIRST_MATCH,
@@ -350,7 +349,7 @@ public class LocalReaderAdapterTest {
     localReaderAdapter.register();
     localReaderAdapter.activateProtocol(CARD_PROTOCOL, CARD_PROTOCOL);
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<KeypleCardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponse> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
             new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
             MultiSelectionProcessing.FIRST_MATCH,
