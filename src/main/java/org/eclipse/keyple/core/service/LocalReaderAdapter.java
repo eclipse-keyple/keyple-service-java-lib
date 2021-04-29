@@ -22,6 +22,7 @@ import org.eclipse.keyple.core.plugin.spi.reader.AutonomousSelectionReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.service.selection.CardSelector;
 import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
+import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.slf4j.Logger;
@@ -388,7 +389,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     apduResponse = new ApduResponse(readerSpi.transmitApdu(apduRequest.getBytes()));
 
-    if (apduRequest.isCase4()
+    if (ApduUtil.isCase4(apduRequest.getBytes())
         && apduResponse.getDataOut().length == 0
         && apduResponse.getStatusCode() == DEFAULT_SUCCESSFUL_CODE) {
       // do the get response command
@@ -651,7 +652,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    */
   private ApduResponse recoverSelectionFciData() throws CardIOException, ReaderIOException {
 
-    ApduRequest apduRequest = new ApduRequest(APDU_GET_DATA, false);
+    ApduRequest apduRequest = new ApduRequest(APDU_GET_DATA);
 
     if (logger.isDebugEnabled()) {
       apduRequest.setName("Internal Get Data");
@@ -698,7 +699,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     System.arraycopy(aid, 0, selectApplicationCommand, 5, aid.length); // data
     selectApplicationCommand[5 + aid.length] = (byte) 0x00; // Le
 
-    ApduRequest apduRequest = new ApduRequest(selectApplicationCommand, true);
+    ApduRequest apduRequest = new ApduRequest(selectApplicationCommand);
 
     if (logger.isDebugEnabled()) {
       apduRequest.setName("Internal Select Application");
