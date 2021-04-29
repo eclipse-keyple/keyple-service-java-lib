@@ -37,8 +37,12 @@ dependencies {
     implementation("org.eclipse.keyple:keyple-java-utils:2.0.0-SNAPSHOT") { isChanging = true }
     implementation("com.google.code.gson:gson:2.8.5")
     implementation("org.slf4j:slf4j-api:1.7.25")
+    testImplementation("org.slf4j:slf4j-simple:1.7.25")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.15.0")
+    testImplementation("org.mockito:mockito-core:2.28.2")
+    testImplementation("org.powermock:powermock-api-mockito2:2.0.9")
+    testImplementation("org.powermock:powermock-module-junit4:2.0.9")
 }
 
 val javaSourceLevel: String by project

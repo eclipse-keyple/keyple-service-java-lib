@@ -15,10 +15,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.*;
 import org.eclipse.keyple.core.card.*;
-import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
 import org.eclipse.keyple.core.distributed.local.LocalServiceApi;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceSpi;
+import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 import org.eclipse.keyple.core.util.json.BodyError;
@@ -417,9 +417,9 @@ final class DistributedLocalServiceAdapter
 
     /**
      * Refers to {@link
-     * ObservableLocalReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenario,
+     * ObservableLocalReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
      * ObservableReader.NotificationMode, ObservableReader.PollingMode)} and {@link
-     * ObservableRemoteReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenario,
+     * ObservableRemoteReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
      * ObservableReader.NotificationMode, ObservableReader.PollingMode)}
      *
      * @since 2.0
@@ -600,7 +600,7 @@ final class DistributedLocalServiceAdapter
           ChannelControl.valueOf(input.get(JsonProperty.CHANNEL_CONTROL.name()).getAsString());
 
       // Execute the service on the reader
-      List<KeypleCardSelectionResponse> cardSelectionResponses =
+      List<CardSelectionResponse> cardSelectionResponses =
           reader.transmitCardSelectionRequests(
               cardSelectionRequests, multiSelectionProcessing, channelControl);
 
@@ -610,7 +610,7 @@ final class DistributedLocalServiceAdapter
           JsonUtil.getParser()
               .toJsonTree(
                   cardSelectionResponses,
-                  new TypeToken<ArrayList<KeypleCardSelectionResponse>>() {}.getType()));
+                  new TypeToken<ArrayList<CardSelectionResponse>>() {}.getType()));
     }
 
     /**
@@ -620,11 +620,11 @@ final class DistributedLocalServiceAdapter
     private void scheduleCardSelectionScenario() {
 
       // Extract info from the message
-      CardSelectionScenario cardSelectionScenario =
+      CardSelectionScenarioAdapter cardSelectionScenario =
           JsonUtil.getParser()
               .fromJson(
                   input.get(JsonProperty.CARD_SELECTION_SCENARIO.name()),
-                  CardSelectionScenario.class);
+                  CardSelectionScenarioAdapter.class);
 
       ObservableReader.NotificationMode notificationMode =
           ObservableReader.NotificationMode.valueOf(

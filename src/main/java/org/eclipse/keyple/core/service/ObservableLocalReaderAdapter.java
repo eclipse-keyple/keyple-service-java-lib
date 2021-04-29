@@ -14,7 +14,6 @@ package org.eclipse.keyple.core.service;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import org.eclipse.keyple.core.card.*;
-import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.WaitForCardInsertionAutonomousReaderApi;
@@ -53,7 +52,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   private final ObservationManagerAdapter<ReaderObserverSpi, ReaderObservationExceptionHandlerSpi>
       observationManager;
 
-  private CardSelectionScenario cardSelectionScenario;
+  private CardSelectionScenarioAdapter cardSelectionScenario;
   private NotificationMode notificationMode;
   private PollingMode currentPollingMode;
 
@@ -249,7 +248,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
     // a card selection scenario is defined, send it and notify according to the notification mode
     // and the selection status
     try {
-      List<KeypleCardSelectionResponse> cardSelectionResponses =
+      List<CardSelectionResponse> cardSelectionResponses =
           transmitCardSelectionRequests(
               cardSelectionScenario.getCardSelectionRequests(),
               cardSelectionScenario.getMultiSelectionProcessing(),
@@ -257,7 +256,10 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
       if (hasACardMatched(cardSelectionResponses)) {
         return new ReaderEvent(
-            getPluginName(), getName(), ReaderEvent.EventType.CARD_MATCHED, cardSelectionResponses);
+            getPluginName(),
+            getName(),
+            ReaderEvent.EventType.CARD_MATCHED,
+            new ScheduledCardSelectionsResponseAdapter(cardSelectionResponses));
       }
 
       if (notificationMode == ObservableReader.NotificationMode.MATCHED_ONLY) {
@@ -277,7 +279,10 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
             "[{}] none of {} default selection matched", getName(), cardSelectionResponses.size());
       }
       return new ReaderEvent(
-          getPluginName(), getName(), ReaderEvent.EventType.CARD_INSERTED, cardSelectionResponses);
+          getPluginName(),
+          getName(),
+          ReaderEvent.EventType.CARD_INSERTED,
+          new ScheduledCardSelectionsResponseAdapter(cardSelectionResponses));
 
     } catch (ReaderCommunicationException e) {
       // Notify the reader communication failure with the exception handler.
@@ -320,10 +325,10 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @param cardSelectionResponses The responses received.
    * @return true if a card has matched, false if not.
    */
-  private boolean hasACardMatched(List<KeypleCardSelectionResponse> cardSelectionResponses) {
-    for (KeypleCardSelectionResponse cardSelectionResponse : cardSelectionResponses) {
+  private boolean hasACardMatched(List<CardSelectionResponse> cardSelectionResponses) {
+    for (CardSelectionResponse cardSelectionResponse : cardSelectionResponses) {
       if (cardSelectionResponse != null
-          && ((CardSelectionResponse) cardSelectionResponse).getSelectionStatus().hasMatched()) {
+          && cardSelectionResponse.getSelectionStatus().hasMatched()) {
         if (logger.isTraceEnabled()) {
           logger.trace("[{}] a default selection has matched", getName());
         }
@@ -426,9 +431,9 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   /**
    * (package-private)<br>
-   * If defined, the prepared {@link CardSelectionScenario} will be processed as soon as a card is
-   * inserted. The result of this request set will be added to the reader event notified to the
-   * application.
+   * If defined, the prepared {@link CardSelectionScenarioAdapter} will be processed as soon as a
+   * card is inserted. The result of this request set will be added to the reader event notified to
+   * the application.
    *
    * <p>If it is not defined (set to null), a simple card detection will be notified in the end.
    *
@@ -442,7 +447,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   void scheduleCardSelectionScenario(
-      CardSelectionScenario cardSelectionScenario,
+      CardSelectionScenarioAdapter cardSelectionScenario,
       ObservableReader.NotificationMode notificationMode,
       ObservableReader.PollingMode pollingMode) {
     this.cardSelectionScenario = cardSelectionScenario;

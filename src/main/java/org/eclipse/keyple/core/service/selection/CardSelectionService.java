@@ -11,8 +11,6 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.selection;
 
-import java.util.List;
-import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.service.KeypleCardCommunicationException;
 import org.eclipse.keyple.core.service.KeypleReaderCommunicationException;
 import org.eclipse.keyple.core.service.ObservableReader;
@@ -126,11 +124,11 @@ public interface CardSelectionService {
    * Analyzes the responses received in return of the execution of a card selection scenario and
    * returns the {@link CardSelectionResult}.
    *
-   * @param cardSelectionResponses The card selection scenario execution response.
+   * @param scheduledCardSelectionsResponse The card selection scenario execution response.
    * @return A not null reference.
    * @throws IllegalArgumentException if the list is null or empty.
    * @since 2.0
    */
-  CardSelectionResult processCardSelectionResponses(
-      List<KeypleCardSelectionResponse> cardSelectionResponses);
+  CardSelectionResult parseScheduledCardSelectionsResponse(
+      ScheduledCardSelectionsResponse scheduledCardSelectionsResponse);
 }

@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-class ReaderManagerAdapter {
+final class ReaderManagerAdapter {
 
   private static final Logger logger = LoggerFactory.getLogger(ReaderManagerAdapter.class);
 

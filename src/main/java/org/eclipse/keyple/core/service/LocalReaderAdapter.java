@@ -16,12 +16,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.keyple.core.card.*;
-import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.AutonomousSelectionReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.service.selection.CardSelector;
+import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.slf4j.Logger;
@@ -66,6 +66,17 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     super(readerSpi.getName(), readerSpi, pluginName);
     this.readerSpi = readerSpi;
     protocolAssociations = new LinkedHashMap<String, String>();
+  }
+
+  /**
+   * (package-private)<br>
+   * Gets {@link ReaderSpi} associated to this reader.
+   *
+   * @return A not null reference.
+   * @since 2.0
+   */
+  public ReaderSpi getReaderSpi() {
+    return readerSpi;
   }
 
   /**
@@ -123,17 +134,16 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   @Override
-  final List<KeypleCardSelectionResponse> processCardSelectionRequests(
+  final List<CardSelectionResponse> processCardSelectionRequests(
       List<CardSelectionRequest> cardSelectionRequests,
-      org.eclipse.keyple.core.card.MultiSelectionProcessing multiSelectionProcessing,
+      MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
       throws ReaderCommunicationException, CardCommunicationException,
           UnexpectedStatusCodeException {
 
     checkStatus();
 
-    List<KeypleCardSelectionResponse> cardSelectionResponses =
-        new ArrayList<KeypleCardSelectionResponse>();
+    List<CardSelectionResponse> cardSelectionResponses = new ArrayList<CardSelectionResponse>();
 
     /* Open the physical channel if needed, determine the current protocol */
     if (!readerSpi.isPhysicalChannelOpen()) {

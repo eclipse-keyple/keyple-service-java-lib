@@ -15,10 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.keyple.core.card.*;
 import org.eclipse.keyple.core.card.spi.CardSelectionSpi;
-import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.service.selection.CardSelectionResult;
 import org.eclipse.keyple.core.service.selection.CardSelectionService;
 import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
+import org.eclipse.keyple.core.service.selection.ScheduledCardSelectionsResponse;
 import org.eclipse.keyple.core.service.selection.spi.CardSelection;
 import org.eclipse.keyple.core.service.selection.spi.SmartCard;
 import org.eclipse.keyple.core.util.Assert;
@@ -33,7 +33,7 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
 
   private final List<CardSelectionSpi> cardSelections;
   private final List<CardSelectionRequest> cardSelectionRequests;
-  private final org.eclipse.keyple.core.card.MultiSelectionProcessing multiSelectionProcessing;
+  private final MultiSelectionProcessing multiSelectionProcessing;
   private ChannelControl channelControl = ChannelControl.KEEP_OPEN;
 
   /**
@@ -44,10 +44,7 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    * @since 2.0
    */
   CardSelectionServiceAdapter(MultiSelectionProcessing multiSelectionProcessing) {
-    this.multiSelectionProcessing =
-        multiSelectionProcessing == MultiSelectionProcessing.PROCESS_ALL
-            ? org.eclipse.keyple.core.card.MultiSelectionProcessing.PROCESS_ALL
-            : org.eclipse.keyple.core.card.MultiSelectionProcessing.FIRST_MATCH;
+    this.multiSelectionProcessing = multiSelectionProcessing;
     cardSelections = new ArrayList<CardSelectionSpi>();
     cardSelectionRequests = new ArrayList<CardSelectionRequest>();
   }
@@ -85,7 +82,7 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
   public CardSelectionResult processCardSelectionScenario(Reader reader) {
 
     // Communicate with the card to make the actual selection
-    List<KeypleCardSelectionResponse> cardSelectionResponses;
+    List<CardSelectionResponse> cardSelectionResponses;
 
     try {
       cardSelectionResponses =
@@ -127,8 +124,9 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
       ObservableReader observableReader,
       ObservableReader.NotificationMode notificationMode,
       ObservableReader.PollingMode pollingMode) {
-    CardSelectionScenario cardSelectionScenario =
-        new CardSelectionScenario(cardSelectionRequests, multiSelectionProcessing, channelControl);
+    CardSelectionScenarioAdapter cardSelectionScenario =
+        new CardSelectionScenarioAdapter(
+            cardSelectionRequests, multiSelectionProcessing, channelControl);
     ((ObservableLocalReaderAdapter) observableReader)
         .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, pollingMode);
   }
@@ -139,8 +137,28 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    * @since 2.0
    */
   @Override
-  public CardSelectionResult processCardSelectionResponses(
-      List<KeypleCardSelectionResponse> cardSelectionResponses) {
+  public CardSelectionResult parseScheduledCardSelectionsResponse(
+      ScheduledCardSelectionsResponse scheduledCardSelectionsResponse) {
+
+    Assert.getInstance()
+        .notNull(scheduledCardSelectionsResponse, "scheduledCardSelectionsResponse");
+
+    return processCardSelectionResponses(
+        ((ScheduledCardSelectionsResponseAdapter) scheduledCardSelectionsResponse)
+            .getCardSelectionResponses());
+  }
+
+  /**
+   * (private)<br>
+   * Analyzes the responses received in return of the execution of a card selection scenario and
+   * returns the CardSelectionResult.
+   *
+   * @param cardSelectionResponses The card selection responses.
+   * @return A not null reference.
+   * @throws IllegalArgumentException If the list is null or empty.
+   */
+  private CardSelectionResult processCardSelectionResponses(
+      List<CardSelectionResponse> cardSelectionResponses) {
 
     Assert.getInstance().notEmpty(cardSelectionResponses, "cardSelectionResponses");
 
@@ -149,9 +167,7 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
     int index = 0;
 
     /* Check card responses */
-    for (KeypleCardSelectionResponse keypleCardSelectionResponse : cardSelectionResponses) {
-      CardSelectionResponse cardSelectionResponse =
-          (CardSelectionResponse) keypleCardSelectionResponse;
+    for (CardSelectionResponse cardSelectionResponse : cardSelectionResponses) {
       /* test if the selection is successful: we should have either a FCI or an ATR */
       if (cardSelectionResponse != null
           && cardSelectionResponse.getSelectionStatus() != null

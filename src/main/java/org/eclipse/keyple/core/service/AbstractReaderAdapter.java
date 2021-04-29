@@ -13,8 +13,8 @@ package org.eclipse.keyple.core.service;
 
 import java.util.List;
 import org.eclipse.keyple.core.card.*;
-import org.eclipse.keyple.core.common.KeypleCardSelectionResponse;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
+import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +82,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    * @throws CardCommunicationException if the communication with the card has failed.
    * @since 2.0
    */
-  final List<KeypleCardSelectionResponse> transmitCardSelectionRequests(
+  final List<CardSelectionResponse> transmitCardSelectionRequests(
       List<CardSelectionRequest> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
@@ -90,7 +90,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
 
     checkStatus();
 
-    List<KeypleCardSelectionResponse> cardSelectionResponses = null;
+    List<CardSelectionResponse> cardSelectionResponses = null;
 
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
@@ -177,7 +177,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    *     request and the card returned an unexpected code.
    * @since 2.0
    */
-  abstract List<KeypleCardSelectionResponse> processCardSelectionRequests(
+  abstract List<CardSelectionResponse> processCardSelectionRequests(
       List<CardSelectionRequest> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
