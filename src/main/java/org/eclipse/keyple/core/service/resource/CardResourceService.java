@@ -47,15 +47,6 @@ public interface CardResourceService {
   CardResourceServiceConfigurator getConfigurator();
 
   /**
-   * Gets the "minimal" configuration builder to setup the service using only one "plugin" or "pool
-   * plugin" associated to only card resource profile.
-   *
-   * @return A not null reference.
-   * @since 2.0
-   */
-  MinimalCardResourceServiceConfigurator getMinimalConfigurator();
-
-  /**
    * Starts the service using the current configuration, initializes the list of card resources,
    * activates the required monitoring, if any.
    *
@@ -89,18 +80,6 @@ public interface CardResourceService {
    * @since 2.0
    */
   CardResource getCardResource(String cardResourceProfileName);
-
-  /**
-   * Gets the first card resource available among all registered card resource profiles.
-   *
-   * <p><u>Note</u> : The returned resource is then no longer available to other users until the
-   * {@link #releaseCardResource(CardResource)} method is called or the service restarted.
-   *
-   * @return Null if no card resource is available.
-   * @throws IllegalStateException If the service is not started.
-   * @since 2.0
-   */
-  CardResource getCardResource();
 
   /**
    * Releases the card resource to make it available to other users.

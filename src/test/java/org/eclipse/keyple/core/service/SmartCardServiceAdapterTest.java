@@ -95,11 +95,9 @@ public class SmartCardServiceAdapterTest {
 
   interface DistributedLocalServiceMock
       extends KeypleDistributedLocalServiceExtension, LocalServiceSpi {}
-  ;
 
   interface DistributedLocalServiceFactoryMock
       extends KeypleDistributedLocalServiceExtensionFactory, LocalServiceFactorySpi {}
-  ;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
