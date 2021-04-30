@@ -250,7 +250,7 @@ final class CardResourceServiceConfiguratorAdapter implements CardResourceServic
    * @return A not null list.
    * @since 2.0
    */
-  public List<Plugin> getPlugins() {
+  List<Plugin> getPlugins() {
     return plugins;
   }
 
@@ -260,7 +260,7 @@ final class CardResourceServiceConfiguratorAdapter implements CardResourceServic
    * @return A not null list.
    * @since 2.0
    */
-  public List<ConfiguredPlugin> getConfiguredPlugins() {
+  List<ConfiguredPlugin> getConfiguredPlugins() {
     return configuredPlugins;
   }
 
@@ -270,7 +270,7 @@ final class CardResourceServiceConfiguratorAdapter implements CardResourceServic
    * @return A not null reference.
    * @since 2.0
    */
-  public AllocationStrategy getAllocationStrategy() {
+  AllocationStrategy getAllocationStrategy() {
     return allocationStrategy;
   }
 
@@ -280,7 +280,7 @@ final class CardResourceServiceConfiguratorAdapter implements CardResourceServic
    * @return 0 if no usage timeout is set.
    * @since 2.0
    */
-  public int getUsageTimeoutMillis() {
+  int getUsageTimeoutMillis() {
     return usageTimeoutMillis;
   }
 
@@ -290,7 +290,7 @@ final class CardResourceServiceConfiguratorAdapter implements CardResourceServic
    * @return A not null list.
    * @since 2.0
    */
-  public List<PoolPlugin> getPoolPlugins() {
+  List<PoolPlugin> getPoolPlugins() {
     return poolPlugins;
   }
 
@@ -300,7 +300,7 @@ final class CardResourceServiceConfiguratorAdapter implements CardResourceServic
    * @return True if pool plugins are prior to regular plugins.
    * @since 2.0
    */
-  public boolean isUsePoolFirst() {
+  boolean isUsePoolFirst() {
     return usePoolFirst;
   }
 
@@ -321,7 +321,7 @@ final class CardResourceServiceConfiguratorAdapter implements CardResourceServic
    * @return A not null boolean.
    * @since 2.0
    */
-  public boolean isBlockingAllocationMode() {
+  boolean isBlockingAllocationMode() {
     return isBlockingAllocationMode;
   }
 
