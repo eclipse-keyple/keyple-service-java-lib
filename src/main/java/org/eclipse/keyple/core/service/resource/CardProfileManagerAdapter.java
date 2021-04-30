@@ -11,7 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.resource;
 
-import static org.eclipse.keyple.core.service.resource.CardResourceServiceConfiguratorAdapter.*;
+import static org.eclipse.keyple.core.service.resource.PluginsConfigurator.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +40,7 @@ final class CardProfileManagerAdapter {
   private static final Logger logger = LoggerFactory.getLogger(CardProfileManagerAdapter.class);
 
   /** The associated card profile. */
-  private final CardProfile cardProfile;
+  private final CardResourceProfileConfigurator cardProfile;
 
   /** The global configuration of the card resource service. */
   private final CardResourceServiceConfiguratorAdapter globalConfiguration;
@@ -70,7 +70,8 @@ final class CardProfileManagerAdapter {
    * @since 2.0
    */
   CardProfileManagerAdapter(
-      CardProfile cardProfile, CardResourceServiceConfiguratorAdapter globalConfiguration) {
+      CardResourceProfileConfigurator cardProfile,
+      CardResourceServiceConfiguratorAdapter globalConfiguration) {
 
     this.cardProfile = cardProfile;
     this.globalConfiguration = globalConfiguration;
@@ -114,14 +115,10 @@ final class CardProfileManagerAdapter {
    * Initializes card resources using the plugins configured on the card resource service.
    */
   private void initializeCardResourcesUsingDefaultPlugins() {
-    for (ConfiguredPoolPlugin configuredPoolPlugin :
-        globalConfiguration.getConfiguredPoolPlugins()) {
-      poolPlugins.add(configuredPoolPlugin.getPoolPlugin());
-    }
-    for (ConfiguredRegularPlugin configuredRegularPlugin :
-        globalConfiguration.getConfiguredRegularPlugins()) {
-      plugins.add(configuredRegularPlugin.getPlugin());
-      initializeCardResources(configuredRegularPlugin.getPlugin());
+    poolPlugins.addAll(globalConfiguration.getPoolPlugins());
+    for (Plugin plugin : globalConfiguration.getPlugins()) {
+      plugins.add(plugin);
+      initializeCardResources(plugin);
     }
   }
 
@@ -156,7 +153,7 @@ final class CardProfileManagerAdapter {
       readerManager.activate();
 
       CardResource cardResource =
-          readerManager.matches(cardProfile.getCardResourceProfileExtension());
+          readerManager.matches(cardProfile.getCardResourceProfileExtensionSpi());
 
       // The returned card resource may already be present in the current list if the service starts
       // with an observable reader in which a card has been inserted.
@@ -167,13 +164,13 @@ final class CardProfileManagerAdapter {
             logger.debug(
                 "Add {} to card resource profile '{}'",
                 CardResourceServiceAdapter.getCardResourceInfo(cardResource),
-                cardProfile.getName());
+                cardProfile.getProfileName());
           }
         } else if (logger.isDebugEnabled()) {
           logger.debug(
               "{} already present in card resource profile '{}'",
               CardResourceServiceAdapter.getCardResourceInfo(cardResource),
-              cardProfile.getName());
+              cardProfile.getProfileName());
         }
       }
     }
@@ -204,7 +201,7 @@ final class CardProfileManagerAdapter {
       logger.debug(
           "Remove {} from card resource profile '{}'",
           CardResourceServiceAdapter.getCardResourceInfo(cardResource),
-          cardProfile.getName());
+          cardProfile.getProfileName());
     }
   }
 
@@ -295,7 +292,7 @@ final class CardProfileManagerAdapter {
    */
   private CardResource getRegularOrPoolCardResource() {
     CardResource cardResource;
-    if (globalConfiguration.getPoolAllocationStrategy() == PoolAllocationStrategy.POOL_FIRST) {
+    if (globalConfiguration.isUsePoolFirst()) {
       cardResource = getPoolCardResource();
       if (cardResource == null) {
         cardResource = getRegularCardResource();
@@ -328,7 +325,8 @@ final class CardProfileManagerAdapter {
         ReaderManagerAdapter readerManager = service.getReaderManager(reader);
         if (readerManager != null) {
           try {
-            if (readerManager.lock(cardResource, cardProfile.getCardResourceProfileExtension())) {
+            if (readerManager.lock(
+                cardResource, cardProfile.getCardResourceProfileExtensionSpi())) {
               int cardResourceIndex = cardResources.indexOf(cardResource);
               updateCardResourcesOrder(cardResourceIndex);
               result = cardResource;
@@ -378,7 +376,7 @@ final class CardProfileManagerAdapter {
         Reader reader = poolPlugin.allocateReader(cardProfile.getReaderGroupReference());
         if (reader != null) {
           SmartCardSpi smartCardSpi =
-              cardProfile.getCardResourceProfileExtension().matches((ProxyReader) reader);
+              cardProfile.getCardResourceProfileExtensionSpi().matches((ProxyReader) reader);
           if (smartCardSpi != null) {
             CardResource cardResource = new CardResource(reader, (SmartCard) smartCardSpi);
             service.registerPoolCardResource(cardResource, poolPlugin);
