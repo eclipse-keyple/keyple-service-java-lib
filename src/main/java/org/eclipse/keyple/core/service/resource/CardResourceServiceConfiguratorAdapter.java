@@ -126,7 +126,7 @@ final class CardResourceServiceConfiguratorAdapter implements CardResourceServic
     this.isBlockingAllocationMode = true;
     this.cycleDurationMillis = cycleDurationMillis;
     this.timeoutMillis = timeoutMillis;
-    return null;
+    return this;
   }
 
   /**
