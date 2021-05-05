@@ -51,15 +51,15 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
    */
   @Override
   public void onReaderConnected(Set<ReaderSpi> readers) {
-    Set<String> readersNames = new HashSet<String>();
+    Set<String> readerNames = new HashSet<String>();
     for (ReaderSpi readerSpi : readers) {
-      readersNames.add(readerSpi.getName());
+      readerNames.add(readerSpi.getName());
     }
     if (logger.isTraceEnabled()) {
-      logger.trace("Notifying connection(s): {}", readersNames);
+      logger.trace("Notifying connection(s): {}", readerNames);
     }
     notifyObservers(
-        new PluginEvent(getName(), readersNames, PluginEvent.EventType.READER_CONNECTED));
+        new PluginEvent(getName(), readerNames, PluginEvent.EventType.READER_CONNECTED));
   }
 
   /**
@@ -68,11 +68,11 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
    * @since 2.0
    */
   @Override
-  public void onReaderDisconnected(Set<String> readersNames) {
+  public void onReaderDisconnected(Set<String> readerNames) {
     if (logger.isTraceEnabled()) {
-      logger.trace("Notifying disconnection(s): {}", readersNames);
+      logger.trace("Notifying disconnection(s): {}", readerNames);
     }
     notifyObservers(
-        new PluginEvent(getName(), readersNames, PluginEvent.EventType.READER_DISCONNECTED));
+        new PluginEvent(getName(), readerNames, PluginEvent.EventType.READER_DISCONNECTED));
   }
 }

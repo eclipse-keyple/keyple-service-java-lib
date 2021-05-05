@@ -130,7 +130,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    */
   @Override
   final void unregister() {
-    Set<String> unregisteredReadersNames = new HashSet<String>(this.getReadersNames());
+    Set<String> unregisteredReadersNames = new HashSet<String>(this.getReaderNames());
     super.unregister();
     notifyObservers(
         new PluginEvent(

@@ -80,14 +80,13 @@ public class LocalPluginAdapterTest {
     assertThat(localPluginAdapter.getName()).isEqualTo(PLUGIN_NAME);
     localPluginAdapter.register();
     localPluginAdapter.checkStatus();
-    assertThat(localPluginAdapter.getReadersNames())
+    assertThat(localPluginAdapter.getReaderNames())
         .containsExactlyInAnyOrder(READER_NAME_1, READER_NAME_2);
     assertThat(localPluginAdapter.getReaders()).hasSize(2);
-    Map<String, Reader> expectedReadersMap = new HashMap<String, Reader>();
-    expectedReadersMap.put(READER_NAME_1, localPluginAdapter.getReader(READER_NAME_1));
-    expectedReadersMap.put(READER_NAME_2, localPluginAdapter.getReader(READER_NAME_2));
     assertThat(localPluginAdapter.getReaders())
-        .containsExactlyInAnyOrderEntriesOf(expectedReadersMap);
+        .containsExactlyInAnyOrder(
+            localPluginAdapter.getReader(READER_NAME_1),
+            localPluginAdapter.getReader(READER_NAME_2));
     assertThat(localPluginAdapter.getReader(READER_NAME_1)).isInstanceOf(Reader.class);
     assertThat(localPluginAdapter.getReader(READER_NAME_1)).isInstanceOf(LocalReaderAdapter.class);
     assertThat(localPluginAdapter.getReader(READER_NAME_2)).isInstanceOf(Reader.class);
@@ -105,7 +104,7 @@ public class LocalPluginAdapterTest {
     LocalPluginAdapter localPluginAdapter = new LocalPluginAdapter(pluginSpi);
     localPluginAdapter.register();
     localPluginAdapter.checkStatus();
-    assertThat(localPluginAdapter.getReadersNames())
+    assertThat(localPluginAdapter.getReaderNames())
         .containsExactlyInAnyOrder(OBSERVABLE_READER_NAME);
     assertThat(localPluginAdapter.getReaders()).hasSize(1);
     assertThat(localPluginAdapter.getReader(OBSERVABLE_READER_NAME))
@@ -129,7 +128,7 @@ public class LocalPluginAdapterTest {
   @Test(expected = IllegalStateException.class)
   public void getReadersNames_whenNotRegistered_shouldISE() {
     LocalPluginAdapter localPluginAdapter = new LocalPluginAdapter(pluginSpi);
-    localPluginAdapter.getReadersNames();
+    localPluginAdapter.getReaderNames();
   }
 
   @Test(expected = IllegalStateException.class)

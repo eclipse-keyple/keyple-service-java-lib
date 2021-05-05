@@ -11,6 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -105,13 +106,12 @@ abstract class AbstractPluginAdapter implements Plugin {
   }
 
   /**
-   * {@inheritDoc}
+   * (package-private)<br>
+   * Gets the Map of all connected readers.
    *
    * @since 2.0
    */
-  @Override
-  public final Map<String, Reader> getReaders() {
-    checkStatus();
+  final Map<String, Reader> getReadersMap() {
     return readers;
   }
 
@@ -121,9 +121,20 @@ abstract class AbstractPluginAdapter implements Plugin {
    * @since 2.0
    */
   @Override
-  public final Set<String> getReadersNames() {
+  public final Set<String> getReaderNames() {
     checkStatus();
-    return readers.keySet();
+    return new HashSet<String>(readers.keySet());
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public final Set<Reader> getReaders() {
+    checkStatus();
+    return new HashSet<Reader>(readers.values());
   }
 
   /**

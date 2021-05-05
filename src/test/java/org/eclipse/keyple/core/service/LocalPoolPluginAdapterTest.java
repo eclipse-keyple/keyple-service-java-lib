@@ -120,11 +120,9 @@ public class LocalPoolPluginAdapterTest {
     Reader reader = localPluginAdapter.allocateReader(GROUP_1);
     assertThat(reader.getName()).isEqualTo(READER_NAME_1);
     assertThat(reader).isInstanceOf(Reader.class).isInstanceOf(LocalReaderAdapter.class);
-    assertThat(localPluginAdapter.getReadersNames()).containsExactly(READER_NAME_1);
-    Map<String, Reader> expectedReadersMap = new HashMap<String, Reader>();
-    expectedReadersMap.put(READER_NAME_1, localPluginAdapter.getReader(READER_NAME_1));
+    assertThat(localPluginAdapter.getReaderNames()).containsExactly(READER_NAME_1);
     assertThat(localPluginAdapter.getReaders())
-        .containsExactlyInAnyOrderEntriesOf(expectedReadersMap);
+        .containsExactlyInAnyOrder(localPluginAdapter.getReader(READER_NAME_1));
   }
 
   @Test
@@ -136,11 +134,8 @@ public class LocalPoolPluginAdapterTest {
     Reader reader = localPluginAdapter.allocateReader(GROUP_3);
     assertThat(reader.getName()).isEqualTo(OBSERVABLE_READER_NAME);
     assertThat(reader).isInstanceOf(Reader.class).isInstanceOf(ObservableLocalReaderAdapter.class);
-    Map<String, Reader> expectedReadersMap = new HashMap<String, Reader>();
-    expectedReadersMap.put(
-        OBSERVABLE_READER_NAME, localPluginAdapter.getReader(OBSERVABLE_READER_NAME));
     assertThat(localPluginAdapter.getReaders())
-        .containsExactlyInAnyOrderEntriesOf(expectedReadersMap);
+        .containsExactlyInAnyOrder(localPluginAdapter.getReader(OBSERVABLE_READER_NAME));
   }
 
   @Test(expected = IllegalStateException.class)
@@ -158,7 +153,7 @@ public class LocalPoolPluginAdapterTest {
     localPluginAdapter.register();
     Reader reader = localPluginAdapter.allocateReader(GROUP_1);
     localPluginAdapter.releaseReader(reader);
-    assertThat(localPluginAdapter.getReadersNames()).isEmpty();
+    assertThat(localPluginAdapter.getReaderNames()).isEmpty();
     assertThat(localPluginAdapter.getReaders()).isEmpty();
   }
 
@@ -176,7 +171,7 @@ public class LocalPoolPluginAdapterTest {
     } catch (KeyplePluginException e) {
 
     }
-    assertThat(localPluginAdapter.getReadersNames()).isEmpty();
+    assertThat(localPluginAdapter.getReaderNames()).isEmpty();
     assertThat(localPluginAdapter.getReaders()).isEmpty();
   }
 }

@@ -11,7 +11,9 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.keyple.core.card.AbstractApduException;
 import org.eclipse.keyple.core.card.CardApiProperties;
@@ -265,7 +267,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   private void checkPluginRegistration(String pluginName) {
     logger.info("Registering a new Plugin to the service : {}", pluginName);
     Assert.getInstance().notEmpty(pluginName, "pluginName");
-    if (isPluginRegistered(pluginName)) {
+    if (plugins.containsKey(pluginName)) {
       throw new IllegalStateException(
           String.format("The plugin '%s' has already been registered to the service.", pluginName));
     }
@@ -295,6 +297,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    *
    * @since 2.0
    */
+  @Override
   public Plugin registerPlugin(KeyplePluginExtensionFactory pluginFactory) {
 
     Assert.getInstance().notNull(pluginFactory, "pluginFactory");
@@ -425,6 +428,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    *
    * @since 2.0
    */
+  @Override
   public void unregisterPlugin(String pluginName) {
     logger.info("Unregistering a plugin from the service : {}", pluginName);
     synchronized (pluginMonitor) {
@@ -442,9 +446,10 @@ final class SmartCardServiceAdapter implements SmartCardService {
    *
    * @since 2.0
    */
-  public boolean isPluginRegistered(String pluginName) {
+  @Override
+  public Set<String> getPluginNames() {
     synchronized (pluginMonitor) {
-      return plugins.containsKey(pluginName);
+      return new HashSet<String>(plugins.keySet());
     }
   }
 
@@ -453,20 +458,22 @@ final class SmartCardServiceAdapter implements SmartCardService {
    *
    * @since 2.0
    */
+  @Override
+  public Set<Plugin> getPlugins() {
+    synchronized (pluginMonitor) {
+      return new HashSet<Plugin>(plugins.values());
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
   public Plugin getPlugin(String pluginName) {
     synchronized (pluginMonitor) {
       return plugins.get(pluginName);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  public Map<String, Plugin> getPlugins() {
-    synchronized (pluginMonitor) {
-      return plugins;
     }
   }
 
@@ -484,6 +491,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    *
    * @since 2.0
    */
+  @Override
   public DistributedLocalService registerDistributedLocalService(
       KeypleDistributedLocalServiceExtensionFactory distributedLocalServiceExtensionFactory) {
 
@@ -533,6 +541,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    *
    * @since 2.0
    */
+  @Override
   public void unregisterDistributedLocalService(String distributedLocalServiceName) {
     logger.info(
         "Unregistering a distributed local service from the service : {}",
@@ -566,6 +575,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    *
    * @since 2.0
    */
+  @Override
   public DistributedLocalService getDistributedLocalService(String distributedLocalServiceName) {
     synchronized (distributedLocalServiceMonitor) {
       return distributedLocalServices.get(distributedLocalServiceName);
