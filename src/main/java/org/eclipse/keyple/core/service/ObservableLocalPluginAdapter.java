@@ -11,7 +11,6 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -163,7 +162,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
         reader = new LocalReaderAdapter(readerSpi, pluginName);
       }
       reader.register();
-      getReaders().put(reader.getName(), reader);
+      getReadersMap().put(reader.getName(), reader);
       if (logger.isTraceEnabled()) {
         logger.trace(
             "[{}][{}] Plugin thread => Add plugged reader to readers list.",
@@ -178,7 +177,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
      */
     private void removeReader(Reader reader) {
       ((LocalReaderAdapter) reader).unregister();
-      getReaders().remove(reader.getName());
+      getReadersMap().remove(reader.getName());
       if (logger.isTraceEnabled()) {
         logger.trace(
             "[{}][{}] Plugin thread => Remove unplugged reader from readers list.",
@@ -218,8 +217,8 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
        * parse the current readers list, notify for disappeared readers, update
        * readers list
        */
-      final Collection<Reader> readerCollection = getReaders().values();
-      for (Reader reader : readerCollection) {
+      final Set<Reader> readers = getReaders();
+      for (Reader reader : readers) {
         if (!actualNativeReadersNames.contains(reader.getName())) {
           changedReaderNames.add(reader.getName());
         }
@@ -227,7 +226,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       /* notify disconnections if any and update the reader list */
       if (!changedReaderNames.isEmpty()) {
         /* list update */
-        for (Reader reader : readerCollection) {
+        for (Reader reader : readers) {
           if (!actualNativeReadersNames.contains(reader.getName())) {
             removeReader(reader);
           }
@@ -241,7 +240,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
        * list
        */
       for (String readerName : actualNativeReadersNames) {
-        if (!getReadersNames().contains(readerName)) {
+        if (!getReaderNames().contains(readerName)) {
           addReader(readerName);
           /* add to the notification list */
           changedReaderNames.add(readerName);
@@ -267,7 +266,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
           /*
            * checks if it has changed this algorithm favors cases where nothing change
            */
-          Set<String> currentlyRegisteredReaderNames = getReadersNames();
+          Set<String> currentlyRegisteredReaderNames = getReaderNames();
           if (!currentlyRegisteredReaderNames.containsAll(actualNativeReadersNames)
               || !actualNativeReadersNames.containsAll(currentlyRegisteredReaderNames)) {
             processChanges(actualNativeReadersNames);

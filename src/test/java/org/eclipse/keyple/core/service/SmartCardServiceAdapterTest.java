@@ -202,7 +202,7 @@ public class SmartCardServiceAdapterTest {
   public void registerPlugin_whenPluginIsCorrect_shouldProducePlugin_BeRegistered_withoutWarning() {
     Plugin p = service.registerPlugin(pluginFactory);
     assertThat(p).isInstanceOf(Plugin.class).isInstanceOf(LocalPluginAdapter.class);
-    assertThat(service.isPluginRegistered(PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
 
@@ -213,7 +213,7 @@ public class SmartCardServiceAdapterTest {
     assertThat(p)
         .isInstanceOf(ObservablePlugin.class)
         .isInstanceOf(ObservableLocalPluginAdapter.class);
-    assertThat(service.isPluginRegistered(OBSERVABLE_PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(OBSERVABLE_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
 
@@ -224,7 +224,7 @@ public class SmartCardServiceAdapterTest {
     assertThat(p)
         .isInstanceOf(ObservablePlugin.class)
         .isInstanceOf(AutonomousObservableLocalPluginAdapter.class);
-    assertThat(service.isPluginRegistered(AUTONOMOUS_OBSERVABLE_PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(AUTONOMOUS_OBSERVABLE_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
 
@@ -241,14 +241,14 @@ public class SmartCardServiceAdapterTest {
       shouldHaveThrown(IllegalArgumentException.class);
     } catch (IllegalArgumentException e) {
     }
-    assertThat(service.isPluginRegistered(PLUGIN_NAME)).isFalse();
+    assertThat(service.getPluginNames().contains(PLUGIN_NAME)).isFalse();
   }
 
   @Test
   public void registerPlugin_whenCommonsApiVersionDiffers_shouldRegister_and_LogWarn() {
     when(pluginFactory.getCommonsApiVersion()).thenReturn("2.1");
     service.registerPlugin(pluginFactory);
-    assertThat(service.isPluginRegistered(PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(PLUGIN_NAME)).isTrue();
     verify(logger).warn(anyString(), eq(PLUGIN_NAME), eq("2.1"), eq(COMMONS_API_VERSION));
   }
 
@@ -256,7 +256,7 @@ public class SmartCardServiceAdapterTest {
   public void registerPlugin_whenPluginApiVersionDiffers_shouldRegister_and_LogWarn() {
     when(pluginFactory.getPluginApiVersion()).thenReturn("2.1");
     service.registerPlugin(pluginFactory);
-    assertThat(service.isPluginRegistered(PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(PLUGIN_NAME)).isTrue();
     verify(logger).warn(anyString(), eq(PLUGIN_NAME), eq("2.1"), eq(PLUGIN_API_VERSION));
   }
 
@@ -279,14 +279,14 @@ public class SmartCardServiceAdapterTest {
       registerPlugin_Pool_whenPluginIsCorrect_shouldProducePlugin_BeRegistered_withoutWarning() {
     Plugin p = service.registerPlugin(poolPluginFactory);
     assertThat(p).isInstanceOf(PoolPlugin.class).isInstanceOf(LocalPoolPluginAdapter.class);
-    assertThat(service.isPluginRegistered(POOL_PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(POOL_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
 
   @Test
   public void registerPlugin_Pool_whenPluginIsObservable_shouldBeRegistered_withoutWarning() {
     service.registerPlugin(poolPluginFactory);
-    assertThat(service.isPluginRegistered(POOL_PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(POOL_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
 
@@ -299,14 +299,14 @@ public class SmartCardServiceAdapterTest {
       shouldHaveThrown(IllegalArgumentException.class);
     } catch (IllegalArgumentException e) {
     }
-    assertThat(service.isPluginRegistered(POOL_PLUGIN_NAME)).isFalse();
+    assertThat(service.getPluginNames().contains(POOL_PLUGIN_NAME)).isFalse();
   }
 
   @Test
   public void registerPlugin_Pool_whenCommonsApiVersionDiffers_shouldRegister_and_LogWarn() {
     when(poolPluginFactory.getCommonsApiVersion()).thenReturn("2.1");
     service.registerPlugin(poolPluginFactory);
-    assertThat(service.isPluginRegistered(POOL_PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(POOL_PLUGIN_NAME)).isTrue();
     verify(logger).warn(anyString(), eq(POOL_PLUGIN_NAME), eq("2.1"), eq(COMMONS_API_VERSION));
   }
 
@@ -314,7 +314,7 @@ public class SmartCardServiceAdapterTest {
   public void registerPlugin_Pool_whenPluginApiVersionDiffers_shouldRegister_and_LogWarn() {
     when(poolPluginFactory.getPluginApiVersion()).thenReturn("2.1");
     service.registerPlugin(poolPluginFactory);
-    assertThat(service.isPluginRegistered(POOL_PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(POOL_PLUGIN_NAME)).isTrue();
     verify(logger).warn(anyString(), eq(POOL_PLUGIN_NAME), eq("2.1"), eq(PLUGIN_API_VERSION));
   }
 
@@ -330,7 +330,7 @@ public class SmartCardServiceAdapterTest {
   public void registerPlugin_Remote_whenPluginIsCorrect_shouldBeRegistered_withoutWarning() {
     Plugin p = service.registerPlugin(remotePluginFactory);
     assertThat(p).isInstanceOf(Plugin.class).isInstanceOf(RemotePluginAdapter.class);
-    assertThat(service.isPluginRegistered(REMOTE_PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(REMOTE_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
 
@@ -342,7 +342,7 @@ public class SmartCardServiceAdapterTest {
     assertThat(p)
         .isInstanceOf(ObservablePlugin.class)
         .isInstanceOf(ObservableRemotePluginAdapter.class);
-    assertThat(service.isPluginRegistered(REMOTE_PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(REMOTE_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
 
@@ -352,7 +352,7 @@ public class SmartCardServiceAdapterTest {
     when(remotePluginFactory.isPoolPlugin()).thenReturn(true);
     Plugin p = service.registerPlugin(remotePluginFactory);
     assertThat(p).isInstanceOf(PoolPlugin.class).isInstanceOf(RemotePoolPluginAdapter.class);
-    assertThat(service.isPluginRegistered(REMOTE_PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(REMOTE_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());
   }
 
@@ -365,14 +365,14 @@ public class SmartCardServiceAdapterTest {
       shouldHaveThrown(IllegalArgumentException.class);
     } catch (IllegalArgumentException e) {
     }
-    assertThat(service.isPluginRegistered(REMOTE_PLUGIN_NAME)).isFalse();
+    assertThat(service.getPluginNames().contains(REMOTE_PLUGIN_NAME)).isFalse();
   }
 
   @Test
   public void registerPlugin_Remote_whenCommonsApiVersionDiffers_shouldRegister_and_LogWarn() {
     when(remotePluginFactory.getCommonsApiVersion()).thenReturn("2.1");
     service.registerPlugin(remotePluginFactory);
-    assertThat(service.isPluginRegistered(REMOTE_PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(REMOTE_PLUGIN_NAME)).isTrue();
     verify(logger).warn(anyString(), eq(REMOTE_PLUGIN_NAME), eq("2.1"), eq(COMMONS_API_VERSION));
   }
 
@@ -380,7 +380,7 @@ public class SmartCardServiceAdapterTest {
   public void registerPlugin_Remote_whenPluginApiVersionDiffers_shouldRegister_and_LogWarn() {
     when(remotePluginFactory.getDistributedRemoteApiVersion()).thenReturn("2.1");
     service.registerPlugin(remotePluginFactory);
-    assertThat(service.isPluginRegistered(REMOTE_PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(REMOTE_PLUGIN_NAME)).isTrue();
     verify(logger)
         .warn(anyString(), eq(REMOTE_PLUGIN_NAME), eq("2.1"), eq(DISTRIBUTED_REMOTE_API_VERSION));
   }
@@ -410,15 +410,15 @@ public class SmartCardServiceAdapterTest {
   @Test
   public void unregisterPlugin_whenPluginIsNotRegistered_shouldDoNothing() {
     service.unregisterPlugin(PLUGIN_NAME);
-    assertThat(service.isPluginRegistered(PLUGIN_NAME)).isFalse();
+    assertThat(service.getPluginNames().contains(PLUGIN_NAME)).isFalse();
   }
 
   @Test
   public void unregisterPlugin_whenPluginIsRegistered_shouldUnregister() {
     service.registerPlugin(pluginFactory);
-    assertThat(service.isPluginRegistered(PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(PLUGIN_NAME)).isTrue();
     service.unregisterPlugin(PLUGIN_NAME);
-    assertThat(service.isPluginRegistered(PLUGIN_NAME)).isFalse();
+    assertThat(service.getPluginNames().contains(PLUGIN_NAME)).isFalse();
   }
 
   // Unregister pool plugin
@@ -426,15 +426,15 @@ public class SmartCardServiceAdapterTest {
   @Test
   public void unregisterPlugin_Pool_whenPluginIsNotRegistered_shouldDoNothing() {
     service.unregisterPlugin(POOL_PLUGIN_NAME);
-    assertThat(service.isPluginRegistered(POOL_PLUGIN_NAME)).isFalse();
+    assertThat(service.getPluginNames().contains(POOL_PLUGIN_NAME)).isFalse();
   }
 
   @Test
   public void unregisterPlugin_Pool_whenPluginIsRegistered_shouldUnregister() {
     service.registerPlugin(poolPluginFactory);
-    assertThat(service.isPluginRegistered(POOL_PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(POOL_PLUGIN_NAME)).isTrue();
     service.unregisterPlugin(POOL_PLUGIN_NAME);
-    assertThat(service.isPluginRegistered(POOL_PLUGIN_NAME)).isFalse();
+    assertThat(service.getPluginNames().contains(POOL_PLUGIN_NAME)).isFalse();
   }
 
   // Unregister remote plugin
@@ -442,15 +442,15 @@ public class SmartCardServiceAdapterTest {
   @Test
   public void unregisterPlugin_Remote_whenPluginIsNotRegistered_shouldDoNothing() {
     service.unregisterPlugin(REMOTE_PLUGIN_NAME);
-    assertThat(service.isPluginRegistered(REMOTE_PLUGIN_NAME)).isFalse();
+    assertThat(service.getPluginNames().contains(REMOTE_PLUGIN_NAME)).isFalse();
   }
 
   @Test
   public void unregisterPlugin_Remote_whenPluginIsRegistered_shouldUnregister() {
     service.registerPlugin(remotePluginFactory);
-    assertThat(service.isPluginRegistered(REMOTE_PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(REMOTE_PLUGIN_NAME)).isTrue();
     service.unregisterPlugin(REMOTE_PLUGIN_NAME);
-    assertThat(service.isPluginRegistered(REMOTE_PLUGIN_NAME)).isFalse();
+    assertThat(service.getPluginNames().contains(REMOTE_PLUGIN_NAME)).isFalse();
   }
 
   @Test
@@ -470,12 +470,12 @@ public class SmartCardServiceAdapterTest {
   }
 
   @Test
-  public void getPlugins_whenTwoPluginsRegistered_shouldTwoPlugins() {
+  public void getPlugins_whenTwoPluginsRegistered_shouldHaveTwoPlugins() {
     service.registerPlugin(pluginFactory);
     service.registerPlugin(poolPluginFactory);
     assertThat(service.getPlugins()).hasSize(2);
-    assertThat(service.getPlugins().get(PLUGIN_NAME)).isNotNull();
-    assertThat(service.getPlugins().get(POOL_PLUGIN_NAME)).isNotNull();
+    assertThat(service.getPluginNames()).contains(PLUGIN_NAME);
+    assertThat(service.getPluginNames()).contains(POOL_PLUGIN_NAME);
   }
 
   // Check card extension APIs
@@ -567,15 +567,15 @@ public class SmartCardServiceAdapterTest {
   @Test
   public void unregisterDistributedLocalService_whenPluginIsNotRegistered_shouldDoNothing() {
     service.unregisterPlugin(PLUGIN_NAME);
-    assertThat(service.isPluginRegistered(PLUGIN_NAME)).isFalse();
+    assertThat(service.getPluginNames().contains(PLUGIN_NAME)).isFalse();
   }
 
   @Test
   public void unregisterDistributedLocalService_whenPluginIsRegistered_shouldUnregister() {
     service.registerPlugin(pluginFactory);
-    assertThat(service.isPluginRegistered(PLUGIN_NAME)).isTrue();
+    assertThat(service.getPluginNames().contains(PLUGIN_NAME)).isTrue();
     service.unregisterPlugin(PLUGIN_NAME);
-    assertThat(service.isPluginRegistered(PLUGIN_NAME)).isFalse();
+    assertThat(service.getPluginNames().contains(PLUGIN_NAME)).isFalse();
   }
 
   @Test

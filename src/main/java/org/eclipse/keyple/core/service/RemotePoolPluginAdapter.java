@@ -137,7 +137,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     } else {
       remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName());
     }
-    getReaders().put(remoteReaderSpi.getName(), remoteReaderAdapter);
+    getReadersMap().put(remoteReaderSpi.getName(), remoteReaderAdapter);
     remoteReaderAdapter.register();
     return remoteReaderAdapter;
   }
@@ -174,7 +174,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     } catch (Exception e) {
       DistributedUtilAdapter.throwRuntimeException(e);
     } finally {
-      getReaders().remove(reader.getName());
+      getReadersMap().remove(reader.getName());
       ((LocalReaderAdapter) reader).unregister();
     }
   }

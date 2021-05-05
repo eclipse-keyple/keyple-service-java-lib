@@ -130,7 +130,7 @@ final class CardProfileManagerAdapter {
    * @param plugin The "regular" plugin to analyse.
    */
   private void initializeCardResources(Plugin plugin) {
-    for (Reader reader : plugin.getReaders().values()) {
+    for (Reader reader : plugin.getReaders()) {
       ReaderManagerAdapter readerManager = service.getReaderManager(reader);
       initializeCardResource(readerManager);
     }

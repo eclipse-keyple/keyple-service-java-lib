@@ -61,7 +61,7 @@ class LocalPluginAdapter extends AbstractPluginAdapter {
       } else {
         localReaderAdapter = new LocalReaderAdapter(readerSpi, getName());
       }
-      getReaders().put(readerSpi.getName(), localReaderAdapter);
+      getReadersMap().put(readerSpi.getName(), localReaderAdapter);
       localReaderAdapter.register();
     }
   }

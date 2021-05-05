@@ -188,7 +188,7 @@ final class CardResourceServiceAdapter
    */
   private void initializeReaderManagers() {
     for (Plugin plugin : configurator.getPlugins()) {
-      for (Reader reader : plugin.getReaders().values()) {
+      for (Reader reader : plugin.getReaders()) {
         registerReader(reader, plugin);
       }
     }
@@ -462,7 +462,7 @@ final class CardResourceServiceAdapter
     }
     Plugin plugin = SmartCardServiceProvider.getService().getPlugin(pluginEvent.getPluginName());
     if (pluginEvent.getEventType() == PluginEvent.EventType.READER_CONNECTED) {
-      for (String readerName : pluginEvent.getReadersNames()) {
+      for (String readerName : pluginEvent.getReaderNames()) {
         // Get the new reader from the plugin because it is not yet registered in the service.
         Reader reader = plugin.getReader(readerName);
         if (reader != null) {
@@ -472,7 +472,7 @@ final class CardResourceServiceAdapter
         }
       }
     } else {
-      for (String readerName : pluginEvent.getReadersNames()) {
+      for (String readerName : pluginEvent.getReaderNames()) {
         // Get the reader back from the service because it is no longer registered in the plugin.
         Reader reader = getReader(readerName);
         if (reader != null) {

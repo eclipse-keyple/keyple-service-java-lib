@@ -111,7 +111,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
     } else {
       localReaderAdapter = new LocalReaderAdapter(readerSpi, getName());
     }
-    getReaders().put(localReaderAdapter.getName(), localReaderAdapter);
+    getReadersMap().put(localReaderAdapter.getName(), localReaderAdapter);
     localReaderAdapter.register();
     return localReaderAdapter;
   }
@@ -143,7 +143,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
               getName(), reader.getName(), e.getMessage()),
           e);
     } finally {
-      getReaders().remove(reader.getName());
+      getReadersMap().remove(reader.getName());
       ((LocalReaderAdapter) reader).unregister();
     }
   }

@@ -11,7 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import java.util.Map;
+import java.util.Set;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory;
 import org.eclipse.keyple.core.common.KeyplePluginExtensionFactory;
@@ -43,13 +43,20 @@ public interface SmartCardService {
   void unregisterPlugin(String pluginName);
 
   /**
-   * Checks whether a plugin is already registered to the service or not.
+   * Gets the names of all registered plugins.
    *
-   * @param pluginName The name of the plugin to be checked.
-   * @return true if a plugin with the provided name is registered.
+   * @return A not null Set String.
    * @since 2.0
    */
-  boolean isPluginRegistered(String pluginName);
+  Set<String> getPluginNames();
+
+  /**
+   * Gets all registered plugins.
+   *
+   * @return A not null Set of {@link Plugin}.
+   * @since 2.0
+   */
+  Set<Plugin> getPlugins();
 
   /**
    * Gets the plugin whose name is provided as an argument.
@@ -59,14 +66,6 @@ public interface SmartCardService {
    * @since 2.0
    */
   Plugin getPlugin(String pluginName);
-
-  /**
-   * Gets the plugins.
-   *
-   * @return A not null map of plugin by its name.
-   * @since 2.0
-   */
-  Map<String, Plugin> getPlugins();
 
   /**
    * Verifies the compatibility with the service of the provided card extension.

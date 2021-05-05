@@ -108,7 +108,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    */
   @Override
   final void unregister() {
-    Set<String> unregisteredReadersNames = new HashSet<String>(this.getReadersNames());
+    Set<String> unregisteredReadersNames = new HashSet<String>(this.getReaderNames());
     super.unregister();
     notifyObservers(
         new PluginEvent(
@@ -223,7 +223,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     }
 
     // Register the reader.
-    getReaders().put(remoteReaderAdapter.getName(), remoteReaderAdapter);
+    getReadersMap().put(remoteReaderAdapter.getName(), remoteReaderAdapter);
     remoteReaderAdapter.register();
 
     // Notify observers for a plugin event.
@@ -269,7 +269,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
             slaveReaderSpi, (ObservableRemoteReaderAdapter) masterReader, getName());
 
     // Register the reader.
-    getReaders().put(remoteReaderAdapter.getName(), remoteReaderAdapter);
+    getReadersMap().put(remoteReaderAdapter.getName(), remoteReaderAdapter);
     remoteReaderAdapter.register();
 
     // Notify observers for a reader event.
@@ -325,7 +325,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    * @param reader The reader to unregister.
    */
   private void unregisterReader(Reader reader) {
-    getReaders().remove(reader.getName());
+    getReadersMap().remove(reader.getName());
     ((RemoteReaderAdapter) reader).unregister();
   }
 

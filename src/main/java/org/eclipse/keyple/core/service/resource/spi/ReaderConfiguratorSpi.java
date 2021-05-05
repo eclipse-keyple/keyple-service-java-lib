@@ -16,6 +16,10 @@ import org.eclipse.keyple.core.service.Reader;
 /**
  * Reader configurator used to setup a new reader connected with its specific settings.
  *
+ * <p>Note: since it depends on the type of reader, only the application developer knows what
+ * settings to apply to the readers implemented by the Card Resource Service in order for them to be
+ * fully operational.
+ *
  * @since 2.0
  */
 public interface ReaderConfiguratorSpi {

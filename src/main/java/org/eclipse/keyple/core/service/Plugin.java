@@ -11,7 +11,6 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import java.util.Map;
 import java.util.Set;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 
@@ -45,30 +44,30 @@ public interface Plugin {
   <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionType);
 
   /**
-   * Gets the list of names of all available readers.
+   * Gets the names of all connected readers.
    *
    * @return An empty set if there's no reader connected.
    * @throws IllegalStateException if plugin is no longer registered.
    * @since 2.0
    */
-  Set<String> getReadersNames();
+  Set<String> getReaderNames();
 
   /**
-   * Gets a map whose elements have a reader name as a key and a {@link Reader} as a value.
+   * Gets all connected readers.
    *
-   * @return An empty Map if there's no reader connected.
+   * @return An empty Set if there's no reader connected.
    * @throws IllegalStateException if the plugin is no longer registered.
    * @since 2.0
    */
-  Map<String, Reader> getReaders();
+  Set<Reader> getReaders();
 
   /**
    * Gets the {@link Reader} whose name is provided.
    *
-   * @param readerName The name of the reader.
+   * @param name The name of the reader.
    * @return null if the reader has not been found.
    * @throws IllegalStateException if the plugin is no longer registered.
    * @since 2.0
    */
-  Reader getReader(String readerName);
+  Reader getReader(String name);
 }

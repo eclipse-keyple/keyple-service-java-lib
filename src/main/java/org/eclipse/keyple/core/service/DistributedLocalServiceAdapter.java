@@ -213,7 +213,7 @@ final class DistributedLocalServiceAdapter
           name);
     }
     boolean isObservationStarted = false;
-    for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins().values()) {
+    for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
       if (plugin instanceof ObservablePlugin) {
         ((ObservablePlugin) plugin).addObserver(this);
         isObservationStarted = true;
@@ -238,7 +238,7 @@ final class DistributedLocalServiceAdapter
           name);
     }
 
-    for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins().values()) {
+    for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
       if (plugin instanceof ObservablePlugin) {
         ((ObservablePlugin) plugin).removeObserver(this);
       }
@@ -291,7 +291,7 @@ final class DistributedLocalServiceAdapter
           "The distributed local service '{}' is forwarding the plugin event '{}' associated to the local reader '{}' of the local plugin '{}'.",
           name,
           pluginEvent.getEventType().name(),
-          pluginEvent.getReadersNames().first(),
+          pluginEvent.getReaderNames().first(),
           pluginEvent.getPluginName());
     }
 
@@ -299,7 +299,7 @@ final class DistributedLocalServiceAdapter
     body.add(JsonProperty.PLUGIN_EVENT.name(), JsonUtil.getParser().toJsonTree(pluginEvent));
 
     localServiceSpi.onPluginEvent(
-        pluginEvent.getReadersNames().first(), body.toString(), pluginEvent);
+        pluginEvent.getReaderNames().first(), body.toString(), pluginEvent);
   }
 
   /**
@@ -333,7 +333,7 @@ final class DistributedLocalServiceAdapter
    * @return null if no reader is found with this name.
    */
   private AbstractReaderAdapter getReader(String readerName) {
-    for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins().values()) {
+    for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
       try {
         AbstractReaderAdapter reader = (AbstractReaderAdapter) plugin.getReader(readerName);
         if (reader != null) {
@@ -364,11 +364,11 @@ final class DistributedLocalServiceAdapter
    */
   void unregister() {
     isRegistered = false;
-    for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins().values()) {
+    for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
       if (plugin instanceof ObservablePlugin) {
         ((ObservablePlugin) plugin).removeObserver(this);
       }
-      for (Reader reader : plugin.getReaders().values()) {
+      for (Reader reader : plugin.getReaders()) {
         if (reader instanceof ObservableReader) {
           ((ObservableReader) reader).removeObserver(this);
         }
@@ -825,8 +825,8 @@ final class DistributedLocalServiceAdapter
 
       // Execute the service on the plugins
       Map<String, Boolean> readers = new HashMap<String, Boolean>();
-      for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins().values()) {
-        for (Reader reader : plugin.getReaders().values()) {
+      for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
+        for (Reader reader : plugin.getReaders()) {
           readers.put(reader.getName(), reader instanceof ObservableReader);
         }
       }
@@ -913,7 +913,7 @@ final class DistributedLocalServiceAdapter
       PoolPlugin poolPlugin;
       for (String poolPluginName : poolPluginNames) {
         poolPlugin = (PoolPlugin) SmartCardServiceProvider.getService().getPlugin(poolPluginName);
-        if (poolPlugin != null && poolPlugin.getReadersNames().contains(readerName)) {
+        if (poolPlugin != null && poolPlugin.getReaderNames().contains(readerName)) {
           poolPlugin.releaseReader(poolPlugin.getReader(readerName));
         }
       }
