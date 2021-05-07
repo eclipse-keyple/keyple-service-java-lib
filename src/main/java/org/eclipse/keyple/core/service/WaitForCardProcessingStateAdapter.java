@@ -22,11 +22,11 @@ import org.slf4j.LoggerFactory;
  * <p>The state during which the card is being processed by the application.
  *
  * <ul>
- *   <li>Upon SE_PROCESSED event, the machine changes state for WAIT_FOR_SE_REMOVAL or
- *       WAIT_FOR_SE_DETECTION according to the {@link ObservableReader.PollingMode} setting.
- *   <li>Upon CARD_REMOVED event, the machine changes state for WAIT_FOR_SE_INSERTION or
- *       WAIT_FOR_SE_DETECTION according to the {@link ObservableReader.PollingMode} setting.
- *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_SE_DETECTION.
+ *   <li>Upon CARD_PROCESSED event, the machine changes state for WAIT_FOR_CARD_REMOVAL or
+ *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableReader.PollingMode} setting.
+ *   <li>Upon CARD_REMOVED event, the machine changes state for WAIT_FOR_CARD_INSERTION or
+ *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableReader.PollingMode} setting.
+ *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_CARD_DETECTION.
  * </ul>
  *
  * @since 2.0
@@ -60,7 +60,7 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
       ObservableLocalReaderAdapter reader,
       AbstractMonitoringJobAdapter monitoringJob,
       ExecutorService executorService) {
-    super(MonitoringState.WAIT_FOR_SE_PROCESSING, reader, monitoringJob, executorService);
+    super(MonitoringState.WAIT_FOR_CARD_PROCESSING, reader, monitoringJob, executorService);
   }
 
   /**
@@ -81,9 +81,9 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
      * Process InternalEvent
      */
     switch (event) {
-      case SE_PROCESSED:
+      case CARD_PROCESSED:
         if (this.getReader().getPollingMode() == ObservableReader.PollingMode.REPEATING) {
-          switchState(MonitoringState.WAIT_FOR_SE_REMOVAL);
+          switchState(MonitoringState.WAIT_FOR_CARD_REMOVAL);
         } else {
           // We close the channels now and notify the application of
           // the CARD_REMOVED event.
@@ -99,7 +99,7 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
         // We notify the application of the CARD_REMOVED event.
         getReader().processCardRemoved();
         if (getReader().getPollingMode() == ObservableReader.PollingMode.REPEATING) {
-          switchState(MonitoringState.WAIT_FOR_SE_INSERTION);
+          switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
         } else {
           switchState(MonitoringState.WAIT_FOR_START_DETECTION);
         }

@@ -22,9 +22,9 @@ import org.slf4j.LoggerFactory;
  * <p>The state in which the card is still present and awaiting removal.
  *
  * <ul>
- *   <li>Upon CARD_REMOVED event, the machine changes state for WAIT_FOR_SE_INSERTION or
- *       WAIT_FOR_SE_DETECTION according to the {@link ObservableReader.PollingMode} setting.
- *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_SE_DETECTION.
+ *   <li>Upon CARD_REMOVED event, the machine changes state for WAIT_FOR_CARD_INSERTION or
+ *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableReader.PollingMode} setting.
+ *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_CARD_DETECTION.
  * </ul>
  *
  * @since 2.0
@@ -58,7 +58,7 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
       ObservableLocalReaderAdapter reader,
       AbstractMonitoringJobAdapter monitoringJob,
       ExecutorService executorService) {
-    super(MonitoringState.WAIT_FOR_SE_REMOVAL, reader, monitoringJob, executorService);
+    super(MonitoringState.WAIT_FOR_CARD_REMOVAL, reader, monitoringJob, executorService);
   }
 
   /**
@@ -86,7 +86,7 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
         // We notify the application of the CARD_REMOVED event.
         getReader().processCardRemoved();
         if (getReader().getPollingMode() == ObservableReader.PollingMode.REPEATING) {
-          switchState(MonitoringState.WAIT_FOR_SE_INSERTION);
+          switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
         } else {
           switchState(MonitoringState.WAIT_FOR_START_DETECTION);
         }

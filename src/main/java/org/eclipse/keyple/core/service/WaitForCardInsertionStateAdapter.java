@@ -24,9 +24,9 @@ import org.slf4j.LoggerFactory;
  * <ul>
  *   <li>Upon CARD_INSERTED event, the default selection is processed if required and if the
  *       conditions are met (ALWAYS or CARD_MATCHED) the machine changes state for
- *       WAIT_FOR_SE_PROCESSING.
- *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_SE_DETECTION.
- *   <li>Upon CARD_REMOVED event, the machine changes state for WAIT_FOR_SE_DETECTION.
+ *       WAIT_FOR_CARD_PROCESSING.
+ *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_CARD_DETECTION.
+ *   <li>Upon CARD_REMOVED event, the machine changes state for WAIT_FOR_CARD_DETECTION.
  * </ul>
  *
  * @since 2.0
@@ -60,7 +60,7 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
       ObservableLocalReaderAdapter reader,
       AbstractMonitoringJobAdapter monitoringJob,
       ExecutorService executorService) {
-    super(MonitoringState.WAIT_FOR_SE_INSERTION, reader, monitoringJob, executorService);
+    super(MonitoringState.WAIT_FOR_CARD_INSERTION, reader, monitoringJob, executorService);
   }
 
   /**
@@ -86,17 +86,17 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
         ReaderEvent cardEvent = this.getReader().processCardInserted();
         if (cardEvent != null) {
           // switch internal state
-          switchState(MonitoringState.WAIT_FOR_SE_PROCESSING);
+          switchState(MonitoringState.WAIT_FOR_CARD_PROCESSING);
           // notify the external observer of the event
           getReader().notifyObservers(cardEvent);
         } else {
           // if none event was sent to the application, back to card detection
-          // stay in the same state, however switch to WAIT_FOR_SE_INSERTION to relaunch
+          // stay in the same state, however switch to WAIT_FOR_CARD_INSERTION to relaunch
           // the monitoring job
           if (logger.isTraceEnabled()) {
             logger.trace("[{}] onEvent => Inserted card hasn't matched", getReader().getName());
           }
-          switchState(MonitoringState.WAIT_FOR_SE_REMOVAL);
+          switchState(MonitoringState.WAIT_FOR_CARD_REMOVAL);
         }
         break;
 
@@ -108,7 +108,7 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
         // TODO Check if this case really happens (NFC?)
         // the card has been removed during default selection
         if (getReader().getPollingMode() == ObservableReader.PollingMode.REPEATING) {
-          switchState(MonitoringState.WAIT_FOR_SE_INSERTION);
+          switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
         } else {
           switchState(MonitoringState.WAIT_FOR_START_DETECTION);
         }

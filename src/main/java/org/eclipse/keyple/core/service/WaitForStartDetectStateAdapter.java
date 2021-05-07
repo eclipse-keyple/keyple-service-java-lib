@@ -20,10 +20,10 @@ import org.slf4j.LoggerFactory;
  * Wait for start the card detection state implementation.
  *
  * <p>The state during which the reader does not wait for a card to be inserted but for a signal
- * from the application to do so (switch to the WAIT_FOR_SE_INSERTION state).
+ * from the application to do so (switch to the WAIT_FOR_CARD_INSERTION state).
  *
  * <ul>
- *   <li>Upon START_DETECT event, the machine changes state for WAIT_FOR_SE_INSERTION.
+ *   <li>Upon START_DETECT event, the machine changes state for WAIT_FOR_CARD_INSERTION.
  * </ul>
  *
  * @since 2.0
@@ -80,7 +80,7 @@ final class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapte
      */
     switch (event) {
       case START_DETECT:
-        switchState(MonitoringState.WAIT_FOR_SE_INSERTION);
+        switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
         break;
 
       default:
