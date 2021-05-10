@@ -157,6 +157,11 @@ final class ObservableReaderStateServiceAdapter {
    */
   synchronized void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
     switch (event) {
+      case CARD_INSERTED:
+      case CARD_REMOVED:
+      case CARD_PROCESSED:
+      case TIME_OUT:
+        break;
       case START_DETECT:
         readerSpi.onStartDetection();
         break;

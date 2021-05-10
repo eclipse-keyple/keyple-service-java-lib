@@ -52,9 +52,16 @@ Each example can be run independently.
 
 * Use Case ‘Generic 7’ – Plugin and reader
   observation: [UseCase7_PluginAndReaderObservation](https://github.com/eclipse/keyple-java-service/tree/main/examples/src/main/java/org.eclipse.keyple.core.service.examples.UseCase7_PluginAndReaderObservation)
-    * Demonstrates multiple selections made at once on the same card with the navigation options (FIRST/NEXT) defined by
-      the ISO standard and returned as a single selection result.
+    * Demonstrates the observation of a plugin to monitor the connection/disconnection of readers and of the readers to
+      monitor the insertion/removal of cards.
     * Implementations:
         * For PC/SC plugin: [`Main_PluginAndReaderObservation_Pcsc.java`]
         * For Stub plugin: [`Main_PluginAndReaderObservation_Stub.java`]
 
+* Use Case ‘Generic 8’ – Card resource service
+  observation: [UseCase8_CardResourceService](https://github.com/eclipse/keyple-java-service/tree/main/examples/src/main/java/org.eclipse.keyple.core.service.examples.UseCase8_CardResourceService)
+    * Shows the implementation of the Card Resource service with simultaneous observation of the plugin and the readers,
+      with the definition of two resource profiles.
+    * Implementations:
+        * For PC/SC plugin: [`Main_CardResourceService_Pcsc.java`]
+        * For Stub plugin: [`Main_CardResourceService_Stub.java`]

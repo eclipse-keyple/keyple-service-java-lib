@@ -216,7 +216,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
 
     // Create the reader.
     RemoteReaderAdapter remoteReaderAdapter;
-    if (masterReaderSpi.isObservable()) {
+    if (masterReaderSpi.isObservable()) { // NOSONAR
       remoteReaderAdapter = new ObservableRemoteReaderAdapter(masterReaderSpi, null, getName());
     } else {
       remoteReaderAdapter = new RemoteReaderAdapter(masterReaderSpi, getName());
@@ -252,7 +252,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     }
     Assert.getInstance()
         .notNull(slaveReaderSpi, "slaveReaderSpi")
-        .isTrue(slaveReaderSpi.isObservable(), "isObservable")
+        .isTrue(slaveReaderSpi.isObservable(), "isObservable") // NOSONAR
         .notEmpty(masterReaderName, "masterReaderName")
         .notEmpty(readerEventJsonData, "readerEventJsonData");
 
