@@ -81,20 +81,20 @@ final class ObservableReaderStateServiceAdapter {
     // insertion
     if (readerSpi instanceof WaitForCardInsertionAutonomousSpi) {
       this.states.put(
-          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_SE_INSERTION,
+          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION,
           new WaitForCardInsertionStateAdapter(this.reader));
     } else if (readerSpi instanceof WaitForCardInsertionNonBlockingSpi) {
       CardInsertionActiveMonitoringJobAdapter cardInsertionActiveMonitoringJobAdapter =
           new CardInsertionActiveMonitoringJobAdapter(reader, 200, true);
       this.states.put(
-          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_SE_INSERTION,
+          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION,
           new WaitForCardInsertionStateAdapter(
               this.reader, cardInsertionActiveMonitoringJobAdapter, this.executorService));
     } else if (readerSpi instanceof WaitForCardInsertionBlockingSpi) {
       final CardInsertionPassiveMonitoringJobAdapter cardInsertionPassiveMonitoringJobAdapter =
           new CardInsertionPassiveMonitoringJobAdapter(reader);
       states.put(
-          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_SE_INSERTION,
+          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION,
           new WaitForCardInsertionStateAdapter(
               this.reader, cardInsertionPassiveMonitoringJobAdapter, this.executorService));
     } else {
@@ -107,12 +107,12 @@ final class ObservableReaderStateServiceAdapter {
       final CardRemovalPassiveMonitoringJobAdapter cardRemovalPassiveMonitoringJobAdapter =
           new CardRemovalPassiveMonitoringJobAdapter(reader);
       this.states.put(
-          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_SE_PROCESSING,
+          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING,
           new WaitForCardProcessingStateAdapter(
               this.reader, cardRemovalPassiveMonitoringJobAdapter, this.executorService));
     } else if (readerSpi instanceof DontWaitForCardRemovalDuringProcessingSpi) {
       this.states.put(
-          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_SE_PROCESSING,
+          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING,
           new WaitForCardProcessingStateAdapter(this.reader));
     } else {
       throw new IllegalStateException(
@@ -122,21 +122,21 @@ final class ObservableReaderStateServiceAdapter {
     // removal
     if (readerSpi instanceof WaitForCardRemovalAutonomousSpi) {
       this.states.put(
-          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_SE_REMOVAL,
+          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_REMOVAL,
           new WaitForCardRemovalStateAdapter(this.reader));
 
     } else if (readerSpi instanceof WaitForCardRemovalNonBlockingSpi) {
       CardRemovalActiveMonitoringJobAdapter cardRemovalActiveMonitoringJobAdapter =
           new CardRemovalActiveMonitoringJobAdapter(this.reader, 200);
       this.states.put(
-          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_SE_REMOVAL,
+          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_REMOVAL,
           new WaitForCardRemovalStateAdapter(
               this.reader, cardRemovalActiveMonitoringJobAdapter, this.executorService));
     } else if (readerSpi instanceof WaitForCardRemovalBlockingSpi) {
       final CardRemovalPassiveMonitoringJobAdapter cardRemovalPassiveMonitoringJobAdapter =
           new CardRemovalPassiveMonitoringJobAdapter(reader);
       states.put(
-          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_SE_REMOVAL,
+          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_REMOVAL,
           new WaitForCardRemovalStateAdapter(
               this.reader, cardRemovalPassiveMonitoringJobAdapter, this.executorService));
     } else {
@@ -157,6 +157,11 @@ final class ObservableReaderStateServiceAdapter {
    */
   synchronized void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
     switch (event) {
+      case CARD_INSERTED:
+      case CARD_REMOVED:
+      case CARD_PROCESSED:
+      case TIME_OUT:
+        break;
       case START_DETECT:
         readerSpi.onStartDetection();
         break;

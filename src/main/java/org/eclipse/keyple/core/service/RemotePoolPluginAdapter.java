@@ -162,7 +162,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     // Build the input JSON data.
     JsonObject input = new JsonObject();
     input.addProperty(JsonProperty.SERVICE.name(), PluginService.RELEASE_READER.name());
-    input.addProperty(JsonProperty.READER_NAME.name(), reader.getName());
+    input.addProperty(JsonProperty.READER_NAME.name(), reader.getName()); // NOSONAR
 
     // Execute the remote service.
     try {

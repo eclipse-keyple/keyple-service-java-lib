@@ -80,7 +80,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
      *
      * @since 2.0
      */
-    SE_PROCESSED,
+    CARD_PROCESSED,
     /**
      * The application has requested the start of card detection
      *
@@ -588,7 +588,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           getName(),
           getPluginName());
     }
-    stateService.onEvent(InternalEvent.SE_PROCESSED);
+    stateService.onEvent(InternalEvent.CARD_PROCESSED);
   }
 
   /**

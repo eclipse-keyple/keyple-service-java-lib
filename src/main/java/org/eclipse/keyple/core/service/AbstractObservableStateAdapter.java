@@ -45,19 +45,19 @@ abstract class AbstractObservableStateAdapter {
      *
      * @since 2.0
      */
-    WAIT_FOR_SE_INSERTION,
+    WAIT_FOR_CARD_INSERTION,
     /**
      * The reader waits for the application to finish processing the card.
      *
      * @since 2.0
      */
-    WAIT_FOR_SE_PROCESSING,
+    WAIT_FOR_CARD_PROCESSING,
     /**
      * The reader waits for the removal of the card.
      *
      * @since 2.0
      */
-    WAIT_FOR_SE_REMOVAL
+    WAIT_FOR_CARD_REMOVAL
   }
 
   /* Identifier of the currentState */
