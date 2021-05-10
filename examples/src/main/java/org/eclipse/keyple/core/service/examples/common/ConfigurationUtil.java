@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility class providing methods for configuring readers and the card resource service used across
  * several examples.
+ *
+ * @since 2.0
  */
 public class ConfigurationUtil {
   public static final String AID_EMV_PPSE = "325041592E5359532E4444463031";
@@ -52,6 +54,7 @@ public class ConfigurationUtil {
    * @param readerNameRegex A regular expression matching the targeted reader.
    * @return A not null reference.
    * @throws IllegalStateException If the reader is not found.
+   * @since 2.0
    */
   public static Reader getCardReader(Plugin plugin, String readerNameRegex) {
     for (String readerName : plugin.getReaderNames()) {
@@ -77,10 +80,14 @@ public class ConfigurationUtil {
   /**
    * Setup the {@link CardResourceService} to provide a card resource when requested.
    *
+   * <p>Since the card resource service is used without reader observation, the card resource must
+   * be available when this method is invoked and during the entire program execution.
+   *
    * @param plugin The plugin to which the card resource reader belongs.
    * @param readerNameRegex A regular expression matching the expected card resource reader name.
    * @param cardResourceProfileName A string defining the card resource profile.
    * @throws IllegalStateException If the expected card resource is not found.
+   * @since 2.0
    */
   public static void setupCardResourceService(
       Plugin plugin, String readerNameRegex, String cardResourceProfileName) {
@@ -114,7 +121,7 @@ public class ConfigurationUtil {
               cardResourceProfileName, readerNameRegex, plugin.getName()));
     }
 
-    // release the resource
+    // release the verified resource
     cardResourceService.releaseCardResource(cardResource);
   }
 
