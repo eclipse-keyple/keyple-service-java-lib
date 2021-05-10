@@ -412,43 +412,4 @@ public class LocalReaderAdapterTest {
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isContactless()).isFalse();
   }
-
-  @Test
-  public void isLogicalChannelOpen() {}
-
-  @Test
-  public void checkStatus() {}
-
-  @Test
-  public void register() {}
-
-  @Test
-  public void unregister() {}
-
-  @Test
-  public void transmitCardRequest() {}
-
-  @Test
-  public void closeLogicalAndPhysicalChannelsSilently() {}
-
-  @Test
-  public void testUnregister() {}
-
-  @Test
-  public void processCardSelectionRequests() {}
-
-  @Test
-  public void processCardRequest() {}
-
-  @Test
-  public void isCardPresent() {}
-
-  @Test
-  public void activateProtocol() {}
-
-  @Test
-  public void deactivateProtocol() {}
-
-  @Test
-  public void releaseChannel() {}
 }
