@@ -72,34 +72,9 @@ public class LocalReaderAdapterTest {
   public void tearDown() {}
 
   @Test
-  public void getPluginName_shouldReturnPluginName() {
-    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
-    assertThat(localReaderAdapter.getPluginName()).isEqualTo(PLUGIN_NAME);
-  }
-
-  @Test
-  public void getName_shouldReturnReaderName() {
-    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
-    assertThat(localReaderAdapter.getName()).isEqualTo(READER_NAME);
-  }
-
-  @Test
   public void getReaderSpi_shouldReturnReaderSpi() {
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     assertThat(localReaderAdapter.getReaderSpi()).isEqualTo(readerSpi);
-  }
-
-  @Test
-  public void getExtension_whenReaderIsRegistered_shouldReturnExtension() {
-    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
-    localReaderAdapter.register();
-    assertThat(localReaderAdapter.getExtension(ReaderSpiMock.class)).isEqualTo(readerSpi);
-  }
-
-  @Test(expected = IllegalStateException.class)
-  public void getExtension_whenReaderIsNotRegistered_shouldISE() {
-    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
-    localReaderAdapter.getExtension(ReaderSpiMock.class);
   }
 
   @Test(expected = KeypleReaderCommunicationException.class)
