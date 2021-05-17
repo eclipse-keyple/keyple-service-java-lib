@@ -283,6 +283,9 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
     } catch (Exception e) {
       DistributedUtilAdapter.throwRuntimeException(e);
     }
+
+    // Start remote observation.
+    getRemoteReaderSpi().startReaderObservation();
   }
 
   /**
@@ -299,6 +302,9 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
           getName(),
           getPluginName());
     }
+
+    // Stop remote observation.
+    getRemoteReaderSpi().stopReaderObservation();
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();

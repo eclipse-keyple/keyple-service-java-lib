@@ -687,7 +687,8 @@ final class DistributedLocalServiceAdapter
           ObservableReader.PollingMode.valueOf(
               input.get(JsonProperty.POLLING_MODE.name()).getAsString());
 
-      // Execute the service on the reader
+      // Execute the service on the readers
+      startReaderObservation(reader.getName());
       ((ObservableReader) reader).startCardDetection(pollingMode);
     }
 
@@ -698,6 +699,7 @@ final class DistributedLocalServiceAdapter
     private void stopCardDetection() {
 
       // Execute the service on the reader
+      stopReaderObservation(reader.getName());
       ((ObservableReader) reader).stopCardDetection();
     }
 
