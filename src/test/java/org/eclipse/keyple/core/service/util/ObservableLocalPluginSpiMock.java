@@ -19,7 +19,7 @@ import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.ObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 
-public class MockObservableLocalPluginSpi implements ObservablePluginSpi {
+public class ObservableLocalPluginSpiMock implements ObservablePluginSpi {
 
   private final String name;
   private final int monitoringCycleDuration = 0;
@@ -31,7 +31,7 @@ public class MockObservableLocalPluginSpi implements ObservablePluginSpi {
    * @param name name of the plugin
    * @since 2.0
    */
-  public MockObservableLocalPluginSpi(String name, PluginIOException pluginError) {
+  public ObservableLocalPluginSpiMock(String name, PluginIOException pluginError) {
     this.name = name;
     this.pluginError = pluginError;
     this.stubReaders = new ConcurrentHashMap<String, ReaderSpi>();
@@ -103,7 +103,7 @@ public class MockObservableLocalPluginSpi implements ObservablePluginSpi {
    */
   public void addReaderName(String... name) {
     for (String readerName : name) {
-      stubReaders.put(readerName, new MockLocalReaderSpi(readerName));
+      stubReaders.put(readerName, new LocalReaderSpiMock(readerName));
     }
   }
   /**

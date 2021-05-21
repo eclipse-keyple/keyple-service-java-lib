@@ -18,11 +18,12 @@ import static org.eclipse.keyple.core.service.PluginEvent.EventType.READER_DISCO
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.*;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import org.eclipse.keyple.core.plugin.PluginIOException;
-import org.eclipse.keyple.core.service.util.MockObservableLocalPluginSpi;
-import org.eclipse.keyple.core.service.util.MockPluginExceptionHandler;
-import org.eclipse.keyple.core.service.util.MockPluginObserverSpi;
+import org.eclipse.keyple.core.service.util.ObservableLocalPluginSpiMock;
+import org.eclipse.keyple.core.service.util.PluginExceptionHandlerMock;
+import org.eclipse.keyple.core.service.util.PluginObserverSpiMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,15 +32,15 @@ public class ObservableLocalPluginAdapterTest {
 
   ObservableLocalPluginAdapter pluginAdapter;
 
-  MockPluginExceptionHandler exceptionHandlerMock;
-  MockObservableLocalPluginSpi observablePluginMock;
-  MockPluginObserverSpi observerMock;
+  PluginExceptionHandlerMock exceptionHandlerMock;
+  ObservableLocalPluginSpiMock observablePluginMock;
+  PluginObserverSpiMock observerMock;
 
   @Before
   public void seTup() {
-    observablePluginMock = new MockObservableLocalPluginSpi(PLUGIN_NAME, null);
-    observerMock = new MockPluginObserverSpi(null);
-    exceptionHandlerMock = new MockPluginExceptionHandler();
+    observablePluginMock = new ObservableLocalPluginSpiMock(PLUGIN_NAME, null);
+    observerMock = new PluginObserverSpiMock(null);
+    exceptionHandlerMock = new PluginExceptionHandlerMock(null);
 
     pluginAdapter = new ObservableLocalPluginAdapter(observablePluginMock);
   }
@@ -73,13 +74,35 @@ public class ObservableLocalPluginAdapterTest {
   }
 
   @Test
-  public void notifyObservers_withEventNotificationExecutorService_isAsync() throws Throwable {}
+  public void notifyObservers_withEventNotificationExecutorService_isAsync() throws Throwable {
+    addFirstObserver_shouldStartEventThread();
+    pluginAdapter.setEventNotificationExecutorService(Executors.newCachedThreadPool());
+    // add reader name
+    observablePluginMock.addReaderName(READER_NAME_1);
+
+    await().atMost(1, TimeUnit.SECONDS).until(eventOfTypeIsReceived(READER_CONNECTED));
+
+    // check if exception has been thrown
+    assertThat(exceptionHandlerMock.getPluginName()).isNull();
+    assertThat(exceptionHandlerMock.getE()).isNull();
+  }
 
   @Test
-  public void notifyObservers_withoutEventNotificationExecutorService_sync() {}
+  public void notifyObserver_throwException_isPassedTo_exceptionHandler() throws Throwable {
+    RuntimeException exception = new RuntimeException();
+    exceptionHandlerMock = new PluginExceptionHandlerMock(new RuntimeException());
+    observerMock = new PluginObserverSpiMock(exception);
 
-  @Test
-  public void notifyObserver_throwException_isPassedTo_exceptionHandler() {}
+    // start plugin
+    addFirstObserver_shouldStartEventThread();
+
+    // add reader name
+    observablePluginMock.addReaderName(READER_NAME_1);
+
+    await().atMost(1, TimeUnit.SECONDS).until(handlerIsInvoked());
+    // when exception handler fails, no error is thrown only logs
+
+  }
 
   /*
    * Observable Local PLugin Adapter
@@ -150,7 +173,7 @@ public class ObservableLocalPluginAdapterTest {
   public void whileMonitoring_observerThrowException_isPassedTo_exceptionHandler()
       throws Throwable {
     RuntimeException exception = new RuntimeException();
-    observerMock = new MockPluginObserverSpi(exception);
+    observerMock = new PluginObserverSpiMock(exception);
 
     // start plugin
     addFirstObserver_shouldStartEventThread();
@@ -168,7 +191,7 @@ public class ObservableLocalPluginAdapterTest {
   @Test
   public void whileMonitoring_pluginThrowException_isPassedTo_exceptionHandler() throws Throwable {
     PluginIOException exception = new PluginIOException("error");
-    observablePluginMock = new MockObservableLocalPluginSpi(PLUGIN_NAME, exception);
+    observablePluginMock = new ObservableLocalPluginSpiMock(PLUGIN_NAME, exception);
     pluginAdapter = new ObservableLocalPluginAdapter(observablePluginMock);
 
     // start plugin

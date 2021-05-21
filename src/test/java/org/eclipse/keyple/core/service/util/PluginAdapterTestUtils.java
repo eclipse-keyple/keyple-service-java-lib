@@ -11,8 +11,12 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.util;
 
+import static org.mockito.Mockito.when;
+
 import java.util.HashSet;
 import java.util.Set;
+import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
+import org.mockito.Mockito;
 
 public class PluginAdapterTestUtils {
 
@@ -25,5 +29,13 @@ public class PluginAdapterTestUtils {
   static {
     READER_NAMES.add(READER_NAME_1);
     READER_NAMES.add(READER_NAME_2);
+  }
+
+  public static final ReaderSpi readerSpi1 = Mockito.mock(ReaderSpi.class);
+  public static final ReaderSpi readerSpi2 = Mockito.mock(ReaderSpi.class);;
+
+  static {
+    when(readerSpi1.getName()).thenReturn(READER_NAME_1);
+    when(readerSpi2.getName()).thenReturn(READER_NAME_2);
   }
 }

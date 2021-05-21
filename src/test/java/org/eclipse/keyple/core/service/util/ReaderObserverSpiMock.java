@@ -13,32 +13,32 @@ package org.eclipse.keyple.core.service.util;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.eclipse.keyple.core.service.PluginEvent;
-import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
+import org.eclipse.keyple.core.service.ReaderEvent;
+import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 
-public class MockPluginObserverSpi implements PluginObserverSpi {
+public class ReaderObserverSpiMock implements ReaderObserverSpi {
 
-  Map<PluginEvent.EventType, PluginEvent> eventTypeReceived =
-      new ConcurrentHashMap<PluginEvent.EventType, PluginEvent>();
+  Map<ReaderEvent.EventType, ReaderEvent> eventTypeReceived =
+      new ConcurrentHashMap<ReaderEvent.EventType, ReaderEvent>();
   RuntimeException throwEx;
 
-  public MockPluginObserverSpi(RuntimeException e) {
+  public ReaderObserverSpiMock(RuntimeException e) {
     this.throwEx = e;
   }
 
   @Override
-  public void onPluginEvent(PluginEvent pluginEvent) {
-    eventTypeReceived.put(pluginEvent.getEventType(), pluginEvent);
+  public void onReaderEvent(ReaderEvent readerEvent) {
+    eventTypeReceived.put(readerEvent.getEventType(), readerEvent);
     if (throwEx != null) {
       throw throwEx;
     }
   }
 
-  public Boolean hasReceived(PluginEvent.EventType eventType) {
+  public Boolean hasReceived(ReaderEvent.EventType eventType) {
     return eventTypeReceived.keySet().contains(eventType);
   }
 
-  public PluginEvent getLastEventOfType(PluginEvent.EventType eventType) {
+  public ReaderEvent getLastEventOfType(ReaderEvent.EventType eventType) {
     return eventTypeReceived.get(eventType);
   }
 }

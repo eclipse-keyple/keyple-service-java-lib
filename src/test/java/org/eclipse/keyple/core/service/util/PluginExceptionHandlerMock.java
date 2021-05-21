@@ -13,16 +13,24 @@ package org.eclipse.keyple.core.service.util;
 
 import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
 
-public class MockPluginExceptionHandler implements PluginObservationExceptionHandlerSpi {
+public class PluginExceptionHandlerMock implements PluginObservationExceptionHandlerSpi {
   boolean invoked = false;
   String pluginName;
   Throwable e;
+  RuntimeException throwEx;
+
+  public PluginExceptionHandlerMock(RuntimeException throwEx) {
+    this.throwEx = throwEx;
+  }
 
   @Override
   public void onPluginObservationError(String pluginName, Throwable e) {
+    this.invoked = true;
+    if (throwEx != null) {
+      throw throwEx;
+    }
     this.pluginName = pluginName;
     this.e = e;
-    this.invoked = true;
   }
 
   public boolean isInvoked() {

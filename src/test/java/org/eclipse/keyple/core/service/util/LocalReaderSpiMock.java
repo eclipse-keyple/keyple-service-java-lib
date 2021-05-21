@@ -15,11 +15,11 @@ import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 
-public class MockLocalReaderSpi implements ReaderSpi {
+public class LocalReaderSpiMock implements ReaderSpi {
 
   protected String readerName;
 
-  public MockLocalReaderSpi(String readerName) {
+  public LocalReaderSpiMock(String readerName) {
     this.readerName = readerName;
   }
 
