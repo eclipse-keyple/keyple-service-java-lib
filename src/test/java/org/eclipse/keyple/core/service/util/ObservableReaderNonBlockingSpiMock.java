@@ -11,31 +11,32 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.util;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.WaitForCardInsertionAutonomousReaderApi;
 import org.eclipse.keyple.core.plugin.WaitForCardRemovalAutonomousReaderApi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionAutonomousSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionNonBlockingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.DontWaitForCardRemovalDuringProcessingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalAutonomousSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalNonBlockingSpi;
 
-public class ObservableReaderAutonomousSpiMock
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public class ObservableReaderNonBlockingSpiMock
     implements ObservableReaderSpi,
-        WaitForCardInsertionAutonomousSpi,
-        WaitForCardRemovalAutonomousSpi,
+        WaitForCardInsertionNonBlockingSpi,
+        WaitForCardRemovalNonBlockingSpi,
         DontWaitForCardRemovalDuringProcessingSpi,
         ObservableReaderSpiMock {
 
-  WaitForCardInsertionAutonomousReaderApi waitForCardInsertionAutonomousReaderApi;
-  WaitForCardRemovalAutonomousReaderApi waitForCardRemovalAutonomousReaderApi;
   boolean detectionStarted;
   boolean physicalChannelOpen;
   AtomicBoolean cardPresent;
   String name;
 
-  public ObservableReaderAutonomousSpiMock(String name) {
+  public ObservableReaderNonBlockingSpiMock(String name) {
     this.detectionStarted = false;
     this.name = name;
     this.physicalChannelOpen = false;
@@ -100,7 +101,11 @@ public class ObservableReaderAutonomousSpiMock
 
   @Override
   public byte[] transmitApdu(byte[] apduIn) throws ReaderIOException, CardIOException {
-    return new byte[0];
+    if(cardPresent.get()){
+      return new byte[0];
+    }else{
+      throw new CardIOException("card is not present");
+    }
   }
 
   @Override
@@ -112,22 +117,7 @@ public class ObservableReaderAutonomousSpiMock
   public void unregister() {}
 
   @Override
-  public void connect(
-      WaitForCardInsertionAutonomousReaderApi waitForCardInsertionAutonomousReaderApi) {
-    this.waitForCardInsertionAutonomousReaderApi = waitForCardInsertionAutonomousReaderApi;
-  }
-
-  @Override
-  public void connect(WaitForCardRemovalAutonomousReaderApi waitForCardRemovalAutonomousReaderApi) {
-    this.waitForCardRemovalAutonomousReaderApi = waitForCardRemovalAutonomousReaderApi;
-  }
-
   public void setCardPresent(boolean cardPresent) {
     this.cardPresent.set(cardPresent);
-    if (cardPresent) {
-      waitForCardInsertionAutonomousReaderApi.onCardInserted();
-    } else {
-      waitForCardRemovalAutonomousReaderApi.onCardRemoved();
-    }
   }
 }

@@ -154,6 +154,7 @@ abstract class AbstractObservableStateAdapter {
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] onActivate => {}", this.reader.getName(), this.getMonitoringState());
     }
+
     // launch the monitoringJob is necessary
     if (monitoringJob != null) {
       if (executorService == null) {
@@ -170,9 +171,12 @@ abstract class AbstractObservableStateAdapter {
    * @since 2.0
    */
   final void onDeactivate() {
+    /*
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] onDeactivate => {}", this.reader.getName(), this.getMonitoringState());
     }
+    */
+     
     // cancel the monitoringJob is necessary
     if (monitoringEvent != null && !monitoringEvent.isDone()) {
       monitoringJob.stop();
@@ -180,8 +184,9 @@ abstract class AbstractObservableStateAdapter {
       boolean canceled = monitoringEvent.cancel(false);
       if (logger.isTraceEnabled()) {
         logger.trace(
-            "[{}] onDeactivate => cancel runnable waitForCarPresent by thread interruption {}",
+            "[{}] onDeactivate => cancel monitoring job {} by thread interruption {}",
             reader.getName(),
+            monitoringJob.getClass().getSimpleName(),
             canceled);
       }
     }
