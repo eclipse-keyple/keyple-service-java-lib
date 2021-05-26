@@ -53,11 +53,11 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
    */
   @Override
   public void onReaderConnected(Set<ReaderSpi> readers) {
-    Assert.getInstance().notNull(readers,"readers");
+    Assert.getInstance().notNull(readers, "readers");
     Set<String> notifyReaders = new HashSet<String>();
 
     for (ReaderSpi readerSpi : readers) {
-      //add reader to plugin
+      // add reader to plugin
       this.addReader(readerSpi);
       notifyReaders.add(readerSpi.getName());
     }
@@ -73,23 +73,25 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
    */
   @Override
   public void onReaderDisconnected(Set<String> readerNames) {
-    Assert.getInstance().notNull(readerNames,"readerNames");
+    Assert.getInstance().notNull(readerNames, "readerNames");
     Set<String> notifyReaders = new HashSet<String>();
 
-    for(String readerName : readerNames){
+    for (String readerName : readerNames) {
       Reader reader = this.getReader(readerName);
-      if(reader==null){
+      if (reader == null) {
         logger.warn(
-                "[{}] ObservableLocalPlugin => Impossible to remove reader, reader not found with name : {}",
-                this.getName(), readerName);
-      }else{
-        //unregister and remove reader
+            "[{}] ObservableLocalPlugin => Impossible to remove reader, reader not found with name : {}",
+            this.getName(),
+            readerName);
+      } else {
+        // unregister and remove reader
         ((LocalReaderAdapter) reader).unregister();
         getReadersMap().remove(reader.getName());
         if (logger.isTraceEnabled()) {
-          logger.trace("[{}] ObservableLocalPlugin => Remove reader '{}' from readers list.",
-                  this.getName(),
-                  reader.getName());
+          logger.trace(
+              "[{}] ObservableLocalPlugin => Remove reader '{}' from readers list.",
+              this.getName(),
+              reader.getName());
         }
         notifyReaders.add(readerName);
       }
@@ -99,12 +101,12 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
         new PluginEventAdapter(getName(), notifyReaders, PluginEvent.Type.READER_DISCONNECTED));
   }
 
-
   /**
    * Create and add a reader to the reader list from a readerSpi
+   *
    * @param readerSpi spi to create the reader from
    */
-  private void addReader(ReaderSpi readerSpi){
+  private void addReader(ReaderSpi readerSpi) {
     LocalReaderAdapter reader;
     if (readerSpi instanceof ObservableReaderSpi) {
       reader = new ObservableLocalReaderAdapter((ObservableReaderSpi) readerSpi, this.getName());
@@ -115,9 +117,9 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
     getReadersMap().put(reader.getName(), reader);
     if (logger.isTraceEnabled()) {
       logger.trace(
-              "[{}] ObservableLocalPlugin => Add reader '{}' to readers list.",
-              this.getName(),
-              readerSpi.getName());
+          "[{}] ObservableLocalPlugin => Add reader '{}' to readers list.",
+          this.getName(),
+          readerSpi.getName());
     }
   }
 }

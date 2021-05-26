@@ -11,6 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.util;
 
+import static org.mockito.Mockito.when;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -19,8 +21,6 @@ import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.ObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.mockito.Mockito;
-
-import static org.mockito.Mockito.when;
 
 public class ObservableLocalPluginSpiMock implements ObservablePluginSpi {
 

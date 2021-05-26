@@ -58,9 +58,7 @@ public class AutonomousObservableLocalPluginAdapterTest {
     // register readers
     plugin.onReaderConnected(readers);
 
-    await()
-            .atMost(1, TimeUnit.SECONDS)
-            .until(eventOfTypeIsReceived(READER_CONNECTED));
+    await().atMost(1, TimeUnit.SECONDS).until(eventOfTypeIsReceived(READER_CONNECTED));
 
     // check event is well formed
     PluginEvent event = observer.getLastEventOfType(READER_CONNECTED);

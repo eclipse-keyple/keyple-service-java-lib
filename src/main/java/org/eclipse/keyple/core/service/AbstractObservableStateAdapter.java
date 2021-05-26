@@ -176,7 +176,7 @@ abstract class AbstractObservableStateAdapter {
       logger.trace("[{}] onDeactivate => {}", this.reader.getName(), this.getMonitoringState());
     }
     */
-     
+
     // cancel the monitoringJob is necessary
     if (monitoringEvent != null && !monitoringEvent.isDone()) {
       monitoringJob.stop();

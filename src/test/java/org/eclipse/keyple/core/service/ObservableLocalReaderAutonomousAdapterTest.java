@@ -11,8 +11,6 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN_NAME;
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER_NAME_1;
 import static org.mockito.Mockito.mock;
@@ -27,7 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ObservableLocalReaderAutonomousAdapterTest {
-  private static final Logger logger = LoggerFactory.getLogger(ObservableLocalReaderAutonomousAdapterTest.class);
+  private static final Logger logger =
+      LoggerFactory.getLogger(ObservableLocalReaderAutonomousAdapterTest.class);
 
   ObservableLocalReaderAdapter reader;
   ObservableReaderAutonomousSpiMock readerSpi;
@@ -43,14 +42,13 @@ public class ObservableLocalReaderAutonomousAdapterTest {
     handler = mock(ReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
     observer = new ReaderObserverSpiMock(null);
-    testSuite = new ObservableLocalReaderSuiteTest(reader, readerSpi,observer,handler,logger);
+    testSuite = new ObservableLocalReaderSuiteTest(reader, readerSpi, observer, handler, logger);
   }
 
   @After
-  public void tearDown(){
+  public void tearDown() {
     reader.unregister();
   }
-
 
   @Test
   public void initReader_addObserver_startDetection() {
@@ -86,5 +84,4 @@ public class ObservableLocalReaderAutonomousAdapterTest {
   public void removeCard_beforeFinalize_shouldNotify_CardRemoved() {
     testSuite.removeCard_beforeFinalize_shouldNotify_CardRemoved();
   }
-
 }

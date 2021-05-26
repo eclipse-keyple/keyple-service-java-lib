@@ -1,44 +1,55 @@
+/* **************************************************************************************
+ * Copyright (c) 2021 Calypso Networks Association https://www.calypsonet-asso.org/
+ *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ ************************************************************************************** */
 package org.eclipse.keyple.core.service;
-
-import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
-import org.eclipse.keyple.core.service.util.ObservableReaderSpiMock;
-import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
-import org.slf4j.Logger;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN_NAME;
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER_NAME_1;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
+import org.eclipse.keyple.core.service.util.ObservableReaderSpiMock;
+import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
+import org.slf4j.Logger;
+
 public class ObservableLocalReaderSuiteTest {
 
-     private ObservableLocalReaderAdapter reader;
-     private ObservableReaderSpiMock readerSpi;
-     private ReaderObserverSpiMock observer;
-    private ReaderObservationExceptionHandlerSpi handler;
-private Logger logger;
+  private ObservableLocalReaderAdapter reader;
+  private ObservableReaderSpiMock readerSpi;
+  private ReaderObserverSpiMock observer;
+  private ReaderObservationExceptionHandlerSpi handler;
+  private Logger logger;
 
-    ObservableLocalReaderSuiteTest(ObservableLocalReaderAdapter reader,
-                                   ObservableReaderSpiMock readerSpi,
-                                   ReaderObserverSpiMock observer,
-                                   ReaderObservationExceptionHandlerSpi handler,
-                                    Logger logger){
-        this.reader = reader;
-        this.readerSpi = readerSpi;
-        this.observer = observer;
-        this.handler = handler;
-        this.logger = logger;
-    }
+  ObservableLocalReaderSuiteTest(
+      ObservableLocalReaderAdapter reader,
+      ObservableReaderSpiMock readerSpi,
+      ReaderObserverSpiMock observer,
+      ReaderObservationExceptionHandlerSpi handler,
+      Logger logger) {
+    this.reader = reader;
+    this.readerSpi = readerSpi;
+    this.observer = observer;
+    this.handler = handler;
+    this.logger = logger;
+  }
 
-    //@Test
+  // @Test
   public void initReader_addObserver_startDetection() {
     reader.register();
 
     assertThat(reader.getCurrentMonitoringState())
-            .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_START_DETECTION);
+        .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_START_DETECTION);
 
     reader.setReaderObservationExceptionHandler(handler);
     reader.addObserver(observer);
@@ -46,36 +57,36 @@ private Logger logger;
     assertThat(reader.countObservers()).isEqualTo(1);
 
     assertThat(reader.getCurrentMonitoringState())
-            .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION);
+        .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION);
   }
 
-  //@Test
+  // @Test
   public void removeObserver() {
     initReader_addObserver_startDetection();
     reader.removeObserver(observer);
     assertThat(reader.countObservers()).isEqualTo(0);
 
-    //state is not changed
+    // state is not changed
     assertThat(reader.getCurrentMonitoringState())
-              .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION);
+        .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION);
   }
 
-  //@Test
+  // @Test
   public void clearObservers() {
     initReader_addObserver_startDetection();
     reader.clearObservers();
     assertThat(reader.countObservers()).isEqualTo(0);
   }
 
-  //@Test
+  // @Test
   public void insertCard_shouldNotify_CardInsertedEvent() {
     initReader_addObserver_startDetection();
     logger.debug("Insert card...");
     readerSpi.setCardPresent(true);
 
     await()
-            .atMost(2, TimeUnit.SECONDS)
-            .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING));
+        .atMost(2, TimeUnit.SECONDS)
+        .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING));
 
     // check event is well formed
     ReaderEvent event = observer.getLastEventOfType(ReaderEvent.EventType.CARD_INSERTED);
@@ -83,7 +94,7 @@ private Logger logger;
     assertThat(event.getPluginName()).isEqualTo(PLUGIN_NAME);
   }
 
-  //@Test
+  // @Test
   public void finalizeCardProcessing_afterInsert_switchState() {
     insertCard_shouldNotify_CardInsertedEvent();
 
@@ -91,12 +102,11 @@ private Logger logger;
     reader.finalizeCardProcessing();
 
     await()
-            .atMost(3, TimeUnit.SECONDS)
-            .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_REMOVAL));
+        .atMost(3, TimeUnit.SECONDS)
+        .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_REMOVAL));
+  }
 
-    }
-
-  //@Test
+  // @Test
   public void removeCard_afterFinalize_shouldNotify_CardRemoved() {
     finalizeCardProcessing_afterInsert_switchState();
 
@@ -104,9 +114,8 @@ private Logger logger;
     readerSpi.setCardPresent(false);
 
     await()
-            .atMost(1, TimeUnit.SECONDS)
-            .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION));
-
+        .atMost(1, TimeUnit.SECONDS)
+        .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION));
 
     // check event is well formed
     ReaderEvent event = observer.getLastEventOfType(ReaderEvent.EventType.CARD_REMOVED);
@@ -114,7 +123,7 @@ private Logger logger;
     assertThat(event.getPluginName()).isEqualTo(PLUGIN_NAME);
   }
 
-  //@Test
+  // @Test
   public void removeCard_beforeFinalize_shouldNotify_CardRemoved() {
     insertCard_shouldNotify_CardInsertedEvent();
 
@@ -122,8 +131,8 @@ private Logger logger;
     readerSpi.setCardPresent(false);
 
     await()
-            .atMost(2, TimeUnit.SECONDS)
-            .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION));
+        .atMost(2, TimeUnit.SECONDS)
+        .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION));
 
     // check event is well formed
     ReaderEvent event = observer.getLastEventOfType(ReaderEvent.EventType.CARD_REMOVED);
@@ -131,11 +140,9 @@ private Logger logger;
     assertThat(event.getPluginName()).isEqualTo(PLUGIN_NAME);
   }
 
-
-
   /*
-     * Callables
-     */
+   * Callables
+   */
 
   private Callable<Boolean> eventOfTypeIsReceived(final ReaderEvent.EventType eventType) {
     return new Callable<Boolean>() {
@@ -146,11 +153,13 @@ private Logger logger;
     };
   }
 
-  private Callable<Boolean> stateIs(final AbstractObservableStateAdapter.MonitoringState monitoringState) {
+  private Callable<Boolean> stateIs(
+      final AbstractObservableStateAdapter.MonitoringState monitoringState) {
     return new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
-        logger.trace("TEST ... wait for {} is {}", reader.getCurrentMonitoringState(),monitoringState);
+        logger.trace(
+            "TEST ... wait for {} is {}", reader.getCurrentMonitoringState(), monitoringState);
         return reader.getCurrentMonitoringState().equals(monitoringState);
       }
     };

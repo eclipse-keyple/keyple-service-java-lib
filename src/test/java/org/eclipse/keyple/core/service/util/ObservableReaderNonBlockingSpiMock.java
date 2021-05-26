@@ -11,18 +11,13 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.util;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
-import org.eclipse.keyple.core.plugin.WaitForCardInsertionAutonomousReaderApi;
-import org.eclipse.keyple.core.plugin.WaitForCardRemovalAutonomousReaderApi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionAutonomousSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionNonBlockingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.DontWaitForCardRemovalDuringProcessingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalAutonomousSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalNonBlockingSpi;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ObservableReaderNonBlockingSpiMock
     implements ObservableReaderSpi,
@@ -101,9 +96,9 @@ public class ObservableReaderNonBlockingSpiMock
 
   @Override
   public byte[] transmitApdu(byte[] apduIn) throws ReaderIOException, CardIOException {
-    if(cardPresent.get()){
+    if (cardPresent.get()) {
       return new byte[0];
-    }else{
+    } else {
       throw new CardIOException("card is not present");
     }
   }
