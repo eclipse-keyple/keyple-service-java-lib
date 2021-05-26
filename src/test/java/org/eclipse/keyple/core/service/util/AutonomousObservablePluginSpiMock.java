@@ -20,7 +20,9 @@ import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.AutonomousObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 
-public class AutonomousObservablePluginSpiMock implements AutonomousObservablePluginSpi {
+public class AutonomousObservablePluginSpiMock
+        implements AutonomousObservablePluginSpi {
+
   @Override
   public void connect(AutonomousObservablePluginApi autonomousObservablePluginApi) {}
 

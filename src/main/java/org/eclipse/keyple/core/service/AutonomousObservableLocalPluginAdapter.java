@@ -16,6 +16,8 @@ import java.util.Set;
 import org.eclipse.keyple.core.plugin.AutonomousObservablePluginApi;
 import org.eclipse.keyple.core.plugin.spi.AutonomousObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
+import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,15 +53,17 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
    */
   @Override
   public void onReaderConnected(Set<ReaderSpi> readers) {
-    Set<String> readerNames = new HashSet<String>();
+    Assert.getInstance().notNull(readers,"readers");
+    Set<String> notifyReaders = new HashSet<String>();
+
     for (ReaderSpi readerSpi : readers) {
-      readerNames.add(readerSpi.getName());
+      //add reader to plugin
+      this.addReader(readerSpi);
+      notifyReaders.add(readerSpi.getName());
     }
-    if (logger.isTraceEnabled()) {
-      logger.trace("Notifying connection(s): {}", readerNames);
-    }
+
     notifyObservers(
-        new PluginEventAdapter(getName(), readerNames, PluginEvent.Type.READER_CONNECTED));
+        new PluginEventAdapter(getName(), notifyReaders, PluginEvent.Type.READER_CONNECTED));
   }
 
   /**
@@ -69,10 +73,51 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
    */
   @Override
   public void onReaderDisconnected(Set<String> readerNames) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Notifying disconnection(s): {}", readerNames);
+    Assert.getInstance().notNull(readerNames,"readerNames");
+    Set<String> notifyReaders = new HashSet<String>();
+
+    for(String readerName : readerNames){
+      Reader reader = this.getReader(readerName);
+      if(reader==null){
+        logger.warn(
+                "[{}] ObservableLocalPlugin => Impossible to remove reader, reader not found with name : {}",
+                this.getName(), readerName);
+      }else{
+        //unregister and remove reader
+        ((LocalReaderAdapter) reader).unregister();
+        getReadersMap().remove(reader.getName());
+        if (logger.isTraceEnabled()) {
+          logger.trace("[{}] ObservableLocalPlugin => Remove reader '{}' from readers list.",
+                  this.getName(),
+                  reader.getName());
+        }
+        notifyReaders.add(readerName);
+      }
     }
+
     notifyObservers(
-        new PluginEventAdapter(getName(), readerNames, PluginEvent.Type.READER_DISCONNECTED));
+        new PluginEventAdapter(getName(), notifyReaders, PluginEvent.Type.READER_DISCONNECTED));
+  }
+
+
+  /**
+   * Create and add a reader to the reader list from a readerSpi
+   * @param readerSpi spi to create the reader from
+   */
+  private void addReader(ReaderSpi readerSpi){
+    LocalReaderAdapter reader;
+    if (readerSpi instanceof ObservableReaderSpi) {
+      reader = new ObservableLocalReaderAdapter((ObservableReaderSpi) readerSpi, this.getName());
+    } else {
+      reader = new LocalReaderAdapter(readerSpi, this.getName());
+    }
+    reader.register();
+    getReadersMap().put(reader.getName(), reader);
+    if (logger.isTraceEnabled()) {
+      logger.trace(
+              "[{}] ObservableLocalPlugin => Add reader '{}' to readers list.",
+              this.getName(),
+              readerSpi.getName());
+    }
   }
 }

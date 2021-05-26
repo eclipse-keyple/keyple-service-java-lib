@@ -50,7 +50,7 @@ public class AutonomousObservableLocalPluginAdapterTest {
   }
 
   @Test
-  public void onReader_shouldNotify_andCreateReaders() throws Throwable {
+  public void onReaderConnected_shouldNotify_andCreateReaders() throws Throwable {
     // start plugin
     Set<ReaderSpi> readers = new HashSet<ReaderSpi>();
     readers.add(readerSpi1);
@@ -58,7 +58,9 @@ public class AutonomousObservableLocalPluginAdapterTest {
     // register readers
     plugin.onReaderConnected(readers);
 
-    await().atMost(1, TimeUnit.SECONDS).until(eventOfTypeIsReceived(READER_CONNECTED));
+    await()
+            .atMost(1, TimeUnit.SECONDS)
+            .until(eventOfTypeIsReceived(READER_CONNECTED));
 
     // check event is well formed
     PluginEvent event = observer.getLastEventOfType(READER_CONNECTED);
@@ -71,8 +73,8 @@ public class AutonomousObservableLocalPluginAdapterTest {
   }
 
   @Test
-  public void removeReader_shouldNotify_andRemoveReaders() throws Throwable {
-    onReader_shouldNotify_andCreateReaders();
+  public void onReaderDisconnected_shouldNotify_andRemoveReaders() throws Throwable {
+    onReaderConnected_shouldNotify_andCreateReaders();
 
     // start plugin
     Set<String> readerNames = new HashSet<String>();

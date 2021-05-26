@@ -18,6 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.ObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
+import org.mockito.Mockito;
+
+import static org.mockito.Mockito.when;
 
 public class ObservableLocalPluginSpiMock implements ObservablePluginSpi {
 
@@ -103,7 +106,9 @@ public class ObservableLocalPluginSpiMock implements ObservablePluginSpi {
    */
   public void addReaderName(String... name) {
     for (String readerName : name) {
-      stubReaders.put(readerName, new LocalReaderSpiMock(readerName));
+      ReaderSpi readerSpi = Mockito.mock(ReaderSpi.class);
+      when(readerSpi.getName()).thenReturn(readerName);
+      stubReaders.put(readerName, readerSpi);
     }
   }
   /**
