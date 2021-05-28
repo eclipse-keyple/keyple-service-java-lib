@@ -11,6 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import static org.eclipse.keyple.core.service.DistributedUtilAdapter.*;
+
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.*;
@@ -61,54 +63,14 @@ final class DistributedLocalServiceAdapter
   }
 
   /**
-   * (package-private)<br>
-   * Enumeration of all available common JSON properties.
+   * {@inheritDoc}
    *
    * @since 2.0
    */
-  enum JsonProperty {
-
-    /** @since 2.0 */
-    CARD_REQUEST,
-
-    /** @since 2.0 */
-    CARD_SELECTION_REQUESTS,
-
-    /** @since 2.0 */
-    CARD_SELECTION_SCENARIO,
-
-    /** @since 2.0 */
-    CHANNEL_CONTROL,
-
-    /** @since 2.0 */
-    ERROR,
-
-    /** @since 2.0 */
-    MULTI_SELECTION_PROCESSING,
-
-    /** @since 2.0 */
-    NOTIFICATION_MODE,
-
-    /** @since 2.0 */
-    PLUGIN_EVENT,
-
-    /** @since 2.0 */
-    POLLING_MODE,
-
-    /** @since 2.0 */
-    READER_EVENT,
-
-    /** @since 2.0 */
-    READER_GROUP_REFERENCE,
-
-    /** @since 2.0 */
-    READER_NAME,
-
-    /** @since 2.0 */
-    RESULT,
-
-    /** @since 2.0 */
-    SERVICE
+  @Override
+  public void setPoolPluginNames(String... poolPluginNames) {
+    checkStatus();
+    this.poolPluginNames = Arrays.asList(poolPluginNames);
   }
 
   /**
@@ -136,124 +98,6 @@ final class DistributedLocalServiceAdapter
       }
       return new LocalPluginExecutor(jsonData).execute();
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public boolean isReaderObservable(String readerName) {
-    checkStatus();
-    Reader reader = getReader(readerName);
-    if (reader == null) {
-      throw new IllegalStateException(String.format(READER_NOT_FOUND_TEMPLATE, readerName));
-    }
-    return reader instanceof ObservableReader;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public void startReaderObservation(String readerName) {
-    checkStatus();
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The distributed local service '{}' is starting the observation of the local reader '{}'.",
-          name,
-          readerName);
-    }
-    Reader reader = getReader(readerName);
-    if (reader == null) {
-      throw new IllegalStateException(String.format(READER_NOT_FOUND_TEMPLATE, readerName));
-    }
-    if (!(reader instanceof ObservableReader)) {
-      throw new IllegalStateException(
-          String.format("The local reader '%s' is not observable.", readerName));
-    }
-    ((ObservableReader) reader).addObserver(this);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public void stopReaderObservation(String readerName) {
-
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The distributed local service '{}' is stopping the observation of the local reader '{}'.",
-          name,
-          readerName);
-    }
-
-    Reader reader = getReader(readerName);
-    if (reader instanceof ObservableReader) {
-      ((ObservableReader) reader).removeObserver(this);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public void startPluginsObservation() {
-    checkStatus();
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The distributed local service '{}' is starting the observation of all local plugins.",
-          name);
-    }
-    boolean isObservationStarted = false;
-    for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
-      if (plugin instanceof ObservablePlugin) {
-        ((ObservablePlugin) plugin).addObserver(this);
-        isObservationStarted = true;
-      }
-    }
-    if (!isObservationStarted) {
-      throw new IllegalStateException("There is no observable local plugin.");
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public void stopPluginsObservation() {
-
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The distributed local service '{}' is stopping the observation of all local plugins.",
-          name);
-    }
-
-    for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
-      if (plugin instanceof ObservablePlugin) {
-        ((ObservablePlugin) plugin).removeObserver(this);
-      }
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public void setPoolPluginNames(String... poolPluginNames) {
-    checkStatus();
-    this.poolPluginNames = Arrays.asList(poolPluginNames);
   }
 
   /**
@@ -298,8 +142,7 @@ final class DistributedLocalServiceAdapter
     JsonObject body = new JsonObject();
     body.add(JsonProperty.PLUGIN_EVENT.name(), JsonUtil.getParser().toJsonTree(pluginEvent));
 
-    localServiceSpi.onPluginEvent(
-        pluginEvent.getReaderNames().first(), body.toString(), pluginEvent);
+    localServiceSpi.onPluginEvent(pluginEvent.getReaderNames().first(), body.toString());
   }
 
   /**
@@ -322,28 +165,7 @@ final class DistributedLocalServiceAdapter
     JsonObject body = new JsonObject();
     body.add(JsonProperty.READER_EVENT.name(), JsonUtil.getParser().toJsonTree(readerEvent));
 
-    localServiceSpi.onReaderEvent(readerEvent.getReaderName(), body.toString(), readerEvent);
-  }
-
-  /**
-   * (private)<br>
-   * Retrieves the first register reader having the provided name among all plugins.
-   *
-   * @param readerName The name of the reader to be found.
-   * @return null if no reader is found with this name.
-   */
-  private AbstractReaderAdapter getReader(String readerName) {
-    for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
-      try {
-        AbstractReaderAdapter reader = (AbstractReaderAdapter) plugin.getReader(readerName);
-        if (reader != null) {
-          return reader;
-        }
-      } catch (IllegalStateException e) {
-        // The plugin is no longer register, then continue.
-      }
-    }
-    return null;
+    localServiceSpi.onReaderEvent(readerEvent.getReaderName(), body.toString());
   }
 
   /**
@@ -392,84 +214,6 @@ final class DistributedLocalServiceAdapter
   }
 
   /**
-   * (package-private)<br>
-   * Enumeration of the available local services that can be invoked on a local reader from the
-   * remote reader.
-   *
-   * @since 2.0
-   */
-  enum ReaderService {
-
-    /**
-     * Refers to {@link ProxyReader#transmitCardRequest(CardRequest, ChannelControl)}
-     *
-     * @since 2.0
-     */
-    TRANSMIT_CARD_REQUEST,
-
-    /**
-     * Refers to {@link AbstractReaderAdapter#transmitCardSelectionRequests(List,
-     * MultiSelectionProcessing, ChannelControl)}
-     *
-     * @since 2.0
-     */
-    TRANSMIT_CARD_SELECTION_REQUESTS,
-
-    /**
-     * Refers to {@link
-     * ObservableLocalReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
-     * ObservableReader.NotificationMode, ObservableReader.PollingMode)} and {@link
-     * ObservableRemoteReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
-     * ObservableReader.NotificationMode, ObservableReader.PollingMode)}
-     *
-     * @since 2.0
-     */
-    SCHEDULE_CARD_SELECTION_SCENARIO,
-
-    /**
-     * Refers to {@link Reader#isCardPresent()}
-     *
-     * @since 2.0
-     */
-    IS_CARD_PRESENT,
-
-    /**
-     * Refers to {@link Reader#isContactless()}
-     *
-     * @since 2.0
-     */
-    IS_CONTACTLESS,
-
-    /**
-     * Refers to {@link ObservableReader#startCardDetection(ObservableReader.PollingMode)}
-     *
-     * @since 2.0
-     */
-    START_CARD_DETECTION,
-
-    /**
-     * Refers to {@link ObservableReader#startCardDetection(ObservableReader.PollingMode)}
-     *
-     * @since 2.0
-     */
-    STOP_CARD_DETECTION,
-
-    /**
-     * Refers to {@link ObservableReader#finalizeCardProcessing()}
-     *
-     * @since 2.0
-     */
-    FINALIZE_CARD_PROCESSING,
-
-    /**
-     * Refers to {@link ProxyReader#releaseChannel()}
-     *
-     * @since 2.0
-     */
-    RELEASE_CHANNEL
-  }
-
-  /**
    * (private)<br>
    * Inner class used to execute a service on a specific local reader.
    */
@@ -494,6 +238,27 @@ final class DistributedLocalServiceAdapter
       }
       this.input = JsonUtil.getParser().fromJson(jsonData, JsonObject.class);
       this.output = new JsonObject();
+    }
+
+    /**
+     * (private)<br>
+     * Retrieves the first register reader having the provided name among all plugins.
+     *
+     * @param readerName The name of the reader to be found.
+     * @return null if no reader is found with this name.
+     */
+    private AbstractReaderAdapter getReader(String readerName) {
+      for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
+        try {
+          Reader localReader = plugin.getReader(readerName);
+          if (localReader != null) {
+            return (AbstractReaderAdapter) localReader;
+          }
+        } catch (IllegalStateException e) {
+          // The plugin is no longer register, then continue.
+        }
+      }
+      return null;
     }
 
     /**
@@ -687,8 +452,8 @@ final class DistributedLocalServiceAdapter
           ObservableReader.PollingMode.valueOf(
               input.get(JsonProperty.POLLING_MODE.name()).getAsString());
 
-      // Execute the service on the readers
-      startReaderObservation(reader.getName());
+      // Execute the service on the reader
+      ((ObservableReader) reader).addObserver(DistributedLocalServiceAdapter.this);
       ((ObservableReader) reader).startCardDetection(pollingMode);
     }
 
@@ -699,7 +464,7 @@ final class DistributedLocalServiceAdapter
     private void stopCardDetection() {
 
       // Execute the service on the reader
-      stopReaderObservation(reader.getName());
+      ((ObservableReader) reader).removeObserver(DistributedLocalServiceAdapter.this);
       ((ObservableReader) reader).stopCardDetection();
     }
 
@@ -724,44 +489,6 @@ final class DistributedLocalServiceAdapter
       // Execute the service on the reader
       reader.releaseChannel();
     }
-  }
-
-  /**
-   * (package-private)<br>
-   * Enumeration of the available local services that can be invoked on local plugins from the
-   * remote plugin.
-   *
-   * @since 2.0
-   */
-  enum PluginService {
-
-    /**
-     * Refers to {@link Plugin#getReaders()}
-     *
-     * @since 2.0
-     */
-    GET_READERS,
-
-    /**
-     * Refers to {@link PoolPlugin#getReaderGroupReferences()}
-     *
-     * @since 2.0
-     */
-    GET_READER_GROUP_REFERENCES,
-
-    /**
-     * Refers to {@link PoolPlugin#allocateReader(String)}
-     *
-     * @since 2.0
-     */
-    ALLOCATE_READER,
-
-    /**
-     * Refers to {@link PoolPlugin#releaseReader(Reader)}
-     *
-     * @since 2.0
-     */
-    RELEASE_READER
   }
 
   /**
@@ -809,6 +536,12 @@ final class DistributedLocalServiceAdapter
             break;
           case RELEASE_READER:
             releaseReader();
+            break;
+          case START_READER_DETECTION:
+            startReaderDetection();
+            break;
+          case STOP_READER_DETECTION:
+            stopReaderDetection();
             break;
           default:
             throw new IllegalArgumentException(service.name());
@@ -896,10 +629,7 @@ final class DistributedLocalServiceAdapter
       Reader reader = poolPlugin.allocateReader(readerGroupReference);
 
       // Build result
-      boolean isObservable = reader instanceof ObservableReader;
-      AbstractMap.SimpleEntry<String, Boolean> readerInfo =
-          new AbstractMap.SimpleEntry<String, Boolean>(reader.getName(), isObservable);
-      output.add(JsonProperty.RESULT.name(), JsonUtil.getParser().toJsonTree(readerInfo));
+      output.addProperty(JsonProperty.RESULT.name(), reader.getName());
     }
 
     /**
@@ -917,6 +647,39 @@ final class DistributedLocalServiceAdapter
         poolPlugin = (PoolPlugin) SmartCardServiceProvider.getService().getPlugin(poolPluginName);
         if (poolPlugin != null && poolPlugin.getReaderNames().contains(readerName)) {
           poolPlugin.releaseReader(poolPlugin.getReader(readerName));
+        }
+      }
+    }
+
+    /**
+     * (private)<br>
+     * Service {@link PluginService#START_READER_DETECTION}.
+     */
+    private void startReaderDetection() {
+
+      // Start the observation of all observable local plugins.
+      boolean isObservationStarted = false;
+      for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
+        if (plugin instanceof ObservablePlugin) {
+          ((ObservablePlugin) plugin).addObserver(DistributedLocalServiceAdapter.this);
+          isObservationStarted = true;
+        }
+      }
+      if (!isObservationStarted) {
+        throw new IllegalStateException("There is no observable local plugin.");
+      }
+    }
+
+    /**
+     * (private)<br>
+     * Service {@link PluginService#STOP_READER_DETECTION}.
+     */
+    private void stopReaderDetection() {
+
+      // Stop the observation of all observable local plugins.
+      for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
+        if (plugin instanceof ObservablePlugin) {
+          ((ObservablePlugin) plugin).removeObserver(DistributedLocalServiceAdapter.this);
         }
       }
     }

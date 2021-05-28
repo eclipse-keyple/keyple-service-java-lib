@@ -11,7 +11,6 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import org.eclipse.keyple.core.common.KeypleReaderEvent;
 import org.eclipse.keyple.core.service.selection.ScheduledCardSelectionsResponse;
 
 /**
@@ -23,7 +22,7 @@ import org.eclipse.keyple.core.service.selection.ScheduledCardSelectionsResponse
  *
  * @since 2.0
  */
-public final class ReaderEvent implements KeypleReaderEvent {
+public final class ReaderEvent {
 
   private final String pluginName;
   private final String readerName;
