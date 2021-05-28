@@ -11,7 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import org.eclipse.keyple.core.service.selection.ScheduledCardSelectionsResponse;
+import org.calypsonet.terminal.reader.CardReaderEvent;
+import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
 
 /**
  * This POJO contains all information about a change of card state within an {@link
@@ -22,48 +23,11 @@ import org.eclipse.keyple.core.service.selection.ScheduledCardSelectionsResponse
  *
  * @since 2.0
  */
-public final class ReaderEvent {
+public final class ReaderEvent implements CardReaderEvent {
 
   private final String pluginName;
   private final String readerName;
   private final ScheduledCardSelectionsResponse scheduledCardSelectionsResponse;
-
-  /**
-   * The different types of reader events, reflecting the status of the reader regarding the
-   * presence of a card.
-   *
-   * @since 2.0
-   */
-  public enum EventType {
-
-    /**
-     * A card has been inserted with or without specific selection.
-     *
-     * @since 2.0
-     */
-    CARD_INSERTED,
-
-    /**
-     * A card has been inserted and matched the selection.
-     *
-     * @since 2.0
-     */
-    CARD_MATCHED,
-
-    /**
-     * The card has been removed from the reader.
-     *
-     * @since 2.0
-     */
-    CARD_REMOVED,
-
-    /**
-     * The reader has been unregistered.
-     *
-     * @since 2.0
-     */
-    UNREGISTERED
-  }
 
   private final EventType eventType;
 
@@ -99,33 +63,31 @@ public final class ReaderEvent {
   }
 
   /**
-   * Gets the name of the reader that generated the event comes from.
+   * {@inheritDoc}
    *
-   * @return A not empty string.
    * @since 2.0
    */
+  @Override
   public String getReaderName() {
     return readerName;
   }
 
   /**
-   * Gets the reader event type.
+   * {@inheritDoc}
    *
-   * @return A not null value.
    * @since 2.0
    */
+  @Override
   public EventType getEventType() {
     return eventType;
   }
 
   /**
-   * Gets the card selection responses that may be present when the event is {@link
-   * EventType#CARD_INSERTED}, always present when the event is {@link EventType#CARD_MATCHED} and
-   * null in the others cases.
+   * {@inheritDoc}
    *
-   * @return null if the event is not carrying a {@link ScheduledCardSelectionsResponse}.
    * @since 2.0
    */
+  @Override
   public ScheduledCardSelectionsResponse getScheduledCardSelectionsResponse() {
     return scheduledCardSelectionsResponse;
   }

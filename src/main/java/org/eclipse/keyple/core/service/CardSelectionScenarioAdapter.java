@@ -12,8 +12,8 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.List;
-import org.eclipse.keyple.core.card.CardSelectionRequest;
-import org.eclipse.keyple.core.card.ChannelControl;
+import org.calypsonet.terminal.card.ChannelControl;
+import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
@@ -26,7 +26,7 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
  * <p>It comprises:
  *
  * <ul>
- *   <li>A list of {@link CardSelectionRequest} corresponding to the selection targets.
+ *   <li>A list of {@link CardSelectionRequestSpi} corresponding to the selection targets.
  *   <li>A {@link MultiSelectionProcessing} indicator specifying whether all scheduled card
  *       selections are to be executed or whether to stop at the first one that is successful.
  *   <li>A {@link ChannelControl} indicator controlling the physical channel the end of the
@@ -37,7 +37,7 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
  */
 final class CardSelectionScenarioAdapter {
 
-  private final List<CardSelectionRequest> cardSelectionRequests;
+  private final List<CardSelectionRequestSpi> cardSelectionRequests;
   private final MultiSelectionProcessing multiSelectionProcessing;
   private final ChannelControl channelControl;
 
@@ -46,9 +46,9 @@ final class CardSelectionScenarioAdapter {
    * Builds a card selection scenario from a list of selection cases and two enum constants guiding
    * the expected behaviour of the selection process.
    *
-   * <p>Note: the {@link CardSelectionRequest} list should be carefully ordered in accordance with
-   * the cards expected in the application to optimize the processing time of the selection process.
-   * The first selection case in the list will be processed first.
+   * <p>Note: the {@link CardSelectionRequestSpi} list should be carefully ordered in accordance
+   * with the cards expected in the application to optimize the processing time of the selection
+   * process. The first selection case in the list will be processed first.
    *
    * @param cardSelectionRequests A list of card selection requests.
    * @param multiSelectionProcessing The multi selection processing policy.
@@ -58,7 +58,7 @@ final class CardSelectionScenarioAdapter {
    * @since 2.0
    */
   CardSelectionScenarioAdapter(
-      List<CardSelectionRequest> cardSelectionRequests,
+      List<CardSelectionRequestSpi> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl) {
 
@@ -79,7 +79,7 @@ final class CardSelectionScenarioAdapter {
    * @return A not null reference
    * @since 2.0
    */
-  List<CardSelectionRequest> getCardSelectionRequests() {
+  List<CardSelectionRequestSpi> getCardSelectionRequests() {
     return cardSelectionRequests;
   }
 

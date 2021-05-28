@@ -62,7 +62,7 @@ public interface SmartCardService {
    * Gets the plugin whose name is provided as an argument.
    *
    * @param pluginName The plugin name.
-   * @return null if the plugin is not found or no longer registered.
+   * @return Null if the plugin is not found or no longer registered.
    * @since 2.0
    */
   Plugin getPlugin(String pluginName);
@@ -101,7 +101,7 @@ public interface SmartCardService {
    * Checks whether a distributed local service is already registered to the service or not.
    *
    * @param distributedLocalServiceName The name of the distributed local service to be checked.
-   * @return true if the distributed local service is registered.
+   * @return True if the distributed local service is registered.
    * @since 2.0
    */
   boolean isDistributedLocalServiceRegistered(String distributedLocalServiceName);
@@ -110,7 +110,7 @@ public interface SmartCardService {
    * Gets the distributed local service having the provided name.
    *
    * @param distributedLocalServiceName The name of the distributed local service.
-   * @return null if the distributed local service is not found or no longer registered.
+   * @return Null if the distributed local service is not found or no longer registered.
    * @since 2.0
    */
   DistributedLocalService getDistributedLocalService(String distributedLocalServiceName);

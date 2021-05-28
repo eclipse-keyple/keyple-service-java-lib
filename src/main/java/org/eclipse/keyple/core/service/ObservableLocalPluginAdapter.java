@@ -50,7 +50,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
    * (package-private)<br>
    * Checks whether the background job is monitoring for new readers.
    *
-   * @return true, if the background job is monitoring, false in all other cases.
+   * @return True, if the background job is monitoring, false in all other cases.
    * @since 2.0
    */
   boolean isMonitoring() {
@@ -208,10 +208,10 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
      * readers accordingly.<br>
      * Observers are notified of changes.
      *
-     * @param actualNativeReadersNames the list of readers currently known by the system
+     * @param actualNativeReaderNames the list of readers currently known by the system
      * @throws PluginIOException if an error occurs while searching readers.
      */
-    private void processChanges(Set<String> actualNativeReadersNames) throws PluginIOException {
+    private void processChanges(Set<String> actualNativeReaderNames) throws PluginIOException {
       SortedSet<String> changedReaderNames = new ConcurrentSkipListSet<String>();
       /*
        * parse the current readers list, notify for disappeared readers, update
@@ -219,7 +219,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
        */
       final Set<Reader> readers = getReaders();
       for (Reader reader : readers) {
-        if (!actualNativeReadersNames.contains(reader.getName())) {
+        if (!actualNativeReaderNames.contains(reader.getName())) {
           changedReaderNames.add(reader.getName());
         }
       }
@@ -227,7 +227,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       if (!changedReaderNames.isEmpty()) {
         /* list update */
         for (Reader reader : readers) {
-          if (!actualNativeReadersNames.contains(reader.getName())) {
+          if (!actualNativeReaderNames.contains(reader.getName())) {
             removeReader(reader);
           }
         }
@@ -239,7 +239,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
        * parse the new readers list, notify for readers appearance, update readers
        * list
        */
-      for (String readerName : actualNativeReadersNames) {
+      for (String readerName : actualNativeReaderNames) {
         if (!getReaderNames().contains(readerName)) {
           addReader(readerName);
           /* add to the notification list */
@@ -262,14 +262,14 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       try {
         while (running) {
           /* retrieves the current readers names list */
-          Set<String> actualNativeReadersNames = observablePluginSpi.searchAvailableReadersNames();
+          Set<String> actualNativeReaderNames = observablePluginSpi.searchAvailableReaderNames();
           /*
            * checks if it has changed this algorithm favors cases where nothing change
            */
           Set<String> currentlyRegisteredReaderNames = getReaderNames();
-          if (!currentlyRegisteredReaderNames.containsAll(actualNativeReadersNames)
-              || !actualNativeReadersNames.containsAll(currentlyRegisteredReaderNames)) {
-            processChanges(actualNativeReadersNames);
+          if (!currentlyRegisteredReaderNames.containsAll(actualNativeReaderNames)
+              || !actualNativeReaderNames.containsAll(currentlyRegisteredReaderNames)) {
+            processChanges(actualNativeReaderNames);
           }
           /* sleep for a while. */
           Thread.sleep(monitoringCycleDuration);

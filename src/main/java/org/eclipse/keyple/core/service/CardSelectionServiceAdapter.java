@@ -13,14 +13,17 @@ package org.eclipse.keyple.core.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.keyple.core.card.*;
-import org.eclipse.keyple.core.card.spi.CardSelectionSpi;
-import org.eclipse.keyple.core.service.selection.CardSelectionResult;
-import org.eclipse.keyple.core.service.selection.CardSelectionService;
+import org.calypsonet.terminal.card.*;
+import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
+import org.calypsonet.terminal.card.spi.CardSelectionSpi;
+import org.calypsonet.terminal.reader.CardReader;
+import org.calypsonet.terminal.reader.ObservableCardReader;
+import org.calypsonet.terminal.reader.selection.CardSelectionResult;
+import org.calypsonet.terminal.reader.selection.CardSelectionService;
+import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
+import org.calypsonet.terminal.reader.selection.spi.CardSelection;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
-import org.eclipse.keyple.core.service.selection.ScheduledCardSelectionsResponse;
-import org.eclipse.keyple.core.service.selection.spi.CardSelection;
-import org.eclipse.keyple.core.service.selection.spi.SmartCard;
 import org.eclipse.keyple.core.util.Assert;
 
 /**
@@ -32,8 +35,8 @@ import org.eclipse.keyple.core.util.Assert;
 final class CardSelectionServiceAdapter implements CardSelectionService {
 
   private final List<CardSelectionSpi> cardSelections;
-  private final List<CardSelectionRequest> cardSelectionRequests;
-  private final MultiSelectionProcessing multiSelectionProcessing;
+  private final List<CardSelectionRequestSpi> cardSelectionRequests;
+  private MultiSelectionProcessing multiSelectionProcessing;
   private ChannelControl channelControl = ChannelControl.KEEP_OPEN;
 
   /**
@@ -43,10 +46,20 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    *
    * @since 2.0
    */
-  CardSelectionServiceAdapter(MultiSelectionProcessing multiSelectionProcessing) {
-    this.multiSelectionProcessing = multiSelectionProcessing;
+  CardSelectionServiceAdapter() {
+    this.multiSelectionProcessing = MultiSelectionProcessing.FIRST_MATCH;
     cardSelections = new ArrayList<CardSelectionSpi>();
-    cardSelectionRequests = new ArrayList<CardSelectionRequest>();
+    cardSelectionRequests = new ArrayList<CardSelectionRequestSpi>();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public void setMultipleSelectionMode() {
+    this.multiSelectionProcessing = MultiSelectionProcessing.PROCESS_ALL;
   }
 
   /**
@@ -79,19 +92,19 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    * @since 2.0
    */
   @Override
-  public CardSelectionResult processCardSelectionScenario(Reader reader) {
+  public CardSelectionResult processCardSelectionScenario(CardReader reader) {
 
     // Communicate with the card to make the actual selection
-    List<CardSelectionResponse> cardSelectionResponses;
+    List<CardSelectionResponseApi> cardSelectionResponses;
 
     try {
       cardSelectionResponses =
           ((AbstractReaderAdapter) reader)
               .transmitCardSelectionRequests(
                   cardSelectionRequests, multiSelectionProcessing, channelControl);
-    } catch (ReaderCommunicationException e) {
+    } catch (ReaderBrokenCommunicationException e) {
       throw new KeypleReaderCommunicationException(e.getMessage(), e);
-    } catch (CardCommunicationException e) {
+    } catch (CardBrokenCommunicationException e) {
       throw new KeypleCardCommunicationException(e.getMessage(), e);
     }
 
@@ -109,25 +122,13 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    */
   @Override
   public void scheduleCardSelectionScenario(
-      ObservableReader observableReader, ObservableReader.NotificationMode notificationMode) {
-    scheduleCardSelectionScenario(
-        observableReader, notificationMode, ObservableReader.PollingMode.REPEATING);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public void scheduleCardSelectionScenario(
-      ObservableReader observableReader,
-      ObservableReader.NotificationMode notificationMode,
-      ObservableReader.PollingMode pollingMode) {
+      ObservableCardReader ObservableCardReader,
+      ObservableCardReader.NotificationMode notificationMode,
+      ObservableCardReader.PollingMode pollingMode) {
     CardSelectionScenarioAdapter cardSelectionScenario =
         new CardSelectionScenarioAdapter(
             cardSelectionRequests, multiSelectionProcessing, channelControl);
-    ((ObservableLocalReaderAdapter) observableReader)
+    ((ObservableLocalReaderAdapter) ObservableCardReader)
         .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, pollingMode);
   }
 
@@ -158,7 +159,7 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    * @throws IllegalArgumentException If the list is null or empty.
    */
   private CardSelectionResult processCardSelectionResponses(
-      List<CardSelectionResponse> cardSelectionResponses) {
+      List<CardSelectionResponseApi> cardSelectionResponses) {
 
     Assert.getInstance().notEmpty(cardSelectionResponses, "cardSelectionResponses");
 
@@ -167,8 +168,8 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
     int index = 0;
 
     /* Check card responses */
-    for (CardSelectionResponse cardSelectionResponse : cardSelectionResponses) {
-      /* test if the selection is successful: we should have either a FCI or an ATR */
+    for (CardSelectionResponseApi cardSelectionResponse : cardSelectionResponses) {
+      /* test if the selection is successful: we should have either a FCI or power-on data */
       if (cardSelectionResponse != null
           && cardSelectionResponse.getSelectionStatus() != null
           && cardSelectionResponse.getSelectionStatus().hasMatched()) {
@@ -179,7 +180,7 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
         SmartCard smartCard = (SmartCard) cardSelections.get(index).parse(cardSelectionResponse);
 
         // determine if the current matching card is selected
-        SelectionStatus selectionStatus = cardSelectionResponse.getSelectionStatus();
+        SelectionStatusApi selectionStatus = cardSelectionResponse.getSelectionStatus();
 
         boolean isSelected = selectionStatus.hasMatched();
 

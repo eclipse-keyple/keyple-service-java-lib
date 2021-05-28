@@ -14,15 +14,16 @@ package org.eclipse.keyple.core.service.examples.UseCase5_SequentialMultiSelecti
 import static org.eclipse.keyple.core.service.examples.common.ConfigurationUtil.CONTACTLESS_READER_NAME_REGEX;
 import static org.eclipse.keyple.core.service.examples.common.ConfigurationUtil.getCardReader;
 
+import org.calypsonet.terminal.reader.selection.CardSelectionResult;
+import org.calypsonet.terminal.reader.selection.CardSelectionService;
+import org.calypsonet.terminal.reader.selection.spi.CardSelection;
+import org.calypsonet.terminal.reader.selection.spi.CardSelector;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
+import org.eclipse.keyple.card.generic.GenericCardSelectorAdapter;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
 import org.eclipse.keyple.card.generic.GenericExtensionServiceProvider;
 import org.eclipse.keyple.core.service.*;
 import org.eclipse.keyple.core.service.examples.common.ConfigurationUtil;
-import org.eclipse.keyple.core.service.selection.CardSelectionResult;
-import org.eclipse.keyple.core.service.selection.CardSelectionService;
-import org.eclipse.keyple.core.service.selection.CardSelector;
-import org.eclipse.keyple.core.service.selection.spi.CardSelection;
-import org.eclipse.keyple.core.service.selection.spi.SmartCard;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.eclipse.keyple.plugin.pcsc.PcscPluginFactoryBuilder;
 import org.slf4j.Logger;
@@ -44,9 +45,9 @@ import org.slf4j.LoggerFactory;
  *   <li>Check if a ISO 14443-4 card is in the reader, select a card (here a card having two
  *       applications whose DF Names are prefixed by a specific AID [see AID_KEYPLE_PREFIX]).
  *   <li>Run an AID based application selection scenario (first occurrence).
- *   <li>Output collected smart card data (FCI and ATR).
+ *   <li>Output collected smart card data (FCI and power-on data).
  *   <li>Run an AID based application selection scenario (next occurrence).
- *   <li>Output collected smart card data (FCI and ATR).
+ *   <li>Output collected smart card data (FCI and power-on data).
  * </ul>
  *
  * All results are logged with slf4j.
@@ -93,7 +94,7 @@ public class Main_SequentialMultiSelection_Pcsc {
     // physical channel open
     CardSelection cardSelection =
         cardExtension.createCardSelection(
-            CardSelector.builder()
+            GenericCardSelectorAdapter.builder()
                 .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
                 .setFileOccurrence(CardSelector.FileOccurrence.FIRST)
                 .build());
@@ -108,7 +109,7 @@ public class Main_SequentialMultiSelection_Pcsc {
     // physical channel after
     cardSelection =
         cardExtension.createCardSelection(
-            CardSelector.builder()
+            GenericCardSelectorAdapter.builder()
                 .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
                 .setFileOccurrence(CardSelector.FileOccurrence.NEXT)
                 .build());
@@ -143,9 +144,16 @@ public class Main_SequentialMultiSelection_Pcsc {
     if (cardSelectionsResult.hasActiveSelection()) {
       SmartCard smartCard = cardSelectionsResult.getActiveSmartCard();
       logger.info("The card matched the selection {}.", index);
-      String atr = smartCard.hasAtr() ? ByteArrayUtil.toHex(smartCard.getAtrBytes()) : "no ATR";
+      String powerOnData =
+          smartCard.hasPowerOnData()
+              ? ByteArrayUtil.toHex(smartCard.getPowerOnData())
+              : "no power-on data";
       String fci = smartCard.hasFci() ? ByteArrayUtil.toHex(smartCard.getFciBytes()) : "no FCI";
-      logger.info("Selection status for case {}: \n\t\tATR: {}\n\t\tFCI: {}", index, atr, fci);
+      logger.info(
+          "Selection status for case {}: \n\t\tpower-on data: {}\n\t\tFCI: {}",
+          index,
+          powerOnData,
+          fci);
     } else {
       logger.info("The selection did not match for case {}.", index);
     }

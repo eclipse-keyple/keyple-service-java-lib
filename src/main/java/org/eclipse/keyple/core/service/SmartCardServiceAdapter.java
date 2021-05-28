@@ -15,9 +15,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import org.eclipse.keyple.core.card.AbstractApduException;
-import org.eclipse.keyple.core.card.CardApiProperties;
-import org.eclipse.keyple.core.card.spi.CardExtensionSpi;
+import org.calypsonet.terminal.card.AbstractApduException;
+import org.calypsonet.terminal.card.CardApiProperties;
+import org.calypsonet.terminal.reader.ReaderApiProperties;
 import org.eclipse.keyple.core.common.CommonsApiProperties;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory;
@@ -202,28 +202,26 @@ final class SmartCardServiceAdapter implements SmartCardService {
    *
    * <p>Generates warnings into the log.
    *
-   * @param cardExtensionSpi The card extension SPI.
+   * @param cardExtension The card extension.
    */
-  private void checkCardExtensionVersion(CardExtensionSpi cardExtensionSpi) {
-    if (compareVersions(cardExtensionSpi.getCommonsApiVersion(), CommonsApiProperties.VERSION)
-        != 0) {
+  private void checkCardExtensionVersion(KeypleCardExtension cardExtension) {
+    if (compareVersions(cardExtension.getCommonsApiVersion(), CommonsApiProperties.VERSION) != 0) {
       logger.warn(
           "The version of Commons API used by the provided card extension ({}) mismatches the version used by the service ({}).",
-          cardExtensionSpi.getCommonsApiVersion(),
+          cardExtension.getCommonsApiVersion(),
           CommonsApiProperties.VERSION);
     }
-    if (compareVersions(cardExtensionSpi.getCardApiVersion(), CardApiProperties.VERSION) != 0) {
+    if (compareVersions(cardExtension.getCardApiVersion(), CardApiProperties.VERSION) != 0) {
       logger.warn(
           "The version of Card API used by the provided card extension ({}) mismatches the version used by the service ({}).",
-          cardExtensionSpi.getCardApiVersion(),
+          cardExtension.getCardApiVersion(),
           CardApiProperties.VERSION);
     }
-    if (compareVersions(cardExtensionSpi.getServiceApiVersion(), ServiceApiProperties.VERSION)
-        != 0) {
+    if (compareVersions(cardExtension.getReaderApiVersion(), ReaderApiProperties.VERSION) != 0) {
       logger.warn(
           "The version of Service API used by the provided card extension ({}) mismatches the version used by the service ({}).",
-          cardExtensionSpi.getServiceApiVersion(),
-          ServiceApiProperties.VERSION);
+          cardExtension.getReaderApiVersion(),
+          ReaderApiProperties.VERSION);
     }
   }
 
@@ -482,7 +480,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @since 2.0
    */
   public void checkCardExtension(KeypleCardExtension cardExtension) {
-    checkCardExtensionVersion((CardExtensionSpi) cardExtension);
+    checkCardExtensionVersion(cardExtension);
   }
 
   /**

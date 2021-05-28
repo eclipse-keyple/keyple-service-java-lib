@@ -16,7 +16,6 @@ import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.util.Collections;
-import org.eclipse.keyple.core.card.spi.CardExtensionSpi;
 import org.eclipse.keyple.core.common.*;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceFactorySpi;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceSpi;
@@ -57,7 +56,8 @@ public class SmartCardServiceAdapterTest {
   private static final String PLUGIN_API_VERSION = "2.0";
   private static final String DISTRIBUTED_REMOTE_API_VERSION = "2.0";
   private static final String DISTRIBUTED_LOCAL_API_VERSION = "2.0";
-  private static final String CARD_API_VERSION = "2.0";
+  private static final String READER_API_VERSION = "1.0";
+  private static final String CARD_API_VERSION = "1.0";
 
   private PluginMock plugin;
   private ObservablePluginMock observablePlugin;
@@ -107,7 +107,7 @@ public class SmartCardServiceAdapterTest {
   interface RemotePoolPluginFactoryMock
       extends KeyplePluginExtensionFactory, RemotePluginFactorySpi {}
 
-  interface CardExtensionMock extends KeypleCardExtension, CardExtensionSpi {}
+  interface CardExtensionMock extends KeypleCardExtension {}
 
   interface DistributedLocalServiceMock
       extends KeypleDistributedLocalServiceExtension, LocalServiceSpi {}
@@ -203,7 +203,7 @@ public class SmartCardServiceAdapterTest {
     cardExtension = mock(CardExtensionMock.class);
     when(cardExtension.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
     when(cardExtension.getCardApiVersion()).thenReturn(CARD_API_VERSION);
-    when(cardExtension.getServiceApiVersion()).thenReturn(SERVICE_API_VERSION);
+    when(cardExtension.getReaderApiVersion()).thenReturn(READER_API_VERSION);
 
     localService = mock(DistributedLocalServiceMock.class);
     when(localService.getName()).thenReturn(LOCAL_SERVICE_NAME);
@@ -522,10 +522,10 @@ public class SmartCardServiceAdapterTest {
   }
 
   @Test
-  public void checkCardExtension_whenServiceApiDiffers_shouldLogWarn() {
-    when(cardExtension.getServiceApiVersion()).thenReturn("2.1");
+  public void checkCardExtension_whenReaderApiDiffers_shouldLogWarn() {
+    when(cardExtension.getReaderApiVersion()).thenReturn("2.1");
     service.checkCardExtension(cardExtension);
-    verify(logger).warn(anyString(), eq("2.1"), eq(SERVICE_API_VERSION));
+    verify(logger).warn(anyString(), eq("2.1"), eq(READER_API_VERSION));
   }
 
   @Test

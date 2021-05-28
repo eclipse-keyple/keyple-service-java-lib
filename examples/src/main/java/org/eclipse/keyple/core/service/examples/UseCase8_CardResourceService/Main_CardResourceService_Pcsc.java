@@ -11,6 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.examples.UseCase8_CardResourceService;
 
+import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.card.generic.CardResourceProfileExtension;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
 import org.eclipse.keyple.card.generic.GenericExtensionServiceProvider;
@@ -18,7 +19,6 @@ import org.eclipse.keyple.core.service.*;
 import org.eclipse.keyple.core.service.resource.*;
 import org.eclipse.keyple.core.service.resource.spi.ReaderConfiguratorSpi;
 import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
-import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.plugin.pcsc.PcscPluginFactoryBuilder;
 import org.eclipse.keyple.plugin.pcsc.PcscReader;
 import org.slf4j.Logger;
@@ -72,17 +72,19 @@ public class Main_CardResourceService_Pcsc {
 
     logger.info("=============== UseCase Generic #8: card resource service ==================");
 
-    // Create a card resource extension A expecting a card having an ATR matching the regex A.
+    // Create a card resource extension A expecting a card having power-on data matching the regex
+    // A.
     CardResourceProfileExtension cardResourceExtensionA =
         GenericExtensionServiceProvider.getService()
             .createCardResourceProfileExtension()
-            .setAtrRegex(ATR_REGEX_A);
+            .setPowerOnDataRegex(ATR_REGEX_A);
 
-    // Create a card resource extension B expecting a card having an ATR matching the regex B.
+    // Create a card resource extension B expecting a card having power-on data matching the regex
+    // B.
     CardResourceProfileExtension cardResourceExtensionB =
         GenericExtensionServiceProvider.getService()
             .createCardResourceProfileExtension()
-            .setAtrRegex(ATR_REGEX_B);
+            .setPowerOnDataRegex(ATR_REGEX_B);
 
     // Get the service
     CardResourceService cardResourceService = CardResourceServiceProvider.getService();
@@ -96,7 +98,7 @@ public class Main_CardResourceService_Pcsc {
     // connection/disconnection of readers) and of the readers (for the insertion/removal of cards)
     // is activated.
     // - two card resource profiles A and B are defined, each expecting a specific card
-    // characterized by its ATR and placed in a specific reader.
+    // characterized by its power-on data and placed in a specific reader.
     // - the timeout for using the card's resources is set at 5 seconds.
     cardResourceService
         .getConfigurator()
@@ -215,7 +217,7 @@ public class Main_CardResourceService_Pcsc {
 
   /** Class implementing the exception handler SPIs for plugin and reader monitoring. */
   private static class PluginAndReaderExceptionHandler
-      implements PluginObservationExceptionHandlerSpi, ReaderObservationExceptionHandlerSpi {
+      implements PluginObservationExceptionHandlerSpi, CardReaderObservationExceptionHandlerSpi {
 
     @Override
     public void onPluginObservationError(String pluginName, Throwable e) {

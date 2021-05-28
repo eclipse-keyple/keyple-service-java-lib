@@ -12,18 +12,20 @@
 package org.eclipse.keyple.core.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.eclipse.keyple.core.card.*;
+import java.util.*;
+import org.calypsonet.terminal.card.CardBrokenCommunicationException;
+import org.calypsonet.terminal.card.CardSelectionResponseApi;
+import org.calypsonet.terminal.card.ChannelControl;
+import org.calypsonet.terminal.card.ReaderBrokenCommunicationException;
+import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
+import org.calypsonet.terminal.card.spi.CardSelectorSpi;
+import org.calypsonet.terminal.reader.selection.spi.CardSelector;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
-import org.eclipse.keyple.core.service.selection.CardSelector;
 import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.junit.After;
@@ -32,24 +34,39 @@ import org.junit.Test;
 
 public class LocalReaderAdapterTest {
   private ReaderSpiMock readerSpi;
+  private CardSelectorMock cardSelector;
+  private CardSelectionRequestSpi cardSelectionRequestSpi;
 
   private static final String PLUGIN_NAME = "plugin";
   private static final String READER_NAME = "reader";
   private static final String CARD_PROTOCOL = "cardProtocol";
   private static final String OTHER_CARD_PROTOCOL = "otherCardProtocol";
-  private static final byte[] ATR = new byte[] {(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78};
+  private static final byte[] POWER_ON_DATA =
+      new byte[] {(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78};
 
   interface ReaderSpiMock extends KeypleReaderExtension, ReaderSpi {}
+
+  interface CardSelectorMock extends CardSelector, CardSelectorSpi {}
 
   @Before
   public void setUp() throws Exception {
     readerSpi = mock(ReaderSpiMock.class);
     when(readerSpi.getName()).thenReturn(READER_NAME);
     when(readerSpi.checkCardPresence()).thenReturn(true);
-    when(readerSpi.getAtr()).thenReturn(ATR);
+    when(readerSpi.getPowerOnData()).thenReturn(POWER_ON_DATA);
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(ByteArrayUtil.fromHex("6D00"));
     when(readerSpi.isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
     when(readerSpi.isCurrentProtocol(CARD_PROTOCOL)).thenReturn(true);
+
+    cardSelector = mock(CardSelectorMock.class);
+    when(cardSelector.powerOnDataMatches(any(byte[].class))).thenReturn(true);
+    when(cardSelector.getFileOccurrence()).thenReturn(CardSelector.FileOccurrence.FIRST);
+    when(cardSelector.getFileControlInformation())
+        .thenReturn(CardSelector.FileControlInformation.FCI);
+    when(cardSelector.getSuccessfulSelectionStatusWords())
+        .thenReturn(Collections.singleton(0x9000));
+
+    cardSelectionRequestSpi = mock(CardSelectionRequestSpi.class);
   }
 
   @After
@@ -98,29 +115,21 @@ public class LocalReaderAdapterTest {
   public void
       transmitCardSelectionRequests_withPermissiveCardSelector_shouldReturnMatchingResponseAndOpenChannel()
           throws Exception {
-    CardSelector cardSelector = CardSelector.builder().build();
-    CardSelectionRequest cardSelectionRequest = new CardSelectionRequest(cardSelector, null);
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<CardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponseApi> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
-            new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
+            new ArrayList<CardSelectionRequestSpi>(
+                Collections.singletonList(cardSelectionRequestSpi)),
             MultiSelectionProcessing.FIRST_MATCH,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .getAtr()
-                .getBytes())
-        .isEqualTo(ATR);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .hasMatched())
-        .isTrue();
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+        .isEqualTo(POWER_ON_DATA);
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().hasMatched()).isTrue();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isTrue();
   }
 
@@ -128,59 +137,44 @@ public class LocalReaderAdapterTest {
   public void
       transmitCardSelectionRequests_withPermissiveCardSelectorAndProcessALL_shouldReturnMatchingResponseAndNotOpenChannel()
           throws Exception {
-    CardSelector cardSelector = CardSelector.builder().build();
-    CardSelectionRequest cardSelectionRequest = new CardSelectionRequest(cardSelector, null);
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<CardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponseApi> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
-            new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
+            new ArrayList<CardSelectionRequestSpi>(
+                Collections.singletonList(cardSelectionRequestSpi)),
             MultiSelectionProcessing.PROCESS_ALL,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .getAtr()
-                .getBytes())
-        .isEqualTo(ATR);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .hasMatched())
-        .isTrue();
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+        .isEqualTo(POWER_ON_DATA);
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().hasMatched()).isTrue();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isFalse();
   }
 
   @Test
   public void
-      transmitCardSelectionRequests_withNonMatchingAtrFilteringCardSelector_shouldReturnNotMatchingResponseAndNotOpenChannel()
+      transmitCardSelectionRequests_withNonMatchingPowerOnDataFilteringCardSelector_shouldReturnNotMatchingResponseAndNotOpenChannel()
           throws Exception {
-    CardSelector cardSelector = CardSelector.builder().filterByAtr("1A2B3C").build();
-    CardSelectionRequest cardSelectionRequest = new CardSelectionRequest(cardSelector, null);
+    when(cardSelector.powerOnDataMatches(any(byte[].class))).thenReturn(false);
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<CardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponseApi> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
-            new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
+            new ArrayList<CardSelectionRequestSpi>(
+                Collections.singletonList(cardSelectionRequestSpi)),
             MultiSelectionProcessing.FIRST_MATCH,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .getAtr()
-                .getBytes())
-        .isEqualTo(ATR);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .hasMatched())
-        .isFalse();
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+        .isEqualTo(POWER_ON_DATA);
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().hasMatched()).isFalse();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isFalse();
   }
 
@@ -188,30 +182,22 @@ public class LocalReaderAdapterTest {
   public void
       transmitCardSelectionRequests_withNonMatchingDFNameFilteringCardSelector_shouldReturnNotMatchingResponseAndNotOpenChannel()
           throws Exception {
-    CardSelector cardSelector = CardSelector.builder().filterByDfName("1122334455").build();
-
-    CardSelectionRequest cardSelectionRequest = new CardSelectionRequest(cardSelector, null);
+    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("1122334455"));
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<CardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponseApi> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
-            new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
+            new ArrayList<CardSelectionRequestSpi>(
+                Collections.singletonList(cardSelectionRequestSpi)),
             MultiSelectionProcessing.FIRST_MATCH,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .getAtr()
-                .getBytes())
-        .isEqualTo(ATR);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .hasMatched())
-        .isFalse();
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+        .isEqualTo(POWER_ON_DATA);
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().hasMatched()).isFalse();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isFalse();
   }
 
@@ -221,37 +207,24 @@ public class LocalReaderAdapterTest {
           throws Exception {
     byte[] selectResponseApdu = ByteArrayUtil.fromHex("123456789000");
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(selectResponseApdu);
-
-    CardSelector cardSelector = CardSelector.builder().filterByDfName("1122334455").build();
-
-    CardSelectionRequest cardSelectionRequest = new CardSelectionRequest(cardSelector, null);
+    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("1122334455"));
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<CardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponseApi> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
-            new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
+            new ArrayList<CardSelectionRequestSpi>(
+                Collections.singletonList(cardSelectionRequestSpi)),
             MultiSelectionProcessing.FIRST_MATCH,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .getAtr()
-                .getBytes())
-        .isEqualTo(ATR);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .getFci()
-                .getBytes())
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+        .isEqualTo(POWER_ON_DATA);
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getFci().getBytes())
         .isEqualTo(selectResponseApdu);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .hasMatched())
-        .isTrue();
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().hasMatched()).isTrue();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isTrue();
   }
 
@@ -261,37 +234,24 @@ public class LocalReaderAdapterTest {
           throws Exception {
     byte[] selectResponseApdu = ByteArrayUtil.fromHex("123456786283");
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(selectResponseApdu);
-
-    CardSelector cardSelector = CardSelector.builder().filterByDfName("1122334455").build();
-
-    CardSelectionRequest cardSelectionRequest = new CardSelectionRequest(cardSelector, null);
+    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("1122334455"));
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<CardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponseApi> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
-            new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
+            new ArrayList<CardSelectionRequestSpi>(
+                Collections.singletonList(cardSelectionRequestSpi)),
             MultiSelectionProcessing.FIRST_MATCH,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .getAtr()
-                .getBytes())
-        .isEqualTo(ATR);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .getFci()
-                .getBytes())
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+        .isEqualTo(POWER_ON_DATA);
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getFci().getBytes())
         .isEqualTo(selectResponseApdu);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .hasMatched())
-        .isFalse();
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().hasMatched()).isFalse();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isFalse();
   }
 
@@ -301,38 +261,26 @@ public class LocalReaderAdapterTest {
           throws Exception {
     byte[] selectResponseApdu = ByteArrayUtil.fromHex("123456786283");
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(selectResponseApdu);
-
-    CardSelector cardSelector =
-        CardSelector.builder().filterByDfName("1122334455").addSuccessfulStatusCode(0x6283).build();
-
-    CardSelectionRequest cardSelectionRequest = new CardSelectionRequest(cardSelector, null);
+    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("1122334455"));
+    when(cardSelector.getSuccessfulSelectionStatusWords())
+        .thenReturn(new HashSet<Integer>(Arrays.asList(0x9000, 0x6283)));
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<CardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponseApi> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
-            new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
+            new ArrayList<CardSelectionRequestSpi>(
+                Collections.singletonList(cardSelectionRequestSpi)),
             MultiSelectionProcessing.FIRST_MATCH,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .getAtr()
-                .getBytes())
-        .isEqualTo(ATR);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .getFci()
-                .getBytes())
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+        .isEqualTo(POWER_ON_DATA);
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getFci().getBytes())
         .isEqualTo(selectResponseApdu);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .hasMatched())
-        .isTrue();
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().hasMatched()).isTrue();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isTrue();
   }
 
@@ -340,34 +288,28 @@ public class LocalReaderAdapterTest {
   public void
       transmitCardSelectionRequests_withNonMatchingCardProtocolFilteringCardSelector_shouldReturnNotMatchingResponseAndNotOpenChannel()
           throws Exception {
-    CardSelector cardSelector =
-        CardSelector.builder().filterByCardProtocol(OTHER_CARD_PROTOCOL).build();
-
-    CardSelectionRequest cardSelectionRequest = new CardSelectionRequest(cardSelector, null);
+    when(cardSelector.getCardProtocol()).thenReturn(OTHER_CARD_PROTOCOL);
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     localReaderAdapter.activateProtocol(CARD_PROTOCOL, CARD_PROTOCOL);
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    List<CardSelectionResponse> cardSelectionResponses =
+    List<CardSelectionResponseApi> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
-            new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
+            new ArrayList<CardSelectionRequestSpi>(
+                Collections.singletonList(cardSelectionRequestSpi)),
             MultiSelectionProcessing.FIRST_MATCH,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(
-            ((CardSelectionResponse) cardSelectionResponses.get(0))
-                .getSelectionStatus()
-                .hasMatched())
-        .isFalse();
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().hasMatched()).isFalse();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isFalse();
   }
 
-  @Test(expected = ReaderCommunicationException.class)
+  @Test(expected = ReaderBrokenCommunicationException.class)
   public void transmitCardSelectionRequests_whenOpenPhysicalThrowsReaderIOException_shouldRCE()
       throws Exception {
-    CardSelector cardSelector = CardSelector.builder().build();
-    CardSelectionRequest cardSelectionRequest = new CardSelectionRequest(cardSelector, null);
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     doThrow(new ReaderIOException("Reader IO Exception")).when(readerSpi).openPhysicalChannel();
 
@@ -375,16 +317,15 @@ public class LocalReaderAdapterTest {
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
     localReaderAdapter.transmitCardSelectionRequests(
-        new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
+        new ArrayList<CardSelectionRequestSpi>(Collections.singletonList(cardSelectionRequestSpi)),
         MultiSelectionProcessing.FIRST_MATCH,
         ChannelControl.CLOSE_AFTER);
   }
 
-  @Test(expected = CardCommunicationException.class)
+  @Test(expected = CardBrokenCommunicationException.class)
   public void transmitCardSelectionRequests_whenOpenPhysicalThrowsCArdIOException_shouldCCE()
       throws Exception {
-    CardSelector cardSelector = CardSelector.builder().build();
-    CardSelectionRequest cardSelectionRequest = new CardSelectionRequest(cardSelector, null);
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     doThrow(new CardIOException("Card IO Exception")).when(readerSpi).openPhysicalChannel();
 
@@ -392,7 +333,7 @@ public class LocalReaderAdapterTest {
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
     localReaderAdapter.transmitCardSelectionRequests(
-        new ArrayList<CardSelectionRequest>(Arrays.asList(cardSelectionRequest)),
+        new ArrayList<CardSelectionRequestSpi>(Collections.singletonList(cardSelectionRequestSpi)),
         MultiSelectionProcessing.FIRST_MATCH,
         ChannelControl.CLOSE_AFTER);
   }

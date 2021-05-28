@@ -12,8 +12,8 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.List;
-import org.eclipse.keyple.core.card.CardSelectionResponse;
-import org.eclipse.keyple.core.service.selection.ScheduledCardSelectionsResponse;
+import org.calypsonet.terminal.card.CardSelectionResponseApi;
+import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
 
 /**
  * (package-private)<br>
@@ -23,7 +23,7 @@ import org.eclipse.keyple.core.service.selection.ScheduledCardSelectionsResponse
  */
 class ScheduledCardSelectionsResponseAdapter implements ScheduledCardSelectionsResponse {
 
-  private final List<CardSelectionResponse> cardSelectionResponses;
+  private final List<CardSelectionResponseApi> cardSelectionResponses;
 
   /**
    * (package-private)<br>
@@ -32,7 +32,7 @@ class ScheduledCardSelectionsResponseAdapter implements ScheduledCardSelectionsR
    * @param cardSelectionResponses The card selection responses.
    * @since 2.0
    */
-  ScheduledCardSelectionsResponseAdapter(List<CardSelectionResponse> cardSelectionResponses) {
+  ScheduledCardSelectionsResponseAdapter(List<CardSelectionResponseApi> cardSelectionResponses) {
     this.cardSelectionResponses = cardSelectionResponses;
   }
 
@@ -40,10 +40,10 @@ class ScheduledCardSelectionsResponseAdapter implements ScheduledCardSelectionsR
    * (package-private)<br>
    * Gets the card responses.
    *
-   * @return A list of {@link CardSelectionResponse}.
+   * @return A list of {@link CardSelectionResponseApi}.
    * @since 2.0
    */
-  List<CardSelectionResponse> getCardSelectionResponses() {
+  List<CardSelectionResponseApi> getCardSelectionResponses() {
     return cardSelectionResponses;
   }
 }

@@ -24,10 +24,10 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> The type of the observers ({@link
  *     org.eclipse.keyple.core.service.spi.PluginObserverSpi} or {@link
- *     org.eclipse.keyple.core.service.spi.ReaderObserverSpi}).
+ *     org.eclipse.keyple.core.service.spi.CardReaderObserverSpi}).
  * @param <S> The type of the exception handler to use during the observation process ({@link
  *     org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi} or {@link
- *     org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi}).
+ *     org.eclipse.keyple.core.service.spi.CardReaderObservationExceptionHandlerSpi}).
  * @since 2.0
  */
 final class ObservationManagerAdapter<T, S> {
@@ -124,7 +124,7 @@ final class ObservationManagerAdapter<T, S> {
    * (package-private)<br>
    * Gets the number of observers.
    *
-   * @return the number of observers.
+   * @return The number of observers.
    * @since 2.0
    */
   int countObservers() {
@@ -175,7 +175,7 @@ final class ObservationManagerAdapter<T, S> {
    * (package-private)<br>
    * Gets the event notification executor service.
    *
-   * @return null if no service has been set.
+   * @return Null if no service has been set.
    * @since 2.0
    */
   ExecutorService getEventNotificationExecutorService() {
@@ -187,7 +187,7 @@ final class ObservationManagerAdapter<T, S> {
    * Gets the exception handler used to notify the application of exceptions raised during the
    * observation process.
    *
-   * @return null if no exception handler has been set.
+   * @return Null if no exception handler has been set.
    * @since 2.0
    */
   S getObservationExceptionHandler() {

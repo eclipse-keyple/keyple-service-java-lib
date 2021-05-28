@@ -12,7 +12,9 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.List;
-import org.eclipse.keyple.core.card.*;
+import org.calypsonet.terminal.card.*;
+import org.calypsonet.terminal.card.spi.CardRequestSpi;
+import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.slf4j.Logger;
@@ -24,7 +26,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-abstract class AbstractReaderAdapter implements Reader, ProxyReader {
+abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractReaderAdapter.class);
 
@@ -66,7 +68,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    * Performs a selection scenario following a card detection.
    *
    * <p>Each scenario selection case consists in checking if the card matches the profile defined in
-   * the {@link CardSelectionRequest} and possibly sending the optional commands provided.<br>
+   * the {@link CardSelectionRequestSpi} and possibly sending the optional commands provided.<br>
    * The cases are processed sequentially in the order in which they are found in the list.<br>
    * Processing continues or stops after the first successful selection according to the policy
    * defined by {@link MultiSelectionProcessing}.<br>
@@ -74,23 +76,23 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    * the channel control policy.
    *
    * @param cardSelectionRequests A list of selection cases composed of one or more {@link
-   *     CardSelectionRequest}.
+   *     CardSelectionRequestSpi}.
    * @param multiSelectionProcessing The multi selection policy.
    * @param channelControl The channel control policy.
    * @return An empty list if no response was received.
-   * @throws ReaderCommunicationException if the communication with the reader has failed.
-   * @throws CardCommunicationException if the communication with the card has failed.
+   * @throws ReaderBrokenCommunicationException if the communication with the reader has failed.
+   * @throws CardBrokenCommunicationException if the communication with the card has failed.
    * @since 2.0
    */
-  final List<CardSelectionResponse> transmitCardSelectionRequests(
-      List<CardSelectionRequest> cardSelectionRequests,
+  final List<CardSelectionResponseApi> transmitCardSelectionRequests(
+      List<CardSelectionRequestSpi> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException {
+      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException {
 
     checkStatus();
 
-    List<CardSelectionResponse> cardSelectionResponses = null;
+    List<CardSelectionResponseApi> cardSelectionResponses = null;
 
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
@@ -107,9 +109,9 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
       cardSelectionResponses =
           processCardSelectionRequests(
               cardSelectionRequests, multiSelectionProcessing, channelControl);
-    } catch (UnexpectedStatusCodeException e) {
-      throw new CardCommunicationException(
-          e.getCardResponse(), "An unexpected status code was received.", e);
+    } catch (UnexpectedStatusWordException e) {
+      throw new CardBrokenCommunicationException(
+          e.getCardResponse(), "An unexpected status word was received.", e);
     } finally {
       if (logger.isDebugEnabled()) {
         long timeStamp = System.nanoTime();
@@ -167,22 +169,22 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    * Abstract method performing the actual card selection process.
    *
    * @param cardSelectionRequests A list of selection cases composed of one or more {@link
-   *     CardSelectionRequest}.
+   *     CardSelectionRequestSpi}.
    * @param multiSelectionProcessing The multi selection policy.
    * @param channelControl The channel control policy.
    * @return An empty list if no response was received.
-   * @throws ReaderCommunicationException if the communication with the reader has failed.
-   * @throws CardCommunicationException if the communication with the card has failed.
-   * @throws UnexpectedStatusCodeException If status code verification is enabled in the card
+   * @throws ReaderBrokenCommunicationException if the communication with the reader has failed.
+   * @throws CardBrokenCommunicationException if the communication with the card has failed.
+   * @throws UnexpectedStatusWordException If status word verification is enabled in the card
    *     request and the card returned an unexpected code.
    * @since 2.0
    */
-  abstract List<CardSelectionResponse> processCardSelectionRequests(
-      List<CardSelectionRequest> cardSelectionRequests,
+  abstract List<CardSelectionResponseApi> processCardSelectionRequests(
+      List<CardSelectionRequestSpi> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException,
-          UnexpectedStatusCodeException;
+      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+          UnexpectedStatusWordException;
 
   /**
    * (package-private)<br>
@@ -191,15 +193,16 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    * @param cardRequest The card request.
    * @param channelControl The channel control policy to apply.
    * @return A not null reference.
-   * @throws ReaderCommunicationException if the communication with the reader has failed.
-   * @throws CardCommunicationException if the communication with the card has failed.
-   * @throws UnexpectedStatusCodeException If status code verification is enabled in the card
+   * @throws ReaderBrokenCommunicationException if the communication with the reader has failed.
+   * @throws CardBrokenCommunicationException if the communication with the card has failed.
+   * @throws UnexpectedStatusWordException If status word verification is enabled in the card
    *     request and the card returned an unexpected code.
    * @since 2.0
    */
-  abstract CardResponse processCardRequest(CardRequest cardRequest, ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException,
-          UnexpectedStatusCodeException;
+  abstract CardResponseApi processCardRequest(
+      CardRequestSpi cardRequest, ChannelControl channelControl)
+      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+          UnexpectedStatusWordException;
 
   /**
    * {@inheritDoc}
@@ -228,12 +231,13 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReader {
    * @since 2.0
    */
   @Override
-  public CardResponse transmitCardRequest(CardRequest cardRequest, ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException,
-          UnexpectedStatusCodeException {
+  public CardResponseApi transmitCardRequest(
+      CardRequestSpi cardRequest, ChannelControl channelControl)
+      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+          UnexpectedStatusWordException {
     checkStatus();
 
-    CardResponse cardResponse = null;
+    CardResponseApi cardResponse = null;
 
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();

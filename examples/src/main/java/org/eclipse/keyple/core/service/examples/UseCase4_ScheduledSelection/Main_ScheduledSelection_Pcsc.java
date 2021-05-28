@@ -11,13 +11,14 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.examples.UseCase4_ScheduledSelection;
 
+import org.calypsonet.terminal.reader.ObservableCardReader;
+import org.calypsonet.terminal.reader.selection.CardSelectionService;
+import org.calypsonet.terminal.reader.selection.spi.CardSelection;
+import org.eclipse.keyple.card.generic.GenericCardSelectorAdapter;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
 import org.eclipse.keyple.card.generic.GenericExtensionServiceProvider;
 import org.eclipse.keyple.core.service.*;
 import org.eclipse.keyple.core.service.examples.common.ConfigurationUtil;
-import org.eclipse.keyple.core.service.selection.CardSelectionService;
-import org.eclipse.keyple.core.service.selection.CardSelector;
-import org.eclipse.keyple.core.service.selection.spi.CardSelection;
 import org.eclipse.keyple.core.util.protocol.ContactlessCardCommonProtocol;
 import org.eclipse.keyple.plugin.pcsc.PcscPluginFactoryBuilder;
 import org.eclipse.keyple.plugin.pcsc.PcscSupportedContactlessProtocol;
@@ -41,7 +42,7 @@ import org.slf4j.LoggerFactory;
  *   <li>Start the observation and wait for a card.
  *   <li>Within the reader event handler:
  *       <ul>
- *         <li>Output collected smart card data (FCI and ATR).
+ *         <li>Output collected smart card data (FCI and power-on data).
  *         <li>Close the physical channel.
  *       </ul>
  * </ul>
@@ -87,7 +88,7 @@ public class Main_ScheduledSelection_Pcsc {
     // Create a card selection using the generic card extension.
     CardSelection cardSelection =
         cardExtension.createCardSelection(
-            CardSelector.builder()
+            GenericCardSelectorAdapter.builder()
                 .filterByCardProtocol(ContactlessCardCommonProtocol.ISO_14443_4.name())
                 .filterByDfName(ConfigurationUtil.AID_EMV_PPSE)
                 .build());
@@ -97,7 +98,9 @@ public class Main_ScheduledSelection_Pcsc {
 
     // Schedule the selection scenario.
     selectionService.scheduleCardSelectionScenario(
-        (ObservableReader) reader, ObservableReader.NotificationMode.MATCHED_ONLY);
+        (ObservableReader) reader,
+        ObservableReader.NotificationMode.MATCHED_ONLY,
+        ObservableCardReader.PollingMode.REPEATING);
 
     // Create and add an observer
     CardReaderObserver cardReaderObserver = new CardReaderObserver(reader, selectionService);

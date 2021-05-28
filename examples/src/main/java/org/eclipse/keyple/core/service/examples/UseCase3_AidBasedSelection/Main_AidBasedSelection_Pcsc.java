@@ -11,15 +11,15 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.examples.UseCase3_AidBasedSelection;
 
+import org.calypsonet.terminal.reader.selection.CardSelectionResult;
+import org.calypsonet.terminal.reader.selection.CardSelectionService;
+import org.calypsonet.terminal.reader.selection.spi.CardSelection;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
+import org.eclipse.keyple.card.generic.GenericCardSelectorAdapter;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
 import org.eclipse.keyple.card.generic.GenericExtensionServiceProvider;
 import org.eclipse.keyple.core.service.*;
 import org.eclipse.keyple.core.service.examples.common.ConfigurationUtil;
-import org.eclipse.keyple.core.service.selection.CardSelectionResult;
-import org.eclipse.keyple.core.service.selection.CardSelectionService;
-import org.eclipse.keyple.core.service.selection.CardSelector;
-import org.eclipse.keyple.core.service.selection.spi.CardSelection;
-import org.eclipse.keyple.core.service.selection.spi.SmartCard;
 import org.eclipse.keyple.plugin.pcsc.PcscPluginFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *   <li>Check if a ISO 14443-4 card is in the reader, select a card with the specified AID (here
  *       the EMV PPSE AID).
  *   <li>Run a selection scenario with the DF Name filter.
- *   <li>Output the collected smart card data (ATR).
+ *   <li>Output the collected smart card data (power-on data).
  * </ul>
  *
  * All results are logged with slf4j.
@@ -85,10 +85,12 @@ public class Main_AidBasedSelection_Pcsc {
     CardSelectionService selectionService = CardSelectionServiceFactory.getService();
 
     // Create a card selection using the generic card extension without specifying any filter
-    // (protocol/ATR/DFName).
+    // (protocol/power-on data/DFName).
     CardSelection cardSelection =
         cardExtension.createCardSelection(
-            CardSelector.builder().filterByDfName(ConfigurationUtil.AID_EMV_PPSE).build());
+            GenericCardSelectorAdapter.builder()
+                .filterByDfName(ConfigurationUtil.AID_EMV_PPSE)
+                .build());
 
     // Prepare the selection by adding the created generic selection to the card selection scenario.
     selectionService.prepareSelection(cardSelection);

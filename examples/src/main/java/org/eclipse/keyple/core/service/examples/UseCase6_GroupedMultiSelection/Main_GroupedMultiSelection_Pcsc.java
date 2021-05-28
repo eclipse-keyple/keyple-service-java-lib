@@ -15,15 +15,15 @@ import static org.eclipse.keyple.core.service.examples.common.ConfigurationUtil.
 import static org.eclipse.keyple.core.service.examples.common.ConfigurationUtil.getCardReader;
 
 import java.util.Map;
+import org.calypsonet.terminal.reader.selection.CardSelectionResult;
+import org.calypsonet.terminal.reader.selection.CardSelectionService;
+import org.calypsonet.terminal.reader.selection.spi.CardSelector;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
+import org.eclipse.keyple.card.generic.GenericCardSelectorAdapter;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
 import org.eclipse.keyple.card.generic.GenericExtensionServiceProvider;
 import org.eclipse.keyple.core.service.*;
 import org.eclipse.keyple.core.service.examples.common.ConfigurationUtil;
-import org.eclipse.keyple.core.service.selection.CardSelectionResult;
-import org.eclipse.keyple.core.service.selection.CardSelectionService;
-import org.eclipse.keyple.core.service.selection.CardSelector;
-import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
-import org.eclipse.keyple.core.service.selection.spi.SmartCard;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.eclipse.keyple.plugin.pcsc.PcscPluginFactoryBuilder;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  *   <li>Check if a ISO 14443-4 card is in the reader, select a card (here a card having two
  *       applications whose DF Names are prefixed by a specific AID [see AID_KEYPLE_PREFIX]).
  *   <li>Run a double AID based application selection scenario (first and next occurrence).
- *   <li>Output collected of all smart cards data (FCI and ATR).
+ *   <li>Output collected of all smart cards data (FCI and power-on data).
  * </ul>
  *
  * All results are logged with slf4j.
@@ -86,15 +86,16 @@ public class Main_GroupedMultiSelection_Pcsc {
     logger.info("= #### Select application with AID = '{}'.", ConfigurationUtil.AID_KEYPLE_PREFIX);
 
     // Get the core card selection service.
-    CardSelectionService selectionService =
-        CardSelectionServiceFactory.getService(MultiSelectionProcessing.PROCESS_ALL);
+    CardSelectionService selectionService = CardSelectionServiceFactory.getService();
+    // Set the multiple selection mode
+    selectionService.setMultipleSelectionMode();
 
     // First selection: get the first application occurrence matching the AID, keep the
     // physical channel open
     // Prepare the selection by adding the created generic selection to the card selection scenario.
     selectionService.prepareSelection(
         cardExtension.createCardSelection(
-            CardSelector.builder()
+            GenericCardSelectorAdapter.builder()
                 .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
                 .setFileOccurrence(CardSelector.FileOccurrence.FIRST)
                 .build()));
@@ -104,7 +105,7 @@ public class Main_GroupedMultiSelection_Pcsc {
     // Prepare the selection by adding the created generic selection to the card selection scenario.
     selectionService.prepareSelection(
         cardExtension.createCardSelection(
-            CardSelector.builder()
+            GenericCardSelectorAdapter.builder()
                 .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
                 .setFileOccurrence(CardSelector.FileOccurrence.NEXT)
                 .build()));
@@ -118,15 +119,18 @@ public class Main_GroupedMultiSelection_Pcsc {
     // log the result
     for (Map.Entry<Integer, SmartCard> entry : cardSelectionsResult.getSmartCards().entrySet()) {
       SmartCard smartCard = entry.getValue();
-      String atr = smartCard.hasAtr() ? ByteArrayUtil.toHex(smartCard.getAtrBytes()) : "no ATR";
+      String powerOnData =
+          smartCard.hasPowerOnData()
+              ? ByteArrayUtil.toHex(smartCard.getPowerOnData())
+              : "no power-on data";
       String fci = smartCard.hasFci() ? ByteArrayUtil.toHex(smartCard.getFciBytes()) : "no FCI";
       String selectionIsActive =
           smartCard == cardSelectionsResult.getActiveSmartCard() ? "true" : "false";
       logger.info(
-          "Selection status for selection (indexed {}): \n\t\tActive smart card: {}\n\t\tATR: {}\n\t\tFCI: {}",
+          "Selection status for selection (indexed {}): \n\t\tActive smart card: {}\n\t\tpower-on data: {}\n\t\tFCI: {}",
           entry.getKey(),
           selectionIsActive,
-          atr,
+          powerOnData,
           fci);
     }
 

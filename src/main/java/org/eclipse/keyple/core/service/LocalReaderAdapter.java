@@ -15,12 +15,15 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.keyple.core.card.*;
+import org.calypsonet.terminal.card.*;
+import org.calypsonet.terminal.card.spi.ApduRequestSpi;
+import org.calypsonet.terminal.card.spi.CardRequestSpi;
+import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
+import org.calypsonet.terminal.reader.selection.spi.CardSelector;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.AutonomousSelectionReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
-import org.eclipse.keyple.core.service.selection.CardSelector;
 import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keyple.core.util.Assert;
@@ -84,7 +87,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * (package-private)<br>
    * Gets the logical channel's opening state.
    *
-   * @return true if the channel is open, false if not.
+   * @return True if the channel is open, false if not.
    * @since 2.0
    */
   final boolean isLogicalChannelOpen() {
@@ -135,34 +138,35 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   @Override
-  final List<CardSelectionResponse> processCardSelectionRequests(
-      List<CardSelectionRequest> cardSelectionRequests,
+  final List<CardSelectionResponseApi> processCardSelectionRequests(
+      List<CardSelectionRequestSpi> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException,
-          UnexpectedStatusCodeException {
+      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+          UnexpectedStatusWordException {
 
     checkStatus();
 
-    List<CardSelectionResponse> cardSelectionResponses = new ArrayList<CardSelectionResponse>();
+    List<CardSelectionResponseApi> cardSelectionResponses =
+        new ArrayList<CardSelectionResponseApi>();
 
     /* Open the physical channel if needed, determine the current protocol */
     if (!readerSpi.isPhysicalChannelOpen()) {
       try {
         openPhysicalChannelAndSetProtocol();
       } catch (ReaderIOException e) {
-        throw new ReaderCommunicationException(
+        throw new ReaderBrokenCommunicationException(
             null, "Reader communication failure while opening physical channel", e);
       } catch (CardIOException e) {
-        throw new CardCommunicationException(
+        throw new CardBrokenCommunicationException(
             null, "Card communication failure while opening physical channel", e);
       }
     }
 
     /* loop over all CardRequest provided in the list */
-    for (CardSelectionRequest cardSelectionRequest : cardSelectionRequests) {
+    for (CardSelectionRequestSpi cardSelectionRequest : cardSelectionRequests) {
       /* process the CardRequest and append the CardResponse list */
-      CardSelectionResponse cardSelectionResponse =
+      CardSelectionResponseApi cardSelectionResponse =
           processCardSelectionRequest(cardSelectionRequest);
       cardSelectionResponses.add(cardSelectionResponse);
       if (multiSelectionProcessing == MultiSelectionProcessing.PROCESS_ALL) {
@@ -190,13 +194,14 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   @Override
-  final CardResponse processCardRequest(CardRequest cardRequest, ChannelControl channelControl)
-      throws CardCommunicationException, ReaderCommunicationException,
-          UnexpectedStatusCodeException {
+  final CardResponseApi processCardRequest(
+      CardRequestSpi cardRequest, ChannelControl channelControl)
+      throws CardBrokenCommunicationException, ReaderBrokenCommunicationException,
+          UnexpectedStatusWordException {
 
     checkStatus();
 
-    CardResponse cardResponse;
+    CardResponseApi cardResponse;
 
     /* process the CardRequest and keep the CardResponse */
     cardResponse = processCardRequest(cardRequest);
@@ -280,12 +285,13 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   @Override
-  public final void releaseChannel() throws ReaderCommunicationException {
+  public final void releaseChannel() throws ReaderBrokenCommunicationException {
     checkStatus();
     try {
       readerSpi.closePhysicalChannel();
     } catch (ReaderIOException e) {
-      throw new ReaderCommunicationException(null, "Failed to release the physical channel", e);
+      throw new ReaderBrokenCommunicationException(
+          null, "Failed to release the physical channel", e);
     }
   }
 
@@ -303,34 +309,34 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
   /**
    * (private)<br>
-   * Transmits a {@link CardRequest} and returns a {@link CardResponse}.
+   * Transmits a {@link CardRequestSpi} and returns a {@link CardResponseApi}.
    *
    * @param cardRequest The card request to transmit.
    * @return A not null reference.
-   * @throws ReaderCommunicationException If the communication with the reader has failed.
-   * @throws CardCommunicationException If the communication with the card has failed.
-   * @throws UnexpectedStatusCodeException If status code verification is enabled in the card
+   * @throws ReaderBrokenCommunicationException If the communication with the reader has failed.
+   * @throws CardBrokenCommunicationException If the communication with the card has failed.
+   * @throws UnexpectedStatusWordException If status word verification is enabled in the card
    *     request and the card returned an unexpected code.
    */
-  private CardResponse processCardRequest(CardRequest cardRequest)
-      throws ReaderCommunicationException, CardCommunicationException,
-          UnexpectedStatusCodeException {
+  private CardResponseApi processCardRequest(CardRequestSpi cardRequest)
+      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+          UnexpectedStatusWordException {
 
-    List<ApduResponse> apduResponses = new ArrayList<ApduResponse>();
+    List<ApduResponseApi> apduResponses = new ArrayList<ApduResponseApi>();
 
     /* Proceeds with the APDU requests present in the CardRequest */
-    for (ApduRequest apduRequest : cardRequest.getApduRequests()) {
+    for (ApduRequestSpi apduRequest : cardRequest.getApduRequests()) {
       try {
-        ApduResponse apduResponse = processApduRequest(apduRequest);
+        ApduResponseApi apduResponse = processApduRequest(apduRequest);
         apduResponses.add(apduResponse);
-        if (cardRequest.isStatusCodesVerificationEnabled()
-            && !apduRequest.getSuccessfulStatusCodes().contains(apduResponse.getStatusCode())) {
-          throw new UnexpectedStatusCodeException(
-              new CardResponse(
+        if (cardRequest.stopOnUnsuccessfulStatusWord()
+            && !apduRequest.getSuccessfulStatusWords().contains(apduResponse.getStatusWord())) {
+          throw new UnexpectedStatusWordException(
+              new CardResponseAdapter(
                   apduResponses,
                   false,
                   cardRequest.getApduRequests().size() == apduResponses.size()),
-              "Unexpected status code.");
+              "Unexpected status word.");
         }
       } catch (ReaderIOException e) {
         /*
@@ -339,8 +345,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
          */
         closeLogicalAndPhysicalChannelsSilently();
 
-        throw new ReaderCommunicationException(
-            new CardResponse(apduResponses, false, false),
+        throw new ReaderBrokenCommunicationException(
+            new CardResponseAdapter(apduResponses, false, false),
             "Reader communication failure while transmitting a card request.",
             e);
       } catch (CardIOException e) {
@@ -350,19 +356,19 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
          */
         closeLogicalAndPhysicalChannelsSilently();
 
-        throw new CardCommunicationException(
-            new CardResponse(apduResponses, false, false),
+        throw new CardBrokenCommunicationException(
+            new CardResponseAdapter(apduResponses, false, false),
             "Card communication failure while transmitting a card request.",
             e);
       }
     }
 
-    return new CardResponse(apduResponses, logicalChannelIsOpen, true);
+    return new CardResponseAdapter(apduResponses, logicalChannelIsOpen, true);
   }
 
   /**
    * (private)<br>
-   * Transmits an {@link ApduRequest} and receives the {@link ApduResponse}.
+   * Transmits an {@link ApduRequestSpi} and receives the {@link ApduResponseApi}.
    *
    * <p>The time measurement is carried out and logged with the detailed information of the
    * exchanges (TRACE level).
@@ -372,10 +378,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
    */
-  private ApduResponse processApduRequest(ApduRequest apduRequest)
+  private ApduResponseApi processApduRequest(ApduRequestSpi apduRequest)
       throws CardIOException, ReaderIOException {
 
-    ApduResponse apduResponse;
+    ApduResponseApi apduResponse;
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
       long elapsed10ms = (timeStamp - before) / 100000;
@@ -387,11 +393,11 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           elapsed10ms / 10.0);
     }
 
-    apduResponse = new ApduResponse(readerSpi.transmitApdu(apduRequest.getBytes()));
+    apduResponse = new ApduResponseAdapter(readerSpi.transmitApdu(apduRequest.getBytes()));
 
     if (ApduUtil.isCase4(apduRequest.getBytes())
         && apduResponse.getDataOut().length == 0
-        && apduResponse.getStatusCode() == DEFAULT_SUCCESSFUL_CODE) {
+        && apduResponse.getStatusWord() == DEFAULT_SUCCESSFUL_CODE) {
       // do the get response command
       apduResponse = case4HackGetResponse();
     }
@@ -421,7 +427,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
    */
-  private ApduResponse case4HackGetResponse() throws ReaderIOException, CardIOException {
+  private ApduResponseApi case4HackGetResponse() throws ReaderIOException, CardIOException {
 
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
@@ -437,7 +443,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     byte[] getResponseHackResponseBytes = readerSpi.transmitApdu(APDU_GET_RESPONSE);
 
-    ApduResponse getResponseHackResponse = new ApduResponse(getResponseHackResponseBytes);
+    ApduResponseApi getResponseHackResponse = new ApduResponseAdapter(getResponseHackResponseBytes);
 
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
@@ -458,37 +464,41 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * (private)<br>
    * Attempts to select the card and executes the optional requests if any.
    *
-   * @param cardSelectionRequest The {@link CardSelectionRequest} to be processed.
+   * @param cardSelectionRequest The {@link CardSelectionRequestSpi} to be processed.
    * @return A not null reference.
-   * @throws ReaderCommunicationException If the communication with the reader has failed.
-   * @throws CardCommunicationException If the communication with the card has failed.
-   * @throws UnexpectedStatusCodeException If status code verification is enabled in the card
+   * @throws ReaderBrokenCommunicationException If the communication with the reader has failed.
+   * @throws CardBrokenCommunicationException If the communication with the card has failed.
+   * @throws UnexpectedStatusWordException If status word verification is enabled in the card
    *     request and the card returned an unexpected code.
    */
-  private CardSelectionResponse processCardSelectionRequest(
-      CardSelectionRequest cardSelectionRequest)
-      throws ReaderCommunicationException, CardCommunicationException,
-          UnexpectedStatusCodeException {
+  private CardSelectionResponseApi processCardSelectionRequest(
+      CardSelectionRequestSpi cardSelectionRequest)
+      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+          UnexpectedStatusWordException {
 
-    SelectionStatus selectionStatus;
+    SelectionStatusApi selectionStatus;
     try {
       selectionStatus = processSelection((CardSelector) cardSelectionRequest.getCardSelector());
     } catch (ReaderIOException e) {
-      throw new ReaderCommunicationException(
-          new CardResponse(new ArrayList<ApduResponse>(), false, false), e.getMessage(), e);
+      throw new ReaderBrokenCommunicationException(
+          new CardResponseAdapter(new ArrayList<ApduResponseApi>(), false, false),
+          e.getMessage(),
+          e);
     } catch (CardIOException e) {
-      throw new CardCommunicationException(
-          new CardResponse(new ArrayList<ApduResponse>(), false, false), e.getMessage(), e);
+      throw new CardBrokenCommunicationException(
+          new CardResponseAdapter(new ArrayList<ApduResponseApi>(), false, false),
+          e.getMessage(),
+          e);
     }
     if (!selectionStatus.hasMatched()) {
       // the selection failed, return an empty response having the selection status
-      return new CardSelectionResponse(
-          selectionStatus, new CardResponse(new ArrayList<ApduResponse>(), false, false));
+      return new CardSelectionResponseAdapter(
+          selectionStatus, new CardResponseAdapter(new ArrayList<ApduResponseApi>(), false, false));
     }
 
     logicalChannelIsOpen = true;
 
-    CardResponse cardResponse;
+    CardResponseApi cardResponse;
 
     if (cardSelectionRequest.getCardRequest() != null) {
       cardResponse = processCardRequest(cardSelectionRequest.getCardRequest());
@@ -496,31 +506,31 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       cardResponse = null;
     }
 
-    return new CardSelectionResponse(selectionStatus, cardResponse);
+    return new CardSelectionResponseAdapter(selectionStatus, cardResponse);
   }
 
   /**
    * (private)<br>
-   * Select the card according to the {@link CardSelector}.
+   * Select the card according to the {@link CardSelectorAdapter}.
    *
    * <p>The selection status is returned.<br>
-   * 3 levels of filtering/selection are applied successively if they are enabled: protocol, ATR and
-   * AID.<br>
+   * 3 levels of filtering/selection are applied successively if they are enabled: protocol, power
+   * on data and AID.<br>
    * As soon as one of these operations fails, the method returns with a failed selection status.
    *
    * <p>Conversely, the selection is considered successful if none of the filters have rejected the
    * card, even if none of the filters are active.
    *
-   * @param cardSelector A not null {@link CardSelector}.
-   * @return A not null {@link SelectionStatus}.
+   * @param cardSelector A not null {@link CardSelectorAdapter}.
+   * @return A not null {@link SelectionStatusApi}.
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
    */
-  private SelectionStatus processSelection(CardSelector cardSelector)
+  private SelectionStatusApi processSelection(CardSelector cardSelector)
       throws CardIOException, ReaderIOException {
 
-    AnswerToReset answerToReset;
-    ApduResponse fciResponse;
+    byte[] powerOnData;
+    ApduResponseApi fciResponse;
     boolean hasMatched = true;
 
     if (cardSelector.getCardProtocol() != null && useDefaultProtocol) {
@@ -531,17 +541,16 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     // check protocol if enabled
     if (cardSelector.getCardProtocol() == null
         || cardSelector.getCardProtocol().equals(currentProtocol)) {
-      // protocol check succeeded, check ATR if enabled
-      byte[] atr = readerSpi.getAtr();
-      answerToReset = new AnswerToReset(atr);
-      if (checkAtr(atr, cardSelector)) {
-        // no ATR filter or ATR check succeeded, select by AID if enabled.
+      // protocol check succeeded, check power-on data if enabled
+      powerOnData = readerSpi.getPowerOnData();
+      if (checkPowerOnData(powerOnData, cardSelector)) {
+        // no power-on data filter or power-on data check succeeded, select by AID if enabled.
         if (cardSelector.getAid() != null) {
           fciResponse = selectByAid(cardSelector);
           hasMatched =
               cardSelector
-                  .getSuccessfulSelectionStatusCodes()
-                  .contains(fciResponse.getStatusCode());
+                  .getSuccessfulSelectionStatusWords()
+                  .contains(fciResponse.getStatusWord());
         } else {
           fciResponse = null;
         }
@@ -552,44 +561,48 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       }
     } else {
       // protocol failed
-      answerToReset = null;
+      powerOnData = null;
       fciResponse = null;
       hasMatched = false;
     }
-    return new SelectionStatus(answerToReset, fciResponse, hasMatched);
+    return new SelectionStatusAdapter(powerOnData, fciResponse, hasMatched);
   }
 
   /**
    * (private)<br>
-   * Checks the provided ATR with the AtrFilter.
+   * Checks the provided power-on data with the PowerOnDataFilter.
    *
-   * <p>Returns true if the ATR is accepted by the filter.
+   * <p>Returns true if the power-on data is accepted by the filter.
    *
-   * @param atr A byte array.
+   * @param powerOnData A byte array.
    * @param cardSelector The card selector.
    * @return True or false.
-   * @throws IllegalStateException if no ATR is available and the AtrFilter is set.
+   * @throws IllegalStateException if no power-on data is available and the PowerOnDataFilter is
+   *     set.
    * @see #processSelection(CardSelector)
    */
-  private boolean checkAtr(byte[] atr, CardSelector cardSelector) {
+  private boolean checkPowerOnData(byte[] powerOnData, CardSelector cardSelector) {
 
     if (logger.isDebugEnabled()) {
-      logger.debug("[{}] openLogicalChannel => ATR = {}", this.getName(), ByteArrayUtil.toHex(atr));
+      logger.debug(
+          "[{}] openLogicalChannel => PowerOnData = {}",
+          this.getName(),
+          ByteArrayUtil.toHex(powerOnData));
     }
 
-    // check the ATR
-    if (!cardSelector.atrMatches(atr)) {
+    // check the power-on data
+    if (!cardSelector.powerOnDataMatches(powerOnData)) {
       if (logger.isInfoEnabled()) {
         logger.info(
-            "[{}] openLogicalChannel => ATR didn't match. ATR = {}, regex filter = {}",
+            "[{}] openLogicalChannel => Power on data didn't match. PowerOnData = {}, regex filter = {}",
             this.getName(),
-            ByteArrayUtil.toHex(atr),
-            cardSelector.getAtrRegex());
+            ByteArrayUtil.toHex(powerOnData),
+            cardSelector.getPowerOnDataRegex());
       }
-      // the ATR has been rejected
+      // the power-on data have been rejected
       return false;
     } else {
-      // the ATR has been accepted
+      // the power-on data have been accepted
       return true;
     }
   }
@@ -602,13 +615,13 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * to retrieve the FCI structure (OMAPI case).
    *
    * @param cardSelector The card selector.
-   * @return An not null {@link ApduResponse} containing the FCI.
+   * @return An not null {@link ApduResponseApi} containing the FCI.
    * @see #processSelection(CardSelector)
    */
-  private ApduResponse selectByAid(CardSelector cardSelector)
+  private ApduResponseApi selectByAid(CardSelector cardSelector)
       throws CardIOException, ReaderIOException {
 
-    ApduResponse fciResponse;
+    ApduResponseApi fciResponse;
 
     if (readerSpi instanceof AutonomousSelectionReaderSpi) {
       byte[] aid = cardSelector.getAid();
@@ -618,12 +631,12 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
                   | cardSelector.getFileControlInformation().getIsoBitMask());
       byte[] selectionDataBytes =
           ((AutonomousSelectionReaderSpi) readerSpi).openChannelForAid(aid, isoControlMask);
-      fciResponse = new ApduResponse(selectionDataBytes);
+      fciResponse = new ApduResponseAdapter(selectionDataBytes);
     } else {
       fciResponse = processExplicitAidSelection(cardSelector);
     }
 
-    if (fciResponse.getStatusCode() == DEFAULT_SUCCESSFUL_CODE
+    if (fciResponse.getStatusWord() == DEFAULT_SUCCESSFUL_CODE
         && fciResponse.getDataOut().length == 0) {
       /*
        * The selection didn't provide data (e.g. OMAPI), we get the FCI using a Get Data
@@ -643,16 +656,16 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * command.
    *
    * <p>A specific APDU is sent to the card to retrieve the FCI data and returns it in an {@link
-   * ApduResponse}.<br>
-   * The provided AidSelector is used to check the response's status codes.
+   * ApduResponseApi}.<br>
+   * The provided AidSelector is used to check the response's status words.
    *
-   * @return A {@link ApduResponse} containing the FCI.
+   * @return A {@link ApduResponseApi} containing the FCI.
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
    */
-  private ApduResponse recoverSelectionFciData() throws CardIOException, ReaderIOException {
+  private ApduResponseApi recoverSelectionFciData() throws CardIOException, ReaderIOException {
 
-    ApduRequest apduRequest = new ApduRequest(APDU_GET_DATA);
+    ApduRequestAdapter apduRequest = new ApduRequestAdapter(APDU_GET_DATA);
 
     if (logger.isDebugEnabled()) {
       apduRequest.setName("Internal Get Data");
@@ -664,14 +677,14 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   /**
    * (private)<br>
    * Sends the select application command to the card and returns the requested data according to
-   * AidSelector attributes (ISO7816-4 selection data) into an {@link ApduResponse}.
+   * AidSelector attributes (ISO7816-4 selection data) into an {@link ApduResponseApi}.
    *
    * @param cardSelector The card selector.
-   * @return A not null {@link ApduResponse}.
+   * @return A not null {@link ApduResponseApi}.
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
    */
-  private ApduResponse processExplicitAidSelection(CardSelector cardSelector)
+  private ApduResponseApi processExplicitAidSelection(CardSelector cardSelector)
       throws CardIOException, ReaderIOException {
 
     final byte[] aid = cardSelector.getAid();
@@ -699,7 +712,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     System.arraycopy(aid, 0, selectApplicationCommand, 5, aid.length); // data
     selectApplicationCommand[5 + aid.length] = (byte) 0x00; // Le
 
-    ApduRequest apduRequest = new ApduRequest(selectApplicationCommand);
+    ApduRequestAdapter apduRequest = new ApduRequestAdapter(selectApplicationCommand);
 
     if (logger.isDebugEnabled()) {
       apduRequest.setName("Internal Select Application");
