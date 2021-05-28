@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import org.eclipse.keyple.core.common.KeyplePluginEvent;
 
 /**
  * This POJO contains all information about a change of reader state within an {@link
@@ -31,7 +30,7 @@ import org.eclipse.keyple.core.common.KeyplePluginEvent;
  *
  * @since 2.0
  */
-public final class PluginEvent implements KeyplePluginEvent {
+public final class PluginEvent {
 
   private final String pluginName;
   private final SortedSet<String> readerNames;

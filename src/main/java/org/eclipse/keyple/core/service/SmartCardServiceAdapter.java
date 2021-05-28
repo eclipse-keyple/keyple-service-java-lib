@@ -26,8 +26,7 @@ import org.eclipse.keyple.core.distributed.local.DistributedLocalApiProperties;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceFactorySpi;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceSpi;
 import org.eclipse.keyple.core.distributed.remote.DistributedRemoteApiProperties;
-import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginFactorySpi;
-import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
+import org.eclipse.keyple.core.distributed.remote.spi.*;
 import org.eclipse.keyple.core.plugin.PluginApiProperties;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.*;
@@ -403,7 +402,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     checkPluginRegistration(remotePluginFactorySpi.getRemotePluginName());
     checkRemotePluginVersion(remotePluginFactorySpi);
 
-    RemotePluginSpi remotePluginSpi = remotePluginFactorySpi.getRemotePlugin();
+    AbstractRemotePluginSpi remotePluginSpi = remotePluginFactorySpi.getRemotePlugin();
 
     if (!remotePluginSpi.getName().equals(remotePluginFactorySpi.getRemotePluginName())) {
       throw new IllegalArgumentException(
@@ -413,12 +412,12 @@ final class SmartCardServiceAdapter implements SmartCardService {
     }
 
     AbstractPluginAdapter plugin;
-    if (remotePluginFactorySpi.isPoolPlugin()) {
-      plugin = new RemotePoolPluginAdapter(remotePluginSpi);
-    } else if (remotePluginSpi.isObservable()) {
-      plugin = new ObservableRemotePluginAdapter(remotePluginSpi);
+    if (remotePluginSpi instanceof RemotePoolPluginSpi) {
+      plugin = new RemotePoolPluginAdapter((RemotePoolPluginSpi) remotePluginSpi);
+    } else if (remotePluginSpi instanceof ObservableRemotePluginSpi) {
+      plugin = new ObservableRemotePluginAdapter((ObservableRemotePluginSpi) remotePluginSpi);
     } else {
-      plugin = new RemotePluginAdapter(remotePluginSpi);
+      plugin = new RemotePluginAdapter((RemotePluginSpi) remotePluginSpi);
     }
     return plugin;
   }

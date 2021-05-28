@@ -11,11 +11,15 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.JsonProperty;
-
 import com.google.gson.JsonObject;
-import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
+import java.util.List;
+import org.eclipse.keyple.core.card.CardRequest;
+import org.eclipse.keyple.core.card.ChannelControl;
+import org.eclipse.keyple.core.card.ProxyReader;
+import org.eclipse.keyple.core.distributed.remote.spi.AbstractRemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
+import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
+import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 import org.eclipse.keyple.core.util.json.BodyError;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;
@@ -49,7 +53,7 @@ final class DistributedUtilAdapter {
    * @since 2.0
    */
   static JsonObject executePluginServiceRemotely(
-      JsonObject input, RemotePluginSpi remotePluginSpi, String pluginName, Logger logger)
+      JsonObject input, AbstractRemotePluginSpi remotePluginSpi, String pluginName, Logger logger)
       throws Exception { // NOSONAR
 
     if (logger.isDebugEnabled()) {
@@ -147,5 +151,186 @@ final class DistributedUtilAdapter {
         String.format(
             "The distributed message sender received an unexpected error : %s", e.getMessage()),
         e);
+  }
+
+  /**
+   * (package-private)<br>
+   * Enumeration of all available common JSON properties.
+   *
+   * @since 2.0
+   */
+  enum JsonProperty {
+
+    /** @since 2.0 */
+    CARD_REQUEST,
+
+    /** @since 2.0 */
+    CARD_SELECTION_REQUESTS,
+
+    /** @since 2.0 */
+    CARD_SELECTION_SCENARIO,
+
+    /** @since 2.0 */
+    CHANNEL_CONTROL,
+
+    /** @since 2.0 */
+    ERROR,
+
+    /** @since 2.0 */
+    MULTI_SELECTION_PROCESSING,
+
+    /** @since 2.0 */
+    NOTIFICATION_MODE,
+
+    /** @since 2.0 */
+    PLUGIN_EVENT,
+
+    /** @since 2.0 */
+    POLLING_MODE,
+
+    /** @since 2.0 */
+    READER_EVENT,
+
+    /** @since 2.0 */
+    READER_GROUP_REFERENCE,
+
+    /** @since 2.0 */
+    READER_NAME,
+
+    /** @since 2.0 */
+    RESULT,
+
+    /** @since 2.0 */
+    SERVICE
+  }
+
+  /**
+   * (package-private)<br>
+   * Enumeration of the available local services that can be invoked on local plugins from the
+   * remote plugin.
+   *
+   * @since 2.0
+   */
+  enum PluginService {
+
+    /**
+     * Refers to {@link Plugin#getReaders()}
+     *
+     * @since 2.0
+     */
+    GET_READERS,
+
+    /**
+     * Refers to {@link PoolPlugin#getReaderGroupReferences()}
+     *
+     * @since 2.0
+     */
+    GET_READER_GROUP_REFERENCES,
+
+    /**
+     * Refers to {@link PoolPlugin#allocateReader(String)}
+     *
+     * @since 2.0
+     */
+    ALLOCATE_READER,
+
+    /**
+     * Refers to {@link PoolPlugin#releaseReader(Reader)}
+     *
+     * @since 2.0
+     */
+    RELEASE_READER,
+
+    /**
+     * Refers to {@link ObservablePlugin#addObserver(PluginObserverSpi)}
+     *
+     * @since 2.0
+     */
+    START_READER_DETECTION,
+
+    /**
+     * Refers to {@link ObservablePlugin#removeObserver(PluginObserverSpi)}
+     *
+     * @since 2.0
+     */
+    STOP_READER_DETECTION
+  }
+
+  /**
+   * (package-private)<br>
+   * Enumeration of the available local services that can be invoked on a local reader from the
+   * remote reader.
+   *
+   * @since 2.0
+   */
+  enum ReaderService {
+
+    /**
+     * Refers to {@link ProxyReader#transmitCardRequest(CardRequest, ChannelControl)}
+     *
+     * @since 2.0
+     */
+    TRANSMIT_CARD_REQUEST,
+
+    /**
+     * Refers to {@link AbstractReaderAdapter#transmitCardSelectionRequests(List,
+     * MultiSelectionProcessing, ChannelControl)}
+     *
+     * @since 2.0
+     */
+    TRANSMIT_CARD_SELECTION_REQUESTS,
+
+    /**
+     * Refers to {@link
+     * ObservableLocalReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
+     * ObservableReader.NotificationMode, ObservableReader.PollingMode)} and {@link
+     * ObservableRemoteReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
+     * ObservableReader.NotificationMode, ObservableReader.PollingMode)}
+     *
+     * @since 2.0
+     */
+    SCHEDULE_CARD_SELECTION_SCENARIO,
+
+    /**
+     * Refers to {@link Reader#isCardPresent()}
+     *
+     * @since 2.0
+     */
+    IS_CARD_PRESENT,
+
+    /**
+     * Refers to {@link Reader#isContactless()}
+     *
+     * @since 2.0
+     */
+    IS_CONTACTLESS,
+
+    /**
+     * Refers to {@link ObservableReader#startCardDetection(ObservableReader.PollingMode)}
+     *
+     * @since 2.0
+     */
+    START_CARD_DETECTION,
+
+    /**
+     * Refers to {@link ObservableReader#startCardDetection(ObservableReader.PollingMode)}
+     *
+     * @since 2.0
+     */
+    STOP_CARD_DETECTION,
+
+    /**
+     * Refers to {@link ObservableReader#finalizeCardProcessing()}
+     *
+     * @since 2.0
+     */
+    FINALIZE_CARD_PROCESSING,
+
+    /**
+     * Refers to {@link ProxyReader#releaseChannel()}
+     *
+     * @since 2.0
+     */
+    RELEASE_CHANNEL
   }
 }

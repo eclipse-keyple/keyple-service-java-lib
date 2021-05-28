@@ -11,14 +11,13 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.*;
+import static org.eclipse.keyple.core.service.DistributedUtilAdapter.*;
 
 import com.google.gson.JsonObject;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.eclipse.keyple.core.card.*;
-import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
+import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemoteReaderSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 import org.eclipse.keyple.core.util.Assert;
@@ -36,7 +35,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
   private static final Logger logger = LoggerFactory.getLogger(ObservableRemoteReaderAdapter.class);
 
-  private final ObservableRemoteReaderAdapter masterReader;
+  private final ObservableRemoteReaderSpi observableRemoteReaderSpi;
   private final ObservationManagerAdapter<ReaderObserverSpi, ReaderObservationExceptionHandlerSpi>
       observationManager;
 
@@ -44,33 +43,18 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    * (package-private)<br>
    * Constructor.
    *
-   * @param remoteReaderSpi The remote reader SPI.
-   * @param masterReader The associated master observable reader. Null if there is no master reader
-   *     associated.
+   * @param observableRemoteReaderSpi The remote reader SPI.
    * @param pluginName The name of the plugin.
    * @since 2.0
    */
   ObservableRemoteReaderAdapter(
-      RemoteReaderSpi remoteReaderSpi,
-      ObservableRemoteReaderAdapter masterReader,
-      String pluginName) {
-    super(remoteReaderSpi, pluginName);
-    this.masterReader = masterReader;
+      ObservableRemoteReaderSpi observableRemoteReaderSpi, String pluginName) {
+    super(observableRemoteReaderSpi, pluginName);
+    this.observableRemoteReaderSpi = observableRemoteReaderSpi;
     this.observationManager =
         new ObservationManagerAdapter<ReaderObserverSpi, ReaderObservationExceptionHandlerSpi>(
             pluginName, getName());
     this.observationManager.setEventNotificationExecutorService(Executors.newCachedThreadPool());
-  }
-
-  /**
-   * (package-private)<br>
-   * Gets the associated master observable reader.
-   *
-   * @return A not null reference.
-   * @since 2.0
-   */
-  ObservableRemoteReaderAdapter getMasterReader() {
-    return masterReader;
   }
 
   /**
@@ -82,42 +66,37 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    */
   void notifyObservers(final ReaderEvent event) {
 
-    if (masterReader != null) {
-      masterReader.notifyObservers(event);
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "The reader '{}' is notifying the reader event '{}' to {} observers.",
+          getName(),
+          event.getEventType().name(),
+          countObservers());
+    }
 
-    } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug(
-            "The reader '{}' is notifying the reader event '{}' to {} observers.",
-            getName(),
-            event.getEventType().name(),
-            countObservers());
-      }
+    Set<ReaderObserverSpi> observersCopy = observationManager.getObservers();
 
-      Set<ReaderObserverSpi> observersCopy = observationManager.getObservers();
-
-      for (final ReaderObserverSpi observer : observersCopy) {
-        observationManager
-            .getEventNotificationExecutorService()
-            .execute(
-                new Runnable() {
-                  @Override
-                  public void run() {
+    for (final ReaderObserverSpi observer : observersCopy) {
+      observationManager
+          .getEventNotificationExecutorService()
+          .execute(
+              new Runnable() {
+                @Override
+                public void run() {
+                  try {
+                    observer.onReaderEvent(event);
+                  } catch (Exception e) {
                     try {
-                      observer.onReaderEvent(event);
-                    } catch (Exception e) {
-                      try {
-                        observationManager
-                            .getObservationExceptionHandler()
-                            .onReaderObservationError(getPluginName(), getName(), e);
-                      } catch (Exception e2) {
-                        logger.error("Exception during notification", e2);
-                        logger.error("Original cause", e);
-                      }
+                      observationManager
+                          .getObservationExceptionHandler()
+                          .onReaderObservationError(getPluginName(), getName(), e);
+                    } catch (Exception e2) {
+                      logger.error("Exception during notification", e2);
+                      logger.error("Original cause", e);
                     }
                   }
-                });
-      }
+                }
+              });
     }
   }
 
@@ -162,13 +141,13 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Execute the remote service.
     try {
-      DistributedUtilAdapter.executeReaderServiceRemotely(
-          input, getRemoteReaderSpi(), getName(), getPluginName(), logger);
+      executeReaderServiceRemotely(
+          input, observableRemoteReaderSpi, getName(), getPluginName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      DistributedUtilAdapter.throwRuntimeException(e);
+      throwRuntimeException(e);
     }
   }
 
@@ -201,11 +180,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   @Override
   public void addObserver(ReaderObserverSpi observer) {
     checkStatus();
-    if (masterReader != null) {
-      masterReader.addObserver(observer);
-    } else {
-      observationManager.addObserver(observer);
-    }
+    observationManager.addObserver(observer);
   }
 
   /**
@@ -215,11 +190,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    */
   @Override
   public void removeObserver(ReaderObserverSpi observer) {
-    if (masterReader != null) {
-      masterReader.removeObserver(observer);
-    } else {
-      observationManager.removeObserver(observer);
-    }
+    observationManager.removeObserver(observer);
   }
 
   /**
@@ -229,11 +200,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    */
   @Override
   public int countObservers() {
-    if (masterReader != null) {
-      return masterReader.countObservers();
-    } else {
-      return observationManager.countObservers();
-    }
+    return observationManager.countObservers();
   }
 
   /**
@@ -243,11 +210,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    */
   @Override
   public void clearObservers() {
-    if (masterReader != null) {
-      masterReader.clearObservers();
-    } else {
-      observationManager.clearObservers();
-    }
+    observationManager.clearObservers();
   }
 
   /**
@@ -275,17 +238,17 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Execute the remote service.
     try {
-      DistributedUtilAdapter.executeReaderServiceRemotely(
-          input, getRemoteReaderSpi(), getName(), getPluginName(), logger);
+      executeReaderServiceRemotely(
+          input, observableRemoteReaderSpi, getName(), getPluginName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      DistributedUtilAdapter.throwRuntimeException(e);
+      throwRuntimeException(e);
     }
 
-    // Start remote observation.
-    getRemoteReaderSpi().startReaderObservation();
+    // Notify the SPI.
+    observableRemoteReaderSpi.onStartObservation();
   }
 
   /**
@@ -303,8 +266,8 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
           getPluginName());
     }
 
-    // Stop remote observation.
-    getRemoteReaderSpi().stopReaderObservation();
+    // Notify the SPI first.
+    observableRemoteReaderSpi.onStopObservation();
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
@@ -312,13 +275,13 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Execute the remote service.
     try {
-      DistributedUtilAdapter.executeReaderServiceRemotely(
-          input, getRemoteReaderSpi(), getName(), getPluginName(), logger);
+      executeReaderServiceRemotely(
+          input, observableRemoteReaderSpi, getName(), getPluginName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      DistributedUtilAdapter.throwRuntimeException(e);
+      throwRuntimeException(e);
     }
   }
 
@@ -343,13 +306,13 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Execute the remote service.
     try {
-      DistributedUtilAdapter.executeReaderServiceRemotely(
-          input, getRemoteReaderSpi(), getName(), getPluginName(), logger);
+      executeReaderServiceRemotely(
+          input, observableRemoteReaderSpi, getName(), getPluginName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      DistributedUtilAdapter.throwRuntimeException(e);
+      throwRuntimeException(e);
     }
   }
 

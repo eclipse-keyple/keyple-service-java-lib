@@ -20,8 +20,10 @@ import org.eclipse.keyple.core.card.spi.CardExtensionSpi;
 import org.eclipse.keyple.core.common.*;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceFactorySpi;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceSpi;
+import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginFactorySpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
+import org.eclipse.keyple.core.distributed.remote.spi.RemotePoolPluginSpi;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.*;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
@@ -62,12 +64,16 @@ public class SmartCardServiceAdapterTest {
   private AutonomousObservablePluginMock autonomousObservablePlugin;
   private PoolPluginMock poolPlugin;
   private RemotePluginMock remotePlugin;
+  private ObservableRemotePluginMock observableRemotePlugin;
+  private RemotePoolPluginMock remotePoolPlugin;
   private ReaderMock reader;
   private PluginFactoryMock pluginFactory;
   private PluginFactoryMock observablePluginFactory;
   private PluginFactoryMock autonomousObservablePluginFactory;
   private PoolPluginFactoryMock poolPluginFactory;
   private RemotePluginFactoryMock remotePluginFactory;
+  private ObservableRemotePluginFactoryMock observableRemotePluginFactory;
+  private RemotePoolPluginFactoryMock remotePoolPluginFactory;
   private CardExtensionMock cardExtension;
   private DistributedLocalServiceMock localService;
   private DistributedLocalServiceFactoryMock localServiceFactory;
@@ -85,11 +91,21 @@ public class SmartCardServiceAdapterTest {
 
   interface RemotePluginMock extends KeyplePluginExtension, RemotePluginSpi {}
 
+  interface ObservableRemotePluginMock extends KeyplePluginExtension, ObservableRemotePluginSpi {}
+
+  interface RemotePoolPluginMock extends KeyplePluginExtension, RemotePoolPluginSpi {}
+
   interface PluginFactoryMock extends KeyplePluginExtensionFactory, PluginFactorySpi {}
 
   interface PoolPluginFactoryMock extends KeyplePluginExtensionFactory, PoolPluginFactorySpi {}
 
   interface RemotePluginFactoryMock extends KeyplePluginExtensionFactory, RemotePluginFactorySpi {}
+
+  interface ObservableRemotePluginFactoryMock
+      extends KeyplePluginExtensionFactory, RemotePluginFactorySpi {}
+
+  interface RemotePoolPluginFactoryMock
+      extends KeyplePluginExtensionFactory, RemotePluginFactorySpi {}
 
   interface CardExtensionMock extends KeypleCardExtension, CardExtensionSpi {}
 
@@ -132,6 +148,12 @@ public class SmartCardServiceAdapterTest {
     remotePlugin = mock(RemotePluginMock.class);
     when(remotePlugin.getName()).thenReturn(REMOTE_PLUGIN_NAME);
 
+    observableRemotePlugin = mock(ObservableRemotePluginMock.class);
+    when(observableRemotePlugin.getName()).thenReturn(REMOTE_PLUGIN_NAME);
+
+    remotePoolPlugin = mock(RemotePoolPluginMock.class);
+    when(remotePoolPlugin.getName()).thenReturn(REMOTE_PLUGIN_NAME);
+
     pluginFactory = mock(PluginFactoryMock.class);
     when(pluginFactory.getPluginName()).thenReturn(PLUGIN_NAME);
     when(pluginFactory.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
@@ -163,6 +185,20 @@ public class SmartCardServiceAdapterTest {
     when(remotePluginFactory.getDistributedRemoteApiVersion())
         .thenReturn(DISTRIBUTED_REMOTE_API_VERSION);
     when(remotePluginFactory.getRemotePlugin()).thenReturn(remotePlugin);
+
+    observableRemotePluginFactory = mock(ObservableRemotePluginFactoryMock.class);
+    when(observableRemotePluginFactory.getRemotePluginName()).thenReturn(REMOTE_PLUGIN_NAME);
+    when(observableRemotePluginFactory.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
+    when(observableRemotePluginFactory.getDistributedRemoteApiVersion())
+        .thenReturn(DISTRIBUTED_REMOTE_API_VERSION);
+    when(observableRemotePluginFactory.getRemotePlugin()).thenReturn(observableRemotePlugin);
+
+    remotePoolPluginFactory = mock(RemotePoolPluginFactoryMock.class);
+    when(remotePoolPluginFactory.getRemotePluginName()).thenReturn(REMOTE_PLUGIN_NAME);
+    when(remotePoolPluginFactory.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
+    when(remotePoolPluginFactory.getDistributedRemoteApiVersion())
+        .thenReturn(DISTRIBUTED_REMOTE_API_VERSION);
+    when(remotePoolPluginFactory.getRemotePlugin()).thenReturn(remotePoolPlugin);
 
     cardExtension = mock(CardExtensionMock.class);
     when(cardExtension.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
@@ -337,8 +373,7 @@ public class SmartCardServiceAdapterTest {
   @Test
   public void
       registerPlugin_Remote_whenPluginIsObservable_shouldProduceObservablePlugin_BeRegistered_withoutWarning() {
-    when(remotePlugin.isObservable()).thenReturn(true);
-    Plugin p = service.registerPlugin(remotePluginFactory);
+    Plugin p = service.registerPlugin(observableRemotePluginFactory);
     assertThat(p)
         .isInstanceOf(ObservablePlugin.class)
         .isInstanceOf(ObservableRemotePluginAdapter.class);
@@ -349,8 +384,7 @@ public class SmartCardServiceAdapterTest {
   @Test
   public void
       registerPlugin_Remote_whenPluginIsPool_shouldProducePoolPlugin_BeRegistered_withoutWarning() {
-    when(remotePluginFactory.isPoolPlugin()).thenReturn(true);
-    Plugin p = service.registerPlugin(remotePluginFactory);
+    Plugin p = service.registerPlugin(remotePoolPluginFactory);
     assertThat(p).isInstanceOf(PoolPlugin.class).isInstanceOf(RemotePoolPluginAdapter.class);
     assertThat(service.getPluginNames().contains(REMOTE_PLUGIN_NAME)).isTrue();
     verify(logger, times(0)).warn(anyString(), anyString(), anyString(), anyString());

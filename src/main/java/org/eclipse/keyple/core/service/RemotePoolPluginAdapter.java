@@ -11,14 +11,13 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.JsonProperty;
-import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.PluginService;
+import static org.eclipse.keyple.core.service.DistributedUtilAdapter.*;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import java.util.AbstractMap;
 import java.util.SortedSet;
-import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
+import java.util.TreeSet;
+import org.eclipse.keyple.core.distributed.remote.spi.RemotePoolPluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
@@ -35,18 +34,18 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
 
   private static final Logger logger = LoggerFactory.getLogger(RemotePoolPluginAdapter.class);
 
-  private final RemotePluginSpi remotePluginSpi;
+  private final RemotePoolPluginSpi remotePoolPluginSpi;
 
   /**
    * (package-private)<br>
    * Constructor.
    *
-   * @param remotePluginSpi The associated SPI.
+   * @param remotePoolPluginSpi The associated SPI.
    * @since 2.0
    */
-  RemotePoolPluginAdapter(RemotePluginSpi remotePluginSpi) {
-    super(remotePluginSpi.getName(), remotePluginSpi);
-    this.remotePluginSpi = remotePluginSpi;
+  RemotePoolPluginAdapter(RemotePoolPluginSpi remotePoolPluginSpi) {
+    super(remotePoolPluginSpi.getName(), remotePoolPluginSpi);
+    this.remotePoolPluginSpi = remotePoolPluginSpi;
   }
 
   /**
@@ -67,8 +66,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     // Execute the remote service.
     try {
       JsonObject output =
-          DistributedUtilAdapter.executePluginServiceRemotely(
-              input, remotePluginSpi, getName(), logger);
+          executePluginServiceRemotely(input, remotePoolPluginSpi, getName(), logger);
 
       return JsonUtil.getParser()
           .fromJson(
@@ -78,8 +76,8 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      DistributedUtilAdapter.throwRuntimeException(e);
-      return null;
+      throwRuntimeException(e);
+      return new TreeSet<String>();
     }
   }
 
@@ -106,37 +104,24 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     input.addProperty(JsonProperty.READER_GROUP_REFERENCE.name(), readerGroupReference);
 
     // Execute the remote service.
-    AbstractMap.SimpleEntry<String, Boolean> readerInfo;
+    String readerName;
     try {
       JsonObject output =
-          DistributedUtilAdapter.executePluginServiceRemotely(
-              input, remotePluginSpi, getName(), logger);
+          executePluginServiceRemotely(input, remotePoolPluginSpi, getName(), logger);
 
-      readerInfo =
-          JsonUtil.getParser()
-              .fromJson(
-                  output.get(JsonProperty.RESULT.name()).getAsString(),
-                  new TypeToken<AbstractMap.SimpleEntry<String, Boolean>>() {}.getType());
+      readerName = output.get(JsonProperty.RESULT.name()).getAsString();
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      DistributedUtilAdapter.throwRuntimeException(e);
+      throwRuntimeException(e);
       return null;
     }
 
     // Build a remote reader and register it.
-    String readerName = readerInfo.getKey();
-    Boolean isObservable = readerInfo.getValue();
+    RemoteReaderSpi remoteReaderSpi = remotePoolPluginSpi.createRemoteReader(readerName);
+    RemoteReaderAdapter remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName());
 
-    RemoteReaderSpi remoteReaderSpi = remotePluginSpi.createRemoteReader(readerName, isObservable);
-
-    RemoteReaderAdapter remoteReaderAdapter;
-    if (remoteReaderSpi.isObservable()) {
-      remoteReaderAdapter = new ObservableRemoteReaderAdapter(remoteReaderSpi, null, getName());
-    } else {
-      remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName());
-    }
     getReadersMap().put(remoteReaderSpi.getName(), remoteReaderAdapter);
     remoteReaderAdapter.register();
     return remoteReaderAdapter;
@@ -166,13 +151,12 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
 
     // Execute the remote service.
     try {
-      DistributedUtilAdapter.executePluginServiceRemotely(
-          input, remotePluginSpi, getName(), logger);
+      executePluginServiceRemotely(input, remotePoolPluginSpi, getName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      DistributedUtilAdapter.throwRuntimeException(e);
+      throwRuntimeException(e);
     } finally {
       getReadersMap().remove(reader.getName());
       ((LocalReaderAdapter) reader).unregister();

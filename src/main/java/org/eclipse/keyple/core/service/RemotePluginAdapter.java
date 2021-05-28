@@ -11,14 +11,14 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.JsonProperty;
-import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.PluginService;
+import static org.eclipse.keyple.core.service.DistributedUtilAdapter.*;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.distributed.remote.RemotePluginApi;
+import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemoteReaderSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
 import org.eclipse.keyple.core.plugin.PluginIOException;
@@ -49,18 +49,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
   RemotePluginAdapter(RemotePluginSpi remotePluginSpi) {
     super(remotePluginSpi.getName(), remotePluginSpi);
     this.remotePluginSpi = remotePluginSpi;
-    remotePluginSpi.connect(this);
-  }
-
-  /**
-   * (package-private)<br>
-   * Gets the associated SPI.
-   *
-   * @return A not null reference.
-   * @since 2.0
-   */
-  public RemotePluginSpi getRemotePluginSpi() {
-    return remotePluginSpi;
+    this.remotePluginSpi.connect(this);
   }
 
   /**
@@ -82,9 +71,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
     // Execute the remote service.
     Map<String, Boolean> localReaders;
     try {
-      JsonObject output =
-          DistributedUtilAdapter.executePluginServiceRemotely(
-              input, remotePluginSpi, getName(), logger);
+      JsonObject output = executePluginServiceRemotely(input, remotePluginSpi, getName(), logger);
       if (output == null) {
         return;
       }
@@ -97,23 +84,28 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      DistributedUtilAdapter.throwRuntimeException(e);
+      throwRuntimeException(e);
       return;
     }
 
     // Build a remote reader for each local reader
     for (Map.Entry<String, Boolean> entry : localReaders.entrySet()) {
 
-      RemoteReaderSpi remoteReaderSpi =
-          remotePluginSpi.createRemoteReader(entry.getKey(), entry.getValue());
+      String readerName = entry.getKey();
+      boolean isObservable = entry.getValue();
 
       RemoteReaderAdapter remoteReaderAdapter;
-      if (remoteReaderSpi.isObservable()) {
-        remoteReaderAdapter = new ObservableRemoteReaderAdapter(remoteReaderSpi, null, getName());
+      if (isObservable) {
+        ObservableRemoteReaderSpi observableRemoteReaderSpi =
+            remotePluginSpi.createObservableRemoteReader(readerName);
+        remoteReaderAdapter =
+            new ObservableRemoteReaderAdapter(observableRemoteReaderSpi, getName());
       } else {
+        RemoteReaderSpi remoteReaderSpi = remotePluginSpi.createRemoteReader(readerName);
         remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName());
       }
-      getReadersMap().put(remoteReaderSpi.getName(), remoteReaderAdapter);
+
+      getReadersMap().put(readerName, remoteReaderAdapter);
       remoteReaderAdapter.register();
     }
   }

@@ -11,7 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import static org.eclipse.keyple.core.service.DistributedLocalServiceAdapter.*;
+import static org.eclipse.keyple.core.service.DistributedUtilAdapter.*;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -54,17 +54,6 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (package-private)<br>
-   * Gets the associated SPI.
-   *
-   * @return A not null reference.
-   * @since 2.0
-   */
-  final RemoteReaderSpi getRemoteReaderSpi() {
-    return remoteReaderSpi;
-  }
-
-  /**
    * {@inheritDoc}
    *
    * @since 2.0
@@ -98,8 +87,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     // Execute the remote service.
     try {
       JsonObject output =
-          DistributedUtilAdapter.executeReaderServiceRemotely(
-              input, remoteReaderSpi, getName(), getPluginName(), logger);
+          executeReaderServiceRemotely(input, remoteReaderSpi, getName(), getPluginName(), logger);
 
       Assert.getInstance().notNull(output, OUTPUT);
 
@@ -115,7 +103,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     } catch (CardCommunicationException e) {
       throw e;
     } catch (Exception e) {
-      DistributedUtilAdapter.throwRuntimeException(e);
+      throwRuntimeException(e);
       return Collections.emptyList();
     }
   }
@@ -144,8 +132,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     // Execute the remote service.
     try {
       JsonObject output =
-          DistributedUtilAdapter.executeReaderServiceRemotely(
-              input, remoteReaderSpi, getName(), getPluginName(), logger);
+          executeReaderServiceRemotely(input, remoteReaderSpi, getName(), getPluginName(), logger);
 
       Assert.getInstance().notNull(output, OUTPUT);
 
@@ -159,7 +146,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     } catch (CardCommunicationException e) {
       throw e;
     } catch (Exception e) {
-      DistributedUtilAdapter.throwRuntimeException(e);
+      throwRuntimeException(e);
       return null;
     }
   }
@@ -179,10 +166,20 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     input.addProperty(JsonProperty.SERVICE.name(), ReaderService.IS_CONTACTLESS.name());
 
     // Execute the remote service.
+    return executeReaderBooleanServiceRemotely(input);
+  }
+
+  /**
+   * (private)<br>
+   * Executes remote reader service for boolean result.
+   *
+   * @param input The input data.
+   * @return The result as a boolean value.
+   */
+  private boolean executeReaderBooleanServiceRemotely(JsonObject input) {
     try {
       JsonObject output =
-          DistributedUtilAdapter.executeReaderServiceRemotely(
-              input, remoteReaderSpi, getName(), getPluginName(), logger);
+          executeReaderServiceRemotely(input, remoteReaderSpi, getName(), getPluginName(), logger);
 
       Assert.getInstance().notNull(output, OUTPUT);
 
@@ -191,7 +188,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      DistributedUtilAdapter.throwRuntimeException(e);
+      throwRuntimeException(e);
       return false;
     }
   }
@@ -211,21 +208,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     input.addProperty(JsonProperty.SERVICE.name(), ReaderService.IS_CARD_PRESENT.name());
 
     // Execute the remote service.
-    try {
-      JsonObject output =
-          DistributedUtilAdapter.executeReaderServiceRemotely(
-              input, remoteReaderSpi, getName(), getPluginName(), logger);
-
-      Assert.getInstance().notNull(output, OUTPUT);
-
-      return output.get(JsonProperty.RESULT.name()).getAsBoolean();
-
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Exception e) {
-      DistributedUtilAdapter.throwRuntimeException(e);
-      return false;
-    }
+    return executeReaderBooleanServiceRemotely(input);
   }
 
   /**
@@ -265,15 +248,14 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Execute the remote service.
     try {
-      DistributedUtilAdapter.executeReaderServiceRemotely(
-          input, remoteReaderSpi, getName(), getPluginName(), logger);
+      executeReaderServiceRemotely(input, remoteReaderSpi, getName(), getPluginName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
     } catch (ReaderCommunicationException e) {
       throw e;
     } catch (Exception e) {
-      DistributedUtilAdapter.throwRuntimeException(e);
+      throwRuntimeException(e);
     }
   }
 }
