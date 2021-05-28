@@ -32,7 +32,7 @@ public class PluginAdapterTestUtils {
   }
 
   public static final ReaderSpi readerSpi1 = Mockito.mock(ReaderSpi.class);
-  public static final ReaderSpi readerSpi2 = Mockito.mock(ReaderSpi.class);;
+  public static final ReaderSpi readerSpi2 = Mockito.mock(ReaderSpi.class);
 
   static {
     when(readerSpi1.getName()).thenReturn(READER_NAME_1);
