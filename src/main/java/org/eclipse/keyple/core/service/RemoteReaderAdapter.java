@@ -22,7 +22,6 @@ import org.calypsonet.terminal.card.*;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
-import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;

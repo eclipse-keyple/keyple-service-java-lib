@@ -23,7 +23,6 @@ import org.calypsonet.terminal.reader.selection.CardSelectionService;
 import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
 import org.calypsonet.terminal.reader.selection.spi.CardSelection;
 import org.calypsonet.terminal.reader.selection.spi.SmartCard;
-import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.util.Assert;
 
 /**
@@ -47,7 +46,7 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    * @since 2.0
    */
   CardSelectionServiceAdapter() {
-    this.multiSelectionProcessing = MultiSelectionProcessing.FIRST_MATCH;
+    multiSelectionProcessing = MultiSelectionProcessing.FIRST_MATCH;
     cardSelections = new ArrayList<CardSelectionSpi>();
     cardSelectionRequests = new ArrayList<CardSelectionRequestSpi>();
   }
@@ -59,7 +58,7 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    */
   @Override
   public void setMultipleSelectionMode() {
-    this.multiSelectionProcessing = MultiSelectionProcessing.PROCESS_ALL;
+    multiSelectionProcessing = MultiSelectionProcessing.PROCESS_ALL;
   }
 
   /**
@@ -122,14 +121,21 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    */
   @Override
   public void scheduleCardSelectionScenario(
-      ObservableCardReader ObservableCardReader,
+      ObservableCardReader observableCardReader,
       ObservableCardReader.NotificationMode notificationMode,
       ObservableCardReader.PollingMode pollingMode) {
     CardSelectionScenarioAdapter cardSelectionScenario =
         new CardSelectionScenarioAdapter(
             cardSelectionRequests, multiSelectionProcessing, channelControl);
-    ((ObservableLocalReaderAdapter) ObservableCardReader)
-        .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, pollingMode);
+    if (observableCardReader instanceof ObservableLocalReaderAdapter) {
+      ((ObservableLocalReaderAdapter) observableCardReader)
+          .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, pollingMode);
+    } else if (observableCardReader instanceof ObservableRemoteReaderAdapter) {
+      ((ObservableRemoteReaderAdapter) observableCardReader)
+          .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, pollingMode);
+    } else {
+      throw new IllegalArgumentException("Not a Keyple reader implementation.");
+    }
   }
 
   /**

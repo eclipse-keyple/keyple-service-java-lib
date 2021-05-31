@@ -16,7 +16,6 @@ import org.calypsonet.terminal.card.*;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
-import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

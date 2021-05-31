@@ -16,8 +16,6 @@ import java.util.concurrent.ExecutorService;
 import org.calypsonet.terminal.card.CardBrokenCommunicationException;
 import org.calypsonet.terminal.card.CardSelectionResponseApi;
 import org.calypsonet.terminal.card.ReaderBrokenCommunicationException;
-import org.calypsonet.terminal.reader.CardReaderEvent;
-import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.plugin.CardIOException;
@@ -33,13 +31,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
- * Implementation for {@link ObservableCardReader}, {@link WaitForCardInsertionAutonomousReaderApi}
- * and {@link WaitForCardRemovalAutonomousReaderApi}.
+ * Implementation for {@link ObservableReader}, {@link WaitForCardInsertionAutonomousReaderApi} and
+ * {@link WaitForCardRemovalAutonomousReaderApi}.
  *
  * @since 2.0
  */
 final class ObservableLocalReaderAdapter extends LocalReaderAdapter
-    implements ObservableCardReader,
+    implements ObservableReader,
         WaitForCardInsertionAutonomousReaderApi,
         WaitForCardRemovalAutonomousReaderApi {
 
@@ -157,12 +155,12 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   /**
    * (package-private)<br>
-   * Gets the current {@link ObservableCardReader.PollingMode}.
+   * Gets the current {@link ObservableReader.PollingMode}.
    *
    * @return Null if the polling mode has not been defined.
    * @since 2.0
    */
-  ObservableCardReader.PollingMode getPollingMode() {
+  ObservableReader.PollingMode getPollingMode() {
     return currentPollingMode;
   }
 
@@ -247,8 +245,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
         logger.trace("[{}] no card selection scenario defined, notify CARD_INSERTED", getName());
       }
       /* no default request is defined, just notify the card insertion */
-      return new ReaderEvent(
-          getPluginName(), getName(), CardReaderEvent.EventType.CARD_INSERTED, null);
+      return new ReaderEvent(getPluginName(), getName(), ReaderEvent.EventType.CARD_INSERTED, null);
     }
 
     // a card selection scenario is defined, send it and notify according to the notification mode
@@ -264,11 +261,11 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
         return new ReaderEvent(
             getPluginName(),
             getName(),
-            CardReaderEvent.EventType.CARD_MATCHED,
+            ReaderEvent.EventType.CARD_MATCHED,
             new ScheduledCardSelectionsResponseAdapter(cardSelectionResponses));
       }
 
-      if (notificationMode == ObservableCardReader.NotificationMode.MATCHED_ONLY) {
+      if (notificationMode == ObservableReader.NotificationMode.MATCHED_ONLY) {
         /* notify only if a card matched the selection, just ignore if not */
         if (logger.isTraceEnabled()) {
           logger.trace(
@@ -287,7 +284,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       return new ReaderEvent(
           getPluginName(),
           getName(),
-          CardReaderEvent.EventType.CARD_INSERTED,
+          ReaderEvent.EventType.CARD_INSERTED,
           new ScheduledCardSelectionsResponseAdapter(cardSelectionResponses));
 
     } catch (ReaderBrokenCommunicationException e) {
@@ -357,7 +354,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   void processCardRemoved() {
     closeLogicalAndPhysicalChannelsSilently();
     notifyObservers(
-        new ReaderEvent(getPluginName(), getName(), CardReaderEvent.EventType.CARD_REMOVED, null));
+        new ReaderEvent(getPluginName(), getName(), ReaderEvent.EventType.CARD_REMOVED, null));
   }
 
   /**
@@ -454,8 +451,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   void scheduleCardSelectionScenario(
       CardSelectionScenarioAdapter cardSelectionScenario,
-      ObservableCardReader.NotificationMode notificationMode,
-      ObservableCardReader.PollingMode pollingMode) {
+      ObservableReader.NotificationMode notificationMode,
+      ObservableReader.PollingMode pollingMode) {
     this.cardSelectionScenario = cardSelectionScenario;
     this.notificationMode = notificationMode;
     this.currentPollingMode = pollingMode;
@@ -464,7 +461,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * {@inheritDoc}
    *
-   * <p>Notifies all observers of the UNREGISTERED event.<br>
+   * <p>Notifies all observers of the UNAVAILABLE event.<br>
    * Stops the card detection unconditionally.<br>
    * Shuts down the reader's executor service.
    *
@@ -475,8 +472,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
     super.unregister();
     try {
       notifyObservers(
-          new ReaderEvent(
-              getPluginName(), getName(), CardReaderEvent.EventType.UNREGISTERED, null));
+          new ReaderEvent(getPluginName(), getName(), ReaderEvent.EventType.UNAVAILABLE, null));
       stopCardDetection();
     } finally {
       clearObservers();
@@ -553,7 +549,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void startCardDetection(ObservableCardReader.PollingMode pollingMode) {
+  public void startCardDetection(ObservableReader.PollingMode pollingMode) {
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(

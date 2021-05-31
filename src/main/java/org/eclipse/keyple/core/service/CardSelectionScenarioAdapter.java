@@ -14,7 +14,6 @@ package org.eclipse.keyple.core.service;
 import java.util.List;
 import org.calypsonet.terminal.card.ChannelControl;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
-import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 

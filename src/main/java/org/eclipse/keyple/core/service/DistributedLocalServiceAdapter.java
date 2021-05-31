@@ -20,12 +20,10 @@ import org.calypsonet.terminal.card.*;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.calypsonet.terminal.reader.CardReaderEvent;
-import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
 import org.eclipse.keyple.core.distributed.local.LocalServiceApi;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceSpi;
-import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 import org.eclipse.keyple.core.util.json.BodyError;
 import org.eclipse.keyple.core.util.json.JsonUtil;
@@ -195,8 +193,8 @@ final class DistributedLocalServiceAdapter
         ((ObservablePlugin) plugin).removeObserver(this);
       }
       for (Reader reader : plugin.getReaders()) {
-        if (reader instanceof ObservableCardReader) {
-          ((ObservableCardReader) reader).removeObserver(this);
+        if (reader instanceof ObservableReader) {
+          ((ObservableReader) reader).removeObserver(this);
         }
       }
     }
@@ -395,14 +393,14 @@ final class DistributedLocalServiceAdapter
                   input.get(JsonProperty.CARD_SELECTION_SCENARIO.name()),
                   CardSelectionScenarioAdapter.class);
 
-      ObservableCardReader.NotificationMode notificationMode =
-          ObservableCardReader.NotificationMode.valueOf(
+      ObservableReader.NotificationMode notificationMode =
+          ObservableReader.NotificationMode.valueOf(
               input.get(JsonProperty.NOTIFICATION_MODE.name()).getAsString());
 
-      ObservableCardReader.PollingMode pollingMode = null;
+      ObservableReader.PollingMode pollingMode = null;
       if (input.has(JsonProperty.POLLING_MODE.name())) {
         pollingMode =
-            ObservableCardReader.PollingMode.valueOf(
+            ObservableReader.PollingMode.valueOf(
                 input.get(JsonProperty.POLLING_MODE.name()).getAsString());
       }
 
@@ -452,13 +450,13 @@ final class DistributedLocalServiceAdapter
     private void startCardDetection() {
 
       // Extract info from the message
-      ObservableCardReader.PollingMode pollingMode =
-          ObservableCardReader.PollingMode.valueOf(
+      ObservableReader.PollingMode pollingMode =
+          ObservableReader.PollingMode.valueOf(
               input.get(JsonProperty.POLLING_MODE.name()).getAsString());
 
       // Execute the service on the reader
       ((ObservableReader) reader).addObserver(DistributedLocalServiceAdapter.this);
-      ((ObservableCardReader) reader).startCardDetection(pollingMode);
+      ((ObservableReader) reader).startCardDetection(pollingMode);
     }
 
     /**
@@ -469,7 +467,7 @@ final class DistributedLocalServiceAdapter
 
       // Execute the service on the reader
       ((ObservableReader) reader).removeObserver(DistributedLocalServiceAdapter.this);
-      ((ObservableCardReader) reader).stopCardDetection();
+      ((ObservableReader) reader).stopCardDetection();
     }
 
     /**
@@ -479,7 +477,7 @@ final class DistributedLocalServiceAdapter
     private void finalizeCardProcessing() {
 
       // Execute the service on the reader
-      ((ObservableCardReader) reader).finalizeCardProcessing();
+      ((ObservableReader) reader).finalizeCardProcessing();
     }
 
     /**
@@ -566,7 +564,7 @@ final class DistributedLocalServiceAdapter
       Map<String, Boolean> readers = new HashMap<String, Boolean>();
       for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
         for (Reader reader : plugin.getReaders()) {
-          readers.put(reader.getName(), reader instanceof ObservableCardReader);
+          readers.put(reader.getName(), reader instanceof ObservableReader);
         }
       }
 

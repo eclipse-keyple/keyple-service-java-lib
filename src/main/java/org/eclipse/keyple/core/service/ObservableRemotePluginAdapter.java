@@ -116,7 +116,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     super.unregister();
     notifyObservers(
         new PluginEvent(
-            this.getName(), unregisteredReaderNames, PluginEvent.EventType.UNREGISTERED));
+            this.getName(), unregisteredReaderNames, PluginEvent.EventType.UNAVAILABLE));
     clearObservers();
   }
 

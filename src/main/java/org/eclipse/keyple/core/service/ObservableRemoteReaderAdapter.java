@@ -17,9 +17,9 @@ import com.google.gson.JsonObject;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
+import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemoteReaderSpi;
-import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
-import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;
@@ -36,7 +36,8 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   private static final Logger logger = LoggerFactory.getLogger(ObservableRemoteReaderAdapter.class);
 
   private final ObservableRemoteReaderSpi observableRemoteReaderSpi;
-  private final ObservationManagerAdapter<ReaderObserverSpi, ReaderObservationExceptionHandlerSpi>
+  private final ObservationManagerAdapter<
+          CardReaderObserverSpi, CardReaderObservationExceptionHandlerSpi>
       observationManager;
 
   /**
@@ -52,8 +53,8 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
     super(observableRemoteReaderSpi, pluginName);
     this.observableRemoteReaderSpi = observableRemoteReaderSpi;
     this.observationManager =
-        new ObservationManagerAdapter<ReaderObserverSpi, ReaderObservationExceptionHandlerSpi>(
-            pluginName, getName());
+        new ObservationManagerAdapter<
+            CardReaderObserverSpi, CardReaderObservationExceptionHandlerSpi>(pluginName, getName());
     this.observationManager.setEventNotificationExecutorService(Executors.newCachedThreadPool());
   }
 
@@ -74,9 +75,9 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
           countObservers());
     }
 
-    Set<ReaderObserverSpi> observersCopy = observationManager.getObservers();
+    Set<CardReaderObserverSpi> observersCopy = observationManager.getObservers();
 
-    for (final ReaderObserverSpi observer : observersCopy) {
+    for (final CardReaderObserverSpi observer : observersCopy) {
       observationManager
           .getEventNotificationExecutorService()
           .execute(
@@ -154,7 +155,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   /**
    * {@inheritDoc}
    *
-   * <p>Notifies all observers of the UNREGISTERED event.<br>
+   * <p>Notifies all observers of the UNAVAILABLE event.<br>
    * Stops the card detection unconditionally.<br>
    * Shuts down the reader's executor service.
    *
@@ -165,7 +166,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
     super.unregister();
     try {
       notifyObservers(
-          new ReaderEvent(getPluginName(), getName(), ReaderEvent.EventType.UNREGISTERED, null));
+          new ReaderEvent(getPluginName(), getName(), ReaderEvent.EventType.UNAVAILABLE, null));
       stopCardDetection();
     } finally {
       clearObservers();
@@ -178,7 +179,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    * @since 2.0
    */
   @Override
-  public void addObserver(ReaderObserverSpi observer) {
+  public void addObserver(CardReaderObserverSpi observer) {
     checkStatus();
     observationManager.addObserver(observer);
   }
@@ -189,7 +190,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    * @since 2.0
    */
   @Override
-  public void removeObserver(ReaderObserverSpi observer) {
+  public void removeObserver(CardReaderObserverSpi observer) {
     observationManager.removeObserver(observer);
   }
 
@@ -335,7 +336,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    */
   @Override
   public void setReaderObservationExceptionHandler(
-      ReaderObservationExceptionHandlerSpi exceptionHandler) {
+      CardReaderObservationExceptionHandlerSpi exceptionHandler) {
     checkStatus();
     observationManager.setObservationExceptionHandler(exceptionHandler);
   }

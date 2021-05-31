@@ -24,7 +24,6 @@ import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.AutonomousSelectionReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
-import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
@@ -594,7 +593,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     if (!cardSelector.powerOnDataMatches(powerOnData)) {
       if (logger.isInfoEnabled()) {
         logger.info(
-            "[{}] openLogicalChannel => Power on data didn't match. PowerOnData = {}, regex filter = {}",
+            "[{}] openLogicalChannel => Power-on data didn't match. PowerOnData = {}, regex filter = {}",
             this.getName(),
             ByteArrayUtil.toHex(powerOnData),
             cardSelector.getPowerOnDataRegex());

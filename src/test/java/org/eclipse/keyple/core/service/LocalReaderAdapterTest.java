@@ -26,7 +26,6 @@ import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
-import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.junit.After;
 import org.junit.Before;

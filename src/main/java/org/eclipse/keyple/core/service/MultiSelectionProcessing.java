@@ -9,15 +9,16 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.eclipse.keyple.core.service.selection;
+package org.eclipse.keyple.core.service;
 
 /**
+ * (package-private)<br>
  * Indicates whether the selection process should stop after the first matching or process all cases
  * in the selection request list.
  *
  * @since 2.0
  */
-public enum MultiSelectionProcessing {
+enum MultiSelectionProcessing {
   /**
    * The selection process stops as soon as a selection case is successful.
    *

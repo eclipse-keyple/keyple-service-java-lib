@@ -32,7 +32,7 @@ public class SelectionStatusAdapter implements SelectionStatusApi {
    * <p>Note: power-on data and FCI are optional but cannot both be null at the same time when the
    * selection has matched.
    *
-   * @param powerOnData The power-on  data (optional).
+   * @param powerOnData The power-on data (optional).
    * @param fci The answer to select (optional).
    * @param hasMatched A boolean.
    * @throws IllegalStateException if hasMatched true and both power-on data and fci are null.
