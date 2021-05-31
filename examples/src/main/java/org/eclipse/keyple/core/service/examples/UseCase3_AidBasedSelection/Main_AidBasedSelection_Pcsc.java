@@ -15,9 +15,7 @@ import org.calypsonet.terminal.reader.selection.CardSelectionResult;
 import org.calypsonet.terminal.reader.selection.CardSelectionService;
 import org.calypsonet.terminal.reader.selection.spi.CardSelection;
 import org.calypsonet.terminal.reader.selection.spi.SmartCard;
-import org.eclipse.keyple.card.generic.GenericCardSelectorAdapter;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
-import org.eclipse.keyple.card.generic.GenericExtensionServiceProvider;
 import org.eclipse.keyple.core.service.*;
 import org.eclipse.keyple.core.service.examples.common.ConfigurationUtil;
 import org.eclipse.keyple.plugin.pcsc.PcscPluginFactoryBuilder;
@@ -61,7 +59,7 @@ public class Main_AidBasedSelection_Pcsc {
     Plugin plugin = smartCardService.registerPlugin(PcscPluginFactoryBuilder.builder().build());
 
     // Get the generic card extension service
-    GenericExtensionService cardExtension = GenericExtensionServiceProvider.getService();
+    GenericExtensionService cardExtension = GenericExtensionService.getInstance();
 
     // Verify that the extension's API level is consistent with the current service.
     smartCardService.checkCardExtension(cardExtension);
@@ -88,9 +86,7 @@ public class Main_AidBasedSelection_Pcsc {
     // (protocol/power-on data/DFName).
     CardSelection cardSelection =
         cardExtension.createCardSelection(
-            GenericCardSelectorAdapter.builder()
-                .filterByDfName(ConfigurationUtil.AID_EMV_PPSE)
-                .build());
+            cardExtension.createCardSelector().filterByDfName(ConfigurationUtil.AID_EMV_PPSE));
 
     // Prepare the selection by adding the created generic selection to the card selection scenario.
     selectionService.prepareSelection(cardSelection);

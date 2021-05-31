@@ -19,9 +19,7 @@ import org.calypsonet.terminal.reader.selection.CardSelectionResult;
 import org.calypsonet.terminal.reader.selection.CardSelectionService;
 import org.calypsonet.terminal.reader.selection.spi.CardSelector;
 import org.calypsonet.terminal.reader.selection.spi.SmartCard;
-import org.eclipse.keyple.card.generic.GenericCardSelectorAdapter;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
-import org.eclipse.keyple.card.generic.GenericExtensionServiceProvider;
 import org.eclipse.keyple.core.service.*;
 import org.eclipse.keyple.core.service.examples.common.ConfigurationUtil;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
@@ -70,7 +68,7 @@ public class Main_GroupedMultiSelection_Pcsc {
 
     Reader reader = getCardReader(plugin, CONTACTLESS_READER_NAME_REGEX);
     // Get the generic card extension service
-    GenericExtensionService cardExtension = GenericExtensionServiceProvider.getService();
+    GenericExtensionService cardExtension = GenericExtensionService.getInstance();
 
     // Verify that the extension's API level is consistent with the current service.
     smartCardService.checkCardExtension(cardExtension);
@@ -95,20 +93,20 @@ public class Main_GroupedMultiSelection_Pcsc {
     // Prepare the selection by adding the created generic selection to the card selection scenario.
     selectionService.prepareSelection(
         cardExtension.createCardSelection(
-            GenericCardSelectorAdapter.builder()
+            cardExtension
+                .createCardSelector()
                 .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
-                .setFileOccurrence(CardSelector.FileOccurrence.FIRST)
-                .build()));
+                .setFileOccurrence(CardSelector.FileOccurrence.FIRST)));
 
     // Second selection: get the next application occurrence matching the same AID, close the
     // physical channel after
     // Prepare the selection by adding the created generic selection to the card selection scenario.
     selectionService.prepareSelection(
         cardExtension.createCardSelection(
-            GenericCardSelectorAdapter.builder()
+            cardExtension
+                .createCardSelector()
                 .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
-                .setFileOccurrence(CardSelector.FileOccurrence.NEXT)
-                .build()));
+                .setFileOccurrence(CardSelector.FileOccurrence.NEXT)));
 
     // close the channel after the selection
     selectionService.prepareReleaseChannel();
