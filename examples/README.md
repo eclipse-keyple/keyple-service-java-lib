@@ -57,11 +57,3 @@ Each example can be run independently.
     * Implementations:
         * For PC/SC plugin: [`Main_PluginAndReaderObservation_Pcsc.java`]
         * For Stub plugin: [`Main_PluginAndReaderObservation_Stub.java`]
-
-* Use Case ‘Generic 8’ – Card resource service
-  observation: [UseCase8_CardResourceService](https://github.com/eclipse/keyple-java-service/tree/main/examples/src/main/java/org/eclipse/keyple/core/service/examples/UseCase8_CardResourceService)
-    * Shows the implementation of the Card Resource service with simultaneous observation of the plugin and the readers,
-      with the definition of two resource profiles.
-    * Implementations:
-        * For PC/SC plugin: [`Main_CardResourceService_Pcsc.java`]
-        * For Stub plugin: [`Main_CardResourceService_Stub.java`]
