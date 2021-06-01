@@ -4,7 +4,7 @@
 
 The **Keyple Service** Java library contains the core Keyple interfaces and classes.
 
-This library **should be import explicitly** by the main application.
+This library **should be imported explicitly** by the main application.
 
 ## User Guide & Download Information
 
