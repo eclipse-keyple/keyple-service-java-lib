@@ -58,11 +58,11 @@ public final class PluginEvent {
     READER_DISCONNECTED,
 
     /**
-     * This plugin has been unregistered
+     * This plugin has become unavailable.
      *
      * @since 2.0
      */
-    UNREGISTERED
+    UNAVAILABLE
   }
 
   /**

@@ -29,13 +29,12 @@ repositories {
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
 }
 dependencies {
-    implementation("org.eclipse.keyple:keyple-java-commons-api:2.0-SNAPSHOT")
-    implementation("org.eclipse.keyple:keyple-java-card-api:2.0-SNAPSHOT")
-    implementation("org.eclipse.keyple:keyple-java-service:2.0.0-SNAPSHOT")
-    implementation("org.eclipse.keyple:keyple-java-card-generic:2.0.0-SNAPSHOT")
-    implementation("org.eclipse.keyple:keyple-java-plugin-pcsc:2.0.0-SNAPSHOT")
-    implementation("org.eclipse.keyple:keyple-java-utils:2.0.0-SNAPSHOT")
-
+    implementation("org.eclipse.keyple:keyple-java-reader-api:1.0-SNAPSHOT") { isChanging = true }
+    implementation("org.eclipse.keyple:keyple-java-commons-api:2.0-SNAPSHOT") { isChanging = true }
+    implementation("org.eclipse.keyple:keyple-java-service:2.0.0-SNAPSHOT") { isChanging = true }
+    implementation("org.eclipse.keyple:keyple-java-card-generic:2.0.0-SNAPSHOT") { isChanging = true }
+    implementation("org.eclipse.keyple:keyple-java-plugin-pcsc:2.0.0-SNAPSHOT") { isChanging = true }
+    implementation("org.eclipse.keyple:keyple-java-utils:2.0.0-SNAPSHOT") { isChanging = true }
     implementation ("org.slf4j:slf4j-simple:1.7.25")
     implementation ("org.slf4j:slf4j-ext:1.7.25")
 }

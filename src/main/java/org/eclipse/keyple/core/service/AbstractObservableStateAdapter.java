@@ -177,7 +177,6 @@ abstract class AbstractObservableStateAdapter {
     if (monitoringEvent != null && !monitoringEvent.isDone()) {
       monitoringJob.stop();
 
-      // TODO this could be inside the stop method?
       boolean canceled = monitoringEvent.cancel(false);
       if (logger.isTraceEnabled()) {
         logger.trace(

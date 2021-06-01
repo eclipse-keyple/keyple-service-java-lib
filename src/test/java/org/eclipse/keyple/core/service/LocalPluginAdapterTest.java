@@ -126,7 +126,7 @@ public class LocalPluginAdapterTest {
   }
 
   @Test(expected = IllegalStateException.class)
-  public void getReadersNames_whenNotRegistered_shouldISE() {
+  public void getReaderNames_whenNotRegistered_shouldISE() {
     LocalPluginAdapter localPluginAdapter = new LocalPluginAdapter(pluginSpi);
     localPluginAdapter.getReaderNames();
   }

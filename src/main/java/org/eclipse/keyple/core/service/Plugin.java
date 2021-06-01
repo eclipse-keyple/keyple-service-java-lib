@@ -36,12 +36,12 @@ public interface Plugin {
    *
    * <p>Note: the provided argument is used at compile time to check the type consistency.
    *
-   * @param pluginExtensionType The specific class of the plugin.
+   * @param pluginExtensionClass The specific class of the plugin.
    * @param <T> The type of the plugin extension.
    * @return A not null reference.
    * @since 2.0
    */
-  <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionType);
+  <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionClass);
 
   /**
    * Gets the names of all connected readers.
@@ -65,7 +65,7 @@ public interface Plugin {
    * Gets the {@link Reader} whose name is provided.
    *
    * @param name The name of the reader.
-   * @return null if the reader has not been found.
+   * @return Null if the reader has not been found.
    * @throws IllegalStateException if the plugin is no longer registered.
    * @since 2.0
    */

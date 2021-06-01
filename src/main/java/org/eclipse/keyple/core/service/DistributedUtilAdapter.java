@@ -13,12 +13,11 @@ package org.eclipse.keyple.core.service;
 
 import com.google.gson.JsonObject;
 import java.util.List;
-import org.eclipse.keyple.core.card.CardRequest;
-import org.eclipse.keyple.core.card.ChannelControl;
-import org.eclipse.keyple.core.card.ProxyReader;
+import org.calypsonet.terminal.card.ChannelControl;
+import org.calypsonet.terminal.card.ProxyReaderApi;
+import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.AbstractRemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
-import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 import org.eclipse.keyple.core.util.json.BodyError;
 import org.eclipse.keyple.core.util.json.JsonUtil;
@@ -266,7 +265,7 @@ final class DistributedUtilAdapter {
   enum ReaderService {
 
     /**
-     * Refers to {@link ProxyReader#transmitCardRequest(CardRequest, ChannelControl)}
+     * Refers to {@link ProxyReaderApi#transmitCardRequest(CardRequestSpi, ChannelControl)}
      *
      * @since 2.0
      */
@@ -327,7 +326,7 @@ final class DistributedUtilAdapter {
     FINALIZE_CARD_PROCESSING,
 
     /**
-     * Refers to {@link ProxyReader#releaseChannel()}
+     * Refers to {@link ProxyReaderApi#releaseChannel()}
      *
      * @since 2.0
      */

@@ -105,7 +105,6 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
         break;
 
       case CARD_REMOVED:
-        // TODO Check if this case really happens (NFC?)
         // the card has been removed during default selection
         if (getReader().getPollingMode() == ObservableReader.PollingMode.REPEATING) {
           switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);

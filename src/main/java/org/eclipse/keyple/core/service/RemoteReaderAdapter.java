@@ -18,9 +18,10 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.eclipse.keyple.core.card.*;
+import org.calypsonet.terminal.card.*;
+import org.calypsonet.terminal.card.spi.CardRequestSpi;
+import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
-import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;
@@ -59,11 +60,11 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   @Override
-  final List<CardSelectionResponse> processCardSelectionRequests(
-      List<CardSelectionRequest> cardSelectionRequests,
+  final List<CardSelectionResponseApi> processCardSelectionRequests(
+      List<CardSelectionRequestSpi> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
-      throws ReaderCommunicationException, CardCommunicationException {
+      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException {
 
     checkStatus();
 
@@ -77,7 +78,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
         JsonUtil.getParser()
             .toJson(
                 cardSelectionRequests,
-                new TypeToken<ArrayList<CardSelectionRequest>>() {}.getType()));
+                new TypeToken<ArrayList<CardSelectionRequestSpi>>() {}.getType()));
 
     input.addProperty(
         JsonProperty.MULTI_SELECTION_PROCESSING.name(), multiSelectionProcessing.name());
@@ -94,13 +95,13 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
       return JsonUtil.getParser()
           .fromJson(
               output.get(JsonProperty.RESULT.name()).getAsString(),
-              new TypeToken<ArrayList<CardSelectionResponse>>() {}.getType());
+              new TypeToken<ArrayList<CardSelectionResponseApi>>() {}.getType());
 
     } catch (RuntimeException e) {
       throw e;
-    } catch (ReaderCommunicationException e) {
+    } catch (ReaderBrokenCommunicationException e) {
       throw e;
-    } catch (CardCommunicationException e) {
+    } catch (CardBrokenCommunicationException e) {
       throw e;
     } catch (Exception e) {
       throwRuntimeException(e);
@@ -114,8 +115,9 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   @Override
-  final CardResponse processCardRequest(CardRequest cardRequest, ChannelControl channelControl)
-      throws CardCommunicationException, ReaderCommunicationException {
+  final CardResponseApi processCardRequest(
+      CardRequestSpi cardRequest, ChannelControl channelControl)
+      throws CardBrokenCommunicationException, ReaderBrokenCommunicationException {
 
     checkStatus();
 
@@ -125,7 +127,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     input.addProperty(
         JsonProperty.CARD_REQUEST.name(),
-        JsonUtil.getParser().toJson(cardRequest, CardRequest.class));
+        JsonUtil.getParser().toJson(cardRequest, CardRequestSpi.class));
 
     input.addProperty(JsonProperty.CHANNEL_CONTROL.name(), channelControl.name());
 
@@ -137,13 +139,13 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
       Assert.getInstance().notNull(output, OUTPUT);
 
       return JsonUtil.getParser()
-          .fromJson(output.get(JsonProperty.RESULT.name()).getAsString(), CardResponse.class);
+          .fromJson(output.get(JsonProperty.RESULT.name()).getAsString(), CardResponseApi.class);
 
     } catch (RuntimeException e) {
       throw e;
-    } catch (ReaderCommunicationException e) {
+    } catch (ReaderBrokenCommunicationException e) {
       throw e;
-    } catch (CardCommunicationException e) {
+    } catch (CardBrokenCommunicationException e) {
       throw e;
     } catch (Exception e) {
       throwRuntimeException(e);
@@ -238,7 +240,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   @Override
-  public final void releaseChannel() throws ReaderCommunicationException {
+  public final void releaseChannel() throws ReaderBrokenCommunicationException {
 
     checkStatus();
 
@@ -252,7 +254,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     } catch (RuntimeException e) {
       throw e;
-    } catch (ReaderCommunicationException e) {
+    } catch (ReaderBrokenCommunicationException e) {
       throw e;
     } catch (Exception e) {
       throwRuntimeException(e);

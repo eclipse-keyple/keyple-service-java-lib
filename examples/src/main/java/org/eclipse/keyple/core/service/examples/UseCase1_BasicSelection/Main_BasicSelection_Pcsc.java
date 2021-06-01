@@ -12,15 +12,13 @@
 package org.eclipse.keyple.core.service.examples.UseCase1_BasicSelection;
 
 import java.util.List;
+import org.calypsonet.terminal.reader.selection.CardSelectionResult;
+import org.calypsonet.terminal.reader.selection.CardSelectionService;
+import org.calypsonet.terminal.reader.selection.spi.CardSelection;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
-import org.eclipse.keyple.card.generic.GenericExtensionServiceProvider;
 import org.eclipse.keyple.core.service.*;
 import org.eclipse.keyple.core.service.examples.common.ConfigurationUtil;
-import org.eclipse.keyple.core.service.selection.CardSelectionResult;
-import org.eclipse.keyple.core.service.selection.CardSelectionService;
-import org.eclipse.keyple.core.service.selection.CardSelector;
-import org.eclipse.keyple.core.service.selection.spi.CardSelection;
-import org.eclipse.keyple.core.service.selection.spi.SmartCard;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.eclipse.keyple.plugin.pcsc.PcscPluginFactoryBuilder;
 import org.slf4j.Logger;
@@ -43,7 +41,7 @@ import org.slf4j.LoggerFactory;
  *   <li>Check if a ISO 14443-4 card is in the reader, select a card (a GlobalPlatform compliant
  *       card is expected here [e.g. EMV card or Javacard]).
  *   <li>Run a selection scenario without filter.
- *   <li>Output the collected smart card data (ATR).
+ *   <li>Output the collected smart card data (power-on data).
  *   <li>Send a additional APDUs to the card (get Card Production Life Cycle data [CPLC]).
  * </ul>
  *
@@ -66,7 +64,7 @@ public class Main_BasicSelection_Pcsc {
     Plugin plugin = smartCardService.registerPlugin(PcscPluginFactoryBuilder.builder().build());
 
     // Get the generic card extension service
-    GenericExtensionService cardExtension = GenericExtensionServiceProvider.getService();
+    GenericExtensionService cardExtension = GenericExtensionService.getInstance();
 
     // Verify that the extension's API level is consistent with the current service.
     smartCardService.checkCardExtension(cardExtension);
@@ -89,8 +87,9 @@ public class Main_BasicSelection_Pcsc {
     CardSelectionService selectionService = CardSelectionServiceFactory.getService();
 
     // Create a card selection using the generic card extension without specifying any filter
-    // (protocol/ATR/DFName).
-    CardSelection cardSelection = cardExtension.createCardSelection(CardSelector.builder().build());
+    // (protocol/power-on data/DFName).
+    CardSelection cardSelection =
+        cardExtension.createCardSelection(cardExtension.createCardSelector());
 
     // Prepare the selection by adding the created generic selection to the card selection scenario.
     selectionService.prepareSelection(cardSelection);

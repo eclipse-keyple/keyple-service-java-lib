@@ -11,11 +11,12 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.examples.UseCase4_ScheduledSelection;
 
+import org.calypsonet.terminal.reader.CardReaderEvent;
+import org.calypsonet.terminal.reader.selection.CardSelectionService;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
+import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
+import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.service.*;
-import org.eclipse.keyple.core.service.selection.CardSelectionService;
-import org.eclipse.keyple.core.service.selection.spi.SmartCard;
-import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
-import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,8 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-class CardReaderObserver implements ReaderObserverSpi, ReaderObservationExceptionHandlerSpi {
+class CardReaderObserver
+    implements CardReaderObserverSpi, CardReaderObservationExceptionHandlerSpi {
 
   private static final Logger logger = LoggerFactory.getLogger(CardReaderObserver.class);
   private final Reader reader;
@@ -43,7 +45,7 @@ class CardReaderObserver implements ReaderObserverSpi, ReaderObservationExceptio
    * @since 2.0
    */
   @Override
-  public void onReaderEvent(ReaderEvent event) {
+  public void onReaderEvent(CardReaderEvent event) {
     switch (event.getEventType()) {
       case CARD_MATCHED:
         // the selection has one target, get the result at index 0
@@ -69,8 +71,8 @@ class CardReaderObserver implements ReaderObserverSpi, ReaderObservationExceptio
       default:
         break;
     }
-    if (event.getEventType() == ReaderEvent.EventType.CARD_INSERTED
-        || event.getEventType() == ReaderEvent.EventType.CARD_MATCHED) {
+    if (event.getEventType() == CardReaderEvent.EventType.CARD_INSERTED
+        || event.getEventType() == CardReaderEvent.EventType.CARD_MATCHED) {
 
       // Informs the underlying layer of the end of the card processing, in order to manage the
       // removal sequence.

@@ -11,8 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import org.eclipse.keyple.core.service.selection.CardSelectionService;
-import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
+import org.calypsonet.terminal.reader.selection.CardSelectionService;
 
 /**
  * Factory of {@link CardSelectionService}
@@ -28,24 +27,16 @@ public final class CardSelectionServiceFactory {
   private CardSelectionServiceFactory() {}
 
   /**
-   * Retrieves an instance of a {@link CardSelectionService} that stops as soon as a card matches.
+   * Retrieves an instance of a {@link CardSelectionService}.
+   *
+   * <p>By default the selection process stops at the first successful selection. However, it is
+   * possible to force the execution of all selection cases defined in the scenario using the {@link
+   * CardSelectionService#setMultipleSelectionMode()} method.
    *
    * @return A not null reference
    * @since 2.0
    */
   public static CardSelectionService getService() {
-    return new CardSelectionServiceAdapter(MultiSelectionProcessing.FIRST_MATCH);
-  }
-
-  /**
-   * Retrieves an instance of a {@link CardSelectionService} with the possibility to define whether
-   * it stops or not after a card match.
-   *
-   * @param multiSelectionProcessing The multi selection processing policy.
-   * @return A not null reference
-   * @since 2.0
-   */
-  public static CardSelectionService getService(MultiSelectionProcessing multiSelectionProcessing) {
-    return new CardSelectionServiceAdapter(multiSelectionProcessing);
+    return new CardSelectionServiceAdapter();
   }
 }

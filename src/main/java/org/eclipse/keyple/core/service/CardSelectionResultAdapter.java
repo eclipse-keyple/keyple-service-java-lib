@@ -13,8 +13,8 @@ package org.eclipse.keyple.core.service;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.eclipse.keyple.core.service.selection.CardSelectionResult;
-import org.eclipse.keyple.core.service.selection.spi.SmartCard;
+import org.calypsonet.terminal.reader.selection.CardSelectionResult;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 
 /**
  * (package-private)<br>

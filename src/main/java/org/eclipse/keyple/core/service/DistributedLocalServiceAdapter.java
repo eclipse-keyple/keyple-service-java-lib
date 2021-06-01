@@ -16,13 +16,15 @@ import static org.eclipse.keyple.core.service.DistributedUtilAdapter.*;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.*;
-import org.eclipse.keyple.core.card.*;
+import org.calypsonet.terminal.card.*;
+import org.calypsonet.terminal.card.spi.CardRequestSpi;
+import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
+import org.calypsonet.terminal.reader.CardReaderEvent;
+import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
 import org.eclipse.keyple.core.distributed.local.LocalServiceApi;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceSpi;
-import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
-import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 import org.eclipse.keyple.core.util.json.BodyError;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;
@@ -35,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * @since 2.0
  */
 final class DistributedLocalServiceAdapter
-    implements DistributedLocalService, PluginObserverSpi, ReaderObserverSpi, LocalServiceApi {
+    implements DistributedLocalService, PluginObserverSpi, CardReaderObserverSpi, LocalServiceApi {
 
   private static final Logger logger =
       LoggerFactory.getLogger(DistributedLocalServiceAdapter.class);
@@ -117,7 +119,7 @@ final class DistributedLocalServiceAdapter
    */
   @Override
   public <T extends KeypleDistributedLocalServiceExtension> T getExtension(
-      Class<T> distributedLocalServiceExtensionType) {
+      Class<T> distributedLocalServiceExtensionClass) {
     checkStatus();
     return (T) localServiceSpi;
   }
@@ -151,7 +153,7 @@ final class DistributedLocalServiceAdapter
    * @since 2.0
    */
   @Override
-  public void onReaderEvent(ReaderEvent readerEvent) {
+  public void onReaderEvent(CardReaderEvent readerEvent) {
 
     if (logger.isDebugEnabled()) {
       logger.debug(
@@ -159,7 +161,7 @@ final class DistributedLocalServiceAdapter
           name,
           readerEvent.getEventType().name(),
           readerEvent.getReaderName(),
-          readerEvent.getPluginName());
+          ((ReaderEvent) readerEvent).getPluginName());
     }
 
     JsonObject body = new JsonObject();
@@ -315,47 +317,47 @@ final class DistributedLocalServiceAdapter
      * (private)<br>
      * Service {@link ReaderService#TRANSMIT_CARD_REQUEST}.
      *
-     * @throws CardCommunicationException If a card communication error occurs.
-     * @throws ReaderCommunicationException If a reader communication error occurs.
+     * @throws CardBrokenCommunicationException If a card communication error occurs.
+     * @throws ReaderBrokenCommunicationException If a reader communication error occurs.
      */
     private void transmitCardRequest()
-        throws CardCommunicationException, ReaderCommunicationException,
-            UnexpectedStatusCodeException {
+        throws CardBrokenCommunicationException, ReaderBrokenCommunicationException,
+            UnexpectedStatusWordException {
 
       // Extract info from the message
       ChannelControl channelControl =
           ChannelControl.valueOf(input.get(JsonProperty.CHANNEL_CONTROL.name()).getAsString());
 
-      CardRequest cardRequest =
+      CardRequestSpi cardRequest =
           JsonUtil.getParser()
               .fromJson(
-                  input.get(JsonProperty.CARD_REQUEST.name()).getAsString(), CardRequest.class);
+                  input.get(JsonProperty.CARD_REQUEST.name()).getAsString(), CardRequestSpi.class);
 
       // Execute the service on the reader
-      CardResponse cardResponse = reader.transmitCardRequest(cardRequest, channelControl);
+      CardResponseApi cardResponse = reader.transmitCardRequest(cardRequest, channelControl);
 
       // Build result
       output.add(
           JsonProperty.RESULT.name(),
-          JsonUtil.getParser().toJsonTree(cardResponse, CardResponse.class));
+          JsonUtil.getParser().toJsonTree(cardResponse, CardResponseApi.class));
     }
 
     /**
      * (private)<br>
      * Service {@link ReaderService#TRANSMIT_CARD_SELECTION_REQUESTS}.
      *
-     * @throws CardCommunicationException If a card communication error occurs.
-     * @throws ReaderCommunicationException If a reader communication error occurs.
+     * @throws CardBrokenCommunicationException If a card communication error occurs.
+     * @throws ReaderBrokenCommunicationException If a reader communication error occurs.
      */
     private void transmitCardSelectionRequests()
-        throws CardCommunicationException, ReaderCommunicationException {
+        throws CardBrokenCommunicationException, ReaderBrokenCommunicationException {
 
       // Extract info from the message
-      List<CardSelectionRequest> cardSelectionRequests =
+      List<CardSelectionRequestSpi> cardSelectionRequests =
           JsonUtil.getParser()
               .fromJson(
                   input.get(JsonProperty.CARD_SELECTION_REQUESTS.name()).getAsString(),
-                  new TypeToken<ArrayList<CardSelectionRequest>>() {}.getType());
+                  new TypeToken<ArrayList<CardSelectionRequestSpi>>() {}.getType());
 
       MultiSelectionProcessing multiSelectionProcessing =
           MultiSelectionProcessing.valueOf(
@@ -365,7 +367,7 @@ final class DistributedLocalServiceAdapter
           ChannelControl.valueOf(input.get(JsonProperty.CHANNEL_CONTROL.name()).getAsString());
 
       // Execute the service on the reader
-      List<CardSelectionResponse> cardSelectionResponses =
+      List<CardSelectionResponseApi> cardSelectionResponses =
           reader.transmitCardSelectionRequests(
               cardSelectionRequests, multiSelectionProcessing, channelControl);
 
@@ -375,7 +377,7 @@ final class DistributedLocalServiceAdapter
           JsonUtil.getParser()
               .toJsonTree(
                   cardSelectionResponses,
-                  new TypeToken<ArrayList<CardSelectionResponse>>() {}.getType()));
+                  new TypeToken<ArrayList<CardSelectionResponseApi>>() {}.getType()));
     }
 
     /**
@@ -482,9 +484,9 @@ final class DistributedLocalServiceAdapter
      * (private)<br>
      * Service {@link ReaderService#RELEASE_CHANNEL}.
      *
-     * @throws ReaderCommunicationException If a reader communication error occurs.
+     * @throws ReaderBrokenCommunicationException If a reader communication error occurs.
      */
-    private void releaseChannel() throws ReaderCommunicationException {
+    private void releaseChannel() throws ReaderBrokenCommunicationException {
 
       // Execute the service on the reader
       reader.releaseChannel();
@@ -575,7 +577,7 @@ final class DistributedLocalServiceAdapter
      * Retrieves the pool plugin that contains the provided reader group reference.
      *
      * @param readerGroupReference The target reader group reference.
-     * @return null if no pool plugin is found containing the provided group reference.
+     * @return Null if no pool plugin is found containing the provided group reference.
      */
     private PoolPlugin getPoolPlugin(String readerGroupReference) {
       PoolPlugin poolPlugin;

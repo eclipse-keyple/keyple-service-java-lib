@@ -85,7 +85,6 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
               monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
               break;
             } catch (ReaderIOException e) {
-              // TODO check this
               // just warn as it can be a disconnection of the reader.
               logger.warn(
                   "[{}] waitForCardAbsentNative => Error while processing card removal event",

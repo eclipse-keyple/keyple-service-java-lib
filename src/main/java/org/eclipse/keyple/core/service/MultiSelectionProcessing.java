@@ -9,22 +9,26 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.eclipse.keyple.core.service.selection.spi;
-
-import org.eclipse.keyple.core.service.selection.CardSelector;
+package org.eclipse.keyple.core.service;
 
 /**
- * Defines a basic card selection case based on a {@link CardSelector}.
+ * (package-private)<br>
+ * Indicates whether the selection process should stop after the first matching or process all cases
+ * in the selection request list.
  *
  * @since 2.0
  */
-public interface CardSelection {
-
+enum MultiSelectionProcessing {
   /**
-   * Gets the {@link CardSelector} for the selection case.
+   * The selection process stops as soon as a selection case is successful.
    *
-   * @return A not null reference.
    * @since 2.0
    */
-  CardSelector getCardSelector();
+  FIRST_MATCH,
+  /**
+   * The selection process performs all the selection cases provided.
+   *
+   * @since 2.0
+   */
+  PROCESS_ALL
 }

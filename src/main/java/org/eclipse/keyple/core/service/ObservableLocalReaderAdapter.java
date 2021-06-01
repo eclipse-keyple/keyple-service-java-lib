@@ -13,7 +13,11 @@ package org.eclipse.keyple.core.service;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import org.eclipse.keyple.core.card.*;
+import org.calypsonet.terminal.card.CardBrokenCommunicationException;
+import org.calypsonet.terminal.card.CardSelectionResponseApi;
+import org.calypsonet.terminal.card.ReaderBrokenCommunicationException;
+import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
+import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.WaitForCardInsertionAutonomousReaderApi;
@@ -21,8 +25,6 @@ import org.eclipse.keyple.core.plugin.WaitForCardRemovalAutonomousReaderApi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionAutonomousSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalAutonomousSpi;
-import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
-import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +51,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   private final ObservableReaderSpi observableReaderSpi;
   private final ObservableReaderStateServiceAdapter stateService;
-  private final ObservationManagerAdapter<ReaderObserverSpi, ReaderObservationExceptionHandlerSpi>
+  private final ObservationManagerAdapter<
+          CardReaderObserverSpi, CardReaderObservationExceptionHandlerSpi>
       observationManager;
 
   private CardSelectionScenarioAdapter cardSelectionScenario;
@@ -117,8 +120,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
     this.observableReaderSpi = observableReaderSpi;
     this.stateService = new ObservableReaderStateServiceAdapter(this);
     this.observationManager =
-        new ObservationManagerAdapter<ReaderObserverSpi, ReaderObservationExceptionHandlerSpi>(
-            pluginName, getName());
+        new ObservationManagerAdapter<
+            CardReaderObserverSpi, CardReaderObservationExceptionHandlerSpi>(pluginName, getName());
     if (observableReaderSpi instanceof WaitForCardInsertionAutonomousSpi) {
       ((WaitForCardInsertionAutonomousSpi) observableReaderSpi).connect(this);
     }
@@ -143,18 +146,18 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * Gets the exception handler used to notify the application of exceptions raised during the
    * observation process.
    *
-   * @return null if no exception has been set.
+   * @return Null if no exception has been set.
    * @since 2.0
    */
-  ReaderObservationExceptionHandlerSpi getObservationExceptionHandler() {
+  CardReaderObservationExceptionHandlerSpi getObservationExceptionHandler() {
     return observationManager.getObservationExceptionHandler();
   }
 
   /**
    * (package-private)<br>
-   * Gets the current {@link org.eclipse.keyple.core.service.ObservableReader.PollingMode}.
+   * Gets the current {@link ObservableReader.PollingMode}.
    *
-   * @return null if the polling mode has not been defined.
+   * @return Null if the polling mode has not been defined.
    * @since 2.0
    */
   ObservableReader.PollingMode getPollingMode() {
@@ -180,7 +183,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    *
    * <p>This method has to be called regularly until the card no longer respond.
    *
-   * @return true if the card still responds, false if not
+   * @return True if the card still responds, false if not
    * @since 2.0
    */
   boolean isCardPresentPing() {
@@ -226,9 +229,9 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    *
    * <p>The selection data and the responses to the optional requests that may be present in the
    * card selection scenario are embedded into the {@link ReaderEvent} as a list of {@link
-   * CardSelectionResponse}.
+   * CardSelectionResponseApi}.
    *
-   * @return null if the card has been rejected by the card selection scenario.
+   * @return Null if the card has been rejected by the card selection scenario.
    * @since 2.0
    */
   ReaderEvent processCardInserted() {
@@ -248,7 +251,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
     // a card selection scenario is defined, send it and notify according to the notification mode
     // and the selection status
     try {
-      List<CardSelectionResponse> cardSelectionResponses =
+      List<CardSelectionResponseApi> cardSelectionResponses =
           transmitCardSelectionRequests(
               cardSelectionScenario.getCardSelectionRequests(),
               cardSelectionScenario.getMultiSelectionProcessing(),
@@ -284,7 +287,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           ReaderEvent.EventType.CARD_INSERTED,
           new ScheduledCardSelectionsResponseAdapter(cardSelectionResponses));
 
-    } catch (ReaderCommunicationException e) {
+    } catch (ReaderBrokenCommunicationException e) {
       // Notify the reader communication failure with the exception handler.
       getObservationExceptionHandler()
           .onReaderObservationError(
@@ -292,13 +295,13 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
               getName(),
               new KeypleReaderCommunicationException(READER_MONITORING_ERROR, e));
 
-    } catch (CardCommunicationException e) {
+    } catch (CardBrokenCommunicationException e) {
       // The last transmission failed, close the logical and physical channels.
       closeLogicalAndPhysicalChannelsSilently();
       // The card was removed or not read correctly, no exception raising or event notification,
       // just log.
       logger.debug(
-          "An card error or communication exception occurred while processing the card selection scenario. {}",
+          "A card error or communication exception occurred while processing the card selection scenario. {}",
           e.getMessage());
     }
 
@@ -323,10 +326,10 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * Check if a card has matched.
    *
    * @param cardSelectionResponses The responses received.
-   * @return true if a card has matched, false if not.
+   * @return True if a card has matched, false if not.
    */
-  private boolean hasACardMatched(List<CardSelectionResponse> cardSelectionResponses) {
-    for (CardSelectionResponse cardSelectionResponse : cardSelectionResponses) {
+  private boolean hasACardMatched(List<CardSelectionResponseApi> cardSelectionResponses) {
+    for (CardSelectionResponseApi cardSelectionResponse : cardSelectionResponses) {
       if (cardSelectionResponse != null
           && cardSelectionResponse.getSelectionStatus().hasMatched()) {
         if (logger.isTraceEnabled()) {
@@ -385,16 +388,16 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           countObservers());
     }
 
-    Set<ReaderObserverSpi> observers = observationManager.getObservers();
+    Set<CardReaderObserverSpi> observers = observationManager.getObservers();
 
     if (observationManager.getEventNotificationExecutorService() == null) {
       // synchronous notification
-      for (ReaderObserverSpi observer : observers) {
+      for (CardReaderObserverSpi observer : observers) {
         notifyObserver(observer, event);
       }
     } else {
       // asynchronous notification
-      for (final ReaderObserverSpi observer : observers) {
+      for (final CardReaderObserverSpi observer : observers) {
         observationManager
             .getEventNotificationExecutorService()
             .execute(
@@ -414,7 +417,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @param observer The observer to notify.
    * @param event The event.
    */
-  private void notifyObserver(ReaderObserverSpi observer, ReaderEvent event) {
+  private void notifyObserver(CardReaderObserverSpi observer, ReaderEvent event) {
     try {
       observer.onReaderEvent(event);
     } catch (Exception e) {
@@ -458,7 +461,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * {@inheritDoc}
    *
-   * <p>Notifies all observers of the UNREGISTERED event.<br>
+   * <p>Notifies all observers of the UNAVAILABLE event.<br>
    * Stops the card detection unconditionally.<br>
    * Shuts down the reader's executor service.
    *
@@ -469,7 +472,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
     super.unregister();
     try {
       notifyObservers(
-          new ReaderEvent(getPluginName(), getName(), ReaderEvent.EventType.UNREGISTERED, null));
+          new ReaderEvent(getPluginName(), getName(), ReaderEvent.EventType.UNAVAILABLE, null));
       stopCardDetection();
     } finally {
       clearObservers();
@@ -505,7 +508,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void addObserver(ReaderObserverSpi observer) {
+  public void addObserver(CardReaderObserverSpi observer) {
     checkStatus();
     observationManager.addObserver(observer);
   }
@@ -516,7 +519,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void removeObserver(ReaderObserverSpi observer) {
+  public void removeObserver(CardReaderObserverSpi observer) {
     observationManager.removeObserver(observer);
   }
 
@@ -610,7 +613,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public void setReaderObservationExceptionHandler(
-      ReaderObservationExceptionHandlerSpi exceptionHandler) {
+      CardReaderObservationExceptionHandlerSpi exceptionHandler) {
     checkStatus();
     observationManager.setObservationExceptionHandler(exceptionHandler);
   }
