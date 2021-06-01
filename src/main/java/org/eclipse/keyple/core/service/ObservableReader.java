@@ -13,5 +13,9 @@ package org.eclipse.keyple.core.service;
 
 import org.calypsonet.terminal.reader.ObservableCardReader;
 
-/** TODO Add Javadoc */
-public interface ObservableReader extends ObservableCardReader {}
+/**
+ * Keyple observable card reader.
+ *
+ * @since 2.0
+ */
+public interface ObservableReader extends Reader, ObservableCardReader {}

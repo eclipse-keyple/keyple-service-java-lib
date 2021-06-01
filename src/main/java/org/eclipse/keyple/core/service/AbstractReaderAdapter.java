@@ -219,7 +219,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * @since 2.0
    */
   @Override
-  public final <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionType) {
+  public final <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionClass) {
     checkStatus();
     return (T) readerExtension;
   }

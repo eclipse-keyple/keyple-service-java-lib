@@ -119,7 +119,7 @@ final class DistributedLocalServiceAdapter
    */
   @Override
   public <T extends KeypleDistributedLocalServiceExtension> T getExtension(
-      Class<T> distributedLocalServiceExtensionType) {
+      Class<T> distributedLocalServiceExtensionClass) {
     checkStatus();
     return (T) localServiceSpi;
   }

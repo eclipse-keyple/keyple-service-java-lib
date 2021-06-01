@@ -16,7 +16,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.*;
-import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.PluginSpi;
@@ -109,7 +108,7 @@ public class LocalPluginAdapterTest {
         .containsExactlyInAnyOrder(OBSERVABLE_READER_NAME);
     assertThat(localPluginAdapter.getReaders()).hasSize(1);
     assertThat(localPluginAdapter.getReader(OBSERVABLE_READER_NAME))
-        .isInstanceOf(ObservableCardReader.class);
+        .isInstanceOf(ObservableReader.class);
     assertThat(localPluginAdapter.getReader(OBSERVABLE_READER_NAME))
         .isInstanceOf(ObservableLocalReaderAdapter.class);
   }

@@ -26,11 +26,11 @@ public interface Reader extends CardReader {
    *
    * <p>Note: the provided argument is used at compile time to check the type consistency.
    *
-   * @param readerExtensionType The specific class of the reader.
+   * @param readerExtensionClass The specific class of the reader.
    * @param <T> The type of the reader extension.
    * @return A {@link KeypleReaderExtension}.
    * @throws IllegalStateException If reader is no longer registered.
    * @since 2.0
    */
-  <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionType);
+  <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionClass);
 }

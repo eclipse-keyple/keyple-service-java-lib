@@ -100,7 +100,7 @@ abstract class AbstractPluginAdapter implements Plugin {
    * @since 2.0
    */
   @Override
-  public final <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionType) {
+  public final <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionClass) {
     checkStatus();
     return (T) pluginExtension;
   }

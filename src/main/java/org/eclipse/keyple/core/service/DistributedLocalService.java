@@ -33,10 +33,10 @@ public interface DistributedLocalService {
    *
    * <p><u>Note</u> : the provided argument is used at compile time to check the type consistency.
    *
-   * @param distributedLocalServiceExtensionType the specific class of the local service
+   * @param distributedLocalServiceExtensionClass the specific class of the local service
    * @param <T> The type of the service extension
    * @return a {@link KeypleDistributedLocalServiceExtension}
    */
   <T extends KeypleDistributedLocalServiceExtension> T getExtension(
-      Class<T> distributedLocalServiceExtensionType);
+      Class<T> distributedLocalServiceExtensionClass);
 }

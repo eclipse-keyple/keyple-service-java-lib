@@ -432,7 +432,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       long timeStamp = System.nanoTime();
       long elapsed10ms = (timeStamp - before) / 100000;
       this.before = timeStamp;
-      // TODO review log format
       logger.debug(
           "[{}] case4HackGetResponse => ApduRequest: NAME = \"Internal Get Response\", RAWDATA = {}, elapsed = {}",
           this.getName(),
@@ -448,7 +447,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       long timeStamp = System.nanoTime();
       long elapsed10ms = (timeStamp - before) / 100000;
       this.before = timeStamp;
-      // TODO review log format
       logger.debug(
           "[{}] case4HackGetResponse => Internal {}, elapsed {} ms.",
           this.getName(),
