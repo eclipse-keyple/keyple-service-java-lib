@@ -50,7 +50,7 @@ public class SelectionStatusAdapter implements SelectionStatusApi {
    * @since 2.0
    */
   @Override
-  public byte[] getPowerOnData() {
+  public byte[] getPowerOnDataBytes() {
     return powerOnData;
   }
 

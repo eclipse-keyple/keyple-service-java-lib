@@ -66,12 +66,12 @@ class PluginObserver implements PluginObserverSpi, PluginObservationExceptionHan
               .getReader(readerName);
 
       logger.info(
-          "PluginEvent: PLUGINNAME = {}, READERNAME = {}, EVENTTYPE = {}",
+          "PluginEvent: PLUGINNAME = {}, READERNAME = {}, Type = {}",
           event.getPluginName(),
           readerName,
-          event.getEventType());
+          event.getType());
 
-      switch (event.getEventType()) {
+      switch (event.getType()) {
         case READER_CONNECTED:
 
           // We are informed here of a connection of a reader. We add an observer to this reader if
@@ -99,7 +99,7 @@ class PluginObserver implements PluginObserverSpi, PluginObservationExceptionHan
           break;
 
         default:
-          logger.info("Unexpected reader event. EVENT = {}", event.getEventType().name());
+          logger.info("Unexpected reader event. EVENT = {}", event.getType().name());
           break;
       }
     }

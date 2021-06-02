@@ -59,7 +59,7 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
       logger.trace("Notifying connection(s): {}", readerNames);
     }
     notifyObservers(
-        new PluginEvent(getName(), readerNames, PluginEvent.EventType.READER_CONNECTED));
+        new PluginEventAdapter(getName(), readerNames, PluginEvent.Type.READER_CONNECTED));
   }
 
   /**
@@ -73,6 +73,6 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
       logger.trace("Notifying disconnection(s): {}", readerNames);
     }
     notifyObservers(
-        new PluginEvent(getName(), readerNames, PluginEvent.EventType.READER_DISCONNECTED));
+        new PluginEventAdapter(getName(), readerNames, PluginEvent.Type.READER_DISCONNECTED));
   }
 }

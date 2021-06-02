@@ -144,7 +144,7 @@ public class Main_SequentialMultiSelection_Pcsc {
       logger.info("The card matched the selection {}.", index);
       String powerOnData =
           smartCard.hasPowerOnData()
-              ? ByteArrayUtil.toHex(smartCard.getPowerOnData())
+              ? ByteArrayUtil.toHex(smartCard.getPowerOnDataBytes())
               : "no power-on data";
       String fci = smartCard.hasFci() ? ByteArrayUtil.toHex(smartCard.getFciBytes()) : "no FCI";
       logger.info(

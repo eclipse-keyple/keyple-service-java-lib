@@ -119,7 +119,7 @@ public class Main_GroupedMultiSelection_Pcsc {
       SmartCard smartCard = entry.getValue();
       String powerOnData =
           smartCard.hasPowerOnData()
-              ? ByteArrayUtil.toHex(smartCard.getPowerOnData())
+              ? ByteArrayUtil.toHex(smartCard.getPowerOnDataBytes())
               : "no power-on data";
       String fci = smartCard.hasFci() ? ByteArrayUtil.toHex(smartCard.getFciBytes()) : "no FCI";
       String selectionIsActive =

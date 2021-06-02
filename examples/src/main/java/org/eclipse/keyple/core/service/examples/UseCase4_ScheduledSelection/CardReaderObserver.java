@@ -46,7 +46,7 @@ class CardReaderObserver
    */
   @Override
   public void onReaderEvent(CardReaderEvent event) {
-    switch (event.getEventType()) {
+    switch (event.getType()) {
       case CARD_MATCHED:
         // the selection has one target, get the result at index 0
         SmartCard smartCard =
@@ -71,8 +71,8 @@ class CardReaderObserver
       default:
         break;
     }
-    if (event.getEventType() == CardReaderEvent.EventType.CARD_INSERTED
-        || event.getEventType() == CardReaderEvent.EventType.CARD_MATCHED) {
+    if (event.getType() == CardReaderEvent.Type.CARD_INSERTED
+        || event.getType() == CardReaderEvent.Type.CARD_MATCHED) {
 
       // Informs the underlying layer of the end of the card processing, in order to manage the
       // removal sequence.

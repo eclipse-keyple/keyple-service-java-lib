@@ -508,7 +508,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
   /**
    * (private)<br>
-   * Select the card according to the {@link CardSelectorAdapter}.
+   * Select the card according to the {@link CardSelector}.
    *
    * <p>The selection status is returned.<br>
    * 3 levels of filtering/selection are applied successively if they are enabled: protocol, power
@@ -518,7 +518,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * <p>Conversely, the selection is considered successful if none of the filters have rejected the
    * card, even if none of the filters are active.
    *
-   * @param cardSelector A not null {@link CardSelectorAdapter}.
+   * @param cardSelector A not null {@link CardSelector}.
    * @return A not null {@link SelectionStatusApi}.
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
@@ -539,7 +539,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     if (cardSelector.getCardProtocol() == null
         || cardSelector.getCardProtocol().equals(currentProtocol)) {
       // protocol check succeeded, check power-on data if enabled
-      powerOnData = readerSpi.getPowerOnData();
+      powerOnData = readerSpi.getPowerOnDataBytes();
       if (checkPowerOnData(powerOnData, cardSelector)) {
         // no power-on data filter or power-on data check succeeded, select by AID if enabled.
         if (cardSelector.getAid() != null) {

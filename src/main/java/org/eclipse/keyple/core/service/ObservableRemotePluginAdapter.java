@@ -75,7 +75,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
       logger.debug(
           "The plugin '{}' is notifying the plugin event '{}' to {} observers.",
           getName(),
-          event.getEventType().name(),
+          event.getType().name(),
           countObservers());
     }
 
@@ -115,8 +115,8 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     Set<String> unregisteredReaderNames = new HashSet<String>(this.getReaderNames());
     super.unregister();
     notifyObservers(
-        new PluginEvent(
-            this.getName(), unregisteredReaderNames, PluginEvent.EventType.UNAVAILABLE));
+        new PluginEventAdapter(
+            this.getName(), unregisteredReaderNames, PluginEvent.Type.UNAVAILABLE));
     clearObservers();
   }
 
@@ -274,8 +274,8 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
 
     // Notify observers for a plugin event.
     notifyObservers(
-        new PluginEvent(
-            getName(), remoteReaderAdapter.getName(), PluginEvent.EventType.READER_CONNECTED));
+        new PluginEventAdapter(
+            getName(), remoteReaderAdapter.getName(), PluginEvent.Type.READER_CONNECTED));
   }
 
   /**

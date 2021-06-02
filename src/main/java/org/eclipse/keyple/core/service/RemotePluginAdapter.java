@@ -132,7 +132,8 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
       readerEvent =
           JsonUtil.getParser()
               .fromJson(
-                  json.get(JsonProperty.READER_EVENT.name()).getAsString(), ReaderEvent.class);
+                  json.get(JsonProperty.READER_EVENT.name()).getAsString(),
+                  ReaderEventAdapter.class);
     } catch (RuntimeException e) {
       throw new IllegalArgumentException(
           String.format("The JSON data of the reader event is malformed : %s", e.getMessage()), e);

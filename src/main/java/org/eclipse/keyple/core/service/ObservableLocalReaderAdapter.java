@@ -245,7 +245,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
         logger.trace("[{}] no card selection scenario defined, notify CARD_INSERTED", getName());
       }
       /* no default request is defined, just notify the card insertion */
-      return new ReaderEvent(getPluginName(), getName(), ReaderEvent.EventType.CARD_INSERTED, null);
+      return new ReaderEventAdapter(
+          getPluginName(), getName(), ReaderEvent.Type.CARD_INSERTED, null);
     }
 
     // a card selection scenario is defined, send it and notify according to the notification mode
@@ -258,10 +259,10 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
               cardSelectionScenario.getChannelControl());
 
       if (hasACardMatched(cardSelectionResponses)) {
-        return new ReaderEvent(
+        return new ReaderEventAdapter(
             getPluginName(),
             getName(),
-            ReaderEvent.EventType.CARD_MATCHED,
+            ReaderEvent.Type.CARD_MATCHED,
             new ScheduledCardSelectionsResponseAdapter(cardSelectionResponses));
       }
 
@@ -281,10 +282,10 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
         logger.trace(
             "[{}] none of {} default selection matched", getName(), cardSelectionResponses.size());
       }
-      return new ReaderEvent(
+      return new ReaderEventAdapter(
           getPluginName(),
           getName(),
-          ReaderEvent.EventType.CARD_INSERTED,
+          ReaderEvent.Type.CARD_INSERTED,
           new ScheduledCardSelectionsResponseAdapter(cardSelectionResponses));
 
     } catch (ReaderBrokenCommunicationException e) {
@@ -344,7 +345,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * (package-private)<br>
    * This method is invoked when a card is removed to notify the application of the {@link
-   * ReaderEvent.EventType#CARD_REMOVED} event.
+   * ReaderEvent.Type#CARD_REMOVED} event.
    *
    * <p>It will also be invoked if {@link #isCardPresent()} is called and at least one of the
    * physical or logical channels is still open.
@@ -354,7 +355,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   void processCardRemoved() {
     closeLogicalAndPhysicalChannelsSilently();
     notifyObservers(
-        new ReaderEvent(getPluginName(), getName(), ReaderEvent.EventType.CARD_REMOVED, null));
+        new ReaderEventAdapter(getPluginName(), getName(), ReaderEvent.Type.CARD_REMOVED, null));
   }
 
   /**
@@ -384,7 +385,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       logger.debug(
           "The reader '{}' is notifying the reader event '{}' to {} observers.",
           getName(),
-          event.getEventType().name(),
+          event.getType().name(),
           countObservers());
     }
 
@@ -472,7 +473,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
     super.unregister();
     try {
       notifyObservers(
-          new ReaderEvent(getPluginName(), getName(), ReaderEvent.EventType.UNAVAILABLE, null));
+          new ReaderEventAdapter(getPluginName(), getName(), ReaderEvent.Type.UNAVAILABLE, null));
       stopCardDetection();
     } finally {
       clearObservers();

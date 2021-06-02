@@ -38,9 +38,9 @@ class ReaderObserver implements CardReaderObserverSpi, CardReaderObservationExce
         "Event: PLUGINNAME = {}, READERNAME = {}, EVENT = {}",
         ((ReaderEvent) event).getPluginName(),
         event.getReaderName(),
-        event.getEventType().name());
+        event.getType().name());
 
-    if (event.getEventType() != CardReaderEvent.EventType.CARD_REMOVED) {
+    if (event.getType() != CardReaderEvent.Type.CARD_REMOVED) {
       ((ObservableReader)
               (SmartCardServiceProvider.getService()
                   .getPlugin(((ReaderEvent) event).getPluginName())

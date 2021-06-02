@@ -52,7 +52,7 @@ public class LocalReaderAdapterTest {
     readerSpi = mock(ReaderSpiMock.class);
     when(readerSpi.getName()).thenReturn(READER_NAME);
     when(readerSpi.checkCardPresence()).thenReturn(true);
-    when(readerSpi.getPowerOnData()).thenReturn(POWER_ON_DATA);
+    when(readerSpi.getPowerOnDataBytes()).thenReturn(POWER_ON_DATA);
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(ByteArrayUtil.fromHex("6D00"));
     when(readerSpi.isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
     when(readerSpi.isCurrentProtocol(CARD_PROTOCOL)).thenReturn(true);
@@ -126,7 +126,7 @@ public class LocalReaderAdapterTest {
             MultiSelectionProcessing.FIRST_MATCH,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnDataBytes())
         .isEqualTo(POWER_ON_DATA);
     assertThat(cardSelectionResponses.get(0).getSelectionStatus().hasMatched()).isTrue();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isTrue();
@@ -148,7 +148,7 @@ public class LocalReaderAdapterTest {
             MultiSelectionProcessing.PROCESS_ALL,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnDataBytes())
         .isEqualTo(POWER_ON_DATA);
     assertThat(cardSelectionResponses.get(0).getSelectionStatus().hasMatched()).isTrue();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isFalse();
@@ -171,7 +171,7 @@ public class LocalReaderAdapterTest {
             MultiSelectionProcessing.FIRST_MATCH,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnDataBytes())
         .isEqualTo(POWER_ON_DATA);
     assertThat(cardSelectionResponses.get(0).getSelectionStatus().hasMatched()).isFalse();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isFalse();
@@ -194,7 +194,7 @@ public class LocalReaderAdapterTest {
             MultiSelectionProcessing.FIRST_MATCH,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnDataBytes())
         .isEqualTo(POWER_ON_DATA);
     assertThat(cardSelectionResponses.get(0).getSelectionStatus().hasMatched()).isFalse();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isFalse();
@@ -219,7 +219,7 @@ public class LocalReaderAdapterTest {
             MultiSelectionProcessing.FIRST_MATCH,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnDataBytes())
         .isEqualTo(POWER_ON_DATA);
     assertThat(cardSelectionResponses.get(0).getSelectionStatus().getFci().getBytes())
         .isEqualTo(selectResponseApdu);
@@ -246,7 +246,7 @@ public class LocalReaderAdapterTest {
             MultiSelectionProcessing.FIRST_MATCH,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnDataBytes())
         .isEqualTo(POWER_ON_DATA);
     assertThat(cardSelectionResponses.get(0).getSelectionStatus().getFci().getBytes())
         .isEqualTo(selectResponseApdu);
@@ -275,7 +275,7 @@ public class LocalReaderAdapterTest {
             MultiSelectionProcessing.FIRST_MATCH,
             ChannelControl.CLOSE_AFTER);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnData())
+    assertThat(cardSelectionResponses.get(0).getSelectionStatus().getPowerOnDataBytes())
         .isEqualTo(POWER_ON_DATA);
     assertThat(cardSelectionResponses.get(0).getSelectionStatus().getFci().getBytes())
         .isEqualTo(selectResponseApdu);

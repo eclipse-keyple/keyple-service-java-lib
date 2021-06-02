@@ -71,7 +71,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
       logger.debug(
           "The reader '{}' is notifying the reader event '{}' to {} observers.",
           getName(),
-          event.getEventType().name(),
+          event.getType().name(),
           countObservers());
     }
 
@@ -166,7 +166,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
     super.unregister();
     try {
       notifyObservers(
-          new ReaderEvent(getPluginName(), getName(), ReaderEvent.EventType.UNAVAILABLE, null));
+          new ReaderEventAdapter(getPluginName(), getName(), ReaderEvent.Type.UNAVAILABLE, null));
       stopCardDetection();
     } finally {
       clearObservers();

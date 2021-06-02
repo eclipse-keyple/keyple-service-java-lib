@@ -63,7 +63,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
 
   /**
    * (package-private)<br>
-   * Notifies all registered observers with the provided {@link PluginEvent}.
+   * Notifies all registered observers with the provided {@link PluginEventAdapter}.
    *
    * <p>This method never throws an exception. Any errors at runtime are notified to the application
    * using the exception handler.
@@ -77,7 +77,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
       logger.debug(
           "The plugin '{}' is notifying the plugin event '{}' to {} observers.",
           getName(),
-          event.getEventType().name(),
+          event.getType().name(),
           countObservers());
     }
 
@@ -133,8 +133,8 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
     Set<String> unregisteredReaderNames = new HashSet<String>(this.getReaderNames());
     super.unregister();
     notifyObservers(
-        new PluginEvent(
-            this.getName(), unregisteredReaderNames, PluginEvent.EventType.UNAVAILABLE));
+        new PluginEventAdapter(
+            this.getName(), unregisteredReaderNames, PluginEvent.Type.UNAVAILABLE));
     clearObservers();
   }
 

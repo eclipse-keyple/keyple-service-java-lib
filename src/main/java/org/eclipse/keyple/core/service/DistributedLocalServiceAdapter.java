@@ -136,7 +136,7 @@ final class DistributedLocalServiceAdapter
       logger.debug(
           "The distributed local service '{}' is forwarding the plugin event '{}' associated to the local reader '{}' of the local plugin '{}'.",
           name,
-          pluginEvent.getEventType().name(),
+          pluginEvent.getType().name(),
           pluginEvent.getReaderNames().first(),
           pluginEvent.getPluginName());
     }
@@ -159,7 +159,7 @@ final class DistributedLocalServiceAdapter
       logger.debug(
           "The distributed local service '{}' is forwarding the reader event '{}' associated to the local reader '{}' of the local plugin '{}'.",
           name,
-          readerEvent.getEventType().name(),
+          readerEvent.getType().name(),
           readerEvent.getReaderName(),
           ((ReaderEvent) readerEvent).getPluginName());
     }

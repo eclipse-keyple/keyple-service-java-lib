@@ -190,16 +190,15 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
      * (private)<br>
      * Notifies observers of changes in the list of readers
      */
-    private void notifyChanges(
-        PluginEvent.EventType eventType, SortedSet<String> changedReaderNames) {
+    private void notifyChanges(PluginEvent.Type type, SortedSet<String> changedReaderNames) {
       /* grouped notification */
       if (logger.isTraceEnabled()) {
         logger.trace(
             "Notifying {}(s): {}",
-            eventType == PluginEvent.EventType.READER_CONNECTED ? "connection" : "disconnection",
+            type == PluginEvent.Type.READER_CONNECTED ? "connection" : "disconnection",
             changedReaderNames);
       }
-      notifyObservers(new PluginEvent(pluginName, changedReaderNames, eventType));
+      notifyObservers(new PluginEventAdapter(pluginName, changedReaderNames, type));
     }
 
     /**
@@ -231,7 +230,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
             removeReader(reader);
           }
         }
-        notifyChanges(PluginEvent.EventType.READER_DISCONNECTED, changedReaderNames);
+        notifyChanges(PluginEvent.Type.READER_DISCONNECTED, changedReaderNames);
         /* clean the list for a possible connection notification */
         changedReaderNames.clear();
       }
@@ -248,7 +247,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       }
       /* notify connections if any */
       if (!changedReaderNames.isEmpty()) {
-        notifyChanges(PluginEvent.EventType.READER_CONNECTED, changedReaderNames);
+        notifyChanges(PluginEvent.Type.READER_CONNECTED, changedReaderNames);
       }
     }
 
