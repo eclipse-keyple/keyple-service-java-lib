@@ -12,20 +12,26 @@
 package org.eclipse.keyple.core.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.keyple.core.card.*;
+import org.calypsonet.terminal.card.*;
+import org.calypsonet.terminal.card.spi.CardRequestSpi;
+import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
+import org.calypsonet.terminal.reader.ReaderCommunicationException;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
-import org.eclipse.keyple.core.service.selection.MultiSelectionProcessing;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class AbstractReaderAdapterTest {
   private LocalReaderAdapterTest.ReaderSpiMock readerSpi;
 
   AbstractReaderAdapter readerAdapter;
+
+  CardRequestSpi cardRequestSpi;
 
   private static final String PLUGIN_NAME = "plugin";
   private static final String READER_NAME = "reader";
@@ -37,23 +43,22 @@ public class AbstractReaderAdapterTest {
   @Before
   public void setUp() throws Exception {
     readerSpi = mock(LocalReaderAdapterTest.ReaderSpiMock.class);
+    cardRequestSpi = mock(CardRequestSpi.class);
+    readerAdapter = new DefaultAbstractReaderAdapter(READER_NAME, readerSpi, PLUGIN_NAME);
   }
 
   @Test
   public void getPluginName_shouldReturnPluginName() {
-    readerAdapter = new DefaultAbstractReaderAdapter(READER_NAME, readerSpi, PLUGIN_NAME);
     assertThat(readerAdapter.getPluginName()).isEqualTo(PLUGIN_NAME);
   }
 
   @Test
   public void getName_shouldReturnReaderName() {
-    readerAdapter = new DefaultAbstractReaderAdapter(READER_NAME, readerSpi, PLUGIN_NAME);
     assertThat(readerAdapter.getName()).isEqualTo(READER_NAME);
   }
 
   @Test
   public void getExtension_whenReaderIsRegistered_shouldReturnExtension() {
-    readerAdapter = new DefaultAbstractReaderAdapter(READER_NAME, readerSpi, PLUGIN_NAME);
     readerAdapter.register();
     assertThat(readerAdapter.getExtension(LocalReaderAdapterTest.ReaderSpiMock.class))
         .isEqualTo(readerSpi);
@@ -61,31 +66,47 @@ public class AbstractReaderAdapterTest {
 
   @Test(expected = IllegalStateException.class)
   public void getExtension_whenReaderIsNotRegistered_shouldISE() {
-    readerAdapter = new DefaultAbstractReaderAdapter(READER_NAME, readerSpi, PLUGIN_NAME);
     readerAdapter.getExtension(LocalReaderAdapterTest.ReaderSpiMock.class);
   }
 
-  static class DefaultAbstractReaderAdapter extends AbstractReaderAdapter {
+  @Test(expected = IllegalStateException.class)
+  public void transmitCardRequest_whenReaderIsNotRegistered_shouldISE()
+      throws UnexpectedStatusWordException, ReaderBrokenCommunicationException,
+          CardBrokenCommunicationException {
+    readerAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.KEEP_OPEN);
+  }
+
+  @Test
+  public void transmitCardRequest_shouldInvoke_processCardRequest()
+      throws UnexpectedStatusWordException, ReaderBrokenCommunicationException,
+          CardBrokenCommunicationException {
+    readerAdapter = Mockito.spy(readerAdapter);
+    readerAdapter.register();
+    readerAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.KEEP_OPEN);
+    verify(readerAdapter, times(1)).processCardRequest(cardRequestSpi, ChannelControl.KEEP_OPEN);
+  }
+
+  private static class DefaultAbstractReaderAdapter extends AbstractReaderAdapter {
 
     DefaultAbstractReaderAdapter(String readerName, Object readerExtension, String pluginName) {
       super(readerName, readerExtension, pluginName);
     }
 
     @Override
-    List<CardSelectionResponse> processCardSelectionRequests(
-        List<CardSelectionRequest> cardSelectionRequests,
+    List<CardSelectionResponseApi> processCardSelectionRequests(
+        List<CardSelectionRequestSpi> cardSelectionRequests,
         MultiSelectionProcessing multiSelectionProcessing,
         ChannelControl channelControl)
-        throws ReaderCommunicationException, CardCommunicationException,
-            UnexpectedStatusCodeException {
-      return null;
+        throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+            UnexpectedStatusWordException {
+      return new ArrayList<CardSelectionResponseApi>();
     }
 
     @Override
-    CardResponse processCardRequest(CardRequest cardRequest, ChannelControl channelControl)
-        throws ReaderCommunicationException, CardCommunicationException,
-            UnexpectedStatusCodeException {
-      return null;
+    CardResponseApi processCardRequest(CardRequestSpi cardRequest, ChannelControl channelControl)
+        throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+            UnexpectedStatusWordException {
+      return Mockito.mock(CardResponseApi.class);
     }
 
     @Override

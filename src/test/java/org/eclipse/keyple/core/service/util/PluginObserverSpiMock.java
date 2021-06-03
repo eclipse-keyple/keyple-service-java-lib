@@ -18,8 +18,8 @@ import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 
 public class PluginObserverSpiMock implements PluginObserverSpi {
 
-  Map<PluginEvent.EventType, PluginEvent> eventTypeReceived =
-      new ConcurrentHashMap<PluginEvent.EventType, PluginEvent>();
+  Map<PluginEvent.Type, PluginEvent> eventTypeReceived =
+      new ConcurrentHashMap<PluginEvent.Type, PluginEvent>();
   RuntimeException throwEx;
 
   public PluginObserverSpiMock(RuntimeException e) {
@@ -28,17 +28,17 @@ public class PluginObserverSpiMock implements PluginObserverSpi {
 
   @Override
   public void onPluginEvent(PluginEvent pluginEvent) {
-    eventTypeReceived.put(pluginEvent.getEventType(), pluginEvent);
+    eventTypeReceived.put(pluginEvent.getType(), pluginEvent);
     if (throwEx != null) {
       throw throwEx;
     }
   }
 
-  public Boolean hasReceived(PluginEvent.EventType eventType) {
+  public Boolean hasReceived(PluginEvent.Type eventType) {
     return eventTypeReceived.keySet().contains(eventType);
   }
 
-  public PluginEvent getLastEventOfType(PluginEvent.EventType eventType) {
+  public PluginEvent getLastEventOfType(PluginEvent.Type eventType) {
     return eventTypeReceived.get(eventType);
   }
 }

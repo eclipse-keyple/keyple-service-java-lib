@@ -13,14 +13,17 @@ package org.eclipse.keyple.core.service;
 
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN_NAME;
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER_NAME_1;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
-import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.util.ObservableReaderAutonomousSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,18 +34,24 @@ public class ObservableLocalReaderAutonomousAdapterTest {
   ObservableLocalReaderAdapter reader;
   ObservableReaderAutonomousSpiMock readerSpi;
   ReaderObserverSpiMock observer;
-  ReaderObservationExceptionHandlerSpi handler;
+  CardReaderObservationExceptionHandlerSpi handler;
   ObservableLocalReaderSuiteTest testSuite;
+  ExecutorService notificationExecutorService;
   /*
    *  With ObservableReaderAutonomousSpi
    */
   @Before
   public void seTup() {
+    notificationExecutorService = Executors.newSingleThreadExecutor();
     readerSpi = new ObservableReaderAutonomousSpiMock(READER_NAME_1);
-    handler = mock(ReaderObservationExceptionHandlerSpi.class);
+    handler = Mockito.spy(CardReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
     observer = new ReaderObserverSpiMock(null);
     testSuite = new ObservableLocalReaderSuiteTest(reader, readerSpi, observer, handler, logger);
+
+    // test with event notification executor service
+    reader.register();
+    reader.setEventNotificationExecutorService(notificationExecutorService);
   }
 
   @After
@@ -67,7 +76,7 @@ public class ObservableLocalReaderAutonomousAdapterTest {
 
   @Test
   public void insertCard_shouldNotify_CardInsertedEvent() {
-    testSuite.insertCard_shouldNotify_CardInsertedEvent();
+    testSuite.insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
   }
 
   @Test
@@ -83,5 +92,16 @@ public class ObservableLocalReaderAutonomousAdapterTest {
   @Test
   public void removeCard_beforeFinalize_shouldNotify_CardRemoved() {
     testSuite.removeCard_beforeFinalize_shouldNotify_CardRemoved();
+  }
+
+  /*
+   * Method of ObservableLocalReaderAdapter
+   */
+  @Test
+  public void observerThrowsError_shouldBe_transferTo_handler() {
+    RuntimeException e = new RuntimeException();
+    testSuite.setObserver(new ReaderObserverSpiMock(e));
+    testSuite.insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
+    verify(handler, times(1)).onReaderObservationError(anyString(), eq(READER_NAME_1), eq(e));
   }
 }

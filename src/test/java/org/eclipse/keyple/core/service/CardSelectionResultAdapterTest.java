@@ -15,8 +15,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
-import org.eclipse.keyple.core.card.spi.SmartCardSpi;
-import org.eclipse.keyple.core.service.selection.spi.SmartCard;
+import org.calypsonet.terminal.card.spi.SmartCardSpi;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.junit.Before;
 import org.junit.Test;
 

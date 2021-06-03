@@ -13,13 +13,14 @@ package org.eclipse.keyple.core.service.util;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.calypsonet.terminal.reader.CardReaderEvent;
+import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.service.ReaderEvent;
-import org.eclipse.keyple.core.service.spi.ReaderObserverSpi;
 
-public class ReaderObserverSpiMock implements ReaderObserverSpi {
+public class ReaderObserverSpiMock implements CardReaderObserverSpi {
 
-  Map<ReaderEvent.EventType, ReaderEvent> eventTypeReceived =
-      new ConcurrentHashMap<ReaderEvent.EventType, ReaderEvent>();
+  Map<CardReaderEvent.Type, CardReaderEvent> eventTypeReceived =
+      new ConcurrentHashMap<CardReaderEvent.Type, CardReaderEvent>();
   RuntimeException throwEx;
 
   public ReaderObserverSpiMock(RuntimeException e) {
@@ -27,18 +28,18 @@ public class ReaderObserverSpiMock implements ReaderObserverSpi {
   }
 
   @Override
-  public void onReaderEvent(ReaderEvent readerEvent) {
-    eventTypeReceived.put(readerEvent.getEventType(), readerEvent);
+  public void onReaderEvent(CardReaderEvent readerEvent) {
+    eventTypeReceived.put(readerEvent.getType(), readerEvent);
     if (throwEx != null) {
       throw throwEx;
     }
   }
 
-  public Boolean hasReceived(ReaderEvent.EventType eventType) {
+  public Boolean hasReceived(ReaderEvent.Type eventType) {
     return eventTypeReceived.keySet().contains(eventType);
   }
 
-  public ReaderEvent getLastEventOfType(ReaderEvent.EventType eventType) {
+  public CardReaderEvent getLastEventOfType(ReaderEvent.Type eventType) {
     return eventTypeReceived.get(eventType);
   }
 }

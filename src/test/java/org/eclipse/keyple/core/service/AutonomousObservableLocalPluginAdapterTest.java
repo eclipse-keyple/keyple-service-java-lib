@@ -13,8 +13,8 @@ package org.eclipse.keyple.core.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.eclipse.keyple.core.service.PluginEvent.EventType.READER_CONNECTED;
-import static org.eclipse.keyple.core.service.PluginEvent.EventType.READER_DISCONNECTED;
+import static org.eclipse.keyple.core.service.PluginEvent.Type.READER_CONNECTED;
+import static org.eclipse.keyple.core.service.PluginEvent.Type.READER_DISCONNECTED;
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.*;
 
 import java.util.HashSet;
@@ -95,7 +95,7 @@ public class AutonomousObservableLocalPluginAdapterTest {
   /*
    * Private Helpers
    */
-  private Callable<Boolean> eventOfTypeIsReceived(final PluginEvent.EventType eventType) {
+  private Callable<Boolean> eventOfTypeIsReceived(final PluginEvent.Type eventType) {
     return new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {

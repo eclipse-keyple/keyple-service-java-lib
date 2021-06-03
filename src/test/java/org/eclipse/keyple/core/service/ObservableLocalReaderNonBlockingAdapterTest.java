@@ -18,7 +18,7 @@ import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER
 import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.TimeUnit;
-import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
+import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.util.ObservableReaderNonBlockingSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
 import org.junit.After;
@@ -35,7 +35,7 @@ public class ObservableLocalReaderNonBlockingAdapterTest {
   ObservableLocalReaderAdapter reader;
   ObservableReaderNonBlockingSpiMock readerSpi;
   ReaderObserverSpiMock observer;
-  ReaderObservationExceptionHandlerSpi handler;
+  CardReaderObservationExceptionHandlerSpi handler;
   ObservableLocalReaderSuiteTest testSuite;
 
   /*
@@ -47,7 +47,7 @@ public class ObservableLocalReaderNonBlockingAdapterTest {
   @Before
   public void seTup() {
     readerSpi = new ObservableReaderNonBlockingSpiMock(READER_NAME_1);
-    handler = mock(ReaderObservationExceptionHandlerSpi.class);
+    handler = mock(CardReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
     observer = new ReaderObserverSpiMock(null);
     testSuite = new ObservableLocalReaderSuiteTest(reader, readerSpi, observer, handler, logger);
@@ -75,7 +75,7 @@ public class ObservableLocalReaderNonBlockingAdapterTest {
 
   @Test
   public void insertCard_shouldNotify_CardInsertedEvent() {
-    testSuite.insertCard_shouldNotify_CardInsertedEvent();
+    testSuite.insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
   }
 
   @Test

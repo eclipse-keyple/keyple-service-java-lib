@@ -107,7 +107,7 @@ public class ObservableReaderBlockingSpiMock
   }
 
   @Override
-  public byte[] getAtr() {
+  public byte[] getPowerOnDataBytes() {
     return new byte[0];
   }
 

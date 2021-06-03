@@ -13,12 +13,12 @@ package org.eclipse.keyple.core.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN_NAME;
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER_NAME_1;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
+import org.calypsonet.terminal.reader.CardReaderEvent;
+import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.util.ObservableReaderSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
 import org.slf4j.Logger;
@@ -28,14 +28,14 @@ public class ObservableLocalReaderSuiteTest {
   private ObservableLocalReaderAdapter reader;
   private ObservableReaderSpiMock readerSpi;
   private ReaderObserverSpiMock observer;
-  private ReaderObservationExceptionHandlerSpi handler;
+  private CardReaderObservationExceptionHandlerSpi handler;
   private Logger logger;
 
   ObservableLocalReaderSuiteTest(
       ObservableLocalReaderAdapter reader,
       ObservableReaderSpiMock readerSpi,
       ReaderObserverSpiMock observer,
-      ReaderObservationExceptionHandlerSpi handler,
+      CardReaderObservationExceptionHandlerSpi handler,
       Logger logger) {
     this.reader = reader;
     this.readerSpi = readerSpi;
@@ -46,7 +46,6 @@ public class ObservableLocalReaderSuiteTest {
 
   // @Test
   public void initReader_addObserver_startDetection() {
-    reader.register();
 
     assertThat(reader.getCurrentMonitoringState())
         .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_START_DETECTION);
@@ -79,7 +78,7 @@ public class ObservableLocalReaderSuiteTest {
   }
 
   // @Test
-  public void insertCard_shouldNotify_CardInsertedEvent() {
+  public void insertCard_onWaitForCard_shouldNotify_CardInsertedEvent() {
     initReader_addObserver_startDetection();
     logger.debug("Insert card...");
     readerSpi.setCardPresent(true);
@@ -89,14 +88,13 @@ public class ObservableLocalReaderSuiteTest {
         .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING));
 
     // check event is well formed
-    ReaderEvent event = observer.getLastEventOfType(ReaderEvent.EventType.CARD_INSERTED);
+    CardReaderEvent event = observer.getLastEventOfType(CardReaderEvent.Type.CARD_INSERTED);
     assertThat(event.getReaderName()).isEqualTo(READER_NAME_1);
-    assertThat(event.getPluginName()).isEqualTo(PLUGIN_NAME);
   }
 
   // @Test
   public void finalizeCardProcessing_afterInsert_switchState() {
-    insertCard_shouldNotify_CardInsertedEvent();
+    insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
 
     logger.debug("Finalize processing...");
     reader.finalizeCardProcessing();
@@ -118,14 +116,13 @@ public class ObservableLocalReaderSuiteTest {
         .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION));
 
     // check event is well formed
-    ReaderEvent event = observer.getLastEventOfType(ReaderEvent.EventType.CARD_REMOVED);
+    CardReaderEvent event = observer.getLastEventOfType(ReaderEvent.Type.CARD_REMOVED);
     assertThat(event.getReaderName()).isEqualTo(READER_NAME_1);
-    assertThat(event.getPluginName()).isEqualTo(PLUGIN_NAME);
   }
 
   // @Test
   public void removeCard_beforeFinalize_shouldNotify_CardRemoved() {
-    insertCard_shouldNotify_CardInsertedEvent();
+    insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
 
     logger.debug("Remove card...");
     readerSpi.setCardPresent(false);
@@ -135,16 +132,15 @@ public class ObservableLocalReaderSuiteTest {
         .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION));
 
     // check event is well formed
-    ReaderEvent event = observer.getLastEventOfType(ReaderEvent.EventType.CARD_REMOVED);
+    CardReaderEvent event = observer.getLastEventOfType(CardReaderEvent.Type.CARD_REMOVED);
     assertThat(event.getReaderName()).isEqualTo(READER_NAME_1);
-    assertThat(event.getPluginName()).isEqualTo(PLUGIN_NAME);
   }
 
   /*
    * Callables
    */
 
-  private Callable<Boolean> eventOfTypeIsReceived(final ReaderEvent.EventType eventType) {
+  private Callable<Boolean> eventOfTypeIsReceived(final ReaderEvent.Type eventType) {
     return new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
@@ -163,5 +159,9 @@ public class ObservableLocalReaderSuiteTest {
         return reader.getCurrentMonitoringState().equals(monitoringState);
       }
     };
+  }
+
+  void setObserver(ReaderObserverSpiMock observer) {
+    this.observer = observer;
   }
 }

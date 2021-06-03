@@ -15,7 +15,7 @@ import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER_NAME_1;
 import static org.mockito.Mockito.mock;
 
-import org.eclipse.keyple.core.service.spi.ReaderObservationExceptionHandlerSpi;
+import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.util.ObservableReaderBlockingSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
 import org.junit.After;
@@ -32,7 +32,7 @@ public class ObservableLocalReaderBlockingAdapterTest {
   ObservableLocalReaderAdapter reader;
   ObservableReaderBlockingSpiMock readerSpi;
   ReaderObserverSpiMock observer;
-  ReaderObservationExceptionHandlerSpi handler;
+  CardReaderObservationExceptionHandlerSpi handler;
   ObservableLocalReaderSuiteTest testSuite;
 
   long waitInsertion = 1000;
@@ -47,7 +47,7 @@ public class ObservableLocalReaderBlockingAdapterTest {
   @Before
   public void seTup() {
     readerSpi = new ObservableReaderBlockingSpiMock(READER_NAME_1, waitInsertion, waitRemoval);
-    handler = mock(ReaderObservationExceptionHandlerSpi.class);
+    handler = mock(CardReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
     observer = new ReaderObserverSpiMock(null);
     testSuite = new ObservableLocalReaderSuiteTest(reader, readerSpi, observer, handler, logger);
@@ -75,7 +75,7 @@ public class ObservableLocalReaderBlockingAdapterTest {
 
   @Test
   public void insertCard_shouldNotify_CardInsertedEvent() {
-    testSuite.insertCard_shouldNotify_CardInsertedEvent();
+    testSuite.insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
   }
 
   @Test
@@ -90,7 +90,7 @@ public class ObservableLocalReaderBlockingAdapterTest {
 
   @Test
   public void removeCard_beforeFinalize_shouldNotify_CardRemoved() {
-    // falky
+    // flaky?
     testSuite.removeCard_beforeFinalize_shouldNotify_CardRemoved();
   }
 }

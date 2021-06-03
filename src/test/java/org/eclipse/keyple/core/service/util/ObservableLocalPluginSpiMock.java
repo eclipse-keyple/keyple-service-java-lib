@@ -54,7 +54,7 @@ public class ObservableLocalPluginSpiMock implements ObservablePluginSpi {
    * @since 2.0
    */
   @Override
-  public Set<String> searchAvailableReadersNames() throws PluginIOException {
+  public Set<String> searchAvailableReaderNames() throws PluginIOException {
     if (pluginError != null) {
       throw pluginError;
     }
