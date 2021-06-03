@@ -51,6 +51,7 @@ public class ObservableLocalReaderBlockingAdapterTest {
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
     observer = new ReaderObserverSpiMock(null);
     testSuite = new ObservableLocalReaderSuiteTest(reader, readerSpi, observer, handler, logger);
+    reader.register();
   }
 
   @After
