@@ -312,8 +312,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
           plugin = createRemotePlugin((RemotePluginFactorySpi) pluginFactory);
 
         } else {
-          throw new IllegalArgumentException(
-              "The factory must implement one and only one of those SPI interfaces : PluginFactorySpi, PoolPluginFactorySpi or RemotePluginFactorySpi.");
+          throw new IllegalArgumentException("The factory doesn't implement the right SPI.");
         }
 
         plugin.register();
@@ -500,8 +499,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     DistributedLocalServiceAdapter distributedLocalService;
     try {
       if (!(distributedLocalServiceExtensionFactory instanceof LocalServiceFactorySpi)) {
-        throw new IllegalArgumentException(
-            "A factory for a Distributed Local Service must implement the interface : LocalServiceFactorySpi.");
+        throw new IllegalArgumentException("The factory doesn't implement the right SPI.");
       }
 
       LocalServiceFactorySpi factory =

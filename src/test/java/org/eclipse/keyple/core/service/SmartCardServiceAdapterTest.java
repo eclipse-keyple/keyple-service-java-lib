@@ -229,7 +229,7 @@ public class SmartCardServiceAdapterTest {
 
   @Test
   public void getInstance_whenIsInvokedTwice_shouldReturnSameInstance() {
-    assertThat(SmartCardServiceAdapter.getInstance()).isNotNull();
+    assertThat(SmartCardServiceAdapter.getInstance()).isEqualTo(service);
   }
 
   // Register regular plugin

@@ -200,11 +200,6 @@ final class ObservableReaderStateServiceAdapter {
     // switch currentState
     currentState = this.states.get(stateId);
 
-    /*
-    if (logger.isTraceEnabled()) {
-        logger.trace(
-            "[{}] New currentState {}", this.reader.getName(), currentState.getMonitoringState());
-      }*/
     // onActivate the new current state
     currentState.onActivate();
   }

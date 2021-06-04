@@ -72,7 +72,7 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
   void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[{}] on Internal Event => Event {} received in currentState {}",
+          "[{}] onInternalEvent => Event {} received in currentState {}",
           getReader().getName(),
           event,
           getMonitoringState());

@@ -53,7 +53,7 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
    */
   @Override
   public void onReaderConnected(Set<ReaderSpi> readers) {
-    Assert.getInstance().notNull(readers, "readers");
+    Assert.getInstance().notEmpty(readers, "readers");
     Set<String> notifyReaders = new HashSet<String>();
 
     for (ReaderSpi readerSpi : readers) {
@@ -73,7 +73,7 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
    */
   @Override
   public void onReaderDisconnected(Set<String> readerNames) {
-    Assert.getInstance().notNull(readerNames, "readerNames");
+    Assert.getInstance().notEmpty(readerNames, "readerNames");
     Set<String> notifyReaders = new HashSet<String>();
 
     for (String readerName : readerNames) {
