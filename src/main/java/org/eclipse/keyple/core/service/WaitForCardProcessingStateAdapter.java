@@ -72,7 +72,7 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
   void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[{}] onEvent => Event {} received in currentState {}",
+          "[{}] onInternalEvent => Event {} received in currentState {}",
           getReader().getName(),
           event,
           getMonitoringState());

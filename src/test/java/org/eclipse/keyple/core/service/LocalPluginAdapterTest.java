@@ -12,6 +12,7 @@
 package org.eclipse.keyple.core.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,11 +33,6 @@ public class LocalPluginAdapterTest {
   private ReaderSpi readerSpi1;
   private ReaderSpi readerSpi2;
   private ObservableReaderSpiMock observableReader;
-
-  private static final String PLUGIN_NAME = "plugin";
-  private static final String READER_NAME_1 = "reader1";
-  private static final String READER_NAME_2 = "reader2";
-  private static final String OBSERVABLE_READER_NAME = "observableReader";
 
   interface PluginSpiMock extends KeyplePluginExtension, PluginSpi {}
 

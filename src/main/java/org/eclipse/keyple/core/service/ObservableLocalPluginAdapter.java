@@ -283,7 +283,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
         getObservationManager()
             .getObservationExceptionHandler()
             .onPluginObservationError(
-                getName(),
+                pluginName,
                 new KeyplePluginException("An error occurred while monitoring the readers.", e));
       }
     }

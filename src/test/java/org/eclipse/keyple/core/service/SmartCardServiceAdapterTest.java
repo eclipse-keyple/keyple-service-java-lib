@@ -269,6 +269,11 @@ public class SmartCardServiceAdapterTest {
     service.registerPlugin(null);
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void registerPlugin_whenFactoryDoesNotImplementSpi_shouldThrowIAE() {
+    service.registerPlugin(new KeyplePluginExtensionFactory() {});
+  }
+
   @Test
   public void registerPlugin_whenFactoryPluginNameMismatchesPluginName_shouldIAE_and_notRegister() {
     when(pluginFactory.getPluginName()).thenReturn("otherPluginName");

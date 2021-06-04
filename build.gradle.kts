@@ -44,6 +44,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core:2.28.2")
     testImplementation("org.powermock:powermock-api-mockito2:2.0.9")
     testImplementation("org.powermock:powermock-module-junit4:2.0.9")
+    testImplementation("org.awaitility:awaitility:4.0.3")
 }
 
 val javaSourceLevel: String by project

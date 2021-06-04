@@ -72,7 +72,7 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
   void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[{}] onEvent => Event {} received in currentState {}",
+          "[{}] onInternalEvent => Event {} received in currentState {}",
           getReader().getName(),
           event,
           getMonitoringState());
@@ -94,7 +94,8 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
           // stay in the same state, however switch to WAIT_FOR_CARD_INSERTION to relaunch
           // the monitoring job
           if (logger.isTraceEnabled()) {
-            logger.trace("[{}] onEvent => Inserted card hasn't matched", getReader().getName());
+            logger.trace(
+                "[{}] onInternalEvent => Inserted card hasn't matched", getReader().getName());
           }
           switchState(MonitoringState.WAIT_FOR_CARD_REMOVAL);
         }

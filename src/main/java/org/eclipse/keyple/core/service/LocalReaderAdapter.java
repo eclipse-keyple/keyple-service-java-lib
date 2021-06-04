@@ -265,6 +265,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *
    * @since 2.0
    */
+  @Override
   public final void deactivateProtocol(String readerProtocol) {
     checkStatus();
     Assert.getInstance().notEmpty(readerProtocol, "readerProtocol");
