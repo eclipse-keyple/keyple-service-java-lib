@@ -110,7 +110,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
               cardSelectionRequests, multiSelectionProcessing, channelControl);
     } catch (UnexpectedStatusWordException e) {
       throw new CardBrokenCommunicationException(
-          e.getCardResponse(), "An unexpected status word was received.", e);
+          e.getCardResponse(), false, "An unexpected status word was received.", e);
     } finally {
       if (logger.isDebugEnabled()) {
         long timeStamp = System.nanoTime();

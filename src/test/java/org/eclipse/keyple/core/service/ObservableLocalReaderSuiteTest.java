@@ -18,6 +18,7 @@ import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import org.calypsonet.terminal.reader.CardReaderEvent;
+import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.util.ObservableReaderSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
@@ -52,7 +53,7 @@ public class ObservableLocalReaderSuiteTest {
 
     reader.setReaderObservationExceptionHandler(handler);
     reader.addObserver(observer);
-    reader.startCardDetection(ObservableReader.PollingMode.REPEATING);
+    reader.startCardDetection(ObservableCardReader.DetectionMode.REPEATING);
     assertThat(reader.countObservers()).isEqualTo(1);
 
     assertThat(reader.getCurrentMonitoringState())

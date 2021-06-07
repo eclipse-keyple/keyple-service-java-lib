@@ -16,9 +16,8 @@ import static org.eclipse.keyple.core.service.examples.common.ConfigurationUtil.
 
 import org.calypsonet.terminal.reader.selection.CardSelectionResult;
 import org.calypsonet.terminal.reader.selection.CardSelectionService;
-import org.calypsonet.terminal.reader.selection.spi.CardSelection;
-import org.calypsonet.terminal.reader.selection.spi.CardSelector;
 import org.calypsonet.terminal.reader.selection.spi.SmartCard;
+import org.eclipse.keyple.card.generic.GenericCardSelection;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
 import org.eclipse.keyple.core.service.*;
 import org.eclipse.keyple.core.service.examples.common.ConfigurationUtil;
@@ -90,12 +89,11 @@ public class Main_SequentialMultiSelection_Pcsc {
 
     // AID based selection: get the first application occurrence matching the AID, keep the
     // physical channel open
-    CardSelection cardSelection =
-        cardExtension.createCardSelection(
-            cardExtension
-                .createCardSelector()
-                .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
-                .setFileOccurrence(CardSelector.FileOccurrence.FIRST));
+    GenericCardSelection cardSelection =
+        cardExtension
+            .createCardSelection()
+            .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
+            .setFileOccurrence(GenericCardSelection.FileOccurrence.FIRST);
 
     // Prepare the selection by adding the created generic selection to the card selection scenario.
     selectionService.prepareSelection(cardSelection);
@@ -106,11 +104,10 @@ public class Main_SequentialMultiSelection_Pcsc {
     // New selection: get the next application occurrence matching the same AID, close the
     // physical channel after
     cardSelection =
-        cardExtension.createCardSelection(
-            cardExtension
-                .createCardSelector()
-                .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
-                .setFileOccurrence(CardSelector.FileOccurrence.NEXT));
+        cardExtension
+            .createCardSelection()
+            .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
+            .setFileOccurrence(GenericCardSelection.FileOccurrence.NEXT);
 
     // Prepare the selection by adding the created generic selection to the card selection scenario.
     selectionService.prepareSelection(cardSelection);
@@ -139,19 +136,17 @@ public class Main_SequentialMultiSelection_Pcsc {
       Reader reader, CardSelectionService cardSelectionsService, int index) {
     CardSelectionResult cardSelectionsResult =
         cardSelectionsService.processCardSelectionScenario(reader);
-    if (cardSelectionsResult.hasActiveSelection()) {
+    if (cardSelectionsResult.getActiveSmartCard() != null) {
       SmartCard smartCard = cardSelectionsResult.getActiveSmartCard();
       logger.info("The card matched the selection {}.", index);
-      String powerOnData =
-          smartCard.hasPowerOnData()
-              ? ByteArrayUtil.toHex(smartCard.getPowerOnDataBytes())
-              : "no power-on data";
-      String fci = smartCard.hasFci() ? ByteArrayUtil.toHex(smartCard.getFciBytes()) : "no FCI";
+      String powerOnData = smartCard.getPowerOnData();
+      String selectApplicationResponse =
+          ByteArrayUtil.toHex(smartCard.getSelectApplicationResponse());
       logger.info(
-          "Selection status for case {}: \n\t\tpower-on data: {}\n\t\tFCI: {}",
+          "Selection status for case {}: \n\t\tpower-on data: {}\n\t\tSelect Application response: {}",
           index,
           powerOnData,
-          fci);
+          selectApplicationResponse);
     } else {
       logger.info("The selection did not match for case {}.", index);
     }

@@ -282,9 +282,9 @@ final class DistributedUtilAdapter {
     /**
      * Refers to {@link
      * ObservableLocalReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
-     * ObservableReader.NotificationMode, ObservableReader.PollingMode)} and {@link
+     * ObservableReader.NotificationMode, ObservableReader.DetectionMode)} and {@link
      * ObservableRemoteReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
-     * ObservableReader.NotificationMode, ObservableReader.PollingMode)}
+     * ObservableReader.NotificationMode, ObservableReader.DetectionMode)}
      *
      * @since 2.0
      */
@@ -305,14 +305,14 @@ final class DistributedUtilAdapter {
     IS_CONTACTLESS,
 
     /**
-     * Refers to {@link ObservableReader#startCardDetection(ObservableReader.PollingMode)}
+     * Refers to {@link ObservableReader#startCardDetection(ObservableReader.DetectionMode)}
      *
      * @since 2.0
      */
     START_CARD_DETECTION,
 
     /**
-     * Refers to {@link ObservableReader#startCardDetection(ObservableReader.PollingMode)}
+     * Refers to {@link ObservableReader#startCardDetection(ObservableReader.DetectionMode)}
      *
      * @since 2.0
      */

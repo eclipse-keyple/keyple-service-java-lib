@@ -121,7 +121,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   void scheduleCardSelectionScenario(
       CardSelectionScenarioAdapter cardSelectionScenario,
       ObservableReader.NotificationMode notificationMode,
-      ObservableReader.PollingMode pollingMode) {
+      ObservableReader.DetectionMode pollingMode) {
 
     checkStatus();
 
@@ -220,7 +220,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    * @since 2.0
    */
   @Override
-  public void startCardDetection(PollingMode pollingMode) {
+  public void startCardDetection(DetectionMode pollingMode) {
 
     checkStatus();
     if (logger.isDebugEnabled()) {

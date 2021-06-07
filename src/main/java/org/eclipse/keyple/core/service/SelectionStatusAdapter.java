@@ -12,74 +12,60 @@
 package org.eclipse.keyple.core.service;
 
 import org.calypsonet.terminal.card.ApduResponseApi;
-import org.calypsonet.terminal.card.SelectionStatusApi;
-import org.eclipse.keyple.core.util.json.JsonUtil;
 
 /**
+ * (package-private)<br>
  * This POJO contains the card selection status.
  *
  * @since 2.0
  */
-public class SelectionStatusAdapter implements SelectionStatusApi {
-  private final byte[] powerOnData;
-  private final ApduResponseApi fci;
+class SelectionStatus {
+  private final String powerOnData;
+  private final ApduResponseApi selectApplicationResponse;
   private final boolean hasMatched;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
-   * <p>Note: power-on data and FCI are optional but cannot both be null at the same time when the
-   * selection has matched.
+   * <p>Note: power-on data and select application response are optional but cannot both be null at
+   * the same time when the selection has matched.
    *
-   * @param powerOnData The power-on data (optional).
-   * @param fci The answer to select (optional).
+   * @param powerOnData A String containing the power-on data (optional).
+   * @param selectApplicationResponse The response to the select application command (optional).
    * @param hasMatched A boolean.
-   * @throws IllegalStateException if hasMatched true and both power-on data and fci are null.
    * @since 2.0
    */
-  SelectionStatusAdapter(byte[] powerOnData, ApduResponseApi fci, boolean hasMatched) {
+  SelectionStatus(
+      String powerOnData, ApduResponseApi selectApplicationResponse, boolean hasMatched) {
     this.powerOnData = powerOnData;
-    this.fci = fci;
+    this.selectApplicationResponse = selectApplicationResponse;
     this.hasMatched = hasMatched;
   }
 
   /**
-   * {@inheritDoc}
+   * Gets the card's power-on data.
    *
    * @since 2.0
    */
-  @Override
-  public byte[] getPowerOnDataBytes() {
+  public String getPowerOnData() {
     return powerOnData;
   }
 
   /**
-   * {@inheritDoc}
+   * Gets the response to the select application command.
    *
    * @since 2.0
    */
-  public ApduResponseApi getFci() {
-    return fci;
+  public ApduResponseApi getSelectApplicationResponse() {
+    return selectApplicationResponse;
   }
 
   /**
-   * {@inheritDoc}
+   * Indicates if the selection has matched the selector filters.
    *
    * @since 2.0
    */
   public boolean hasMatched() {
     return hasMatched;
-  }
-
-  /**
-   * Converts the selection status into a string where the data is encoded in a json format.
-   *
-   * @return A not empty String
-   * @since 2.0
-   */
-  @Override
-  public String toString() {
-    return "SELECTION_STATUS = " + JsonUtil.toJson(this);
   }
 }

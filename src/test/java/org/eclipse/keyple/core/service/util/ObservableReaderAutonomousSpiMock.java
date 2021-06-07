@@ -94,8 +94,8 @@ public class ObservableReaderAutonomousSpiMock
   }
 
   @Override
-  public byte[] getPowerOnDataBytes() {
-    return new byte[0];
+  public String getPowerOnData() {
+    return "";
   }
 
   @Override

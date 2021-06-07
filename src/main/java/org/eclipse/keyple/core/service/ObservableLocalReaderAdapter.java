@@ -57,7 +57,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   private CardSelectionScenarioAdapter cardSelectionScenario;
   private NotificationMode notificationMode;
-  private PollingMode currentPollingMode;
+  private DetectionMode currentPollingMode;
 
   /**
    * (package-private)<br>
@@ -155,12 +155,12 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   /**
    * (package-private)<br>
-   * Gets the current {@link ObservableReader.PollingMode}.
+   * Gets the current {@link ObservableReader.DetectionMode}.
    *
    * @return Null if the polling mode has not been defined.
    * @since 2.0
    */
-  ObservableReader.PollingMode getPollingMode() {
+  ObservableReader.DetectionMode getPollingMode() {
     return currentPollingMode;
   }
 
@@ -331,8 +331,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   private boolean hasACardMatched(List<CardSelectionResponseApi> cardSelectionResponses) {
     for (CardSelectionResponseApi cardSelectionResponse : cardSelectionResponses) {
-      if (cardSelectionResponse != null
-          && cardSelectionResponse.getSelectionStatus().hasMatched()) {
+      if (cardSelectionResponse != null && cardSelectionResponse.hasMatched()) {
         if (logger.isTraceEnabled()) {
           logger.trace("[{}] a default selection has matched", getName());
         }
@@ -453,7 +452,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   void scheduleCardSelectionScenario(
       CardSelectionScenarioAdapter cardSelectionScenario,
       ObservableReader.NotificationMode notificationMode,
-      ObservableReader.PollingMode pollingMode) {
+      ObservableReader.DetectionMode pollingMode) {
     this.cardSelectionScenario = cardSelectionScenario;
     this.notificationMode = notificationMode;
     this.currentPollingMode = pollingMode;
@@ -550,7 +549,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void startCardDetection(ObservableReader.PollingMode pollingMode) {
+  public void startCardDetection(ObservableReader.DetectionMode pollingMode) {
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(

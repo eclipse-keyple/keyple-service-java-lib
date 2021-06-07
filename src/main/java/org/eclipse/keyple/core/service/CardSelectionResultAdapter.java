@@ -24,7 +24,7 @@ import org.calypsonet.terminal.reader.selection.spi.SmartCard;
  */
 final class CardSelectionResultAdapter implements CardSelectionResult {
 
-  private Integer activeSelectionIndex = null;
+  private int activeSelectionIndex = -1;
   private final Map<Integer, SmartCard> smartCardMap = new HashMap<Integer, SmartCard>();
 
   /**
@@ -59,51 +59,8 @@ final class CardSelectionResultAdapter implements CardSelectionResult {
    * @since 2.0
    */
   @Override
-  public boolean hasActiveSelection() {
-    return activeSelectionIndex != null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public int getActiveSelectionIndex() {
-    if (hasActiveSelection()) {
-      return activeSelectionIndex;
-    }
-    throw new IllegalStateException("No active Matching card is available");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public boolean hasSelectionMatched(int selectionIndex) {
-    return smartCardMap.containsKey(selectionIndex);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
   public Map<Integer, SmartCard> getSmartCards() {
     return smartCardMap;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public SmartCard getSmartCard(int selectionIndex) {
-    return smartCardMap.get(selectionIndex);
   }
 
   /**
@@ -118,5 +75,15 @@ final class CardSelectionResultAdapter implements CardSelectionResult {
       throw new IllegalStateException("No active matching card is available");
     }
     return smartCard;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public int getActiveSelectionIndex() {
+    return activeSelectionIndex;
   }
 }

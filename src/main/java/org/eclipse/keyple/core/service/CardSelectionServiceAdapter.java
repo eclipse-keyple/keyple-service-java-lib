@@ -122,8 +122,8 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
   @Override
   public void scheduleCardSelectionScenario(
       ObservableCardReader observableCardReader,
-      ObservableCardReader.NotificationMode notificationMode,
-      ObservableCardReader.PollingMode pollingMode) {
+      ObservableCardReader.DetectionMode pollingMode,
+      ObservableCardReader.NotificationMode notificationMode) {
     CardSelectionScenarioAdapter cardSelectionScenario =
         new CardSelectionScenarioAdapter(
             cardSelectionRequests, multiSelectionProcessing, channelControl);
@@ -176,19 +176,14 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
     /* Check card responses */
     for (CardSelectionResponseApi cardSelectionResponse : cardSelectionResponses) {
       /* test if the selection is successful: we should have either a FCI or power-on data */
-      if (cardSelectionResponse != null
-          && cardSelectionResponse.getSelectionStatus() != null
-          && cardSelectionResponse.getSelectionStatus().hasMatched()) {
+      if (cardSelectionResponse != null && cardSelectionResponse.hasMatched()) {
         /*
          * create a AbstractSmartCard with the class deduced from the selection request
          * during the selection preparation
          */
         SmartCard smartCard = (SmartCard) cardSelections.get(index).parse(cardSelectionResponse);
 
-        // determine if the current matching card is selected
-        SelectionStatusApi selectionStatus = cardSelectionResponse.getSelectionStatus();
-
-        boolean isSelected = selectionStatus.hasMatched();
+        boolean isSelected = cardSelectionResponse.hasMatched();
 
         cardSelectionsResult.addSmartCard(index, smartCard, isSelected);
       }

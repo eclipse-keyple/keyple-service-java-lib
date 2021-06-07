@@ -88,8 +88,7 @@ public class Main_BasicSelection_Pcsc {
 
     // Create a card selection using the generic card extension without specifying any filter
     // (protocol/power-on data/DFName).
-    CardSelection cardSelection =
-        cardExtension.createCardSelection(cardExtension.createCardSelector());
+    CardSelection cardSelection = cardExtension.createCardSelection();
 
     // Prepare the selection by adding the created generic selection to the card selection scenario.
     selectionService.prepareSelection(cardSelection);
@@ -98,7 +97,7 @@ public class Main_BasicSelection_Pcsc {
     CardSelectionResult selectionResult = selectionService.processCardSelectionScenario(reader);
 
     // Check the selection result.
-    if (!selectionResult.hasActiveSelection()) {
+    if (selectionResult.getActiveSmartCard() == null) {
       throw new IllegalStateException("The selection of the card failed.");
     }
 

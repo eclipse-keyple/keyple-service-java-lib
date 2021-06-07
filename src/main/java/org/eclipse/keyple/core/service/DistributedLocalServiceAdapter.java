@@ -397,10 +397,10 @@ final class DistributedLocalServiceAdapter
           ObservableReader.NotificationMode.valueOf(
               input.get(JsonProperty.NOTIFICATION_MODE.name()).getAsString());
 
-      ObservableReader.PollingMode pollingMode = null;
+      ObservableReader.DetectionMode pollingMode = null;
       if (input.has(JsonProperty.POLLING_MODE.name())) {
         pollingMode =
-            ObservableReader.PollingMode.valueOf(
+            ObservableReader.DetectionMode.valueOf(
                 input.get(JsonProperty.POLLING_MODE.name()).getAsString());
       }
 
@@ -450,8 +450,8 @@ final class DistributedLocalServiceAdapter
     private void startCardDetection() {
 
       // Extract info from the message
-      ObservableReader.PollingMode pollingMode =
-          ObservableReader.PollingMode.valueOf(
+      ObservableReader.DetectionMode pollingMode =
+          ObservableReader.DetectionMode.valueOf(
               input.get(JsonProperty.POLLING_MODE.name()).getAsString());
 
       // Execute the service on the reader

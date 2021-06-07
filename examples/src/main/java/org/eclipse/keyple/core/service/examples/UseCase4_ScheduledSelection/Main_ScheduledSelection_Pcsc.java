@@ -85,11 +85,10 @@ public class Main_ScheduledSelection_Pcsc {
 
     // Create a card selection using the generic card extension.
     CardSelection cardSelection =
-        cardExtension.createCardSelection(
-            cardExtension
-                .createCardSelector()
-                .filterByCardProtocol(ContactlessCardCommonProtocol.ISO_14443_4.name())
-                .filterByDfName(ConfigurationUtil.AID_EMV_PPSE));
+        cardExtension
+            .createCardSelection()
+            .filterByCardProtocol(ContactlessCardCommonProtocol.ISO_14443_4.name())
+            .filterByDfName(ConfigurationUtil.AID_EMV_PPSE);
 
     // Prepare the selection by adding the created generic selection to the card selection scenario.
     selectionService.prepareSelection(cardSelection);
@@ -97,14 +96,14 @@ public class Main_ScheduledSelection_Pcsc {
     // Schedule the selection scenario.
     selectionService.scheduleCardSelectionScenario(
         (ObservableReader) reader,
-        ObservableReader.NotificationMode.MATCHED_ONLY,
-        ObservableCardReader.PollingMode.REPEATING);
+        ObservableCardReader.DetectionMode.REPEATING,
+        ObservableReader.NotificationMode.MATCHED_ONLY);
 
     // Create and add an observer
     CardReaderObserver cardReaderObserver = new CardReaderObserver(reader, selectionService);
     ((ObservableReader) reader).setReaderObservationExceptionHandler(cardReaderObserver);
     ((ObservableReader) reader).addObserver(cardReaderObserver);
-    ((ObservableReader) reader).startCardDetection(ObservableReader.PollingMode.REPEATING);
+    ((ObservableReader) reader).startCardDetection(ObservableReader.DetectionMode.REPEATING);
 
     logger.info(
         "= #### Wait for a card. The AID based selection scenario will be processed as soon as a card is detected.");

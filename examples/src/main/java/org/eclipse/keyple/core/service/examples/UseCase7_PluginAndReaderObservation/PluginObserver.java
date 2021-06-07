@@ -142,6 +142,6 @@ class PluginObserver implements PluginObserverSpi, PluginObservationExceptionHan
     logger.info("Add observer READERNAME = {}", reader.getName());
     ((ObservableReader) reader).setReaderObservationExceptionHandler(readerObserver);
     ((ObservableReader) reader).addObserver(readerObserver);
-    ((ObservableReader) reader).startCardDetection(ObservableReader.PollingMode.REPEATING);
+    ((ObservableReader) reader).startCardDetection(ObservableReader.DetectionMode.REPEATING);
   }
 }

@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
  *
  * <ul>
  *   <li>Upon CARD_PROCESSED event, the machine changes state for WAIT_FOR_CARD_REMOVAL or
- *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableReader.PollingMode} setting.
+ *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableReader.DetectionMode} setting.
  *   <li>Upon CARD_REMOVED event, the machine changes state for WAIT_FOR_CARD_INSERTION or
- *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableReader.PollingMode} setting.
+ *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableReader.DetectionMode} setting.
  *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_CARD_DETECTION.
  * </ul>
  *
@@ -82,7 +82,7 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
      */
     switch (event) {
       case CARD_PROCESSED:
-        if (this.getReader().getPollingMode() == ObservableReader.PollingMode.REPEATING) {
+        if (this.getReader().getPollingMode() == ObservableReader.DetectionMode.REPEATING) {
           switchState(MonitoringState.WAIT_FOR_CARD_REMOVAL);
         } else {
           // We close the channels now and notify the application of
@@ -98,7 +98,7 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
         // for insertion
         // We notify the application of the CARD_REMOVED event.
         getReader().processCardRemoved();
-        if (getReader().getPollingMode() == ObservableReader.PollingMode.REPEATING) {
+        if (getReader().getPollingMode() == ObservableReader.DetectionMode.REPEATING) {
           switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
         } else {
           switchState(MonitoringState.WAIT_FOR_START_DETECTION);
