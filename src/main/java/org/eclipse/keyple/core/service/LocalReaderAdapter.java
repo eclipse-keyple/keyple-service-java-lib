@@ -490,12 +490,12 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           e.getMessage(),
           e);
     }
-    if (!selectionStatus.hasMatched()) {
+    if (!selectionStatus.hasMatched) {
       // the selection failed, return an empty response having the selection status
       return new CardSelectionResponseAdapter(
-          selectionStatus.getPowerOnData(),
-          selectionStatus.getSelectApplicationResponse(),
-          selectionStatus.hasMatched(),
+          selectionStatus.powerOnData,
+          selectionStatus.selectApplicationResponse,
+          selectionStatus.hasMatched,
           new CardResponseAdapter(new ArrayList<ApduResponseApi>(), false));
     }
 
@@ -510,9 +510,9 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     }
 
     return new CardSelectionResponseAdapter(
-        selectionStatus.getPowerOnData(),
-        selectionStatus.getSelectApplicationResponse(),
-        selectionStatus.hasMatched(),
+        selectionStatus.powerOnData,
+        selectionStatus.selectApplicationResponse,
+        selectionStatus.hasMatched,
         cardResponse);
   }
 
@@ -762,10 +762,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         p2 |= (byte) 0x04;
         break;
       case FMD:
-        p2 = (byte) 0x08;
+        p2 |= (byte) 0x08;
         break;
       case NO_RESPONSE:
-        p2 = (byte) 0x0C;
+        p2 |= (byte) 0x0C;
         break;
       default:
         throw new IllegalStateException("Unexpected value: " + fileControlInformation);
@@ -809,8 +809,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * set to null and the boolean field {@link #useDefaultProtocol} is set to true.
    */
   private void computeCurrentProtocol() {
-
-    /* Determine the current protocol */
     currentProtocol = null;
     if (protocolAssociations.size() == 0) {
       useDefaultProtocol = true;
@@ -821,6 +819,31 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           currentProtocol = entry.getValue();
         }
       }
+    }
+  }
+
+  /**
+   * (private)<br>
+   * This POJO contains the card selection status.
+   */
+  private static class SelectionStatus {
+
+    private final String powerOnData;
+    private final ApduResponseApi selectApplicationResponse;
+    private final boolean hasMatched;
+
+    /**
+     * Constructor.
+     *
+     * @param powerOnData A String containing the power-on data (optional).
+     * @param selectApplicationResponse The response to the select application command (optional).
+     * @param hasMatched A boolean.
+     */
+    SelectionStatus(
+        String powerOnData, ApduResponseApi selectApplicationResponse, boolean hasMatched) {
+      this.powerOnData = powerOnData;
+      this.selectApplicationResponse = selectApplicationResponse;
+      this.hasMatched = hasMatched;
     }
   }
 }
