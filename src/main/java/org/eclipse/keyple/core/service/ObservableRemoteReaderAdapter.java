@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2021 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -115,13 +115,13 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    *
    * @param cardSelectionScenario The card selection scenario.
    * @param notificationMode The notification policy.
-   * @param pollingMode The polling policy (optional).
+   * @param detectionMode The polling policy (optional).
    * @since 2.0
    */
   void scheduleCardSelectionScenario(
       CardSelectionScenarioAdapter cardSelectionScenario,
       ObservableReader.NotificationMode notificationMode,
-      ObservableReader.DetectionMode pollingMode) {
+      ObservableReader.DetectionMode detectionMode) {
 
     checkStatus();
 
@@ -136,8 +136,8 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     input.addProperty(JsonProperty.NOTIFICATION_MODE.name(), notificationMode.name());
 
-    if (pollingMode != null) {
-      input.addProperty(JsonProperty.POLLING_MODE.name(), pollingMode.name());
+    if (detectionMode != null) {
+      input.addProperty(JsonProperty.POLLING_MODE.name(), detectionMode.name());
     }
 
     // Execute the remote service.
@@ -220,7 +220,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    * @since 2.0
    */
   @Override
-  public void startCardDetection(DetectionMode pollingMode) {
+  public void startCardDetection(DetectionMode detectionMode) {
 
     checkStatus();
     if (logger.isDebugEnabled()) {
@@ -228,14 +228,14 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
           "The reader '{}' of plugin '{}' is starting the card detection with polling mode '{}'.",
           getName(),
           getPluginName(),
-          pollingMode);
+          detectionMode);
     }
-    Assert.getInstance().notNull(pollingMode, "pollingMode");
+    Assert.getInstance().notNull(detectionMode, "detectionMode");
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
     input.addProperty(JsonProperty.SERVICE.name(), ReaderService.START_CARD_DETECTION.name());
-    input.addProperty(JsonProperty.POLLING_MODE.name(), pollingMode.name());
+    input.addProperty(JsonProperty.POLLING_MODE.name(), detectionMode.name());
 
     // Execute the remote service.
     try {

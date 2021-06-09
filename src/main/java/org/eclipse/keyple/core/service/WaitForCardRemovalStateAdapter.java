@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2021 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -85,7 +85,7 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
         // for insertion
         // We notify the application of the CARD_REMOVED event.
         getReader().processCardRemoved();
-        if (getReader().getPollingMode() == ObservableReader.DetectionMode.REPEATING) {
+        if (getReader().getdetectionMode() == ObservableReader.DetectionMode.REPEATING) {
           switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
         } else {
           switchState(MonitoringState.WAIT_FOR_START_DETECTION);

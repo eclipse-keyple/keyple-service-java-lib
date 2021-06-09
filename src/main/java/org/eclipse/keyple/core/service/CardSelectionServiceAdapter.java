@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2021 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -68,6 +68,9 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    */
   @Override
   public int prepareSelection(CardSelection cardSelection) {
+
+    Assert.getInstance().notNull(cardSelection, "cardSelection");
+
     /* keep the selection request */
     cardSelections.add((CardSelectionSpi) cardSelection);
     cardSelectionRequests.add(((CardSelectionSpi) cardSelection).getCardSelectionRequest());
@@ -92,6 +95,8 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    */
   @Override
   public CardSelectionResult processCardSelectionScenario(CardReader reader) {
+
+    Assert.getInstance().notNull(reader, "reader");
 
     // Communicate with the card to make the actual selection
     List<CardSelectionResponseApi> cardSelectionResponses;
@@ -122,17 +127,23 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
   @Override
   public void scheduleCardSelectionScenario(
       ObservableCardReader observableCardReader,
-      ObservableCardReader.DetectionMode pollingMode,
+      ObservableCardReader.DetectionMode detectionMode,
       ObservableCardReader.NotificationMode notificationMode) {
+
+    Assert.getInstance()
+        .notNull(observableCardReader, "observableCardReader")
+        .notNull(detectionMode, "detectionMode")
+        .notNull(notificationMode, "notificationMode");
+
     CardSelectionScenarioAdapter cardSelectionScenario =
         new CardSelectionScenarioAdapter(
             cardSelectionRequests, multiSelectionProcessing, channelControl);
     if (observableCardReader instanceof ObservableLocalReaderAdapter) {
       ((ObservableLocalReaderAdapter) observableCardReader)
-          .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, pollingMode);
+          .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, detectionMode);
     } else if (observableCardReader instanceof ObservableRemoteReaderAdapter) {
       ((ObservableRemoteReaderAdapter) observableCardReader)
-          .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, pollingMode);
+          .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, detectionMode);
     } else {
       throw new IllegalArgumentException("Not a Keyple reader implementation.");
     }

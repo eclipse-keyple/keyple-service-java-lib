@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2021 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -24,10 +24,10 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> The type of the observers ({@link
  *     org.eclipse.keyple.core.service.spi.PluginObserverSpi} or {@link
- *     org.eclipse.keyple.core.service.spi.CardReaderObserverSpi}).
+ *     org.calypsonet.terminal.reader.spi.CardReaderObserverSpi}).
  * @param <S> The type of the exception handler to use during the observation process ({@link
  *     org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi} or {@link
- *     org.eclipse.keyple.core.service.spi.CardReaderObservationExceptionHandlerSpi}).
+ *     org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi}).
  * @since 2.0
  */
 final class ObservationManagerAdapter<T, S> {
