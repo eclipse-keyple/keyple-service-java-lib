@@ -17,6 +17,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
+ * (package-private)<br>
  * This POJO contains all information about a change of reader state within an {@link
  * ObservablePlugin}.
  *
@@ -30,13 +31,14 @@ import java.util.TreeSet;
  *
  * @since 2.0
  */
-public final class PluginEventAdapter implements PluginEvent {
+final class PluginEventAdapter implements PluginEvent {
 
   private final String pluginName;
   private final SortedSet<String> readerNames;
   private final Type Type;
 
   /**
+   * (package-private)<br>
    * Create a PluginEvent for a single reader from the plugin and reader names and the type of
    * event.
    *
@@ -46,13 +48,14 @@ public final class PluginEventAdapter implements PluginEvent {
    *     (should be not null).
    * @since 2.0
    */
-  public PluginEventAdapter(String pluginName, String readerName, Type Type) {
+  PluginEventAdapter(String pluginName, String readerName, Type Type) {
     this.pluginName = pluginName;
     this.readerNames = new TreeSet<String>(Collections.singleton(readerName));
     this.Type = Type;
   }
 
   /**
+   * (package-private)<br>
    * Create a PluginEvent for multiple readers from the plugin name, multiple reader names and the
    * type of event.
    *
@@ -65,7 +68,7 @@ public final class PluginEventAdapter implements PluginEvent {
    *     (must be not null).
    * @since 2.0
    */
-  public PluginEventAdapter(String pluginName, Set<String> readerNames, Type Type) {
+  PluginEventAdapter(String pluginName, Set<String> readerNames, Type Type) {
     this.pluginName = pluginName;
     this.readerNames = new TreeSet<String>(readerNames);
     this.Type = Type;
