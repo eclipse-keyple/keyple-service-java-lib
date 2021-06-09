@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2021 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -397,20 +397,20 @@ final class DistributedLocalServiceAdapter
           ObservableReader.NotificationMode.valueOf(
               input.get(JsonProperty.NOTIFICATION_MODE.name()).getAsString());
 
-      ObservableReader.PollingMode pollingMode = null;
+      ObservableReader.DetectionMode detectionMode = null;
       if (input.has(JsonProperty.POLLING_MODE.name())) {
-        pollingMode =
-            ObservableReader.PollingMode.valueOf(
+        detectionMode =
+            ObservableReader.DetectionMode.valueOf(
                 input.get(JsonProperty.POLLING_MODE.name()).getAsString());
       }
 
       // Execute the service on the reader
       if (reader instanceof ObservableLocalReaderAdapter) {
         ((ObservableLocalReaderAdapter) reader)
-            .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, pollingMode);
+            .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, detectionMode);
       } else if (reader instanceof ObservableRemoteReaderAdapter) {
         ((ObservableRemoteReaderAdapter) reader)
-            .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, pollingMode);
+            .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, detectionMode);
       } else {
         throw new IllegalStateException(
             String.format("The reader '%s' is not observable", reader.getName()));
@@ -450,13 +450,13 @@ final class DistributedLocalServiceAdapter
     private void startCardDetection() {
 
       // Extract info from the message
-      ObservableReader.PollingMode pollingMode =
-          ObservableReader.PollingMode.valueOf(
+      ObservableReader.DetectionMode detectionMode =
+          ObservableReader.DetectionMode.valueOf(
               input.get(JsonProperty.POLLING_MODE.name()).getAsString());
 
       // Execute the service on the reader
       ((ObservableReader) reader).addObserver(DistributedLocalServiceAdapter.this);
-      ((ObservableReader) reader).startCardDetection(pollingMode);
+      ((ObservableReader) reader).startCardDetection(detectionMode);
     }
 
     /**

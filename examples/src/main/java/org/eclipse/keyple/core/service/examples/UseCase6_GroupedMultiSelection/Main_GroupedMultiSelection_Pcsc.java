@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2018 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2018 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -17,8 +17,8 @@ import static org.eclipse.keyple.core.service.examples.common.ConfigurationUtil.
 import java.util.Map;
 import org.calypsonet.terminal.reader.selection.CardSelectionResult;
 import org.calypsonet.terminal.reader.selection.CardSelectionService;
-import org.calypsonet.terminal.reader.selection.spi.CardSelector;
 import org.calypsonet.terminal.reader.selection.spi.SmartCard;
+import org.eclipse.keyple.card.generic.GenericCardSelection;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
 import org.eclipse.keyple.core.service.*;
 import org.eclipse.keyple.core.service.examples.common.ConfigurationUtil;
@@ -92,21 +92,19 @@ public class Main_GroupedMultiSelection_Pcsc {
     // physical channel open
     // Prepare the selection by adding the created generic selection to the card selection scenario.
     selectionService.prepareSelection(
-        cardExtension.createCardSelection(
-            cardExtension
-                .createCardSelector()
-                .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
-                .setFileOccurrence(CardSelector.FileOccurrence.FIRST)));
+        cardExtension
+            .createCardSelection()
+            .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
+            .setFileOccurrence(GenericCardSelection.FileOccurrence.FIRST));
 
     // Second selection: get the next application occurrence matching the same AID, close the
     // physical channel after
     // Prepare the selection by adding the created generic selection to the card selection scenario.
     selectionService.prepareSelection(
-        cardExtension.createCardSelection(
-            cardExtension
-                .createCardSelector()
-                .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
-                .setFileOccurrence(CardSelector.FileOccurrence.NEXT)));
+        cardExtension
+            .createCardSelection()
+            .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
+            .setFileOccurrence(GenericCardSelection.FileOccurrence.NEXT));
 
     // close the channel after the selection
     selectionService.prepareReleaseChannel();
@@ -117,19 +115,17 @@ public class Main_GroupedMultiSelection_Pcsc {
     // log the result
     for (Map.Entry<Integer, SmartCard> entry : cardSelectionsResult.getSmartCards().entrySet()) {
       SmartCard smartCard = entry.getValue();
-      String powerOnData =
-          smartCard.hasPowerOnData()
-              ? ByteArrayUtil.toHex(smartCard.getPowerOnDataBytes())
-              : "no power-on data";
-      String fci = smartCard.hasFci() ? ByteArrayUtil.toHex(smartCard.getFciBytes()) : "no FCI";
+      String powerOnData = smartCard.getPowerOnData();
+      String selectApplicationResponse =
+          ByteArrayUtil.toHex(smartCard.getSelectApplicationResponse());
       String selectionIsActive =
           smartCard == cardSelectionsResult.getActiveSmartCard() ? "true" : "false";
       logger.info(
-          "Selection status for selection (indexed {}): \n\t\tActive smart card: {}\n\t\tpower-on data: {}\n\t\tFCI: {}",
+          "Selection status for selection (indexed {}): \n\t\tActive smart card: {}\n\t\tpower-on data: {}\n\t\tSelect Application response: {}",
           entry.getKey(),
           selectionIsActive,
           powerOnData,
-          fci);
+          selectApplicationResponse);
     }
 
     logger.info("= #### End of the generic card processing.");

@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2021 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -31,36 +31,9 @@ public class CardSelectionResultAdapterTest {
   }
 
   @Test
-  public void hasActiveSelection_whenNoSmartCard_shouldReturnFalse() {
+  public void getActiveSelectionIndex_whenNoSmartCard_shouldReturnMinusOne() {
     CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    assertThat(cardSelectionResult.hasActiveSelection()).isFalse();
-  }
-
-  @Test
-  public void hasActiveSelection_whenNullSmartCardAndIsSelected_shouldReturnTrue() {
-    CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    cardSelectionResult.addSmartCard(0, null, true);
-    assertThat(cardSelectionResult.hasActiveSelection()).isTrue();
-  }
-
-  @Test
-  public void hasActiveSelection_whenNotNullSmartCardAndIsNotSelected_shouldReturnFalse() {
-    CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    cardSelectionResult.addSmartCard(0, smartCard, false);
-    assertThat(cardSelectionResult.hasActiveSelection()).isFalse();
-  }
-
-  @Test
-  public void hasActiveSelection_whenNotNullSmartCardAndIsSelected_shouldReturnTrue() {
-    CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    cardSelectionResult.addSmartCard(0, smartCard, true);
-    assertThat(cardSelectionResult.hasActiveSelection()).isTrue();
-  }
-
-  @Test(expected = IllegalStateException.class)
-  public void getActiveSelectionIndex_whenNoSmartCard_shouldISE() {
-    CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    cardSelectionResult.getActiveSelectionIndex();
+    assertThat(cardSelectionResult.getActiveSelectionIndex()).isEqualTo(-1);
   }
 
   @Test
@@ -78,26 +51,6 @@ public class CardSelectionResultAdapterTest {
   }
 
   @Test
-  public void hasSelectionMatched_whenNoSmartCard_shouldReturnFalse() {
-    CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    assertThat(cardSelectionResult.hasSelectionMatched(0)).isFalse();
-  }
-
-  @Test
-  public void hasSelectionMatched_whenNotNullSmartCardAndIsNotSelected_shouldReturnTrue() {
-    CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    cardSelectionResult.addSmartCard(0, smartCard, false);
-    assertThat(cardSelectionResult.hasSelectionMatched(0)).isTrue();
-  }
-
-  @Test
-  public void hasSelectionMatched_whenNotNullSmartCardAndIsSelected_shouldReturnTrue() {
-    CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    cardSelectionResult.addSmartCard(0, smartCard, true);
-    assertThat(cardSelectionResult.hasSelectionMatched(0)).isTrue();
-  }
-
-  @Test
   public void getSmartCards_whenNoSmartCard_shouldReturnEmptyMap() {
     CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
     assertThat(cardSelectionResult.getSmartCards()).isEmpty();
@@ -112,16 +65,16 @@ public class CardSelectionResultAdapterTest {
   }
 
   @Test
-  public void getSmartCard_whenNoSmartCard_shouldReturnNull() {
+  public void getSmartCards_whenNoSmartCard_shouldReturnNull() {
     CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    assertThat(cardSelectionResult.getSmartCard(0)).isNull();
+    assertThat(cardSelectionResult.getSmartCards().get(0)).isNull();
   }
 
   @Test
-  public void getSmartCard_whenNotNullSmartCard_shouldReturnSmartCard() {
+  public void getSmartCards_whenNotNullSmartCard_shouldReturnSmartCard() {
     CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
     cardSelectionResult.addSmartCard(0, smartCard, true);
-    assertThat(cardSelectionResult.getSmartCard(0)).isEqualTo(smartCard);
+    assertThat(cardSelectionResult.getSmartCards().get(0)).isEqualTo(smartCard);
   }
 
   @Test(expected = IllegalStateException.class)

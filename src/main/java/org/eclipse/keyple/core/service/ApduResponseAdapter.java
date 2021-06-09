@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2018 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2018 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -16,26 +16,46 @@ import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 
 /**
+ * (package-private)<br>
  * This POJO contains a set of data related to an ISO-7816 APDU response.
  *
  * @since 2.0
  */
-public final class ApduResponseAdapter implements ApduResponseApi {
+final class ApduResponseAdapter implements ApduResponseApi {
 
-  private final byte[] bytes;
+  private final byte[] apdu;
   private final int statusWord;
 
   /**
    * (package-private)<br>
    * Builds an APDU response from an array of bytes from the card, computes the status word.
    *
-   * @param bytes A byte array
+   * @param apdu A array of at least 2 bytes.
    * @since 2.0
    */
-  ApduResponseAdapter(byte[] bytes) {
-    this.bytes = bytes;
-    statusWord =
-        ((bytes[bytes.length - 2] & 0x000000FF) << 8) + (bytes[bytes.length - 1] & 0x000000FF);
+  ApduResponseAdapter(byte[] apdu) {
+    this.apdu = apdu;
+    statusWord = ((apdu[apdu.length - 2] & 0x000000FF) << 8) + (apdu[apdu.length - 1] & 0x000000FF);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public byte[] getApdu() {
+    return this.apdu;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public byte[] getDataOut() {
+    return Arrays.copyOfRange(this.apdu, 0, this.apdu.length - 2);
   }
 
   /**
@@ -46,26 +66,6 @@ public final class ApduResponseAdapter implements ApduResponseApi {
   @Override
   public int getStatusWord() {
     return statusWord;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public byte[] getBytes() {
-    return this.bytes;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public byte[] getDataOut() {
-    return Arrays.copyOfRange(this.bytes, 0, this.bytes.length - 2);
   }
 
   /**

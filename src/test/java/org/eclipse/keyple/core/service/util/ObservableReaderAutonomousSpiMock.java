@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2021 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -94,8 +94,8 @@ public class ObservableReaderAutonomousSpiMock
   }
 
   @Override
-  public byte[] getPowerOnDataBytes() {
-    return new byte[0];
+  public String getPowerOnData() {
+    return "";
   }
 
   @Override

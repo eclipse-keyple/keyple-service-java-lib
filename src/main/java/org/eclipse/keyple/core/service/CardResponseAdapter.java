@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2018 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2018 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -17,35 +17,31 @@ import org.calypsonet.terminal.card.CardResponseApi;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 
 /**
+ * (package-private)<br>
  * This POJO contains an ordered list of the responses received following a card request and
  * indicators related to the status of the channel and the completion of the card request.
  *
  * @see org.calypsonet.terminal.card.spi.CardRequestSpi
  * @since 2.0
  */
-public final class CardResponseAdapter implements CardResponseApi {
+final class CardResponseAdapter implements CardResponseApi {
 
   private final List<ApduResponseApi> apduResponses;
   private final boolean isLogicalChannelOpen;
-  private final boolean isComplete;
 
   /**
    * (package-private)<br>
    * Builds a card response from all {@link ApduResponseApi} received from the card and booleans
-   * indicating if the logical channel is still open and if all expected responses have been
-   * received.
+   * indicating if the logical channel is still open.
    *
    * @param apduResponses A not null list.
    * @param isLogicalChannelOpen true if the logical channel is open, false if not.
-   * @param isComplete true if all responses have been received, false if not
    * @since 2.0
    */
-  CardResponseAdapter(
-      List<ApduResponseApi> apduResponses, boolean isLogicalChannelOpen, boolean isComplete) {
+  CardResponseAdapter(List<ApduResponseApi> apduResponses, boolean isLogicalChannelOpen) {
 
     this.apduResponses = apduResponses;
     this.isLogicalChannelOpen = isLogicalChannelOpen;
-    this.isComplete = isComplete;
   }
 
   /**
@@ -66,16 +62,6 @@ public final class CardResponseAdapter implements CardResponseApi {
   @Override
   public boolean isLogicalChannelOpen() {
     return isLogicalChannelOpen;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public boolean isComplete() {
-    return isComplete;
   }
 
   /**

@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2021 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -25,20 +25,20 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
 class ApduRequestAdapter implements ApduRequestSpi {
   private static final int DEFAULT_SUCCESSFUL_CODE = 0x9000;
 
-  private final byte[] bytes;
+  private final byte[] apdu;
   private final Set<Integer> successfulStatusWords;
-  private String name;
+  private String info;
 
   /**
    * Builds an APDU request from a raw byte buffer.
    *
    * <p>The default status words list is initialized with the standard successful code 9000h.
    *
-   * @param bytes The bytes of the APDU's body.
+   * @param apdu An array of at least 4 bytes.
    * @since 2.0
    */
-  public ApduRequestAdapter(byte[] bytes) {
-    this.bytes = bytes;
+  public ApduRequestAdapter(byte[] apdu) {
+    this.apdu = apdu;
     this.successfulStatusWords = new HashSet<Integer>();
     this.successfulStatusWords.add(DEFAULT_SUCCESSFUL_CODE);
   }
@@ -58,6 +58,30 @@ class ApduRequestAdapter implements ApduRequestSpi {
   }
 
   /**
+   * Optional information about the APDU request.
+   *
+   * <p>This string is essentially dedicated to improving the readability of the logs.
+   *
+   * @param info The request information (free text).
+   * @return The object instance.
+   * @since 2.0
+   */
+  public ApduRequestAdapter setInfo(final String info) {
+    this.info = info;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public byte[] getApdu() {
+    return this.apdu;
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @since 2.0
@@ -68,38 +92,13 @@ class ApduRequestAdapter implements ApduRequestSpi {
   }
 
   /**
-   * Names the APDU request.
-   *
-   * <p>This string is dedicated to improve the readability of logs and should therefore only be
-   * invoked conditionally (e.g. when log level &gt;= debug).
-   *
-   * @param name The request name (free text).
-   * @return The object instance.
-   * @since 2.0
-   */
-  public ApduRequestAdapter setName(final String name) {
-    this.name = name;
-    return this;
-  }
-
-  /**
    * {@inheritDoc}
    *
    * @since 2.0
    */
   @Override
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public byte[] getBytes() {
-    return this.bytes;
+  public String getInfo() {
+    return info;
   }
 
   /**

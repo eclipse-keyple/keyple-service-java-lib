@@ -29,7 +29,7 @@ repositories {
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
 }
 dependencies {
-    implementation("org.eclipse.keyple:keyple-java-reader-api:1.0-SNAPSHOT") { isChanging = true }
+    implementation("org.calypsonet.terminal:calypsonet-terminal-reader-java-api:1.0-SNAPSHOT") { isChanging = true }
     implementation("org.eclipse.keyple:keyple-java-commons-api:2.0-SNAPSHOT") { isChanging = true }
     implementation("org.eclipse.keyple:keyple-java-service:2.0.0-SNAPSHOT") { isChanging = true }
     implementation("org.eclipse.keyple:keyple-java-card-generic:2.0.0-SNAPSHOT") { isChanging = true }

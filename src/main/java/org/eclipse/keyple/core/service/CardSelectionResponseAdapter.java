@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2020 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2020 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -11,37 +11,48 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import org.calypsonet.terminal.card.ApduResponseApi;
 import org.calypsonet.terminal.card.CardResponseApi;
 import org.calypsonet.terminal.card.CardSelectionResponseApi;
-import org.calypsonet.terminal.card.SelectionStatusApi;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 
 /**
+ * (package-private)<br>
  * This POJO contains the data from a card obtained in response to a card selection request.
  *
- * <p>These data are the selection status ({@link SelectionStatusApi}) and the responses, if any, to
- * the additional APDUs sent to the card ({@link CardResponseApi}).
+ * <p>These data are the selection status and the responses, if any, to the additional APDUs sent to
+ * the card ({@link CardResponseApi}).
  *
  * @see org.calypsonet.terminal.card.spi.CardSelectionRequestSpi
  * @since 2.0
  */
-public final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
+final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
 
-  private final SelectionStatusApi selectionStatus;
+  private final String powerOnData;
+  private final ApduResponseApi selectApplicationResponse;
+  private final boolean hasMatched;
   private final CardResponseApi cardResponse;
 
   /**
    * (package-private)<br>
-   * Builds a card selection response from the {@link SelectionStatusApi} and a {@link
-   * CardResponseApi} (list of {@link org.calypsonet.terminal.card.ApduResponseApi}).
+   * Builds a card selection response including the selection status and a {@link CardResponseApi}
+   * (list of {@link org.calypsonet.terminal.card.ApduResponseApi}).
    *
-   * @param selectionStatus The selection status.
+   * @param powerOnData The card power-on data, null if the power-on data is not available.
+   * @param selectApplicationResponse The response to the Select Application command, null if no
+   *     Select Application command was performed...
+   * @param hasMatched True if the card inserted matches the selection filters.
    * @param cardResponse null if no card response is available.
    * @since 2.0
    */
-  CardSelectionResponseAdapter(SelectionStatusApi selectionStatus, CardResponseApi cardResponse) {
-
-    this.selectionStatus = selectionStatus;
+  CardSelectionResponseAdapter(
+      String powerOnData,
+      ApduResponseApi selectApplicationResponse,
+      boolean hasMatched,
+      CardResponseApi cardResponse) {
+    this.powerOnData = powerOnData;
+    this.selectApplicationResponse = selectApplicationResponse;
+    this.hasMatched = hasMatched;
     this.cardResponse = cardResponse;
   }
 
@@ -51,8 +62,28 @@ public final class CardSelectionResponseAdapter implements CardSelectionResponse
    * @since 2.0
    */
   @Override
-  public SelectionStatusApi getSelectionStatus() {
-    return this.selectionStatus;
+  public String getPowerOnData() {
+    return powerOnData;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public ApduResponseApi getSelectApplicationResponse() {
+    return selectApplicationResponse;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public boolean hasMatched() {
+    return hasMatched;
   }
 
   /**

@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2021 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -16,6 +16,7 @@ import org.calypsonet.terminal.card.*;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
+import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +111,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
               cardSelectionRequests, multiSelectionProcessing, channelControl);
     } catch (UnexpectedStatusWordException e) {
       throw new CardBrokenCommunicationException(
-          e.getCardResponse(), "An unexpected status word was received.", e);
+          e.getCardResponse(), false, "An unexpected status word was received.", e);
     } finally {
       if (logger.isDebugEnabled()) {
         long timeStamp = System.nanoTime();
@@ -235,6 +236,10 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
       throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
           UnexpectedStatusWordException {
     checkStatus();
+
+    Assert.getInstance()
+        .notNull(cardRequest, "cardRequest")
+        .notNull(channelControl, "channelControl");
 
     CardResponseApi cardResponse = null;
 

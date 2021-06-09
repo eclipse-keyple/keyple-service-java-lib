@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2021 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -57,7 +57,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   private CardSelectionScenarioAdapter cardSelectionScenario;
   private NotificationMode notificationMode;
-  private PollingMode currentPollingMode;
+  private DetectionMode currentdetectionMode;
 
   /**
    * (package-private)<br>
@@ -155,13 +155,13 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   /**
    * (package-private)<br>
-   * Gets the current {@link ObservableReader.PollingMode}.
+   * Gets the current {@link ObservableReader.DetectionMode}.
    *
    * @return Null if the polling mode has not been defined.
    * @since 2.0
    */
-  ObservableReader.PollingMode getPollingMode() {
-    return currentPollingMode;
+  ObservableReader.DetectionMode getdetectionMode() {
+    return currentdetectionMode;
   }
 
   /**
@@ -331,8 +331,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   private boolean hasACardMatched(List<CardSelectionResponseApi> cardSelectionResponses) {
     for (CardSelectionResponseApi cardSelectionResponse : cardSelectionResponses) {
-      if (cardSelectionResponse != null
-          && cardSelectionResponse.getSelectionStatus().hasMatched()) {
+      if (cardSelectionResponse != null && cardSelectionResponse.hasMatched()) {
         if (logger.isTraceEnabled()) {
           logger.trace("[{}] a default selection has matched", getName());
         }
@@ -447,16 +446,16 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    *
    * @param cardSelectionScenario The card selection scenario.
    * @param notificationMode The notification policy.
-   * @param pollingMode The polling policy (optional).
+   * @param detectionMode The polling policy (optional).
    * @since 2.0
    */
   void scheduleCardSelectionScenario(
       CardSelectionScenarioAdapter cardSelectionScenario,
       ObservableReader.NotificationMode notificationMode,
-      ObservableReader.PollingMode pollingMode) {
+      ObservableReader.DetectionMode detectionMode) {
     this.cardSelectionScenario = cardSelectionScenario;
     this.notificationMode = notificationMode;
-    this.currentPollingMode = pollingMode;
+    this.currentdetectionMode = detectionMode;
   }
 
   /**
@@ -550,17 +549,17 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void startCardDetection(ObservableReader.PollingMode pollingMode) {
+  public void startCardDetection(ObservableReader.DetectionMode detectionMode) {
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
           "The reader '{}' of plugin '{}' is starting the card detection with polling mode '{}'.",
           getName(),
           getPluginName(),
-          pollingMode);
+          detectionMode);
     }
-    Assert.getInstance().notNull(pollingMode, "pollingMode");
-    currentPollingMode = pollingMode;
+    Assert.getInstance().notNull(detectionMode, "detectionMode");
+    currentdetectionMode = detectionMode;
     stateService.onEvent(InternalEvent.START_DETECT);
   }
 

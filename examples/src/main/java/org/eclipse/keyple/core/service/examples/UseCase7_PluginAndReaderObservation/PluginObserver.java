@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2020 Calypso Networks Association https://www.calypsonet-asso.org/
+ * Copyright (c) 2020 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -142,6 +142,6 @@ class PluginObserver implements PluginObserverSpi, PluginObservationExceptionHan
     logger.info("Add observer READERNAME = {}", reader.getName());
     ((ObservableReader) reader).setReaderObservationExceptionHandler(readerObserver);
     ((ObservableReader) reader).addObserver(readerObserver);
-    ((ObservableReader) reader).startCardDetection(ObservableReader.PollingMode.REPEATING);
+    ((ObservableReader) reader).startCardDetection(ObservableReader.DetectionMode.REPEATING);
   }
 }
