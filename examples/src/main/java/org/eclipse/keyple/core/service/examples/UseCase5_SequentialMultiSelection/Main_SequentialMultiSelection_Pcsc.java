@@ -14,8 +14,8 @@ package org.eclipse.keyple.core.service.examples.UseCase5_SequentialMultiSelecti
 import static org.eclipse.keyple.core.service.examples.common.ConfigurationUtil.CONTACTLESS_READER_NAME_REGEX;
 import static org.eclipse.keyple.core.service.examples.common.ConfigurationUtil.getCardReader;
 
+import org.calypsonet.terminal.reader.selection.CardSelectionManager;
 import org.calypsonet.terminal.reader.selection.CardSelectionResult;
-import org.calypsonet.terminal.reader.selection.CardSelectionService;
 import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.eclipse.keyple.card.generic.GenericCardSelection;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
@@ -84,8 +84,8 @@ public class Main_SequentialMultiSelection_Pcsc {
 
     logger.info("= #### Select application with AID = '{}'.", ConfigurationUtil.AID_KEYPLE_PREFIX);
 
-    // Get the core card selection service.
-    CardSelectionService selectionService = CardSelectionServiceFactory.getService();
+    // Get the core card selection manager.
+    CardSelectionManager cardSelectionManager = smartCardService.createCardSelectionManager();
 
     // AID based selection: get the first application occurrence matching the AID, keep the
     // physical channel open
@@ -96,10 +96,10 @@ public class Main_SequentialMultiSelection_Pcsc {
             .setFileOccurrence(GenericCardSelection.FileOccurrence.FIRST);
 
     // Prepare the selection by adding the created generic selection to the card selection scenario.
-    selectionService.prepareSelection(cardSelection);
+    cardSelectionManager.prepareSelection(cardSelection);
 
     // Do the selection and display the result
-    doAndAnalyseSelection(reader, selectionService, 1);
+    doAndAnalyseSelection(reader, cardSelectionManager, 1);
 
     // New selection: get the next application occurrence matching the same AID, close the
     // physical channel after
@@ -110,13 +110,13 @@ public class Main_SequentialMultiSelection_Pcsc {
             .setFileOccurrence(GenericCardSelection.FileOccurrence.NEXT);
 
     // Prepare the selection by adding the created generic selection to the card selection scenario.
-    selectionService.prepareSelection(cardSelection);
+    cardSelectionManager.prepareSelection(cardSelection);
 
     // close the channel after the selection
-    selectionService.prepareReleaseChannel();
+    cardSelectionManager.prepareReleaseChannel();
 
     // Do the selection and display the result
-    doAndAnalyseSelection(reader, selectionService, 2);
+    doAndAnalyseSelection(reader, cardSelectionManager, 2);
 
     logger.info("= #### End of the generic card processing.");
 
@@ -126,14 +126,14 @@ public class Main_SequentialMultiSelection_Pcsc {
   /**
    * Performs the selection for the provided reader and logs its result.
    *
-   * <p>The selection service must have been previously assigned a selection case.
+   * <p>The card selection manager must have been previously assigned a selection case.
    *
    * @param reader The reader.
-   * @param cardSelectionsService The selection service.
+   * @param cardSelectionsService The card selection manager.
    * @param index An int indicating the selection rank.
    */
   private static void doAndAnalyseSelection(
-      Reader reader, CardSelectionService cardSelectionsService, int index) {
+      Reader reader, CardSelectionManager cardSelectionsService, int index) {
     CardSelectionResult cardSelectionsResult =
         cardSelectionsService.processCardSelectionScenario(reader);
     if (cardSelectionsResult.getActiveSmartCard() != null) {

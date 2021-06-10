@@ -15,8 +15,8 @@ import static org.eclipse.keyple.core.service.examples.common.ConfigurationUtil.
 import static org.eclipse.keyple.core.service.examples.common.ConfigurationUtil.getCardReader;
 
 import java.util.Map;
+import org.calypsonet.terminal.reader.selection.CardSelectionManager;
 import org.calypsonet.terminal.reader.selection.CardSelectionResult;
-import org.calypsonet.terminal.reader.selection.CardSelectionService;
 import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.eclipse.keyple.card.generic.GenericCardSelection;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
@@ -83,15 +83,15 @@ public class Main_GroupedMultiSelection_Pcsc {
 
     logger.info("= #### Select application with AID = '{}'.", ConfigurationUtil.AID_KEYPLE_PREFIX);
 
-    // Get the core card selection service.
-    CardSelectionService selectionService = CardSelectionServiceFactory.getService();
+    // Get the core card selection manager.
+    CardSelectionManager cardSelectionManager = smartCardService.createCardSelectionManager();
     // Set the multiple selection mode
-    selectionService.setMultipleSelectionMode();
+    cardSelectionManager.setMultipleSelectionMode();
 
     // First selection: get the first application occurrence matching the AID, keep the
     // physical channel open
     // Prepare the selection by adding the created generic selection to the card selection scenario.
-    selectionService.prepareSelection(
+    cardSelectionManager.prepareSelection(
         cardExtension
             .createCardSelection()
             .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
@@ -100,17 +100,17 @@ public class Main_GroupedMultiSelection_Pcsc {
     // Second selection: get the next application occurrence matching the same AID, close the
     // physical channel after
     // Prepare the selection by adding the created generic selection to the card selection scenario.
-    selectionService.prepareSelection(
+    cardSelectionManager.prepareSelection(
         cardExtension
             .createCardSelection()
             .filterByDfName(ConfigurationUtil.AID_KEYPLE_PREFIX)
             .setFileOccurrence(GenericCardSelection.FileOccurrence.NEXT));
 
     // close the channel after the selection
-    selectionService.prepareReleaseChannel();
+    cardSelectionManager.prepareReleaseChannel();
 
     CardSelectionResult cardSelectionsResult =
-        selectionService.processCardSelectionScenario(reader);
+        cardSelectionManager.processCardSelectionScenario(reader);
 
     // log the result
     for (Map.Entry<Integer, SmartCard> entry : cardSelectionsResult.getSmartCards().entrySet()) {

@@ -18,8 +18,8 @@ import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionSpi;
 import org.calypsonet.terminal.reader.CardReader;
 import org.calypsonet.terminal.reader.ObservableCardReader;
+import org.calypsonet.terminal.reader.selection.CardSelectionManager;
 import org.calypsonet.terminal.reader.selection.CardSelectionResult;
-import org.calypsonet.terminal.reader.selection.CardSelectionService;
 import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
 import org.calypsonet.terminal.reader.selection.spi.CardSelection;
 import org.calypsonet.terminal.reader.selection.spi.SmartCard;
@@ -27,11 +27,11 @@ import org.eclipse.keyple.core.util.Assert;
 
 /**
  * (package-private) <br>
- * Implementation of the {@link CardSelectionService}.
+ * Implementation of the {@link CardSelectionManager}.
  *
  * @since 2.0
  */
-final class CardSelectionServiceAdapter implements CardSelectionService {
+final class CardSelectionManagerAdapter implements CardSelectionManager {
 
   private final List<CardSelectionSpi> cardSelections;
   private final List<CardSelectionRequestSpi> cardSelectionRequests;
@@ -45,7 +45,7 @@ final class CardSelectionServiceAdapter implements CardSelectionService {
    *
    * @since 2.0
    */
-  CardSelectionServiceAdapter() {
+  CardSelectionManagerAdapter() {
     multiSelectionProcessing = MultiSelectionProcessing.FIRST_MATCH;
     cardSelections = new ArrayList<CardSelectionSpi>();
     cardSelectionRequests = new ArrayList<CardSelectionRequestSpi>();

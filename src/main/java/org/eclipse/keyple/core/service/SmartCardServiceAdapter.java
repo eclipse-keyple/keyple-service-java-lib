@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.calypsonet.terminal.card.AbstractApduException;
 import org.calypsonet.terminal.card.CardApiProperties;
 import org.calypsonet.terminal.reader.ReaderApiProperties;
+import org.calypsonet.terminal.reader.selection.CardSelectionManager;
 import org.eclipse.keyple.core.common.CommonsApiProperties;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory;
@@ -577,5 +578,15 @@ final class SmartCardServiceAdapter implements SmartCardService {
     synchronized (distributedLocalServiceMonitor) {
       return distributedLocalServices.get(distributedLocalServiceName);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
+  public CardSelectionManager createCardSelectionManager() {
+    return new CardSelectionManagerAdapter();
   }
 }

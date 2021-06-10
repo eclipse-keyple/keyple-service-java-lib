@@ -12,8 +12,8 @@
 package org.eclipse.keyple.core.service.examples.UseCase1_BasicSelection;
 
 import java.util.List;
+import org.calypsonet.terminal.reader.selection.CardSelectionManager;
 import org.calypsonet.terminal.reader.selection.CardSelectionResult;
-import org.calypsonet.terminal.reader.selection.CardSelectionService;
 import org.calypsonet.terminal.reader.selection.spi.CardSelection;
 import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
@@ -83,18 +83,18 @@ public class Main_BasicSelection_Pcsc {
 
     logger.info("= #### Select the card with no conditions.");
 
-    // Get the core card selection service.
-    CardSelectionService selectionService = CardSelectionServiceFactory.getService();
+    // Get the core card selection manager.
+    CardSelectionManager cardSelectionManager = smartCardService.createCardSelectionManager();
 
     // Create a card selection using the generic card extension without specifying any filter
     // (protocol/power-on data/DFName).
     CardSelection cardSelection = cardExtension.createCardSelection();
 
     // Prepare the selection by adding the created generic selection to the card selection scenario.
-    selectionService.prepareSelection(cardSelection);
+    cardSelectionManager.prepareSelection(cardSelection);
 
     // Actual card communication: run the selection scenario.
-    CardSelectionResult selectionResult = selectionService.processCardSelectionScenario(reader);
+    CardSelectionResult selectionResult = cardSelectionManager.processCardSelectionScenario(reader);
 
     // Check the selection result.
     if (selectionResult.getActiveSmartCard() == null) {

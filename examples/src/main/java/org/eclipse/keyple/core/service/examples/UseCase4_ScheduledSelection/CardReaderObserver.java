@@ -12,7 +12,7 @@
 package org.eclipse.keyple.core.service.examples.UseCase4_ScheduledSelection;
 
 import org.calypsonet.terminal.reader.CardReaderEvent;
-import org.calypsonet.terminal.reader.selection.CardSelectionService;
+import org.calypsonet.terminal.reader.selection.CardSelectionManager;
 import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
@@ -32,11 +32,11 @@ class CardReaderObserver
 
   private static final Logger logger = LoggerFactory.getLogger(CardReaderObserver.class);
   private final Reader reader;
-  private final CardSelectionService selectionService;
+  private final CardSelectionManager cardSelectionManager;
 
-  CardReaderObserver(Reader reader, CardSelectionService selectionService) {
+  CardReaderObserver(Reader reader, CardSelectionManager cardSelectionManager) {
     this.reader = reader;
-    this.selectionService = selectionService;
+    this.cardSelectionManager = cardSelectionManager;
   }
 
   /**
@@ -50,7 +50,7 @@ class CardReaderObserver
       case CARD_MATCHED:
         // the selection has one target, get the result at index 0
         SmartCard smartCard =
-            selectionService
+            cardSelectionManager
                 .parseScheduledCardSelectionsResponse(event.getScheduledCardSelectionsResponse())
                 .getActiveSmartCard();
 

@@ -12,6 +12,7 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.Set;
+import org.calypsonet.terminal.reader.selection.CardSelectionManager;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory;
 import org.eclipse.keyple.core.common.KeyplePluginExtensionFactory;
@@ -114,4 +115,12 @@ public interface SmartCardService {
    * @since 2.0
    */
   DistributedLocalService getDistributedLocalService(String distributedLocalServiceName);
+
+  /**
+   * Create a new instance of a {@link CardSelectionManager} in order to perform a card selection.
+   *
+   * @return A not null reference.
+   * @since 2.0
+   */
+  CardSelectionManager createCardSelectionManager();
 }

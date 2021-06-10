@@ -12,7 +12,7 @@
 package org.eclipse.keyple.core.service.examples.UseCase4_ScheduledSelection;
 
 import org.calypsonet.terminal.reader.ObservableCardReader;
-import org.calypsonet.terminal.reader.selection.CardSelectionService;
+import org.calypsonet.terminal.reader.selection.CardSelectionManager;
 import org.calypsonet.terminal.reader.selection.spi.CardSelection;
 import org.eclipse.keyple.card.generic.GenericExtensionService;
 import org.eclipse.keyple.core.service.*;
@@ -80,8 +80,8 @@ public class Main_ScheduledSelection_Pcsc {
 
     logger.info("= #### Select application with AID = '{}'.", ConfigurationUtil.AID_EMV_PPSE);
 
-    // Get the core card selection service.
-    CardSelectionService selectionService = CardSelectionServiceFactory.getService();
+    // Get the core card selection manager.
+    CardSelectionManager cardSelectionManager = smartCardService.createCardSelectionManager();
 
     // Create a card selection using the generic card extension.
     CardSelection cardSelection =
@@ -91,16 +91,16 @@ public class Main_ScheduledSelection_Pcsc {
             .filterByDfName(ConfigurationUtil.AID_EMV_PPSE);
 
     // Prepare the selection by adding the created generic selection to the card selection scenario.
-    selectionService.prepareSelection(cardSelection);
+    cardSelectionManager.prepareSelection(cardSelection);
 
     // Schedule the selection scenario.
-    selectionService.scheduleCardSelectionScenario(
+    cardSelectionManager.scheduleCardSelectionScenario(
         (ObservableReader) reader,
         ObservableCardReader.DetectionMode.REPEATING,
         ObservableReader.NotificationMode.MATCHED_ONLY);
 
     // Create and add an observer
-    CardReaderObserver cardReaderObserver = new CardReaderObserver(reader, selectionService);
+    CardReaderObserver cardReaderObserver = new CardReaderObserver(reader, cardSelectionManager);
     ((ObservableReader) reader).setReaderObservationExceptionHandler(cardReaderObserver);
     ((ObservableReader) reader).addObserver(cardReaderObserver);
     ((ObservableReader) reader).startCardDetection(ObservableReader.DetectionMode.REPEATING);
