@@ -39,14 +39,14 @@ public class CardSelectionResultAdapterTest {
   @Test
   public void getActiveSelectionIndex_whenNullSmartCardAndIsSelected_shouldReturnIndex() {
     CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    cardSelectionResult.addSmartCard(0, null);
+    cardSelectionResult.addSmartCard(0, null, true);
     assertThat(cardSelectionResult.getActiveSelectionIndex()).isEqualTo(0);
   }
 
   @Test
   public void getActiveSelectionIndex_whenNotNullSmartCardAndIsSelected_shouldReturnIndex() {
     CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    cardSelectionResult.addSmartCard(0, smartCard);
+    cardSelectionResult.addSmartCard(0, smartCard, true);
     assertThat(cardSelectionResult.getActiveSelectionIndex()).isEqualTo(0);
   }
 
@@ -59,7 +59,7 @@ public class CardSelectionResultAdapterTest {
   @Test
   public void getSmartCards_whenNotNullSmartCard_shouldReturnNotEmptyMap() {
     CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    cardSelectionResult.addSmartCard(0, smartCard);
+    cardSelectionResult.addSmartCard(0, smartCard, true);
     assertThat(cardSelectionResult.getSmartCards()).isNotEmpty();
     assertThat(cardSelectionResult.getSmartCards()).containsValue(smartCard);
   }
@@ -73,7 +73,7 @@ public class CardSelectionResultAdapterTest {
   @Test
   public void getSmartCards_whenNotNullSmartCard_shouldReturnSmartCard() {
     CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    cardSelectionResult.addSmartCard(0, smartCard);
+    cardSelectionResult.addSmartCard(0, smartCard, true);
     assertThat(cardSelectionResult.getSmartCards().get(0)).isEqualTo(smartCard);
   }
 
@@ -86,7 +86,7 @@ public class CardSelectionResultAdapterTest {
   @Test
   public void getActiveSmartCard_whenNotSmartCard_shouldReturnSmartcard() {
     CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    cardSelectionResult.addSmartCard(0, smartCard);
+    cardSelectionResult.addSmartCard(0, smartCard, true);
     assertThat(cardSelectionResult.getActiveSmartCard()).isEqualTo(smartCard);
   }
 }
