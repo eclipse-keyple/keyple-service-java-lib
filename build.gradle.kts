@@ -32,11 +32,11 @@ repositories {
 dependencies {
     implementation("org.calypsonet.terminal:calypsonet-terminal-reader-java-api:1.0-SNAPSHOT") { isChanging = true }
     implementation("org.calypsonet.terminal:calypsonet-terminal-card-java-api:1.0-SNAPSHOT") { isChanging = true }
-    implementation("org.eclipse.keyple:keyple-java-commons-api:2.0-SNAPSHOT") { isChanging = true }
-    implementation("org.eclipse.keyple:keyple-java-plugin-api:2.0-SNAPSHOT") { isChanging = true }
-    implementation("org.eclipse.keyple:keyple-java-distributed-remote-api:2.0-SNAPSHOT") { isChanging = true }
-    implementation("org.eclipse.keyple:keyple-java-distributed-local-api:2.0-SNAPSHOT") { isChanging = true }
-    implementation("org.eclipse.keyple:keyple-java-utils:2.0.0-SNAPSHOT") { isChanging = true }
+    implementation("org.eclipse.keyple:keyple-common-java-api:2.0-SNAPSHOT") { isChanging = true }
+    implementation("org.eclipse.keyple:keyple-plugin-java-api:2.0-SNAPSHOT") { isChanging = true }
+    implementation("org.eclipse.keyple:keyple-distributed-remote-java-api:2.0-SNAPSHOT") { isChanging = true }
+    implementation("org.eclipse.keyple:keyple-distributed-local-java-api:2.0-SNAPSHOT") { isChanging = true }
+    implementation("org.eclipse.keyple:keyple-util-java-lib:2.0.0-SNAPSHOT") { isChanging = true }
     implementation("com.google.code.gson:gson:2.8.5")
     implementation("org.slf4j:slf4j-api:1.7.25")
     testImplementation("org.slf4j:slf4j-simple:1.7.25")
