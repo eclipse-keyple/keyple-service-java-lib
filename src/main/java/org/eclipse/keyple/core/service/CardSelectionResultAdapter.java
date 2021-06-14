@@ -39,18 +39,14 @@ final class CardSelectionResultAdapter implements CardSelectionResult {
    * (package-private)<br>
    * Append a {@link SmartCard} to the internal list
    *
-   * @param selectionIndex the index of the selection that resulted in the matching card
-   * @param smartCard the matching card to add
-   * @param isSelected true if the currently added matching card is selected (its logical channel is
-   *     open)
+   * @param selectionIndex The index of the selection that resulted in the smart card.
+   * @param smartCard The smart card.
    * @since 2.0
    */
-  void addSmartCard(int selectionIndex, SmartCard smartCard, boolean isSelected) {
-    if (smartCard != null) smartCardMap.put(selectionIndex, smartCard);
-    // if the current selection is active, we keep its index
-    if (isSelected) {
-      activeSelectionIndex = selectionIndex;
-    }
+  void addSmartCard(int selectionIndex, SmartCard smartCard) {
+    smartCardMap.put(selectionIndex, smartCard);
+    // keep the current selection index
+    activeSelectionIndex = selectionIndex;
   }
 
   /**
