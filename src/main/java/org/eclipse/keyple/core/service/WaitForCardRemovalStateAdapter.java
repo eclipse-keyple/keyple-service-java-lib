@@ -11,9 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import static org.calypsonet.terminal.reader.ObservableCardReader.DetectionMode.REPEATING;
-
 import java.util.concurrent.ExecutorService;
+import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +24,8 @@ import org.slf4j.LoggerFactory;
  *
  * <ul>
  *   <li>Upon CARD_REMOVED event, the machine changes state for WAIT_FOR_CARD_INSERTION or
- *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableReader.DetectionMode} setting.
+ *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableCardReader.DetectionMode}
+ *       setting.
  *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_CARD_DETECTION.
  * </ul>
  *
@@ -87,7 +87,7 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
         // for insertion
         // We notify the application of the CARD_REMOVED event.
         getReader().processCardRemoved();
-        if (getReader().getdetectionMode() == REPEATING) {
+        if (getReader().getdetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
           switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
         } else {
           switchState(MonitoringState.WAIT_FOR_START_DETECTION);

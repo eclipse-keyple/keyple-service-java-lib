@@ -12,6 +12,8 @@
 package org.eclipse.keyple.core.service.examples.UseCase7_PluginAndReaderObservation;
 
 import java.util.Set;
+
+import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.eclipse.keyple.core.service.*;
 import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
@@ -142,6 +144,6 @@ class PluginObserver implements PluginObserverSpi, PluginObservationExceptionHan
     logger.info("Add observer READERNAME = {}", reader.getName());
     ((ObservableReader) reader).setReaderObservationExceptionHandler(readerObserver);
     ((ObservableReader) reader).addObserver(readerObserver);
-    ((ObservableReader) reader).startCardDetection(ObservableReader.DetectionMode.REPEATING);
+    ((ObservableReader) reader).startCardDetection(ObservableCardReader.DetectionMode.REPEATING);
   }
 }

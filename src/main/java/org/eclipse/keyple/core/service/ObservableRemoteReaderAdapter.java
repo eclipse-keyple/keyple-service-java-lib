@@ -11,13 +11,13 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import static org.calypsonet.terminal.reader.CardReaderEvent.Type.UNAVAILABLE;
 import static org.eclipse.keyple.core.service.DistributedUtilAdapter.*;
 
 import com.google.gson.JsonObject;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.calypsonet.terminal.reader.CardReaderEvent;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemoteReaderSpi;
@@ -166,7 +166,9 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   void unregister() {
     super.unregister();
     try {
-      notifyObservers(new ReaderEventAdapter(getPluginName(), getName(), UNAVAILABLE, null));
+      notifyObservers(
+          new ReaderEventAdapter(
+              getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));
       stopCardDetection();
     } finally {
       clearObservers();

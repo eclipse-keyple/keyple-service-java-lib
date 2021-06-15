@@ -186,9 +186,11 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
 
     /* Check card responses */
     for (CardSelectionResponseApi cardSelectionResponse : cardSelectionResponses) {
-      // invoke the parse method defined by the card extension to retrieve the smart card
-      SmartCard smartCard = (SmartCard) cardSelections.get(index).parse(cardSelectionResponse);
-      cardSelectionsResult.addSmartCard(index, smartCard);
+      if (cardSelectionResponse.hasMatched()) {
+        // invoke the parse method defined by the card extension to retrieve the smart card
+        SmartCard smartCard = (SmartCard) cardSelections.get(index).parse(cardSelectionResponse);
+        cardSelectionsResult.addSmartCard(index, smartCard);
+      }
       index++;
     }
     return cardSelectionsResult;
