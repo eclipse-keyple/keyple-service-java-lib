@@ -117,7 +117,7 @@ public class ObservableLocalReaderSuiteTest {
         .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION));
 
     // check event is well formed
-    CardReaderEvent event = observer.getLastEventOfType(ReaderEvent.Type.CARD_REMOVED);
+    CardReaderEvent event = observer.getLastEventOfType(CardReaderEvent.Type.CARD_REMOVED);
     assertThat(event.getReaderName()).isEqualTo(READER_NAME_1);
   }
 
@@ -141,7 +141,7 @@ public class ObservableLocalReaderSuiteTest {
    * Callables
    */
 
-  private Callable<Boolean> eventOfTypeIsReceived(final ReaderEvent.Type eventType) {
+  private Callable<Boolean> eventOfTypeIsReceived(final CardReaderEvent.Type eventType) {
     return new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {

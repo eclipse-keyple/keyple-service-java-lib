@@ -20,6 +20,7 @@ import org.calypsonet.terminal.card.*;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.calypsonet.terminal.reader.CardReaderEvent;
+import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
 import org.eclipse.keyple.core.distributed.local.LocalServiceApi;
@@ -393,14 +394,14 @@ final class DistributedLocalServiceAdapter
                   input.get(JsonProperty.CARD_SELECTION_SCENARIO.name()),
                   CardSelectionScenarioAdapter.class);
 
-      ObservableReader.NotificationMode notificationMode =
-          ObservableReader.NotificationMode.valueOf(
+      ObservableCardReader.NotificationMode notificationMode =
+          ObservableCardReader.NotificationMode.valueOf(
               input.get(JsonProperty.NOTIFICATION_MODE.name()).getAsString());
 
-      ObservableReader.DetectionMode detectionMode = null;
+      ObservableCardReader.DetectionMode detectionMode = null;
       if (input.has(JsonProperty.POLLING_MODE.name())) {
         detectionMode =
-            ObservableReader.DetectionMode.valueOf(
+            ObservableCardReader.DetectionMode.valueOf(
                 input.get(JsonProperty.POLLING_MODE.name()).getAsString());
       }
 
@@ -450,8 +451,8 @@ final class DistributedLocalServiceAdapter
     private void startCardDetection() {
 
       // Extract info from the message
-      ObservableReader.DetectionMode detectionMode =
-          ObservableReader.DetectionMode.valueOf(
+      ObservableCardReader.DetectionMode detectionMode =
+          ObservableCardReader.DetectionMode.valueOf(
               input.get(JsonProperty.POLLING_MODE.name()).getAsString());
 
       // Execute the service on the reader

@@ -97,13 +97,13 @@ public class Main_ScheduledSelection_Pcsc {
     cardSelectionManager.scheduleCardSelectionScenario(
         (ObservableReader) reader,
         ObservableCardReader.DetectionMode.REPEATING,
-        ObservableReader.NotificationMode.MATCHED_ONLY);
+        ObservableCardReader.NotificationMode.MATCHED_ONLY);
 
     // Create and add an observer
     CardReaderObserver cardReaderObserver = new CardReaderObserver(reader, cardSelectionManager);
     ((ObservableReader) reader).setReaderObservationExceptionHandler(cardReaderObserver);
     ((ObservableReader) reader).addObserver(cardReaderObserver);
-    ((ObservableReader) reader).startCardDetection(ObservableReader.DetectionMode.REPEATING);
+    ((ObservableReader) reader).startCardDetection(ObservableCardReader.DetectionMode.REPEATING);
 
     logger.info(
         "= #### Wait for a card. The AID based selection scenario will be processed as soon as a card is detected.");

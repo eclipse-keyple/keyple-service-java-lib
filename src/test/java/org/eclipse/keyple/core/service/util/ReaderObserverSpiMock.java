@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.calypsonet.terminal.reader.CardReaderEvent;
 import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
-import org.eclipse.keyple.core.service.ReaderEvent;
 
 public class ReaderObserverSpiMock implements CardReaderObserverSpi {
 
@@ -35,11 +34,11 @@ public class ReaderObserverSpiMock implements CardReaderObserverSpi {
     }
   }
 
-  public Boolean hasReceived(ReaderEvent.Type eventType) {
+  public Boolean hasReceived(CardReaderEvent.Type eventType) {
     return eventTypeReceived.keySet().contains(eventType);
   }
 
-  public CardReaderEvent getLastEventOfType(ReaderEvent.Type eventType) {
+  public CardReaderEvent getLastEventOfType(CardReaderEvent.Type eventType) {
     return eventTypeReceived.get(eventType);
   }
 }

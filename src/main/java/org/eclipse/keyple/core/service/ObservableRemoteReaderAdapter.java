@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.calypsonet.terminal.reader.CardReaderEvent;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemoteReaderSpi;
@@ -120,8 +121,8 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    */
   void scheduleCardSelectionScenario(
       CardSelectionScenarioAdapter cardSelectionScenario,
-      ObservableReader.NotificationMode notificationMode,
-      ObservableReader.DetectionMode detectionMode) {
+      NotificationMode notificationMode,
+      DetectionMode detectionMode) {
 
     checkStatus();
 
@@ -166,7 +167,8 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
     super.unregister();
     try {
       notifyObservers(
-          new ReaderEventAdapter(getPluginName(), getName(), ReaderEvent.Type.UNAVAILABLE, null));
+          new ReaderEventAdapter(
+              getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));
       stopCardDetection();
     } finally {
       clearObservers();

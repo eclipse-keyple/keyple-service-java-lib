@@ -45,9 +45,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     (byte) 0x00, (byte) 0xC0, (byte) 0x00, (byte) 0x00, (byte) 0x00
   };
 
-  private static final byte[] APDU_GET_DATA = {
-    (byte) 0x00, (byte) 0xCA, (byte) 0x00, (byte) 0x6F, (byte) 0x00
-  };
   private static final int DEFAULT_SUCCESSFUL_CODE = 0x9000;
 
   private final ReaderSpi readerSpi;
@@ -495,7 +492,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       return new CardSelectionResponseAdapter(
           selectionStatus.powerOnData,
           selectionStatus.selectApplicationResponse,
-          selectionStatus.hasMatched,
+          false,
           new CardResponseAdapter(new ArrayList<ApduResponseApi>(), false));
     }
 
@@ -510,10 +507,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     }
 
     return new CardSelectionResponseAdapter(
-        selectionStatus.powerOnData,
-        selectionStatus.selectApplicationResponse,
-        selectionStatus.hasMatched,
-        cardResponse);
+        selectionStatus.powerOnData, selectionStatus.selectApplicationResponse, true, cardResponse);
   }
 
   /**
@@ -615,9 +609,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * (private)<br>
    * Selects the card with the provided AID and gets the FCI response in return.
    *
-   * <p>If the initial FCI response does not contain any data, a special Get Data command is issued
-   * to retrieve the FCI structure (OMAPI case).
-   *
    * @param cardSelector The card selector.
    * @return An not null {@link ApduResponseApi} containing the FCI.
    * @see #processSelection(CardSelectorSpi)
@@ -638,43 +629,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     } else {
       fciResponse = processExplicitAidSelection(cardSelector);
     }
-
-    if (fciResponse.getStatusWord() == DEFAULT_SUCCESSFUL_CODE
-        && fciResponse.getDataOut().length == 0) {
-      /*
-       * The selection didn't provide data (e.g. OMAPI), we get the FCI using a Get Data
-       * command.
-       *
-       * The AID selector is provided to handle successful status word in the Get Data
-       * command.
-       */
-      fciResponse = recoverSelectionFciData();
-    }
     return fciResponse;
-  }
-
-  /**
-   * (private)<br>
-   * This method is dedicated to the case where no FCI data is available in return for the select
-   * command.
-   *
-   * <p>A specific APDU is sent to the card to retrieve the FCI data and returns it in an {@link
-   * ApduResponseApi}.<br>
-   * The provided AidSelector is used to check the response's status words.
-   *
-   * @return A {@link ApduResponseApi} containing the FCI.
-   * @throws ReaderIOException if the communication with the reader has failed.
-   * @throws CardIOException if the communication with the card has failed.
-   */
-  private ApduResponseApi recoverSelectionFciData() throws CardIOException, ReaderIOException {
-
-    ApduRequestAdapter apduRequest = new ApduRequestAdapter(APDU_GET_DATA);
-
-    if (logger.isDebugEnabled()) {
-      apduRequest.setInfo("Internal Get Data");
-    }
-
-    return processApduRequest(apduRequest);
   }
 
   /**
