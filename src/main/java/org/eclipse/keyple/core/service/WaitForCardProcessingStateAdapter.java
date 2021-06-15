@@ -11,6 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import static org.calypsonet.terminal.reader.ObservableCardReader.DetectionMode.REPEATING;
+
 import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +84,7 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
      */
     switch (event) {
       case CARD_PROCESSED:
-        if (this.getReader().getdetectionMode() == ObservableReader.DetectionMode.REPEATING) {
+        if (this.getReader().getdetectionMode() == REPEATING) {
           switchState(MonitoringState.WAIT_FOR_CARD_REMOVAL);
         } else {
           // We close the channels now and notify the application of
@@ -98,7 +100,7 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
         // for insertion
         // We notify the application of the CARD_REMOVED event.
         getReader().processCardRemoved();
-        if (getReader().getdetectionMode() == ObservableReader.DetectionMode.REPEATING) {
+        if (getReader().getdetectionMode() == REPEATING) {
           switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
         } else {
           switchState(MonitoringState.WAIT_FOR_START_DETECTION);

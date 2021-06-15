@@ -11,6 +11,9 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import static org.calypsonet.terminal.reader.CardReaderEvent.Type.*;
+import static org.calypsonet.terminal.reader.ObservableCardReader.NotificationMode.MATCHED_ONLY;
+
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import org.calypsonet.terminal.card.CardBrokenCommunicationException;
@@ -155,12 +158,12 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   /**
    * (package-private)<br>
-   * Gets the current {@link ObservableReader.DetectionMode}.
+   * Gets the current {@link DetectionMode}.
    *
    * @return Null if the polling mode has not been defined.
    * @since 2.0
    */
-  ObservableReader.DetectionMode getdetectionMode() {
+  DetectionMode getdetectionMode() {
     return currentdetectionMode;
   }
 
@@ -245,8 +248,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
         logger.trace("[{}] no card selection scenario defined, notify CARD_INSERTED", getName());
       }
       /* no default request is defined, just notify the card insertion */
-      return new ReaderEventAdapter(
-          getPluginName(), getName(), ReaderEvent.Type.CARD_INSERTED, null);
+      return new ReaderEventAdapter(getPluginName(), getName(), CARD_INSERTED, null);
     }
 
     // a card selection scenario is defined, send it and notify according to the notification mode
@@ -262,11 +264,11 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
         return new ReaderEventAdapter(
             getPluginName(),
             getName(),
-            ReaderEvent.Type.CARD_MATCHED,
+            CARD_MATCHED,
             new ScheduledCardSelectionsResponseAdapter(cardSelectionResponses));
       }
 
-      if (notificationMode == ObservableReader.NotificationMode.MATCHED_ONLY) {
+      if (notificationMode == MATCHED_ONLY) {
         /* notify only if a card matched the selection, just ignore if not */
         if (logger.isTraceEnabled()) {
           logger.trace(
@@ -285,7 +287,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       return new ReaderEventAdapter(
           getPluginName(),
           getName(),
-          ReaderEvent.Type.CARD_INSERTED,
+          CARD_INSERTED,
           new ScheduledCardSelectionsResponseAdapter(cardSelectionResponses));
 
     } catch (ReaderBrokenCommunicationException e) {
@@ -353,8 +355,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   void processCardRemoved() {
     closeLogicalAndPhysicalChannelsSilently();
-    notifyObservers(
-        new ReaderEventAdapter(getPluginName(), getName(), ReaderEvent.Type.CARD_REMOVED, null));
+    notifyObservers(new ReaderEventAdapter(getPluginName(), getName(), CARD_REMOVED, null));
   }
 
   /**
@@ -451,8 +452,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   void scheduleCardSelectionScenario(
       CardSelectionScenarioAdapter cardSelectionScenario,
-      ObservableReader.NotificationMode notificationMode,
-      ObservableReader.DetectionMode detectionMode) {
+      NotificationMode notificationMode,
+      DetectionMode detectionMode) {
     this.cardSelectionScenario = cardSelectionScenario;
     this.notificationMode = notificationMode;
     this.currentdetectionMode = detectionMode;
@@ -471,8 +472,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
   void unregister() {
     super.unregister();
     try {
-      notifyObservers(
-          new ReaderEventAdapter(getPluginName(), getName(), ReaderEvent.Type.UNAVAILABLE, null));
+      notifyObservers(new ReaderEventAdapter(getPluginName(), getName(), UNAVAILABLE, null));
       stopCardDetection();
     } finally {
       clearObservers();
@@ -549,7 +549,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void startCardDetection(ObservableReader.DetectionMode detectionMode) {
+  public void startCardDetection(DetectionMode detectionMode) {
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(

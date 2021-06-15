@@ -35,7 +35,7 @@ final class PluginEventAdapter implements PluginEvent {
 
   private final String pluginName;
   private final SortedSet<String> readerNames;
-  private final Type Type;
+  private final Type type;
 
   /**
    * (package-private)<br>
@@ -44,14 +44,14 @@ final class PluginEventAdapter implements PluginEvent {
    *
    * @param pluginName A string containing the name of the plugin (should be not null).
    * @param readerName A string containing the name of the reader (should be not null).
-   * @param Type An event type {@link Type#READER_CONNECTED} or {@link Type#READER_DISCONNECTED}
+   * @param type An event type {@link Type#READER_CONNECTED} or {@link Type#READER_DISCONNECTED}
    *     (should be not null).
    * @since 2.0
    */
-  PluginEventAdapter(String pluginName, String readerName, Type Type) {
+  PluginEventAdapter(String pluginName, String readerName, Type type) {
     this.pluginName = pluginName;
     this.readerNames = new TreeSet<String>(Collections.singleton(readerName));
-    this.Type = Type;
+    this.type = type;
   }
 
   /**
@@ -64,14 +64,14 @@ final class PluginEventAdapter implements PluginEvent {
    *
    * @param pluginName A string containing the name of the plugin (must be not empty).
    * @param readerNames A set of string containing the readers names (must be not empty).
-   * @param Type An event type {@link Type#READER_CONNECTED} or {@link Type#READER_DISCONNECTED}
+   * @param type An event type {@link Type#READER_CONNECTED} or {@link Type#READER_DISCONNECTED}
    *     (must be not null).
    * @since 2.0
    */
-  PluginEventAdapter(String pluginName, Set<String> readerNames, Type Type) {
+  PluginEventAdapter(String pluginName, Set<String> readerNames, Type type) {
     this.pluginName = pluginName;
     this.readerNames = new TreeSet<String>(readerNames);
-    this.Type = Type;
+    this.type = type;
   }
 
   /**
@@ -101,6 +101,6 @@ final class PluginEventAdapter implements PluginEvent {
    */
   @Override
   public Type getType() {
-    return Type;
+    return type;
   }
 }

@@ -25,14 +25,14 @@ final class ReaderEventAdapter implements ReaderEvent {
   private final String readerName;
   private final ScheduledCardSelectionsResponse scheduledCardSelectionsResponse;
 
-  private final Type Type;
+  private final Type type;
 
   /**
    * ReaderEvent constructor for simple insertion notification mode
    *
    * @param pluginName The name of the current plugin (should be not null).
    * @param readerName The name of the current reader (should be not null).
-   * @param Type The type of event (should be not null).
+   * @param type The type of event (should be not null).
    * @param scheduledCardSelectionsResponse The responses received during the execution of the card
    *     selection scenario (can be null).
    * @since 2.0
@@ -40,11 +40,11 @@ final class ReaderEventAdapter implements ReaderEvent {
   public ReaderEventAdapter(
       String pluginName,
       String readerName,
-      Type Type,
+      Type type,
       ScheduledCardSelectionsResponse scheduledCardSelectionsResponse) {
     this.pluginName = pluginName;
     this.readerName = readerName;
-    this.Type = Type;
+    this.type = type;
     this.scheduledCardSelectionsResponse = scheduledCardSelectionsResponse;
   }
 
@@ -60,7 +60,7 @@ final class ReaderEventAdapter implements ReaderEvent {
 
   @Override
   public Type getType() {
-    return Type;
+    return type;
   }
 
   @Override

@@ -11,6 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import static org.calypsonet.terminal.reader.CardReaderEvent.Type.UNAVAILABLE;
 import static org.eclipse.keyple.core.service.DistributedUtilAdapter.*;
 
 import com.google.gson.JsonObject;
@@ -120,8 +121,8 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    */
   void scheduleCardSelectionScenario(
       CardSelectionScenarioAdapter cardSelectionScenario,
-      ObservableReader.NotificationMode notificationMode,
-      ObservableReader.DetectionMode detectionMode) {
+      NotificationMode notificationMode,
+      DetectionMode detectionMode) {
 
     checkStatus();
 
@@ -165,8 +166,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   void unregister() {
     super.unregister();
     try {
-      notifyObservers(
-          new ReaderEventAdapter(getPluginName(), getName(), ReaderEvent.Type.UNAVAILABLE, null));
+      notifyObservers(new ReaderEventAdapter(getPluginName(), getName(), UNAVAILABLE, null));
       stopCardDetection();
     } finally {
       clearObservers();

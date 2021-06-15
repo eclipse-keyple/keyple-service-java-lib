@@ -13,6 +13,7 @@ package org.eclipse.keyple.core.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.calypsonet.terminal.reader.CardReaderEvent.Type.CARD_REMOVED;
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER_NAME_1;
 
 import java.util.concurrent.Callable;
@@ -117,7 +118,7 @@ public class ObservableLocalReaderSuiteTest {
         .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION));
 
     // check event is well formed
-    CardReaderEvent event = observer.getLastEventOfType(ReaderEvent.Type.CARD_REMOVED);
+    CardReaderEvent event = observer.getLastEventOfType(CARD_REMOVED);
     assertThat(event.getReaderName()).isEqualTo(READER_NAME_1);
   }
 
@@ -133,7 +134,7 @@ public class ObservableLocalReaderSuiteTest {
         .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION));
 
     // check event is well formed
-    CardReaderEvent event = observer.getLastEventOfType(CardReaderEvent.Type.CARD_REMOVED);
+    CardReaderEvent event = observer.getLastEventOfType(CARD_REMOVED);
     assertThat(event.getReaderName()).isEqualTo(READER_NAME_1);
   }
 

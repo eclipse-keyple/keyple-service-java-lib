@@ -186,18 +186,9 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
 
     /* Check card responses */
     for (CardSelectionResponseApi cardSelectionResponse : cardSelectionResponses) {
-      /* test if the selection is successful: we should have either a FCI or power-on data */
-      if (cardSelectionResponse != null && cardSelectionResponse.hasMatched()) {
-        /*
-         * create a AbstractSmartCard with the class deduced from the selection request
-         * during the selection preparation
-         */
-        SmartCard smartCard = (SmartCard) cardSelections.get(index).parse(cardSelectionResponse);
-
-        boolean isSelected = cardSelectionResponse.hasMatched();
-
-        cardSelectionsResult.addSmartCard(index, smartCard, isSelected);
-      }
+      // invoke the parse method defined by the card extension to retrieve the smart card
+      SmartCard smartCard = (SmartCard) cardSelections.get(index).parse(cardSelectionResponse);
+      cardSelectionsResult.addSmartCard(index, smartCard);
       index++;
     }
     return cardSelectionsResult;
