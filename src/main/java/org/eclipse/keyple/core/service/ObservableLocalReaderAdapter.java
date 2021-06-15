@@ -17,7 +17,6 @@ import org.calypsonet.terminal.card.CardBrokenCommunicationException;
 import org.calypsonet.terminal.card.CardSelectionResponseApi;
 import org.calypsonet.terminal.card.ReaderBrokenCommunicationException;
 import org.calypsonet.terminal.reader.CardReaderEvent;
-import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.plugin.CardIOException;
@@ -268,7 +267,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
             new ScheduledCardSelectionsResponseAdapter(cardSelectionResponses));
       }
 
-      if (notificationMode == ObservableCardReader.NotificationMode.MATCHED_ONLY) {
+      if (notificationMode == NotificationMode.MATCHED_ONLY) {
         /* notify only if a card matched the selection, just ignore if not */
         if (logger.isTraceEnabled()) {
           logger.trace(
