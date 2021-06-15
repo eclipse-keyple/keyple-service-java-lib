@@ -58,7 +58,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   private CardSelectionScenarioAdapter cardSelectionScenario;
   private NotificationMode notificationMode;
-  private DetectionMode currentdetectionMode;
+  private DetectionMode detectionMode;
 
   /**
    * (package-private)<br>
@@ -162,7 +162,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   DetectionMode getdetectionMode() {
-    return currentdetectionMode;
+    return detectionMode;
   }
 
   /**
@@ -457,7 +457,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
       DetectionMode detectionMode) {
     this.cardSelectionScenario = cardSelectionScenario;
     this.notificationMode = notificationMode;
-    this.currentdetectionMode = detectionMode;
+    this.detectionMode = detectionMode;
   }
 
   /**
@@ -562,7 +562,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           detectionMode);
     }
     Assert.getInstance().notNull(detectionMode, "detectionMode");
-    currentdetectionMode = detectionMode;
+    this.detectionMode = detectionMode;
     stateService.onEvent(InternalEvent.START_DETECT);
   }
 
