@@ -16,10 +16,14 @@ import java.util.List;
 import org.calypsonet.terminal.card.*;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionSpi;
+import org.calypsonet.terminal.card.spi.ParseException;
+import org.calypsonet.terminal.reader.CardCommunicationException;
 import org.calypsonet.terminal.reader.CardReader;
 import org.calypsonet.terminal.reader.ObservableCardReader;
+import org.calypsonet.terminal.reader.ReaderCommunicationException;
 import org.calypsonet.terminal.reader.selection.CardSelectionManager;
 import org.calypsonet.terminal.reader.selection.CardSelectionResult;
+import org.calypsonet.terminal.reader.selection.InvalidCardResponseException;
 import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
 import org.calypsonet.terminal.reader.selection.spi.CardSelection;
 import org.calypsonet.terminal.reader.selection.spi.SmartCard;
@@ -107,9 +111,9 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
               .transmitCardSelectionRequests(
                   cardSelectionRequests, multiSelectionProcessing, channelControl);
     } catch (ReaderBrokenCommunicationException e) {
-      throw new KeypleReaderCommunicationException(e.getMessage(), e);
+      throw new ReaderCommunicationException(e.getMessage(), e);
     } catch (CardBrokenCommunicationException e) {
-      throw new KeypleCardCommunicationException(e.getMessage(), e);
+      throw new CardCommunicationException(e.getMessage(), e);
     }
 
     // clear the selection requests list
@@ -188,7 +192,13 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
     for (CardSelectionResponseApi cardSelectionResponse : cardSelectionResponses) {
       if (cardSelectionResponse.hasMatched()) {
         // invoke the parse method defined by the card extension to retrieve the smart card
-        SmartCard smartCard = (SmartCard) cardSelections.get(index).parse(cardSelectionResponse);
+        SmartCard smartCard = null;
+        try {
+          smartCard = (SmartCard) cardSelections.get(index).parse(cardSelectionResponse);
+        } catch (ParseException e) {
+          throw new InvalidCardResponseException(
+              "Error occurred while parsing the card response: " + e.getMessage(), e);
+        }
         cardSelectionsResult.addSmartCard(index, smartCard);
       }
       index++;

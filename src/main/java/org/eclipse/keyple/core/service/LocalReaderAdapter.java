@@ -20,6 +20,8 @@ import org.calypsonet.terminal.card.spi.ApduRequestSpi;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectorSpi;
+import org.calypsonet.terminal.reader.ReaderCommunicationException;
+import org.calypsonet.terminal.reader.ReaderProtocolNotSupportedException;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.AutonomousSelectionReaderSpi;
@@ -231,7 +233,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     try {
       return readerSpi.checkCardPresence();
     } catch (ReaderIOException e) {
-      throw new KeypleReaderCommunicationException(
+      throw new ReaderCommunicationException(
           "An exception occurred while checking the card presence.", e);
     }
   }
@@ -249,7 +251,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         .notEmpty(applicationProtocol, "applicationProtocol");
 
     if (!readerSpi.isProtocolSupported(readerProtocol)) {
-      throw new KeypleReaderProtocolNotSupportedException(readerProtocol);
+      throw new ReaderProtocolNotSupportedException(readerProtocol);
     }
 
     readerSpi.activateProtocol(readerProtocol);
@@ -270,7 +272,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     protocolAssociations.remove(readerProtocol);
 
     if (!readerSpi.isProtocolSupported(readerProtocol)) {
-      throw new KeypleReaderProtocolNotSupportedException(readerProtocol);
+      throw new ReaderProtocolNotSupportedException(readerProtocol);
     }
 
     readerSpi.deactivateProtocol(readerProtocol);
