@@ -21,6 +21,7 @@ import org.calypsonet.terminal.card.ChannelControl;
 import org.calypsonet.terminal.card.ReaderBrokenCommunicationException;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectorSpi;
+import org.calypsonet.terminal.reader.ReaderCommunicationException;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
@@ -74,7 +75,7 @@ public class LocalReaderAdapterTest {
     assertThat(localReaderAdapter.getReaderSpi()).isEqualTo(readerSpi);
   }
 
-  @Test(expected = KeypleReaderCommunicationException.class)
+  @Test(expected = ReaderCommunicationException.class)
   public void isCardPresent_whenReaderSpiFails_shouldKRCE() throws Exception {
     doThrow(new ReaderIOException("Reader IO Exception")).when(readerSpi).checkCardPresence();
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);

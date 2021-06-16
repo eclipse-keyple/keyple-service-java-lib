@@ -17,6 +17,7 @@ import org.calypsonet.terminal.card.CardBrokenCommunicationException;
 import org.calypsonet.terminal.card.CardSelectionResponseApi;
 import org.calypsonet.terminal.card.ReaderBrokenCommunicationException;
 import org.calypsonet.terminal.reader.CardReaderEvent;
+import org.calypsonet.terminal.reader.ReaderCommunicationException;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.plugin.CardIOException;
@@ -200,7 +201,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           .onReaderObservationError(
               getPluginName(),
               getName(),
-              new KeypleReaderCommunicationException(READER_MONITORING_ERROR, e));
+              new ReaderCommunicationException(READER_MONITORING_ERROR, e));
     } catch (CardIOException e) {
       if (logger.isTraceEnabled()) {
         logger.trace(
@@ -295,7 +296,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           .onReaderObservationError(
               getPluginName(),
               getName(),
-              new KeypleReaderCommunicationException(READER_MONITORING_ERROR, e));
+              new ReaderCommunicationException(READER_MONITORING_ERROR, e));
 
     } catch (CardBrokenCommunicationException e) {
       // The last transmission failed, close the logical and physical channels.
@@ -317,7 +318,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           .onReaderObservationError(
               getPluginName(),
               getName(),
-              new KeypleReaderCommunicationException(READER_MONITORING_ERROR, e));
+              new ReaderCommunicationException(READER_MONITORING_ERROR, e));
     }
 
     // no event returned
