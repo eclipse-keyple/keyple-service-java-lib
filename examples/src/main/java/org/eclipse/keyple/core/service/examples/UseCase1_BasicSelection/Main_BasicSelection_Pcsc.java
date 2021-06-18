@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-public class Main_BasicSelection_Pcsc {
+public class Main_BasicS election_Pcsc {
   private static final Logger logger = LoggerFactory.getLogger(Main_BasicSelection_Pcsc.class);
 
   public static void main(String[] args) {
