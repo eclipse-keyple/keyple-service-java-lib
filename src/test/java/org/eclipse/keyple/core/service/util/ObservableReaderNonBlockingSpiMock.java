@@ -109,7 +109,7 @@ public class ObservableReaderNonBlockingSpiMock
   }
 
   @Override
-  public void unregister() {}
+  public void onUnregister() {}
 
   @Override
   public void setCardPresent(boolean cardPresent) {

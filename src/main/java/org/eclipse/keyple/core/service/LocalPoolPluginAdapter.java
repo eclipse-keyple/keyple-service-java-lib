@@ -54,7 +54,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
   @Override
   void unregister() {
     super.unregister();
-    poolPluginSpi.unregister();
+    poolPluginSpi.onUnregister();
   }
 
   /**

@@ -120,14 +120,14 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * <p>Invoke {@link ReaderSpi#unregister()} on the associated SPI.
+   * <p>Invoke {@link ReaderSpi#onUnregister()} on the associated SPI.
    *
    * @since 2.0
    */
   @Override
   void unregister() {
     super.unregister();
-    readerSpi.unregister();
+    readerSpi.onUnregister();
   }
 
   /**

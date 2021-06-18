@@ -76,6 +76,6 @@ class LocalPluginAdapter extends AbstractPluginAdapter {
   @Override
   void unregister() {
     super.unregister();
-    pluginSpi.unregister();
+    pluginSpi.onUnregister();
   }
 }

@@ -36,5 +36,5 @@ public class AutonomousObservablePluginSpiMock implements AutonomousObservablePl
   }
 
   @Override
-  public void unregister() {}
+  public void onUnregister() {}
 }

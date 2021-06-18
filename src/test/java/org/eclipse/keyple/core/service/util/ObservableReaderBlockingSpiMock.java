@@ -126,7 +126,7 @@ public class ObservableReaderBlockingSpiMock
   }
 
   @Override
-  public void unregister() {}
+  public void onUnregister() {}
 
   /**
    * Wait for a one time card insertion

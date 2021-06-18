@@ -109,7 +109,7 @@ public class ObservableReaderAutonomousSpiMock
   }
 
   @Override
-  public void unregister() {}
+  public void onUnregister() {}
 
   @Override
   public void connect(
