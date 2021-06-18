@@ -12,7 +12,6 @@
 package org.eclipse.keyple.core.service.examples.UseCase7_PluginAndReaderObservation;
 
 import java.util.Set;
-
 import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.eclipse.keyple.core.service.*;
 import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
