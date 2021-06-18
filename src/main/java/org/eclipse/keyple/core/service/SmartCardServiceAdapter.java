@@ -46,7 +46,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
 
   private static final Logger logger = LoggerFactory.getLogger(SmartCardServiceAdapter.class);
 
-  private static final SmartCardServiceAdapter instance = new SmartCardServiceAdapter();
+  private static final SmartCardServiceAdapter INSTANCE = new SmartCardServiceAdapter();
 
   private final Map<String, Plugin> plugins = new ConcurrentHashMap<String, Plugin>();
   private final Object pluginMonitor = new Object();
@@ -72,7 +72,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @since 2.0
    */
   static SmartCardServiceAdapter getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   /**
