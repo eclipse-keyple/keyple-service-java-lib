@@ -108,7 +108,7 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
 
       case CARD_REMOVED:
         // the card has been removed during default selection
-        if (getReader().getdetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
+        if (getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
           switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
         } else {
           switchState(MonitoringState.WAIT_FOR_START_DETECTION);

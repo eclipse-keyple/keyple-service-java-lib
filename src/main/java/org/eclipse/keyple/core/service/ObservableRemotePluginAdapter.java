@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.eclipse.keyple.core.distributed.remote.ObservableRemotePluginApi;
 import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemoteReaderSpi;
@@ -42,6 +43,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   private final ObservableRemotePluginSpi observableRemotePluginSpi;
   private final ObservationManagerAdapter<PluginObserverSpi, PluginObservationExceptionHandlerSpi>
       observationManager;
+  private final ExecutorService eventNotificationExecutorService;
 
   /**
    * (package-private)<br>
@@ -57,6 +59,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     this.observationManager =
         new ObservationManagerAdapter<PluginObserverSpi, PluginObservationExceptionHandlerSpi>(
             getName(), null);
+    this.eventNotificationExecutorService = Executors.newCachedThreadPool();
   }
 
   /**
@@ -82,26 +85,24 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     Set<PluginObserverSpi> observers = observationManager.getObservers();
 
     for (final PluginObserverSpi observer : observers) {
-      observationManager
-          .getEventNotificationExecutorService()
-          .execute(
-              new Runnable() {
-                @Override
-                public void run() {
-                  try {
-                    observer.onPluginEvent(event);
-                  } catch (Exception e) {
-                    try {
-                      observationManager
-                          .getObservationExceptionHandler()
-                          .onPluginObservationError(getName(), e);
-                    } catch (Exception e2) {
-                      logger.error("Exception during notification", e2);
-                      logger.error("Original cause", e);
-                    }
-                  }
+      eventNotificationExecutorService.execute(
+          new Runnable() {
+            @Override
+            public void run() {
+              try {
+                observer.onPluginEvent(event);
+              } catch (Exception e) {
+                try {
+                  observationManager
+                      .getObservationExceptionHandler()
+                      .onPluginObservationError(getName(), e);
+                } catch (Exception e2) {
+                  logger.error("Exception during notification", e2);
+                  logger.error("Original cause", e);
                 }
-              });
+              }
+            }
+          });
     }
   }
 
@@ -216,18 +217,6 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   @Override
   public final int countObservers() {
     return observationManager.countObservers();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public final void setEventNotificationExecutorService(
-      ExecutorService eventNotificationExecutorService) {
-    checkStatus();
-    observationManager.setEventNotificationExecutorService(eventNotificationExecutorService);
   }
 
   /**

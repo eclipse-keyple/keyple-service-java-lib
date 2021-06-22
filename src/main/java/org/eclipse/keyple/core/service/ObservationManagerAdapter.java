@@ -13,7 +13,6 @@ package org.eclipse.keyple.core.service;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,6 @@ final class ObservationManagerAdapter<T, S> {
   private final Set<T> observers;
   private final Object monitor;
 
-  private ExecutorService eventNotificationExecutorService;
   private S exceptionHandler;
 
   /**
@@ -133,20 +131,6 @@ final class ObservationManagerAdapter<T, S> {
 
   /**
    * (package-private)<br>
-   * Sets the event notification executor service.
-   *
-   * @param eventNotificationExecutorService The event notification executor service.
-   * @throws IllegalArgumentException If the provided service is null.
-   * @since 2.0
-   */
-  void setEventNotificationExecutorService(ExecutorService eventNotificationExecutorService) {
-    Assert.getInstance()
-        .notNull(eventNotificationExecutorService, "eventNotificationExecutorService");
-    this.eventNotificationExecutorService = eventNotificationExecutorService;
-  }
-
-  /**
-   * (package-private)<br>
    * Sets the observation exception handler.
    *
    * @param exceptionHandler the observation exception handler.
@@ -169,17 +153,6 @@ final class ObservationManagerAdapter<T, S> {
     synchronized (monitor) {
       return new LinkedHashSet<T>(observers);
     }
-  }
-
-  /**
-   * (package-private)<br>
-   * Gets the event notification executor service.
-   *
-   * @return Null if no service has been set.
-   * @since 2.0
-   */
-  ExecutorService getEventNotificationExecutorService() {
-    return eventNotificationExecutorService;
   }
 
   /**

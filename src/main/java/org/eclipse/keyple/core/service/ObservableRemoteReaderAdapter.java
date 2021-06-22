@@ -40,6 +40,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   private final ObservationManagerAdapter<
           CardReaderObserverSpi, CardReaderObservationExceptionHandlerSpi>
       observationManager;
+  private final ExecutorService eventNotificationExecutorService;
 
   /**
    * (package-private)<br>
@@ -56,7 +57,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
     this.observationManager =
         new ObservationManagerAdapter<
             CardReaderObserverSpi, CardReaderObservationExceptionHandlerSpi>(pluginName, getName());
-    this.observationManager.setEventNotificationExecutorService(Executors.newCachedThreadPool());
+    this.eventNotificationExecutorService = Executors.newCachedThreadPool();
   }
 
   /**
@@ -79,26 +80,24 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
     Set<CardReaderObserverSpi> observersCopy = observationManager.getObservers();
 
     for (final CardReaderObserverSpi observer : observersCopy) {
-      observationManager
-          .getEventNotificationExecutorService()
-          .execute(
-              new Runnable() {
-                @Override
-                public void run() {
-                  try {
-                    observer.onReaderEvent(event);
-                  } catch (Exception e) {
-                    try {
-                      observationManager
-                          .getObservationExceptionHandler()
-                          .onReaderObservationError(getPluginName(), getName(), e);
-                    } catch (Exception e2) {
-                      logger.error("Exception during notification", e2);
-                      logger.error("Original cause", e);
-                    }
-                  }
+      eventNotificationExecutorService.execute(
+          new Runnable() {
+            @Override
+            public void run() {
+              try {
+                observer.onReaderEvent(event);
+              } catch (Exception e) {
+                try {
+                  observationManager
+                      .getObservationExceptionHandler()
+                      .onReaderObservationError(getPluginName(), getName(), e);
+                } catch (Exception e2) {
+                  logger.error("Exception during notification", e2);
+                  logger.error("Original cause", e);
                 }
-              });
+              }
+            }
+          });
     }
   }
 
@@ -317,18 +316,6 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
     } catch (Exception e) {
       throwRuntimeException(e);
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public void setEventNotificationExecutorService(
-      ExecutorService eventNotificationExecutorService) {
-    checkStatus();
-    observationManager.setEventNotificationExecutorService(eventNotificationExecutorService);
   }
 
   /**

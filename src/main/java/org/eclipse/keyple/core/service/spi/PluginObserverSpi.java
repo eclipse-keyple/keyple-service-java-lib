@@ -24,6 +24,11 @@ public interface PluginObserverSpi {
   /**
    * Invoked when a plugin event occurs.
    *
+   * <p>The event notification is <b>synchronous</b> for <b>local</b> plugin and <b>asynchronous</b>
+   * for <b>remote</b> plugin.
+   *
+   * <p>The same behaviour is used for notification of reader events.
+   *
    * @param pluginEvent The plugin event.
    * @since 2.0
    */

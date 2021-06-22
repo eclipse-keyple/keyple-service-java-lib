@@ -148,7 +148,7 @@ abstract class AbstractObservableStateAdapter {
    * Invoked when activated, a custom behaviour can be added here.
    *
    * @since 2.0
-   * @thows IllegalStateException if a job is defined with a null executor service.
+   * @throws IllegalStateException if a job is defined with a null executor service.
    */
   final void onActivate() {
     if (logger.isTraceEnabled()) {

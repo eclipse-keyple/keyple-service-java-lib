@@ -85,7 +85,7 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
      */
     switch (event) {
       case CARD_PROCESSED:
-        if (this.getReader().getdetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
+        if (this.getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
           switchState(MonitoringState.WAIT_FOR_CARD_REMOVAL);
         } else {
           // We close the channels now and notify the application of
@@ -101,7 +101,7 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
         // for insertion
         // We notify the application of the CARD_REMOVED event.
         getReader().processCardRemoved();
-        if (getReader().getdetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
+        if (getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
           switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
         } else {
           switchState(MonitoringState.WAIT_FOR_START_DETECTION);

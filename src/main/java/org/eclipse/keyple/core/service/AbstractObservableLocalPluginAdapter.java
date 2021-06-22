@@ -13,7 +13,6 @@ package org.eclipse.keyple.core.service;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import org.eclipse.keyple.core.plugin.spi.PluginSpi;
 import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
@@ -81,26 +80,8 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
           countObservers());
     }
 
-    Set<PluginObserverSpi> observers = observationManager.getObservers();
-
-    if (observationManager.getEventNotificationExecutorService() == null) {
-      // synchronous notification
-      for (PluginObserverSpi observer : observers) {
-        notifyObserver(observer, event);
-      }
-    } else {
-      // asynchronous notification
-      for (final PluginObserverSpi observer : observers) {
-        observationManager
-            .getEventNotificationExecutorService()
-            .execute(
-                new Runnable() {
-                  @Override
-                  public void run() {
-                    notifyObserver(observer, event);
-                  }
-                });
-      }
+    for (PluginObserverSpi observer : observationManager.getObservers()) {
+      notifyObserver(observer, event);
     }
   }
 
@@ -177,18 +158,6 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   @Override
   public final int countObservers() {
     return observationManager.countObservers();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public final void setEventNotificationExecutorService(
-      ExecutorService eventNotificationExecutorService) {
-    checkStatus();
-    observationManager.setEventNotificationExecutorService(eventNotificationExecutorService);
   }
 
   /**

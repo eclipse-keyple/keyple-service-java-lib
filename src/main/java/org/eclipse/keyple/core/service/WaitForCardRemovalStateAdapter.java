@@ -87,7 +87,7 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
         // for insertion
         // We notify the application of the CARD_REMOVED event.
         getReader().processCardRemoved();
-        if (getReader().getdetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
+        if (getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
           switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
         } else {
           switchState(MonitoringState.WAIT_FOR_START_DETECTION);

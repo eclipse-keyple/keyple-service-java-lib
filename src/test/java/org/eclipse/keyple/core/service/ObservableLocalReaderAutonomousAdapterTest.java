@@ -15,8 +15,6 @@ import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER_NAME_1;
 import static org.mockito.Mockito.*;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.util.ObservableReaderAutonomousSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
@@ -36,13 +34,11 @@ public class ObservableLocalReaderAutonomousAdapterTest {
   ReaderObserverSpiMock observer;
   CardReaderObservationExceptionHandlerSpi handler;
   ObservableLocalReaderSuiteTest testSuite;
-  ExecutorService notificationExecutorService;
   /*
    *  With ObservableReaderAutonomousSpi
    */
   @Before
   public void seTup() {
-    notificationExecutorService = Executors.newSingleThreadExecutor();
     readerSpi = new ObservableReaderAutonomousSpiMock(READER_NAME_1);
     handler = Mockito.spy(CardReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
@@ -51,7 +47,6 @@ public class ObservableLocalReaderAutonomousAdapterTest {
 
     // test with event notification executor service
     reader.register();
-    reader.setEventNotificationExecutorService(notificationExecutorService);
   }
 
   @After

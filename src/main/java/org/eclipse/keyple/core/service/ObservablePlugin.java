@@ -11,7 +11,6 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import java.util.concurrent.ExecutorService;
 import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 
@@ -67,22 +66,6 @@ public interface ObservablePlugin extends Plugin {
    * @since 2.0
    */
   int countObservers();
-
-  /**
-   * Configures the plugin to use a custom thread pool for events notification.
-   *
-   * <p>The custom pool should be flexible enough to handle many concurrent tasks as each {@link
-   * PluginEvent} are executed asynchronously.
-   *
-   * <p>The use of this method is optional and depends on the needs of the application.<br>
-   * When used, the event notification will always be done asynchronously. Otherwise, the
-   * notification can be synchronous (local plugin) or asynchronous (remote plugin) depending on the
-   * type of reader.
-   *
-   * @param eventNotificationExecutorService The executor service provided by the application.
-   * @since 2.0
-   */
-  void setEventNotificationExecutorService(ExecutorService eventNotificationExecutorService);
 
   /**
    * Sets the exception handler.

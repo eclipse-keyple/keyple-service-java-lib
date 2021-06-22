@@ -12,7 +12,6 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import org.calypsonet.terminal.card.CardBrokenCommunicationException;
 import org.calypsonet.terminal.card.CardSelectionResponseApi;
 import org.calypsonet.terminal.card.ReaderBrokenCommunicationException;
@@ -162,7 +161,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @return Null if the polling mode has not been defined.
    * @since 2.0
    */
-  DetectionMode getdetectionMode() {
+  DetectionMode getDetectionMode() {
     return detectionMode;
   }
 
@@ -391,26 +390,8 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           countObservers());
     }
 
-    Set<CardReaderObserverSpi> observers = observationManager.getObservers();
-
-    if (observationManager.getEventNotificationExecutorService() == null) {
-      // synchronous notification
-      for (CardReaderObserverSpi observer : observers) {
-        notifyObserver(observer, event);
-      }
-    } else {
-      // asynchronous notification
-      for (final CardReaderObserverSpi observer : observers) {
-        observationManager
-            .getEventNotificationExecutorService()
-            .execute(
-                new Runnable() {
-                  @Override
-                  public void run() {
-                    notifyObserver(observer, event);
-                  }
-                });
-      }
+    for (CardReaderObserverSpi observer : observationManager.getObservers()) {
+      notifyObserver(observer, event);
     }
   }
 
@@ -596,18 +577,6 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
           getPluginName());
     }
     stateService.onEvent(InternalEvent.CARD_PROCESSED);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0
-   */
-  @Override
-  public void setEventNotificationExecutorService(
-      ExecutorService eventNotificationExecutorService) {
-    checkStatus();
-    observationManager.setEventNotificationExecutorService(eventNotificationExecutorService);
   }
 
   /**

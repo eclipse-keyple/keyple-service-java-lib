@@ -18,7 +18,6 @@ import static org.eclipse.keyple.core.service.PluginEvent.Type.READER_DISCONNECT
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.*;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.service.util.ObservableLocalPluginSpiMock;
@@ -74,20 +73,6 @@ public class ObservableLocalPluginAdapterTest {
   }
 
   @Test
-  public void notifyObservers_withEventNotificationExecutorService_isAsync() throws Throwable {
-    addFirstObserver_shouldStartEventThread();
-    pluginAdapter.setEventNotificationExecutorService(Executors.newCachedThreadPool());
-    // add reader name
-    observablePluginMock.addReaderName(READER_NAME_1);
-
-    await().atMost(1, TimeUnit.SECONDS).until(eventOfTypeIsReceived(READER_CONNECTED));
-
-    // check if exception has been thrown
-    assertThat(exceptionHandlerMock.getPluginName()).isNull();
-    assertThat(exceptionHandlerMock.getE()).isNull();
-  }
-
-  @Test
   public void notifyObserver_throwException_isPassedTo_exceptionHandler() throws Throwable {
     RuntimeException exception = new RuntimeException();
     exceptionHandlerMock = new PluginExceptionHandlerMock(new RuntimeException());
@@ -120,7 +105,7 @@ public class ObservableLocalPluginAdapterTest {
   public void removeLastObserver_shouldStopEventThread() throws Throwable {
     addFirstObserver_shouldStartEventThread();
     pluginAdapter.removeObserver(observerMock);
-    assertThat(pluginAdapter.countObservers()).isEqualTo(0);
+    assertThat(pluginAdapter.countObservers()).isZero();
     assertThat(pluginAdapter.isMonitoring()).isFalse();
   }
 
@@ -128,7 +113,7 @@ public class ObservableLocalPluginAdapterTest {
   public void clearObserver_shouldStopEventThread() throws Throwable {
     addFirstObserver_shouldStartEventThread();
     pluginAdapter.clearObservers();
-    assertThat(pluginAdapter.countObservers()).isEqualTo(0);
+    assertThat(pluginAdapter.countObservers()).isZero();
     assertThat(pluginAdapter.isMonitoring()).isFalse();
   }
 
