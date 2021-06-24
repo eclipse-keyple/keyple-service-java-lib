@@ -52,7 +52,7 @@ public class SmartCardServiceAdapterTest {
   private static final String LOCAL_SERVICE_NAME = "localService";
 
   private static final String SERVICE_API_VERSION = "2.0";
-  private static final String COMMONS_API_VERSION = "2.0";
+  private static final String COMMON_API_VERSION = "2.0";
   private static final String PLUGIN_API_VERSION = "2.0";
   private static final String DISTRIBUTED_REMOTE_API_VERSION = "2.0";
   private static final String DISTRIBUTED_LOCAL_API_VERSION = "2.0";
@@ -156,52 +156,52 @@ public class SmartCardServiceAdapterTest {
 
     pluginFactory = mock(PluginFactoryMock.class);
     when(pluginFactory.getPluginName()).thenReturn(PLUGIN_NAME);
-    when(pluginFactory.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
+    when(pluginFactory.getCommonApiVersion()).thenReturn(COMMON_API_VERSION);
     when(pluginFactory.getPluginApiVersion()).thenReturn(PLUGIN_API_VERSION);
     when(pluginFactory.getPlugin()).thenReturn(plugin);
 
     observablePluginFactory = mock(PluginFactoryMock.class);
     when(observablePluginFactory.getPluginName()).thenReturn(OBSERVABLE_PLUGIN_NAME);
-    when(observablePluginFactory.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
+    when(observablePluginFactory.getCommonApiVersion()).thenReturn(COMMON_API_VERSION);
     when(observablePluginFactory.getPluginApiVersion()).thenReturn(PLUGIN_API_VERSION);
     when(observablePluginFactory.getPlugin()).thenReturn(observablePlugin);
 
     autonomousObservablePluginFactory = mock(PluginFactoryMock.class);
     when(autonomousObservablePluginFactory.getPluginName())
         .thenReturn(AUTONOMOUS_OBSERVABLE_PLUGIN_NAME);
-    when(autonomousObservablePluginFactory.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
+    when(autonomousObservablePluginFactory.getCommonApiVersion()).thenReturn(COMMON_API_VERSION);
     when(autonomousObservablePluginFactory.getPluginApiVersion()).thenReturn(PLUGIN_API_VERSION);
     when(autonomousObservablePluginFactory.getPlugin()).thenReturn(autonomousObservablePlugin);
 
     poolPluginFactory = mock(PoolPluginFactoryMock.class);
     when(poolPluginFactory.getPoolPluginName()).thenReturn(POOL_PLUGIN_NAME);
-    when(poolPluginFactory.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
+    when(poolPluginFactory.getCommonApiVersion()).thenReturn(COMMON_API_VERSION);
     when(poolPluginFactory.getPluginApiVersion()).thenReturn(PLUGIN_API_VERSION);
     when(poolPluginFactory.getPoolPlugin()).thenReturn(poolPlugin);
 
     remotePluginFactory = mock(RemotePluginFactoryMock.class);
     when(remotePluginFactory.getRemotePluginName()).thenReturn(REMOTE_PLUGIN_NAME);
-    when(remotePluginFactory.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
+    when(remotePluginFactory.getCommonApiVersion()).thenReturn(COMMON_API_VERSION);
     when(remotePluginFactory.getDistributedRemoteApiVersion())
         .thenReturn(DISTRIBUTED_REMOTE_API_VERSION);
     when(remotePluginFactory.getRemotePlugin()).thenReturn(remotePlugin);
 
     observableRemotePluginFactory = mock(ObservableRemotePluginFactoryMock.class);
     when(observableRemotePluginFactory.getRemotePluginName()).thenReturn(REMOTE_PLUGIN_NAME);
-    when(observableRemotePluginFactory.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
+    when(observableRemotePluginFactory.getCommonApiVersion()).thenReturn(COMMON_API_VERSION);
     when(observableRemotePluginFactory.getDistributedRemoteApiVersion())
         .thenReturn(DISTRIBUTED_REMOTE_API_VERSION);
     when(observableRemotePluginFactory.getRemotePlugin()).thenReturn(observableRemotePlugin);
 
     remotePoolPluginFactory = mock(RemotePoolPluginFactoryMock.class);
     when(remotePoolPluginFactory.getRemotePluginName()).thenReturn(REMOTE_PLUGIN_NAME);
-    when(remotePoolPluginFactory.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
+    when(remotePoolPluginFactory.getCommonApiVersion()).thenReturn(COMMON_API_VERSION);
     when(remotePoolPluginFactory.getDistributedRemoteApiVersion())
         .thenReturn(DISTRIBUTED_REMOTE_API_VERSION);
     when(remotePoolPluginFactory.getRemotePlugin()).thenReturn(remotePoolPlugin);
 
     cardExtension = mock(CardExtensionMock.class);
-    when(cardExtension.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
+    when(cardExtension.getCommonApiVersion()).thenReturn(COMMON_API_VERSION);
     when(cardExtension.getCardApiVersion()).thenReturn(CARD_API_VERSION);
     when(cardExtension.getReaderApiVersion()).thenReturn(READER_API_VERSION);
 
@@ -210,7 +210,7 @@ public class SmartCardServiceAdapterTest {
 
     localServiceFactory = mock(DistributedLocalServiceFactoryMock.class);
     when(localServiceFactory.getLocalServiceName()).thenReturn(LOCAL_SERVICE_NAME);
-    when(localServiceFactory.getCommonsApiVersion()).thenReturn(COMMONS_API_VERSION);
+    when(localServiceFactory.getCommonApiVersion()).thenReturn(COMMON_API_VERSION);
     when(localServiceFactory.getDistributedLocalApiVersion())
         .thenReturn(DISTRIBUTED_LOCAL_API_VERSION);
     when(localServiceFactory.getLocalService()).thenReturn(localService);
@@ -286,11 +286,11 @@ public class SmartCardServiceAdapterTest {
   }
 
   @Test
-  public void registerPlugin_whenCommonsApiVersionDiffers_shouldRegister_and_LogWarn() {
-    when(pluginFactory.getCommonsApiVersion()).thenReturn("2.1");
+  public void registerPlugin_whenCommonApiVersionDiffers_shouldRegister_and_LogWarn() {
+    when(pluginFactory.getCommonApiVersion()).thenReturn("2.1");
     service.registerPlugin(pluginFactory);
     assertThat(service.getPluginNames().contains(PLUGIN_NAME)).isTrue();
-    verify(logger).warn(anyString(), eq(PLUGIN_NAME), eq("2.1"), eq(COMMONS_API_VERSION));
+    verify(logger).warn(anyString(), eq(PLUGIN_NAME), eq("2.1"), eq(COMMON_API_VERSION));
   }
 
   @Test
@@ -344,11 +344,11 @@ public class SmartCardServiceAdapterTest {
   }
 
   @Test
-  public void registerPlugin_Pool_whenCommonsApiVersionDiffers_shouldRegister_and_LogWarn() {
-    when(poolPluginFactory.getCommonsApiVersion()).thenReturn("2.1");
+  public void registerPlugin_Pool_whenCommonApiVersionDiffers_shouldRegister_and_LogWarn() {
+    when(poolPluginFactory.getCommonApiVersion()).thenReturn("2.1");
     service.registerPlugin(poolPluginFactory);
     assertThat(service.getPluginNames().contains(POOL_PLUGIN_NAME)).isTrue();
-    verify(logger).warn(anyString(), eq(POOL_PLUGIN_NAME), eq("2.1"), eq(COMMONS_API_VERSION));
+    verify(logger).warn(anyString(), eq(POOL_PLUGIN_NAME), eq("2.1"), eq(COMMON_API_VERSION));
   }
 
   @Test
@@ -408,11 +408,11 @@ public class SmartCardServiceAdapterTest {
   }
 
   @Test
-  public void registerPlugin_Remote_whenCommonsApiVersionDiffers_shouldRegister_and_LogWarn() {
-    when(remotePluginFactory.getCommonsApiVersion()).thenReturn("2.1");
+  public void registerPlugin_Remote_whenCommonApiVersionDiffers_shouldRegister_and_LogWarn() {
+    when(remotePluginFactory.getCommonApiVersion()).thenReturn("2.1");
     service.registerPlugin(remotePluginFactory);
     assertThat(service.getPluginNames().contains(REMOTE_PLUGIN_NAME)).isTrue();
-    verify(logger).warn(anyString(), eq(REMOTE_PLUGIN_NAME), eq("2.1"), eq(COMMONS_API_VERSION));
+    verify(logger).warn(anyString(), eq(REMOTE_PLUGIN_NAME), eq("2.1"), eq(COMMON_API_VERSION));
   }
 
   @Test
@@ -434,13 +434,13 @@ public class SmartCardServiceAdapterTest {
 
   @Test(expected = IllegalStateException.class)
   public void registerPlugin_whenApiVersionHasBadLength_shouldISE() {
-    when(pluginFactory.getCommonsApiVersion()).thenReturn("2.0.0");
+    when(pluginFactory.getCommonApiVersion()).thenReturn("2.0.0");
     service.registerPlugin(pluginFactory);
   }
 
   @Test(expected = IllegalStateException.class)
   public void registerPlugin_whenApiVersionHasBadFormat_shouldISE() {
-    when(pluginFactory.getCommonsApiVersion()).thenReturn("2.A");
+    when(pluginFactory.getCommonApiVersion()).thenReturn("2.A");
     service.registerPlugin(pluginFactory);
   }
 
@@ -520,10 +520,10 @@ public class SmartCardServiceAdapterTest {
   // Check card extension APIs
 
   @Test
-  public void checkCardExtension_whenCommonsApiDiffers_shouldLogWarn() {
-    when(cardExtension.getCommonsApiVersion()).thenReturn("2.1");
+  public void checkCardExtension_whenCommonApiDiffers_shouldLogWarn() {
+    when(cardExtension.getCommonApiVersion()).thenReturn("2.1");
     service.checkCardExtension(cardExtension);
-    verify(logger).warn(anyString(), eq("2.1"), eq(COMMONS_API_VERSION));
+    verify(logger).warn(anyString(), eq("2.1"), eq(COMMON_API_VERSION));
   }
 
   @Test
@@ -564,11 +564,11 @@ public class SmartCardServiceAdapterTest {
 
   @Test
   public void
-      registerDistributedLocalService_whenCommonsApiVersionDiffers_shouldRegister_and_LogWarn() {
-    when(localServiceFactory.getCommonsApiVersion()).thenReturn("2.1");
+      registerDistributedLocalService_whenCommonApiVersionDiffers_shouldRegister_and_LogWarn() {
+    when(localServiceFactory.getCommonApiVersion()).thenReturn("2.1");
     service.registerDistributedLocalService(localServiceFactory);
     assertThat(service.isDistributedLocalServiceRegistered(LOCAL_SERVICE_NAME)).isTrue();
-    verify(logger).warn(anyString(), eq(LOCAL_SERVICE_NAME), eq("2.1"), eq(COMMONS_API_VERSION));
+    verify(logger).warn(anyString(), eq(LOCAL_SERVICE_NAME), eq("2.1"), eq(COMMON_API_VERSION));
   }
 
   @Test
@@ -591,13 +591,13 @@ public class SmartCardServiceAdapterTest {
 
   @Test(expected = IllegalStateException.class)
   public void registerDistributedLocalService_whenApiVersionHasBadLength_shouldISE() {
-    when(localServiceFactory.getCommonsApiVersion()).thenReturn("2.0.0");
+    when(localServiceFactory.getCommonApiVersion()).thenReturn("2.0.0");
     service.registerDistributedLocalService(localServiceFactory);
   }
 
   @Test(expected = IllegalStateException.class)
   public void registerDistributedLocalService_whenApiVersionHasBadFormat_shouldISE() {
-    when(localServiceFactory.getCommonsApiVersion()).thenReturn("2.A");
+    when(localServiceFactory.getCommonApiVersion()).thenReturn("2.A");
     service.registerDistributedLocalService(localServiceFactory);
   }
 

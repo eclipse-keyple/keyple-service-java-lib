@@ -19,7 +19,7 @@ import org.calypsonet.terminal.card.AbstractApduException;
 import org.calypsonet.terminal.card.CardApiProperties;
 import org.calypsonet.terminal.reader.ReaderApiProperties;
 import org.calypsonet.terminal.reader.selection.CardSelectionManager;
-import org.eclipse.keyple.core.common.CommonsApiProperties;
+import org.eclipse.keyple.core.common.CommonApiProperties;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory;
 import org.eclipse.keyple.core.common.KeyplePluginExtensionFactory;
@@ -121,13 +121,12 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @param pluginFactorySpi The plugin factory SPI.
    */
   private void checkPluginVersion(PluginFactorySpi pluginFactorySpi) {
-    if (compareVersions(pluginFactorySpi.getCommonsApiVersion(), CommonsApiProperties.VERSION)
-        != 0) {
+    if (compareVersions(pluginFactorySpi.getCommonApiVersion(), CommonApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Commons API used by the provided plugin ({}:{}) mismatches the version used by the service ({}).",
+          "The version of Common API used by the provided plugin ({}:{}) mismatches the version used by the service ({}).",
           pluginFactorySpi.getPluginName(),
-          pluginFactorySpi.getCommonsApiVersion(),
-          CommonsApiProperties.VERSION);
+          pluginFactorySpi.getCommonApiVersion(),
+          CommonApiProperties.VERSION);
     }
     if (compareVersions(pluginFactorySpi.getPluginApiVersion(), PluginApiProperties.VERSION) != 0) {
       logger.warn(
@@ -148,13 +147,13 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @param remotePluginFactorySpi The remote plugin factory SPI.
    */
   private void checkRemotePluginVersion(RemotePluginFactorySpi remotePluginFactorySpi) {
-    if (compareVersions(remotePluginFactorySpi.getCommonsApiVersion(), CommonsApiProperties.VERSION)
+    if (compareVersions(remotePluginFactorySpi.getCommonApiVersion(), CommonApiProperties.VERSION)
         != 0) {
       logger.warn(
-          "The version of Commons API used by the provided plugin ({}:{}) mismatches the version used by the service ({}).",
+          "The version of Common API used by the provided plugin ({}:{}) mismatches the version used by the service ({}).",
           remotePluginFactorySpi.getRemotePluginName(),
-          remotePluginFactorySpi.getCommonsApiVersion(),
-          CommonsApiProperties.VERSION);
+          remotePluginFactorySpi.getCommonApiVersion(),
+          CommonApiProperties.VERSION);
     }
     if (compareVersions(
             remotePluginFactorySpi.getDistributedRemoteApiVersion(),
@@ -178,13 +177,13 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @param poolPluginFactorySpi The plugin factory SPI.
    */
   private void checkPoolPluginVersion(PoolPluginFactorySpi poolPluginFactorySpi) {
-    if (compareVersions(poolPluginFactorySpi.getCommonsApiVersion(), CommonsApiProperties.VERSION)
+    if (compareVersions(poolPluginFactorySpi.getCommonApiVersion(), CommonApiProperties.VERSION)
         != 0) {
       logger.warn(
-          "The version of Commons API used by the provided pool plugin ({}:{}) mismatches the version used by the service ({}).",
+          "The version of Common API used by the provided pool plugin ({}:{}) mismatches the version used by the service ({}).",
           poolPluginFactorySpi.getPoolPluginName(),
-          poolPluginFactorySpi.getCommonsApiVersion(),
-          CommonsApiProperties.VERSION);
+          poolPluginFactorySpi.getCommonApiVersion(),
+          CommonApiProperties.VERSION);
     }
     if (compareVersions(poolPluginFactorySpi.getPluginApiVersion(), PluginApiProperties.VERSION)
         != 0) {
@@ -206,11 +205,11 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @param cardExtension The card extension.
    */
   private void checkCardExtensionVersion(KeypleCardExtension cardExtension) {
-    if (compareVersions(cardExtension.getCommonsApiVersion(), CommonsApiProperties.VERSION) != 0) {
+    if (compareVersions(cardExtension.getCommonApiVersion(), CommonApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Commons API used by the provided card extension ({}) mismatches the version used by the service ({}).",
-          cardExtension.getCommonsApiVersion(),
-          CommonsApiProperties.VERSION);
+          "The version of Common API used by the provided card extension ({}) mismatches the version used by the service ({}).",
+          cardExtension.getCommonApiVersion(),
+          CommonApiProperties.VERSION);
     }
     if (compareVersions(cardExtension.getCardApiVersion(), CardApiProperties.VERSION) != 0) {
       logger.warn(
@@ -236,13 +235,13 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @param localServiceFactorySpi The distributed local service factory SPI.
    */
   private void checkDistributedLocalServiceVersion(LocalServiceFactorySpi localServiceFactorySpi) {
-    if (compareVersions(localServiceFactorySpi.getCommonsApiVersion(), CommonsApiProperties.VERSION)
+    if (compareVersions(localServiceFactorySpi.getCommonApiVersion(), CommonApiProperties.VERSION)
         != 0) {
       logger.warn(
-          "The version of Commons API used by the provided distributed local service ({}:{}) mismatches the version used by the service ({}).",
+          "The version of Common API used by the provided distributed local service ({}:{}) mismatches the version used by the service ({}).",
           localServiceFactorySpi.getLocalServiceName(),
-          localServiceFactorySpi.getCommonsApiVersion(),
-          CommonsApiProperties.VERSION);
+          localServiceFactorySpi.getCommonApiVersion(),
+          CommonApiProperties.VERSION);
     }
     if (compareVersions(
             localServiceFactorySpi.getDistributedLocalApiVersion(),
