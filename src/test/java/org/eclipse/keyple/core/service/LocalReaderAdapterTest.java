@@ -12,58 +12,43 @@
 package org.eclipse.keyple.core.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN_NAME;
+import static org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils.*;
 import static org.mockito.Mockito.*;
 
 import java.util.*;
-import org.calypsonet.terminal.card.CardBrokenCommunicationException;
-import org.calypsonet.terminal.card.CardSelectionResponseApi;
-import org.calypsonet.terminal.card.ChannelControl;
-import org.calypsonet.terminal.card.ReaderBrokenCommunicationException;
+import org.calypsonet.terminal.card.*;
+import org.calypsonet.terminal.card.spi.ApduRequestSpi;
+import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
-import org.calypsonet.terminal.card.spi.CardSelectorSpi;
 import org.calypsonet.terminal.reader.ReaderCommunicationException;
-import org.eclipse.keyple.core.common.KeypleReaderExtension;
+import org.calypsonet.terminal.reader.ReaderProtocolNotSupportedException;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
+import org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 
 public class LocalReaderAdapterTest {
-  private ReaderSpiMock readerSpi;
-  private CardSelectorMock cardSelector;
+  private ReaderAdapterTestUtils.ReaderSpiMock readerSpi;
+  private ReaderAdapterTestUtils.CardSelectorMock cardSelector;
   private CardSelectionRequestSpi cardSelectionRequestSpi;
-
-  private static final String PLUGIN_NAME = "plugin";
-  private static final String READER_NAME = "reader";
-  private static final String CARD_PROTOCOL = "cardProtocol";
-  private static final String OTHER_CARD_PROTOCOL = "otherCardProtocol";
-  private static final String POWER_ON_DATA = "12345678";
-
-  interface ReaderSpiMock extends KeypleReaderExtension, ReaderSpi {}
-
-  interface CardSelectorMock extends CardSelectorSpi {}
+  private CardRequestSpi cardRequestSpi;
+  private ApduRequestSpi apduRequestSpi;
 
   @Before
   public void setUp() throws Exception {
-    readerSpi = mock(ReaderSpiMock.class);
-    when(readerSpi.getName()).thenReturn(READER_NAME);
-    when(readerSpi.checkCardPresence()).thenReturn(true);
-    when(readerSpi.getPowerOnData()).thenReturn(POWER_ON_DATA);
-    when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(ByteArrayUtil.fromHex("6D00"));
-    when(readerSpi.isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
-    when(readerSpi.isCurrentProtocol(CARD_PROTOCOL)).thenReturn(true);
-
-    cardSelector = mock(CardSelectorMock.class);
-    when(cardSelector.getFileOccurrence()).thenReturn(CardSelectorSpi.FileOccurrence.FIRST);
-    when(cardSelector.getFileControlInformation())
-        .thenReturn(CardSelectorSpi.FileControlInformation.FCI);
-    when(cardSelector.getSuccessfulSelectionStatusWords())
-        .thenReturn(Collections.singleton(0x9000));
-
+    readerSpi = ReaderAdapterTestUtils.getReaderSpi();
+    cardSelector = ReaderAdapterTestUtils.getCardSelectorSpi();
     cardSelectionRequestSpi = mock(CardSelectionRequestSpi.class);
+
+    cardRequestSpi = mock(CardRequestSpi.class);
+    apduRequestSpi = mock(ApduRequestSpi.class);
+    when(cardRequestSpi.getApduRequests()).thenReturn(Arrays.asList(apduRequestSpi));
   }
 
   @After
@@ -269,6 +254,94 @@ public class LocalReaderAdapterTest {
     assertThat(cardSelectionResponses).hasSize(1);
     assertThat(cardSelectionResponses.get(0).hasMatched()).isFalse();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isFalse();
+  }
+
+  @Test
+  public void transmitCardRequest_shouldReturnResponse() throws Exception {
+    byte[] responseApdu = ByteArrayUtil.fromHex("123456786283");
+    byte[] requestApdu = ByteArrayUtil.fromHex("0000");
+
+    when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(responseApdu);
+    when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    localReaderAdapter.activateProtocol(CARD_PROTOCOL, CARD_PROTOCOL);
+    assertThat(localReaderAdapter.isCardPresent()).isTrue();
+    CardResponseApi cardResponse =
+        localReaderAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.CLOSE_AFTER);
+
+    assertThat(cardResponse.getApduResponses().iterator().next().getApdu()).isEqualTo(responseApdu);
+    assertThat(cardResponse.isLogicalChannelOpen()).isFalse();
+  }
+
+  @Test(expected = UnexpectedStatusWordException.class)
+  public void transmitCardRequest_withUnsuccessfulStatusWord_shouldThrow_USW() throws Exception {
+    byte[] responseApdu = ByteArrayUtil.fromHex("123456789000");
+    byte[] requestApdu = ByteArrayUtil.fromHex("0000");
+
+    when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(responseApdu);
+    when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
+    when(apduRequestSpi.getSuccessfulStatusWords())
+        .thenReturn(new HashSet<Integer>(Arrays.asList(0x9001)));
+    when(cardRequestSpi.stopOnUnsuccessfulStatusWord()).thenReturn(true);
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    localReaderAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.CLOSE_AFTER);
+  }
+
+  @Test(expected = CardBrokenCommunicationException.class)
+  public void transmitCardRequest_withCardExceptionOnTransmit_shouldThrow_CBCE() throws Exception {
+    byte[] requestApdu = ByteArrayUtil.fromHex("0000");
+
+    when(readerSpi.transmitApdu(any(byte[].class))).thenThrow(new CardIOException(""));
+    when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    localReaderAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.CLOSE_AFTER);
+  }
+
+  @Test(expected = ReaderBrokenCommunicationException.class)
+  public void transmitCardRequest_withCardExceptionOnTransmit_shouldThrow_RBCE() throws Exception {
+    byte[] requestApdu = ByteArrayUtil.fromHex("0000");
+
+    when(readerSpi.transmitApdu(any(byte[].class))).thenThrow(new ReaderIOException(""));
+    when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    localReaderAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.CLOSE_AFTER);
+  }
+
+  @Test
+  public void deActivateProtocol_shouldInvoke_deActivateProcotol_OnReaderSpi() throws Exception {
+    ReaderSpi spy = getReaderSpiSpy();
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(spy, PLUGIN_NAME);
+    localReaderAdapter.register();
+    localReaderAdapter.activateProtocol(CARD_PROTOCOL, CARD_PROTOCOL);
+    localReaderAdapter.deactivateProtocol(CARD_PROTOCOL);
+    verify(spy, times(1)).deactivateProtocol(CARD_PROTOCOL);
+  }
+
+  @Test(expected = ReaderProtocolNotSupportedException.class)
+  public void activateProtocol_whileNotSupported_should_RPNS() throws Exception {
+    ReaderSpi spy = getReaderSpiSpy();
+    when(spy.isProtocolSupported(ArgumentMatchers.<String>any())).thenReturn(false);
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(spy, PLUGIN_NAME);
+    localReaderAdapter.register();
+    localReaderAdapter.activateProtocol(CARD_PROTOCOL, CARD_PROTOCOL);
+  }
+
+  @Test(expected = ReaderProtocolNotSupportedException.class)
+  public void deActivateProtocol_whileNotSupported_should_RPNS() throws Exception {
+    ReaderSpi spy = getReaderSpiSpy();
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(spy, PLUGIN_NAME);
+    localReaderAdapter.register();
+    localReaderAdapter.activateProtocol(CARD_PROTOCOL, CARD_PROTOCOL);
+    when(spy.isProtocolSupported(ArgumentMatchers.<String>any())).thenReturn(false);
+    localReaderAdapter.deactivateProtocol(CARD_PROTOCOL);
   }
 
   @Test(expected = ReaderBrokenCommunicationException.class)

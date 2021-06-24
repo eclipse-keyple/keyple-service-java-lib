@@ -14,27 +14,28 @@ package org.eclipse.keyple.core.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER_NAME_1;
+import static org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils.READER_NAME;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import org.calypsonet.terminal.reader.CardReaderEvent;
 import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
-import org.eclipse.keyple.core.service.util.ObservableReaderSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
+import org.eclipse.keyple.core.service.util.StubReaderSpiMock;
 import org.slf4j.Logger;
 
 public class ObservableLocalReaderSuiteTest {
 
   private ObservableLocalReaderAdapter reader;
-  private ObservableReaderSpiMock readerSpi;
+  private StubReaderSpiMock readerSpi;
   private ReaderObserverSpiMock observer;
   private CardReaderObservationExceptionHandlerSpi handler;
   private Logger logger;
 
   ObservableLocalReaderSuiteTest(
       ObservableLocalReaderAdapter reader,
-      ObservableReaderSpiMock readerSpi,
+      StubReaderSpiMock readerSpi,
       ReaderObserverSpiMock observer,
       CardReaderObservationExceptionHandlerSpi handler,
       Logger logger) {
@@ -90,7 +91,24 @@ public class ObservableLocalReaderSuiteTest {
 
     // check event is well formed
     CardReaderEvent event = observer.getLastEventOfType(CardReaderEvent.Type.CARD_INSERTED);
+    assertThat(event).isNotNull();
+    assertThat(event.getReaderName()).isEqualTo(READER_NAME);
+  }
+
+  public void insertMatchingCard_onWaitForCard_shouldNotify_CardMatchedEvent() {
+    initReader_addObserver_startDetection();
+    logger.debug("Insert card...");
+    readerSpi.setCardPresent(true);
+
+    await()
+        .atMost(1, TimeUnit.SECONDS)
+        .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING));
+
+    // check event is well formed
+    CardReaderEvent event = observer.getLastEventOfType(CardReaderEvent.Type.CARD_MATCHED);
+    assertThat(event).isNotNull();
     assertThat(event.getReaderName()).isEqualTo(READER_NAME_1);
+    assertThat(event.getScheduledCardSelectionsResponse()).isNotNull();
   }
 
   // @Test
@@ -118,7 +136,7 @@ public class ObservableLocalReaderSuiteTest {
 
     // check event is well formed
     CardReaderEvent event = observer.getLastEventOfType(CardReaderEvent.Type.CARD_REMOVED);
-    assertThat(event.getReaderName()).isEqualTo(READER_NAME_1);
+    assertThat(event.getReaderName()).isEqualTo(READER_NAME);
   }
 
   // @Test
@@ -134,7 +152,7 @@ public class ObservableLocalReaderSuiteTest {
 
     // check event is well formed
     CardReaderEvent event = observer.getLastEventOfType(CardReaderEvent.Type.CARD_REMOVED);
-    assertThat(event.getReaderName()).isEqualTo(READER_NAME_1);
+    assertThat(event.getReaderName()).isEqualTo(READER_NAME);
   }
 
   /*

@@ -30,7 +30,7 @@ public class ObservableReaderBlockingSpiMock
         WaitForCardInsertionBlockingSpi,
         WaitForCardRemovalBlockingSpi,
         WaitForCardRemovalDuringProcessingBlockingSpi,
-        ObservableReaderSpiMock {
+        StubReaderSpiMock {
 
   boolean detectionStarted;
   boolean physicalChannelOpen;

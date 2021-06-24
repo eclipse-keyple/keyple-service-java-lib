@@ -12,6 +12,8 @@
 package org.eclipse.keyple.core.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN_NAME;
+import static org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils.READER_NAME;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -27,22 +29,17 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 public class AbstractReaderAdapterTest {
-  private LocalReaderAdapterTest.ReaderSpiMock readerSpi;
+  private ReaderSpiMock readerSpi;
 
   AbstractReaderAdapter readerAdapter;
 
   CardRequestSpi cardRequestSpi;
 
-  private static final String PLUGIN_NAME = "plugin";
-  private static final String READER_NAME = "reader";
-  private static final String CARD_PROTOCOL = "cardProtocol";
-  private static final byte[] ATR = new byte[] {(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78};
-
   interface ReaderSpiMock extends KeypleReaderExtension, ReaderSpi {}
 
   @Before
   public void setUp() throws Exception {
-    readerSpi = mock(LocalReaderAdapterTest.ReaderSpiMock.class);
+    readerSpi = mock(ReaderSpiMock.class);
     cardRequestSpi = mock(CardRequestSpi.class);
     readerAdapter = new DefaultAbstractReaderAdapter(READER_NAME, readerSpi, PLUGIN_NAME);
   }
@@ -60,13 +57,12 @@ public class AbstractReaderAdapterTest {
   @Test
   public void getExtension_whenReaderIsRegistered_shouldReturnExtension() {
     readerAdapter.register();
-    assertThat(readerAdapter.getExtension(LocalReaderAdapterTest.ReaderSpiMock.class))
-        .isEqualTo(readerSpi);
+    assertThat(readerAdapter.getExtension(ReaderSpiMock.class)).isEqualTo(readerSpi);
   }
 
   @Test(expected = IllegalStateException.class)
   public void getExtension_whenReaderIsNotRegistered_shouldISE() {
-    readerAdapter.getExtension(LocalReaderAdapterTest.ReaderSpiMock.class);
+    readerAdapter.getExtension(ReaderSpiMock.class);
   }
 
   @Test(expected = IllegalStateException.class)

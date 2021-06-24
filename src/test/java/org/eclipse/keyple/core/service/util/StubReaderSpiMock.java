@@ -11,6 +11,6 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.util;
 
-public interface ObservableReaderSpiMock {
+public interface StubReaderSpiMock {
   void setCardPresent(boolean cardPresent);
 }

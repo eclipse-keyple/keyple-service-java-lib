@@ -14,7 +14,7 @@ package org.eclipse.keyple.core.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN_NAME;
-import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER_NAME_1;
+import static org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils.READER_NAME;
 import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.TimeUnit;
@@ -46,7 +46,7 @@ public class ObservableLocalReaderNonBlockingAdapterTest {
   */
   @Before
   public void seTup() {
-    readerSpi = new ObservableReaderNonBlockingSpiMock(READER_NAME_1);
+    readerSpi = new ObservableReaderNonBlockingSpiMock(READER_NAME);
     handler = mock(CardReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
     observer = new ReaderObserverSpiMock(null);

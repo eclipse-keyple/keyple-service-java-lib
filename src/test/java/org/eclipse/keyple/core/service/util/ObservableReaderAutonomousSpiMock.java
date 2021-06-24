@@ -28,7 +28,7 @@ public class ObservableReaderAutonomousSpiMock
         WaitForCardInsertionAutonomousSpi,
         WaitForCardRemovalAutonomousSpi,
         DontWaitForCardRemovalDuringProcessingSpi,
-        ObservableReaderSpiMock {
+        StubReaderSpiMock {
 
   WaitForCardInsertionAutonomousReaderApi waitForCardInsertionAutonomousReaderApi;
   WaitForCardRemovalAutonomousReaderApi waitForCardRemovalAutonomousReaderApi;
