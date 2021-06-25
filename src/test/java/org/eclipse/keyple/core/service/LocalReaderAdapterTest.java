@@ -60,14 +60,9 @@ public class LocalReaderAdapterTest {
     assertThat(localReaderAdapter.getReaderSpi()).isEqualTo(readerSpi);
   }
 
-  @Test(expected = ReaderCommunicationException.class)
-  public void isCardPresent_whenReaderSpiFails_shouldKRCE() throws Exception {
-    doThrow(new ReaderIOException("Reader IO Exception")).when(readerSpi).checkCardPresence();
-    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
-    localReaderAdapter.register();
-    localReaderAdapter.isCardPresent();
-  }
-
+  /*
+   * Transmit card selections operations
+   */
   @Test
   public void
       transmitCardSelectionRequests_withPermissiveCardSelector_shouldReturnMatchingResponseAndOpenChannel()
@@ -256,6 +251,80 @@ public class LocalReaderAdapterTest {
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isFalse();
   }
 
+  @Test(expected = ReaderBrokenCommunicationException.class)
+  public void transmitCardSelectionRequests_whenOpenPhysicalThrowsReaderIOException_shouldRCE()
+      throws Exception {
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
+
+    doThrow(new ReaderIOException("Reader IO Exception")).when(readerSpi).openPhysicalChannel();
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    assertThat(localReaderAdapter.isCardPresent()).isTrue();
+    localReaderAdapter.transmitCardSelectionRequests(
+        new ArrayList<CardSelectionRequestSpi>(Collections.singletonList(cardSelectionRequestSpi)),
+        MultiSelectionProcessing.FIRST_MATCH,
+        ChannelControl.CLOSE_AFTER);
+  }
+
+  @Test(expected = CardBrokenCommunicationException.class)
+  public void transmitCardSelectionRequests_whenOpenPhysicalThrowsCArdIOException_shouldCCE()
+      throws Exception {
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
+
+    doThrow(new CardIOException("Card IO Exception")).when(readerSpi).openPhysicalChannel();
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    assertThat(localReaderAdapter.isCardPresent()).isTrue();
+    localReaderAdapter.transmitCardSelectionRequests(
+        new ArrayList<CardSelectionRequestSpi>(Collections.singletonList(cardSelectionRequestSpi)),
+        MultiSelectionProcessing.FIRST_MATCH,
+        ChannelControl.CLOSE_AFTER);
+  }
+
+  @Test(expected = CardBrokenCommunicationException.class)
+  public void transmitCardSelectionRequests_whenTransmitApduThrowsCardIOException_shouldCCE()
+      throws Exception {
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
+    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("12341234"));
+    doThrow(new CardIOException("Card IO Exception"))
+        .when(readerSpi)
+        .transmitApdu(ArgumentMatchers.<byte[]>any());
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    assertThat(localReaderAdapter.isCardPresent()).isTrue();
+    localReaderAdapter.transmitCardSelectionRequests(
+        new ArrayList<CardSelectionRequestSpi>(Collections.singletonList(cardSelectionRequestSpi)),
+        MultiSelectionProcessing.FIRST_MATCH,
+        ChannelControl.CLOSE_AFTER);
+  }
+
+  @Test(expected = ReaderBrokenCommunicationException.class)
+  public void transmitCardSelectionRequests_whenTransmitApduThrowsReaderIOException_shouldRCE()
+      throws Exception {
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
+    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("12341234"));
+    doThrow(new ReaderIOException("Reader IO Exception"))
+        .when(readerSpi)
+        .transmitApdu(ArgumentMatchers.<byte[]>any());
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    assertThat(localReaderAdapter.isCardPresent()).isTrue();
+    localReaderAdapter.transmitCardSelectionRequests(
+        new ArrayList<CardSelectionRequestSpi>(Collections.singletonList(cardSelectionRequestSpi)),
+        MultiSelectionProcessing.FIRST_MATCH,
+        ChannelControl.CLOSE_AFTER);
+  }
+
+  // todo: selectByAid with AutonomousSelectionReaderSpi
+
+  /*
+   * Transmit card request
+   */
+
   @Test
   public void transmitCardRequest_shouldReturnResponse() throws Exception {
     byte[] responseApdu = ByteArrayUtil.fromHex("123456786283");
@@ -273,6 +342,23 @@ public class LocalReaderAdapterTest {
 
     assertThat(cardResponse.getApduResponses().iterator().next().getApdu()).isEqualTo(responseApdu);
     assertThat(cardResponse.isLogicalChannelOpen()).isFalse();
+  }
+
+  @Test
+  public void transmitCardRequest_isCase4() throws Exception {
+    byte[] requestApdu = ByteArrayUtil.fromHex("11223344041234567803");
+    byte[] responseApdu = ByteArrayUtil.fromHex("9000");
+    byte[] responseCase4Apdu = ByteArrayUtil.fromHex("0000");
+    byte[] APDU_GET_RESPONSE = {(byte) 0x00, (byte) 0xC0, (byte) 0x00, (byte) 0x00, (byte) 0x00};
+    when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
+    when(readerSpi.transmitApdu(requestApdu)).thenReturn(responseApdu);
+    when(readerSpi.transmitApdu(APDU_GET_RESPONSE)).thenReturn(responseCase4Apdu);
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    CardResponseApi response =
+        localReaderAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.CLOSE_AFTER);
+    assertThat(response.getApduResponses().get(0).getApdu()).isEqualTo(responseCase4Apdu);
   }
 
   @Test(expected = UnexpectedStatusWordException.class)
@@ -315,6 +401,10 @@ public class LocalReaderAdapterTest {
     localReaderAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.CLOSE_AFTER);
   }
 
+  /*
+   * active protocol operations
+   */
+
   @Test
   public void deActivateProtocol_shouldInvoke_deActivateProcotol_OnReaderSpi() throws Exception {
     ReaderSpi spy = getReaderSpiSpy();
@@ -344,37 +434,9 @@ public class LocalReaderAdapterTest {
     localReaderAdapter.deactivateProtocol(CARD_PROTOCOL);
   }
 
-  @Test(expected = ReaderBrokenCommunicationException.class)
-  public void transmitCardSelectionRequests_whenOpenPhysicalThrowsReaderIOException_shouldRCE()
-      throws Exception {
-    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
-
-    doThrow(new ReaderIOException("Reader IO Exception")).when(readerSpi).openPhysicalChannel();
-
-    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
-    localReaderAdapter.register();
-    assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    localReaderAdapter.transmitCardSelectionRequests(
-        new ArrayList<CardSelectionRequestSpi>(Collections.singletonList(cardSelectionRequestSpi)),
-        MultiSelectionProcessing.FIRST_MATCH,
-        ChannelControl.CLOSE_AFTER);
-  }
-
-  @Test(expected = CardBrokenCommunicationException.class)
-  public void transmitCardSelectionRequests_whenOpenPhysicalThrowsCArdIOException_shouldCCE()
-      throws Exception {
-    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
-
-    doThrow(new CardIOException("Card IO Exception")).when(readerSpi).openPhysicalChannel();
-
-    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
-    localReaderAdapter.register();
-    assertThat(localReaderAdapter.isCardPresent()).isTrue();
-    localReaderAdapter.transmitCardSelectionRequests(
-        new ArrayList<CardSelectionRequestSpi>(Collections.singletonList(cardSelectionRequestSpi)),
-        MultiSelectionProcessing.FIRST_MATCH,
-        ChannelControl.CLOSE_AFTER);
-  }
+  /*
+   * Misc operations
+   */
 
   @Test
   public void isContactless_whenSpiIsContactless_shouldReturnTrue() {
@@ -390,5 +452,31 @@ public class LocalReaderAdapterTest {
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     assertThat(localReaderAdapter.isContactless()).isFalse();
+  }
+
+  @Test
+  public void closeLogicalAndPhysicalChannelsSilently_withException_does_not_propagate()
+      throws Exception {
+    doThrow(new ReaderIOException("")).when(readerSpi).closePhysicalChannel();
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.closeLogicalAndPhysicalChannelsSilently();
+    // no exception is propagated
+  }
+
+  @Test(expected = ReaderBrokenCommunicationException.class)
+  public void releaseChannel_withException_throwRBCE() throws Exception {
+    doThrow(new ReaderIOException("")).when(readerSpi).closePhysicalChannel();
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    localReaderAdapter.releaseChannel();
+    // exception is thrown
+  }
+
+  @Test(expected = ReaderCommunicationException.class)
+  public void isCardPresent_whenReaderSpiFails_shouldKRCE() throws Exception {
+    doThrow(new ReaderIOException("Reader IO Exception")).when(readerSpi).checkCardPresence();
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    localReaderAdapter.isCardPresent();
   }
 }

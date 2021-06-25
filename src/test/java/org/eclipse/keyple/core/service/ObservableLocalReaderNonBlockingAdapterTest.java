@@ -36,7 +36,7 @@ public class ObservableLocalReaderNonBlockingAdapterTest {
   ObservableReaderNonBlockingSpiMock readerSpi;
   ReaderObserverSpiMock observer;
   CardReaderObservationExceptionHandlerSpi handler;
-  ObservableLocalReaderSuiteTest testSuite;
+  ObservableLocalReaderSuite testSuite;
 
   /*
   *  With
@@ -50,7 +50,7 @@ public class ObservableLocalReaderNonBlockingAdapterTest {
     handler = mock(CardReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
     observer = new ReaderObserverSpiMock(null);
-    testSuite = new ObservableLocalReaderSuiteTest(reader, readerSpi, observer, handler, logger);
+    testSuite = new ObservableLocalReaderSuite(reader, readerSpi, observer, handler, logger);
     reader.register();
   }
 
@@ -61,17 +61,17 @@ public class ObservableLocalReaderNonBlockingAdapterTest {
 
   @Test
   public void initReader_addObserver_startDetection() {
-    testSuite.initReader_addObserver_startDetection();
+    testSuite.addFirstObserver_should_startDetection();
   }
 
   @Test
   public void removeObserver() {
-    testSuite.removeObserver();
+    testSuite.removeLastObserver_shoul_StopDetection();
   }
 
   @Test
   public void clearObservers() {
-    testSuite.clearObservers();
+    testSuite.clearObservers_shouldRemove_allObservers();
   }
 
   @Test

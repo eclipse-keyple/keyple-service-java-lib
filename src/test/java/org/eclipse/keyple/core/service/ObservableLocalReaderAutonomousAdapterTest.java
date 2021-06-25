@@ -37,7 +37,7 @@ public class ObservableLocalReaderAutonomousAdapterTest {
   ObservableReaderAutonomousSpiMock readerSpi;
   ReaderObserverSpiMock observer;
   CardReaderObservationExceptionHandlerSpi handler;
-  ObservableLocalReaderSuiteTest testSuite;
+  ObservableLocalReaderSuite testSuite;
   ExecutorService notificationExecutorService;
 
   CardSelectionRequestSpi cardSelectionRequestSpi;
@@ -54,7 +54,7 @@ public class ObservableLocalReaderAutonomousAdapterTest {
     handler = Mockito.spy(CardReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
     observer = new ReaderObserverSpiMock(null);
-    testSuite = new ObservableLocalReaderSuiteTest(reader, readerSpi, observer, handler, logger);
+    testSuite = new ObservableLocalReaderSuite(reader, readerSpi, observer, handler, logger);
     cardSelectionRequestSpi = mock(CardSelectionRequestSpi.class);
     cardSelectionResponseApi = mock(CardSelectionResponseApi.class);
     cardResponseApi = mock(CardResponseApi.class);
@@ -70,17 +70,17 @@ public class ObservableLocalReaderAutonomousAdapterTest {
 
   @Test
   public void initReader_addObserver_startDetection() {
-    testSuite.initReader_addObserver_startDetection();
+    testSuite.addFirstObserver_should_startDetection();
   }
 
   @Test
   public void removeObserver() {
-    testSuite.removeObserver();
+    testSuite.removeLastObserver_shoul_StopDetection();
   }
 
   @Test
   public void clearObservers() {
-    testSuite.clearObservers();
+    testSuite.clearObservers_shouldRemove_allObservers();
   }
 
   @Test
@@ -113,64 +113,4 @@ public class ObservableLocalReaderAutonomousAdapterTest {
     testSuite.insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
     verify(handler, times(1)).onReaderObservationError(anyString(), eq(READER_NAME), eq(e));
   }
-
-  /*
-  @Test
-   public void insertMatchingCard_shouldNotify_CardMatchedEvent() throws Exception {
-     CardSelectorSpi cardSelector = ReaderAdapterTestUtils.getCardSelectorSpi();
-     when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
-
-     CardSelectionScenarioAdapter cardSelectionScenario = new CardSelectionScenarioAdapter(
-             Collections.singletonList(cardSelectionRequestSpi),
-             MultiSelectionProcessing.PROCESS_ALL,
-             ChannelControl.KEEP_OPEN);
-
-     reader.scheduleCardSelectionScenario(cardSelectionScenario,
-             ObservableCardReader.NotificationMode.MATCHED_ONLY,
-             ObservableCardReader.DetectionMode.SINGLESHOT);
-
-     testSuite.insertMatchingCard_onWaitForCard_shouldNotify_CardMatchedEvent();
-   }
-   */
-
-  /*@Test
-  public void insertMatchingCard_shouldNotify_CardMatchedEvent() throws Exception {
-    CardSelectorSpi cardSelector = ReaderAdapterTestUtils.getCardSelectorSpi();
-
-    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
-    when(cardSelectionResponseApi.getCardResponse()).thenReturn(cardResponseApi);
-
-
-    CardSelectionScenarioAdapter cardSelectionScenario = new CardSelectionScenarioAdapter(
-            Collections.singletonList(cardSelectionRequestSpi),
-            MultiSelectionProcessing.PROCESS_ALL,
-            ChannelControl.KEEP_OPEN);
-
-    reader.scheduleCardSelectionScenario(cardSelectionScenario,
-            ObservableCardReader.NotificationMode.MATCHED_ONLY,
-            ObservableCardReader.DetectionMode.SINGLESHOT);
-
-    testSuite.insertMatchingCard_onWaitForCard_shouldNotify_CardMatchedEvent();
-  }
-
-  @Test
-  public void insertNotMatchingCard_shouldNotify_CardInsertedEvent() throws Exception {
-    byte[] selectResponseApdu = ByteArrayUtil.fromHex("123456786283");
-    when(readerSpi.transmitApdu(ArgumentMatchers.<byte[]>any())).thenReturn(selectResponseApdu);
-
-    CardSelectorSpi cardSelector = ReaderAdapterTestUtils.getCardSelectorSpi();
-    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
-
-    CardSelectionScenarioAdapter cardSelectionScenario = new CardSelectionScenarioAdapter(
-            Collections.singletonList(cardSelectionRequestSpi),
-            MultiSelectionProcessing.PROCESS_ALL,
-            ChannelControl.KEEP_OPEN);
-
-    reader.scheduleCardSelectionScenario(cardSelectionScenario,
-            ObservableCardReader.NotificationMode.ALWAYS,
-            ObservableCardReader.DetectionMode.SINGLESHOT);
-
-    testSuite.insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
-  }*/
-
 }

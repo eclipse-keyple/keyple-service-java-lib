@@ -45,7 +45,7 @@ public class ObservableLocalReaderSelectionScenarioTest {
   ObservableReaderAutonomousSpiMock readerSpi;
   ReaderObserverSpiMock observer;
   CardReaderObservationExceptionHandlerSpi handler;
-  ObservableLocalReaderSuiteTest testSuite;
+  ObservableLocalReaderSuite testSuite;
 
   CardSelectionRequestSpi cardSelectionRequestSpi;
   CardSelectionResponseApi cardSelectionResponseApi;
@@ -60,7 +60,7 @@ public class ObservableLocalReaderSelectionScenarioTest {
     handler = Mockito.spy(CardReaderObservationExceptionHandlerSpi.class);
     readerSpy = spy(new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME));
     observer = new ReaderObserverSpiMock(null);
-    testSuite = new ObservableLocalReaderSuiteTest(readerSpy, readerSpi, observer, handler, logger);
+    testSuite = new ObservableLocalReaderSuite(readerSpy, readerSpi, observer, handler, logger);
     cardSelectionRequestSpi = mock(CardSelectionRequestSpi.class);
     cardSelectionResponseApi = mock(CardSelectionResponseApi.class);
     cardResponseApi = mock(CardResponseApi.class);
@@ -128,8 +128,9 @@ public class ObservableLocalReaderSelectionScenarioTest {
     assertThat(
             ((ScheduledCardSelectionsResponseAdapter) event.getScheduledCardSelectionsResponse())
                 .getCardSelectionResponses())
-        .size().isEqualTo(3);
-    //todo check this
+        .size()
+        .isEqualTo(3);
+    // todo check this
   }
 
   @Test

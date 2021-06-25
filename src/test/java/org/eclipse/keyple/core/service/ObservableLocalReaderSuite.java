@@ -13,7 +13,6 @@ package org.eclipse.keyple.core.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER_NAME_1;
 import static org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils.READER_NAME;
 
 import java.util.concurrent.Callable;
@@ -25,7 +24,7 @@ import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
 import org.eclipse.keyple.core.service.util.StubReaderSpiMock;
 import org.slf4j.Logger;
 
-public class ObservableLocalReaderSuiteTest {
+public class ObservableLocalReaderSuite {
 
   private ObservableLocalReaderAdapter reader;
   private StubReaderSpiMock readerSpi;
@@ -33,7 +32,7 @@ public class ObservableLocalReaderSuiteTest {
   private CardReaderObservationExceptionHandlerSpi handler;
   private Logger logger;
 
-  ObservableLocalReaderSuiteTest(
+  ObservableLocalReaderSuite(
       ObservableLocalReaderAdapter reader,
       StubReaderSpiMock readerSpi,
       ReaderObserverSpiMock observer,
@@ -46,8 +45,7 @@ public class ObservableLocalReaderSuiteTest {
     this.logger = logger;
   }
 
-  // @Test
-  public void initReader_addObserver_startDetection() {
+  public void addFirstObserver_should_startDetection() {
 
     assertThat(reader.getCurrentMonitoringState())
         .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_START_DETECTION);
@@ -61,9 +59,8 @@ public class ObservableLocalReaderSuiteTest {
         .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION);
   }
 
-  // @Test
-  public void removeObserver() {
-    initReader_addObserver_startDetection();
+  public void removeLastObserver_shoul_StopDetection() {
+    addFirstObserver_should_startDetection();
     reader.removeObserver(observer);
     assertThat(reader.countObservers()).isEqualTo(0);
 
@@ -72,16 +69,14 @@ public class ObservableLocalReaderSuiteTest {
         .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION);
   }
 
-  // @Test
-  public void clearObservers() {
-    initReader_addObserver_startDetection();
+  public void clearObservers_shouldRemove_allObservers() {
+    addFirstObserver_should_startDetection();
     reader.clearObservers();
     assertThat(reader.countObservers()).isEqualTo(0);
   }
 
-  // @Test
   public void insertCard_onWaitForCard_shouldNotify_CardInsertedEvent() {
-    initReader_addObserver_startDetection();
+    addFirstObserver_should_startDetection();
     logger.debug("Insert card...");
     readerSpi.setCardPresent(true);
 
@@ -95,23 +90,6 @@ public class ObservableLocalReaderSuiteTest {
     assertThat(event.getReaderName()).isEqualTo(READER_NAME);
   }
 
-  public void insertMatchingCard_onWaitForCard_shouldNotify_CardMatchedEvent() {
-    initReader_addObserver_startDetection();
-    logger.debug("Insert card...");
-    readerSpi.setCardPresent(true);
-
-    await()
-        .atMost(1, TimeUnit.SECONDS)
-        .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING));
-
-    // check event is well formed
-    CardReaderEvent event = observer.getLastEventOfType(CardReaderEvent.Type.CARD_MATCHED);
-    assertThat(event).isNotNull();
-    assertThat(event.getReaderName()).isEqualTo(READER_NAME_1);
-    assertThat(event.getScheduledCardSelectionsResponse()).isNotNull();
-  }
-
-  // @Test
   public void finalizeCardProcessing_afterInsert_switchState() {
     insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
 
