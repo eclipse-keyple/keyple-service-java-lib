@@ -116,6 +116,17 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
    * @since 2.0
    */
   @Override
+  void unregister() {
+    super.unregister();
+    remotePluginSpi.onUnregister();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
   public final void onReaderEvent(String jsonData) {
 
     checkStatus();

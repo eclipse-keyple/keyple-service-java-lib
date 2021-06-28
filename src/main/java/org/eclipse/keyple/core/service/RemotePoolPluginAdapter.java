@@ -54,6 +54,17 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
    * @since 2.0
    */
   @Override
+  void unregister() {
+    super.unregister();
+    remotePoolPluginSpi.onUnregister();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0
+   */
+  @Override
   public SortedSet<String> getReaderGroupReferences() {
 
     checkStatus();
