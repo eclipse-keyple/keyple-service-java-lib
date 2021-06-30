@@ -18,6 +18,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.*;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
+import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.PoolPluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
@@ -31,8 +32,8 @@ import org.junit.Test;
 
 public class LocalPoolPluginAdapterTest {
   private PoolPluginSpiMock poolPluginSpi;
-  private ReaderSpi readerSpi1;
-  private ReaderSpi readerSpi2;
+  private ReaderSpiMock readerSpi1;
+  private ReaderSpiMock readerSpi2;
   private ObservableReaderSpiMock observableReader;
   private SortedSet<String> groupReferences;
 
@@ -47,19 +48,22 @@ public class LocalPoolPluginAdapterTest {
   interface PoolPluginSpiMock extends KeyplePluginExtension, PoolPluginSpi {}
 
   interface ObservableReaderSpiMock
-      extends ObservableReaderSpi,
+      extends KeypleReaderExtension,
+          ObservableReaderSpi,
           WaitForCardInsertionBlockingSpi,
           WaitForCardRemovalBlockingSpi,
           DontWaitForCardRemovalDuringProcessingSpi {}
+
+  interface ReaderSpiMock extends KeypleReaderExtension, ReaderSpi {}
 
   @Before
   public void setUp() throws Exception {
     groupReferences = new TreeSet<String>(Arrays.asList(GROUP_1, GROUP_2));
 
-    readerSpi1 = mock(ReaderSpi.class);
+    readerSpi1 = mock(ReaderSpiMock.class);
     when(readerSpi1.getName()).thenReturn(READER_NAME_1);
 
-    readerSpi2 = mock(ReaderSpi.class);
+    readerSpi2 = mock(ReaderSpiMock.class);
     when(readerSpi2.getName()).thenReturn(READER_NAME_2);
 
     observableReader = mock(ObservableReaderSpiMock.class);

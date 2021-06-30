@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.*;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
+import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.PluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
@@ -30,14 +31,17 @@ import org.junit.Test;
 
 public class LocalPluginAdapterTest {
   private PluginSpiMock pluginSpi;
-  private ReaderSpi readerSpi1;
-  private ReaderSpi readerSpi2;
+  private ReaderSpiMock readerSpi1;
+  private ReaderSpiMock readerSpi2;
   private ObservableReaderSpiMock observableReader;
 
   interface PluginSpiMock extends KeyplePluginExtension, PluginSpi {}
 
+  interface ReaderSpiMock extends KeypleReaderExtension, ReaderSpi {}
+
   interface ObservableReaderSpiMock
-      extends ObservableReaderSpi,
+      extends KeypleReaderExtension,
+          ObservableReaderSpi,
           WaitForCardInsertionBlockingSpi,
           WaitForCardRemovalBlockingSpi,
           DontWaitForCardRemovalDuringProcessingSpi {}
@@ -48,10 +52,10 @@ public class LocalPluginAdapterTest {
     when(pluginSpi.getName()).thenReturn(PLUGIN_NAME);
     when(pluginSpi.searchAvailableReaders()).thenReturn(Collections.<ReaderSpi>emptySet());
 
-    readerSpi1 = mock(ReaderSpi.class);
+    readerSpi1 = mock(ReaderSpiMock.class);
     when(readerSpi1.getName()).thenReturn(READER_NAME_1);
 
-    readerSpi2 = mock(ReaderSpi.class);
+    readerSpi2 = mock(ReaderSpiMock.class);
     when(readerSpi2.getName()).thenReturn(READER_NAME_2);
 
     observableReader = mock(ObservableReaderSpiMock.class);

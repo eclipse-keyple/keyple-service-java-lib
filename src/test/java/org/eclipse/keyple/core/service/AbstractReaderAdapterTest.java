@@ -88,7 +88,8 @@ public class AbstractReaderAdapterTest {
 
   private static class DefaultAbstractReaderAdapter extends AbstractReaderAdapter {
 
-    DefaultAbstractReaderAdapter(String readerName, Object readerExtension, String pluginName) {
+    DefaultAbstractReaderAdapter(
+        String readerName, KeypleReaderExtension readerExtension, String pluginName) {
       super(readerName, readerExtension, pluginName);
     }
 

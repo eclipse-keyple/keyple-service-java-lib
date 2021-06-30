@@ -21,6 +21,7 @@ import java.util.List;
 import org.calypsonet.terminal.card.*;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
+import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
@@ -50,7 +51,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   RemoteReaderAdapter(RemoteReaderSpi remoteReaderSpi, String pluginName) {
-    super(remoteReaderSpi.getName(), remoteReaderSpi, pluginName);
+    super(remoteReaderSpi.getName(), (KeypleReaderExtension) remoteReaderSpi, pluginName);
     this.remoteReaderSpi = remoteReaderSpi;
   }
 

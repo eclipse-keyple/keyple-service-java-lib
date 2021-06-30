@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.mockito.Mockito;
 
@@ -31,8 +32,10 @@ public class PluginAdapterTestUtils {
     READER_NAMES.add(READER_NAME_2);
   }
 
-  public static final ReaderSpi readerSpi1 = Mockito.mock(ReaderSpi.class);
-  public static final ReaderSpi readerSpi2 = Mockito.mock(ReaderSpi.class);
+  public static final ReaderSpiMock readerSpi1 = Mockito.mock(ReaderSpiMock.class);
+  public static final ReaderSpiMock readerSpi2 = Mockito.mock(ReaderSpiMock.class);
+
+  interface ReaderSpiMock extends KeypleReaderExtension, ReaderSpi {}
 
   static {
     when(readerSpi1.getName()).thenReturn(READER_NAME_1);

@@ -15,12 +15,14 @@ import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN
 
 import java.util.HashSet;
 import java.util.Set;
+import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.plugin.AutonomousObservablePluginApi;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.AutonomousObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 
-public class AutonomousObservablePluginSpiMock implements AutonomousObservablePluginSpi {
+public class AutonomousObservablePluginSpiMock
+    implements KeyplePluginExtension, AutonomousObservablePluginSpi {
 
   @Override
   public void connect(AutonomousObservablePluginApi autonomousObservablePluginApi) {}

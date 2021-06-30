@@ -12,6 +12,7 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.Set;
+import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.PluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
@@ -35,7 +36,7 @@ class LocalPluginAdapter extends AbstractPluginAdapter {
    * @since 2.0
    */
   LocalPluginAdapter(PluginSpi pluginSpi) {
-    super(pluginSpi.getName(), pluginSpi);
+    super(pluginSpi.getName(), (KeyplePluginExtension) pluginSpi);
     this.pluginSpi = pluginSpi;
   }
 

@@ -27,7 +27,7 @@ import org.eclipse.keyple.core.plugin.PluginIOException;
 abstract class AbstractPluginAdapter implements Plugin {
 
   private final String pluginName;
-  private final Object pluginExtension;
+  private final KeyplePluginExtension pluginExtension;
   private boolean isRegistered;
   private final Map<String, Reader> readers;
 
@@ -39,7 +39,7 @@ abstract class AbstractPluginAdapter implements Plugin {
    * @param pluginExtension The associated plugin extension SPI.
    * @since 2.0
    */
-  AbstractPluginAdapter(String pluginName, Object pluginExtension) {
+  AbstractPluginAdapter(String pluginName, KeyplePluginExtension pluginExtension) {
     this.pluginName = pluginName;
     this.pluginExtension = pluginExtension;
     this.readers = new ConcurrentHashMap<String, Reader>();

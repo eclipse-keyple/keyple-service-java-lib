@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.HashMap;
 import java.util.Map;
+import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.distributed.remote.RemotePluginApi;
 import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemoteReaderSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
@@ -47,7 +48,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
    * @since 2.0
    */
   RemotePluginAdapter(RemotePluginSpi remotePluginSpi) {
-    super(remotePluginSpi.getName(), remotePluginSpi);
+    super(remotePluginSpi.getName(), (KeyplePluginExtension) remotePluginSpi);
     this.remotePluginSpi = remotePluginSpi;
     this.remotePluginSpi.connect(this);
   }

@@ -12,6 +12,7 @@
 package org.eclipse.keyple.core.service.util;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
@@ -20,7 +21,8 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.Don
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalNonBlockingSpi;
 
 public class ObservableReaderNonBlockingSpiMock
-    implements ObservableReaderSpi,
+    implements KeypleReaderExtension,
+        ObservableReaderSpi,
         WaitForCardInsertionNonBlockingSpi,
         WaitForCardRemovalNonBlockingSpi,
         DontWaitForCardRemovalDuringProcessingSpi,

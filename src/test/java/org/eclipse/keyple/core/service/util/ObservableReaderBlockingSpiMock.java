@@ -15,6 +15,7 @@ import static java.lang.Thread.sleep;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.TaskCanceledException;
@@ -24,7 +25,8 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.Wai
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalBlockingSpi;
 
 public class ObservableReaderBlockingSpiMock
-    implements ObservableReaderSpi,
+    implements KeypleReaderExtension,
+        ObservableReaderSpi,
         WaitForCardInsertionBlockingSpi,
         WaitForCardRemovalBlockingSpi,
         WaitForCardRemovalDuringProcessingSpi,

@@ -12,6 +12,7 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.SortedSet;
+import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.PoolPluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
@@ -40,7 +41,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
    * @since 2.0
    */
   LocalPoolPluginAdapter(PoolPluginSpi poolPluginSpi) {
-    super(poolPluginSpi.getName(), poolPluginSpi);
+    super(poolPluginSpi.getName(), (KeyplePluginExtension) poolPluginSpi);
     this.poolPluginSpi = poolPluginSpi;
   }
 

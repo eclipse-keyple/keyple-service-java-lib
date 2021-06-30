@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePoolPluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
 import org.eclipse.keyple.core.util.Assert;
@@ -44,7 +45,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
    * @since 2.0
    */
   RemotePoolPluginAdapter(RemotePoolPluginSpi remotePoolPluginSpi) {
-    super(remotePoolPluginSpi.getName(), remotePoolPluginSpi);
+    super(remotePoolPluginSpi.getName(), (KeyplePluginExtension) remotePoolPluginSpi);
     this.remotePoolPluginSpi = remotePoolPluginSpi;
   }
 

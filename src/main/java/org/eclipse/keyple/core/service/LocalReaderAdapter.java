@@ -22,6 +22,7 @@ import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectorSpi;
 import org.calypsonet.terminal.reader.ReaderCommunicationException;
 import org.calypsonet.terminal.reader.ReaderProtocolNotSupportedException;
+import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.AutonomousSelectionReaderSpi;
@@ -65,7 +66,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0
    */
   LocalReaderAdapter(ReaderSpi readerSpi, String pluginName) {
-    super(readerSpi.getName(), readerSpi, pluginName);
+    super(readerSpi.getName(), (KeypleReaderExtension) readerSpi, pluginName);
     this.readerSpi = readerSpi;
     protocolAssociations = new LinkedHashMap<String, String>();
   }

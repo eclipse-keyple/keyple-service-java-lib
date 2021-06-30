@@ -17,17 +17,22 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.eclipse.keyple.core.common.KeyplePluginExtension;
+import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.ObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.mockito.Mockito;
 
-public class ObservableLocalPluginSpiMock implements ObservablePluginSpi {
+public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, ObservablePluginSpi {
 
   private final String name;
   private final int monitoringCycleDuration = 0;
   private final Map<String, ReaderSpi> stubReaders;
   private final PluginIOException pluginError;
+
+  interface ReaderSpiMock extends KeypleReaderExtension, ReaderSpi {}
+
   /**
    * (package-private )constructor
    *
@@ -106,7 +111,7 @@ public class ObservableLocalPluginSpiMock implements ObservablePluginSpi {
    */
   public void addReaderName(String... name) {
     for (String readerName : name) {
-      ReaderSpi readerSpi = Mockito.mock(ReaderSpi.class);
+      ReaderSpiMock readerSpi = Mockito.mock(ReaderSpiMock.class);
       when(readerSpi.getName()).thenReturn(readerName);
       stubReaders.put(readerName, readerSpi);
     }

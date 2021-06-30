@@ -36,7 +36,7 @@ public class ObservableLocalPluginAdapterTest {
   PluginObserverSpiMock observerMock;
 
   @Before
-  public void seTup() {
+  public void setUp() {
     observablePluginMock = new ObservableLocalPluginSpiMock(PLUGIN_NAME, null);
     observerMock = new PluginObserverSpiMock(null);
     exceptionHandlerMock = new PluginExceptionHandlerMock(null);

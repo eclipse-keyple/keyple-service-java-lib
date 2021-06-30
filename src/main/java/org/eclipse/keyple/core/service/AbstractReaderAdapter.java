@@ -31,7 +31,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
   private static final Logger logger = LoggerFactory.getLogger(AbstractReaderAdapter.class);
 
   private final String readerName;
-  private final Object readerExtension;
+  private final KeypleReaderExtension readerExtension;
   private final String pluginName;
 
   private boolean isRegistered;
@@ -46,7 +46,8 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * @param pluginName The name of the plugin.
    * @since 2.0
    */
-  AbstractReaderAdapter(String readerName, Object readerExtension, String pluginName) {
+  AbstractReaderAdapter(
+      String readerName, KeypleReaderExtension readerExtension, String pluginName) {
     this.readerName = readerName;
     this.readerExtension = readerExtension;
     this.pluginName = pluginName;

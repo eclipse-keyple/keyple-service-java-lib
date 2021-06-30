@@ -16,11 +16,14 @@ import static org.awaitility.Awaitility.await;
 import static org.eclipse.keyple.core.service.PluginEvent.Type.READER_CONNECTED;
 import static org.eclipse.keyple.core.service.PluginEvent.Type.READER_DISCONNECTED;
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.AutonomousObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
@@ -32,14 +35,18 @@ import org.junit.Test;
 
 public class AutonomousObservableLocalPluginAdapterTest {
 
-  AutonomousObservablePluginSpi pluginSpi;
+  AutonomousObservablePluginSpiMock pluginSpi;
   AutonomousObservableLocalPluginAdapter plugin;
   PluginObserverSpiMock observer;
   PluginExceptionHandlerMock exceptionHandler;
 
+  interface AutonomousObservablePluginSpiMock
+      extends KeyplePluginExtension, AutonomousObservablePluginSpi {}
+
   @Before
   public void seTup() throws PluginIOException {
-    pluginSpi = new AutonomousObservablePluginSpiMock();
+    pluginSpi = mock(AutonomousObservablePluginSpiMock.class);
+    when(pluginSpi.getName()).thenReturn(PLUGIN_NAME);
     plugin = new AutonomousObservableLocalPluginAdapter(pluginSpi);
     observer = new PluginObserverSpiMock(null);
     exceptionHandler = new PluginExceptionHandlerMock(null);
