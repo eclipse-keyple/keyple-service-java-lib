@@ -130,9 +130,8 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
     input.addProperty(
         JsonProperty.SERVICE.name(), ReaderService.SCHEDULE_CARD_SELECTION_SCENARIO.name());
 
-    input.add(
-        JsonProperty.CARD_SELECTION_SCENARIO.name(),
-        JsonUtil.getParser().toJsonTree(cardSelectionScenario));
+    input.addProperty(
+        JsonProperty.CARD_SELECTION_SCENARIO.name(), JsonUtil.toJson(cardSelectionScenario));
 
     input.addProperty(JsonProperty.NOTIFICATION_MODE.name(), notificationMode.name());
 

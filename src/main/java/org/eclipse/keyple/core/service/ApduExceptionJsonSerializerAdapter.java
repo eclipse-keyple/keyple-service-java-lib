@@ -49,7 +49,7 @@ class ApduExceptionJsonSerializerAdapter implements JsonSerializer<AbstractApduE
       JsonSerializationContext jsonSerializationContext) {
 
     JsonObject json = new JsonObject();
-    json.addProperty("message", exception.getMessage());
+    json.addProperty("detailMessage", exception.getMessage());
     json.add(
         "cardResponse",
         jsonSerializationContext.serialize(exception.getCardResponse(), CardResponseApi.class));

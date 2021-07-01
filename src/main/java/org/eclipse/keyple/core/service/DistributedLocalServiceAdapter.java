@@ -143,7 +143,7 @@ final class DistributedLocalServiceAdapter
     }
 
     JsonObject body = new JsonObject();
-    body.add(JsonProperty.PLUGIN_EVENT.name(), JsonUtil.getParser().toJsonTree(pluginEvent));
+    body.addProperty(JsonProperty.PLUGIN_EVENT.name(), JsonUtil.toJson(pluginEvent));
 
     localServiceSpi.onPluginEvent(pluginEvent.getReaderNames().first(), body.toString());
   }
@@ -166,7 +166,7 @@ final class DistributedLocalServiceAdapter
     }
 
     JsonObject body = new JsonObject();
-    body.add(JsonProperty.READER_EVENT.name(), JsonUtil.getParser().toJsonTree(readerEvent));
+    body.addProperty(JsonProperty.READER_EVENT.name(), JsonUtil.toJson(readerEvent));
 
     localServiceSpi.onReaderEvent(readerEvent.getReaderName(), body.toString());
   }
@@ -309,7 +309,7 @@ final class DistributedLocalServiceAdapter
             throw new IllegalArgumentException(service.name());
         }
       } catch (Exception e) {
-        output.add(JsonProperty.ERROR.name(), JsonUtil.getParser().toJsonTree(new BodyError(e)));
+        output.addProperty(JsonProperty.ERROR.name(), JsonUtil.toJson(new BodyError(e)));
       }
       return output.toString();
     }
@@ -338,9 +338,7 @@ final class DistributedLocalServiceAdapter
       CardResponseApi cardResponse = reader.transmitCardRequest(cardRequest, channelControl);
 
       // Build result
-      output.add(
-          JsonProperty.RESULT.name(),
-          JsonUtil.getParser().toJsonTree(cardResponse, CardResponseApi.class));
+      output.addProperty(JsonProperty.RESULT.name(), JsonUtil.toJson(cardResponse));
     }
 
     /**
@@ -373,12 +371,7 @@ final class DistributedLocalServiceAdapter
               cardSelectionRequests, multiSelectionProcessing, channelControl);
 
       // Build result
-      output.add(
-          JsonProperty.RESULT.name(),
-          JsonUtil.getParser()
-              .toJsonTree(
-                  cardSelectionResponses,
-                  new TypeToken<ArrayList<CardSelectionResponseApi>>() {}.getType()));
+      output.addProperty(JsonProperty.RESULT.name(), JsonUtil.toJson(cardSelectionResponses));
     }
 
     /**
@@ -550,7 +543,7 @@ final class DistributedLocalServiceAdapter
             throw new IllegalArgumentException(service.name());
         }
       } catch (Exception e) {
-        output.add(JsonProperty.ERROR.name(), JsonUtil.getParser().toJsonTree(new BodyError(e)));
+        output.addProperty(JsonProperty.ERROR.name(), JsonUtil.toJson(new BodyError(e)));
       }
       return output.toString();
     }
@@ -570,7 +563,7 @@ final class DistributedLocalServiceAdapter
       }
 
       // Build result
-      output.add(JsonProperty.RESULT.name(), JsonUtil.getParser().toJsonTree(readers));
+      output.addProperty(JsonProperty.RESULT.name(), JsonUtil.toJson(readers));
     }
 
     /**
@@ -607,8 +600,7 @@ final class DistributedLocalServiceAdapter
       }
 
       // Build result
-      output.add(
-          JsonProperty.RESULT.name(), JsonUtil.getParser().toJsonTree(readerGroupReferences));
+      output.addProperty(JsonProperty.RESULT.name(), JsonUtil.toJson(readerGroupReferences));
     }
 
     /**
