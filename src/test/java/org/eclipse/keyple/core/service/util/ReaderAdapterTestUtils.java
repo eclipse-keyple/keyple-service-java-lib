@@ -54,7 +54,7 @@ public class ReaderAdapterTestUtils {
           WaitForCardInsertionAutonomousSpi,
           WaitForCardRemovalAutonomousSpi,
           DontWaitForCardRemovalDuringProcessingSpi,
-          StubReaderSpiMock {}
+          ControllableReaderSpiMock {}
 
   public interface ReaderSpiMock extends KeypleReaderExtension, ReaderSpi {}
 

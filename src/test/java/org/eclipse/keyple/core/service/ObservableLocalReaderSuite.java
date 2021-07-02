@@ -20,21 +20,21 @@ import java.util.concurrent.TimeUnit;
 import org.calypsonet.terminal.reader.CardReaderEvent;
 import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
+import org.eclipse.keyple.core.service.util.ControllableReaderSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
-import org.eclipse.keyple.core.service.util.StubReaderSpiMock;
 import org.slf4j.Logger;
 
 public class ObservableLocalReaderSuite {
 
   private ObservableLocalReaderAdapter reader;
-  private StubReaderSpiMock readerSpi;
+  private ControllableReaderSpiMock readerSpi;
   private ReaderObserverSpiMock observer;
   private CardReaderObservationExceptionHandlerSpi handler;
   private Logger logger;
 
   ObservableLocalReaderSuite(
       ObservableLocalReaderAdapter reader,
-      StubReaderSpiMock readerSpi,
+      ControllableReaderSpiMock readerSpi,
       ReaderObserverSpiMock observer,
       CardReaderObservationExceptionHandlerSpi handler,
       Logger logger) {
