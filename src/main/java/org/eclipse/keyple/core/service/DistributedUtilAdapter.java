@@ -12,10 +12,16 @@
 package org.eclipse.keyple.core.service;
 
 import com.google.gson.JsonObject;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.calypsonet.terminal.card.ChannelControl;
 import org.calypsonet.terminal.card.ProxyReaderApi;
+import org.calypsonet.terminal.card.spi.ApduRequestSpi;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
+import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
+import org.calypsonet.terminal.card.spi.CardSelectorSpi;
+import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.eclipse.keyple.core.distributed.remote.spi.AbstractRemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
@@ -282,7 +288,7 @@ final class DistributedUtilAdapter {
     /**
      * Refers to {@link
      * ObservableLocalReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
-     * ObservableReader.NotificationMode, ObservableCardReader.DetectionMode)} and {@link
+     * ObservableCardReader.NotificationMode, ObservableCardReader.DetectionMode)} and {@link
      * ObservableRemoteReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
      * ObservableReader.NotificationMode, ObservableCardReader.DetectionMode)}
      *
@@ -331,5 +337,184 @@ final class DistributedUtilAdapter {
      * @since 2.0
      */
     RELEASE_CHANNEL
+  }
+
+  /**
+   * (package-private)<br>
+   *
+   * @since 2.0
+   */
+  static class CardSelectionRequest implements CardSelectionRequestSpi {
+
+    private CardSelector cardSelector;
+    private CardRequest cardRequest;
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.0
+     */
+    @Override
+    public CardSelectorSpi getCardSelector() {
+      return cardSelector;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.0
+     */
+    @Override
+    public CardRequestSpi getCardRequest() {
+      return cardRequest;
+    }
+  }
+
+  /**
+   * (package-private)<br>
+   *
+   * @since 2.0
+   */
+  static class CardSelector implements CardSelectorSpi {
+
+    private String cardProtocol;
+    private String powerOnDataRegex;
+    private byte[] aid;
+    private FileOccurrence fileOccurrence;
+    private FileControlInformation fileControlInformation;
+    private Set<Integer> successfulSelectionStatusWords;
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.0
+     */
+    @Override
+    public String getCardProtocol() {
+      return cardProtocol;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.0
+     */
+    @Override
+    public String getPowerOnDataRegex() {
+      return powerOnDataRegex;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.0
+     */
+    @Override
+    public byte[] getAid() {
+      return aid;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.0
+     */
+    @Override
+    public FileOccurrence getFileOccurrence() {
+      return fileOccurrence;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.0
+     */
+    @Override
+    public FileControlInformation getFileControlInformation() {
+      return fileControlInformation;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.0
+     */
+    @Override
+    public Set<Integer> getSuccessfulSelectionStatusWords() {
+      return successfulSelectionStatusWords;
+    }
+  }
+
+  /**
+   * (package-private)<br>
+   *
+   * @since 2.0
+   */
+  static class CardRequest implements CardRequestSpi {
+
+    private List<ApduRequest> apduRequests;
+    private boolean stopOnUnsuccessfulStatusWord;
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.0
+     */
+    @Override
+    public List<ApduRequestSpi> getApduRequests() {
+      return new ArrayList<ApduRequestSpi>(apduRequests);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.0
+     */
+    @Override
+    public boolean stopOnUnsuccessfulStatusWord() {
+      return stopOnUnsuccessfulStatusWord;
+    }
+  }
+
+  /**
+   * (package-private)<br>
+   *
+   * @since 2.0
+   */
+  static class ApduRequest implements ApduRequestSpi {
+
+    private byte[] apdu;
+    private Set<Integer> successfulStatusWords;
+    private String info;
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.0
+     */
+    @Override
+    public byte[] getApdu() {
+      return apdu;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.0
+     */
+    @Override
+    public Set<Integer> getSuccessfulStatusWords() {
+      return successfulStatusWords;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.0
+     */
+    @Override
+    public String getInfo() {
+      return info;
+    }
   }
 }

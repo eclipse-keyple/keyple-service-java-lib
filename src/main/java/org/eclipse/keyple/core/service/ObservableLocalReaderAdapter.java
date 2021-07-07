@@ -453,16 +453,16 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   void unregister() {
-    super.unregister();
     try {
-      notifyObservers(
-          new ReaderEventAdapter(
-              getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));
       stopCardDetection();
-    } finally {
-      clearObservers();
       stateService.shutdown();
+    } catch (Exception e) {
+      logger.error("Error during the stop card detection of reader '{}'", getName(), e);
     }
+    notifyObservers(
+        new ReaderEventAdapter(getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));
+    clearObservers();
+    super.unregister();
   }
 
   /**
@@ -505,7 +505,10 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public void removeObserver(CardReaderObserverSpi observer) {
-    observationManager.removeObserver(observer);
+    Assert.getInstance().notNull(observer, "observer");
+    if (observationManager.getObservers().contains(observer)) {
+      observationManager.removeObserver(observer);
+    }
   }
 
   /**

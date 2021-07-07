@@ -114,11 +114,11 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   @Override
   final void unregister() {
     Set<String> unregisteredReaderNames = new HashSet<String>(this.getReaderNames());
-    super.unregister();
     notifyObservers(
         new PluginEventAdapter(
             this.getName(), unregisteredReaderNames, PluginEvent.Type.UNAVAILABLE));
     clearObservers();
+    super.unregister();
   }
 
   /**
@@ -164,9 +164,12 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    */
   @Override
   public void removeObserver(PluginObserverSpi observer) {
-    observationManager.removeObserver(observer);
-    if (observationManager.countObservers() == 0) {
-      stopPluginMonitoring();
+    Assert.getInstance().notNull(observer, "observer");
+    if (observationManager.getObservers().contains(observer)) {
+      observationManager.removeObserver(observer);
+      if (observationManager.countObservers() == 0) {
+        stopPluginMonitoring();
+      }
     }
   }
 

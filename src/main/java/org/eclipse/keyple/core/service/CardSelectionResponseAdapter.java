@@ -29,9 +29,9 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
 final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
 
   private final String powerOnData;
-  private final ApduResponseApi selectApplicationResponse;
+  private final ApduResponseAdapter selectApplicationResponse;
   private final boolean hasMatched;
-  private final CardResponseApi cardResponse;
+  private final CardResponseAdapter cardResponse;
 
   /**
    * (package-private)<br>
@@ -47,9 +47,9 @@ final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
    */
   CardSelectionResponseAdapter(
       String powerOnData,
-      ApduResponseApi selectApplicationResponse,
+      ApduResponseAdapter selectApplicationResponse,
       boolean hasMatched,
-      CardResponseApi cardResponse) {
+      CardResponseAdapter cardResponse) {
     this.powerOnData = powerOnData;
     this.selectApplicationResponse = selectApplicationResponse;
     this.hasMatched = hasMatched;

@@ -17,7 +17,6 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
 import org.calypsonet.terminal.card.AbstractApduException;
-import org.calypsonet.terminal.card.CardResponseApi;
 
 /**
  * (package-private)<br>
@@ -50,9 +49,7 @@ class ApduExceptionJsonSerializerAdapter implements JsonSerializer<AbstractApduE
 
     JsonObject json = new JsonObject();
     json.addProperty("detailMessage", exception.getMessage());
-    json.add(
-        "cardResponse",
-        jsonSerializationContext.serialize(exception.getCardResponse(), CardResponseApi.class));
+    json.add("cardResponse", jsonSerializationContext.serialize(exception.getCardResponse()));
     return json;
   }
 }

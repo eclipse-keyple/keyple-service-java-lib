@@ -97,7 +97,6 @@ final class ObservationManagerAdapter<T, S> {
           ownerComponent,
           observer != null ? observer.getClass().getSimpleName() : null);
     }
-    Assert.getInstance().notNull(observer, "observer");
     synchronized (monitor) {
       observers.remove(observer);
     }

@@ -19,6 +19,7 @@ import org.eclipse.keyple.core.plugin.spi.ObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
+import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,13 +91,16 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
    */
   @Override
   public void removeObserver(PluginObserverSpi observer) {
-    super.removeObserver(observer);
-    if (countObservers() == 0) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Stop the plugin monitoring.");
-      }
-      if (thread != null) {
-        thread.end();
+    Assert.getInstance().notNull(observer, "observer");
+    if (getObservationManager().getObservers().contains(observer)) {
+      super.removeObserver(observer);
+      if (countObservers() == 0) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Stop the plugin monitoring.");
+        }
+        if (thread != null) {
+          thread.end();
+        }
       }
     }
   }

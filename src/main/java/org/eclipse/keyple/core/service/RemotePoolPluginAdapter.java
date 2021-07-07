@@ -56,8 +56,12 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
    */
   @Override
   void unregister() {
+    try {
+      remotePoolPluginSpi.onUnregister();
+    } catch (Exception e) {
+      logger.error("Error during the unregistration of the extension of plugin '{}'", getName(), e);
+    }
     super.unregister();
-    remotePoolPluginSpi.onUnregister();
   }
 
   /**

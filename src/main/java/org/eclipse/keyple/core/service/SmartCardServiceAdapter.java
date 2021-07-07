@@ -315,8 +315,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
           throw new IllegalArgumentException("The factory doesn't implement the right SPI.");
         }
 
-        plugin.register();
         plugins.put(plugin.getName(), plugin);
+        plugin.register();
       }
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException(
@@ -429,9 +429,13 @@ final class SmartCardServiceAdapter implements SmartCardService {
   public void unregisterPlugin(String pluginName) {
     logger.info("Unregistering a plugin from the service : {}", pluginName);
     synchronized (pluginMonitor) {
-      Plugin removedPlugin = plugins.remove(pluginName);
-      if (removedPlugin != null) {
-        ((AbstractPluginAdapter) removedPlugin).unregister();
+      Plugin plugin = plugins.get(pluginName);
+      if (plugin != null) {
+        try {
+          ((AbstractPluginAdapter) plugin).unregister();
+        } finally {
+          plugins.remove(pluginName);
+        }
       } else {
         logger.warn("The plugin '{}' is not registered", pluginName);
       }
@@ -445,9 +449,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public Set<String> getPluginNames() {
-    synchronized (pluginMonitor) {
-      return new HashSet<String>(plugins.keySet());
-    }
+    return new HashSet<String>(plugins.keySet());
   }
 
   /**
@@ -457,9 +459,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public Set<Plugin> getPlugins() {
-    synchronized (pluginMonitor) {
-      return new HashSet<Plugin>(plugins.values());
-    }
+    return new HashSet<Plugin>(plugins.values());
   }
 
   /**
@@ -469,9 +469,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public Plugin getPlugin(String pluginName) {
-    synchronized (pluginMonitor) {
-      return plugins.get(pluginName);
-    }
+    return plugins.get(pluginName);
   }
 
   /**
@@ -562,9 +560,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public boolean isDistributedLocalServiceRegistered(String distributedLocalServiceName) {
-    synchronized (distributedLocalServiceMonitor) {
-      return distributedLocalServices.containsKey(distributedLocalServiceName);
-    }
+    return distributedLocalServices.containsKey(distributedLocalServiceName);
   }
 
   /**
@@ -574,9 +570,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public DistributedLocalService getDistributedLocalService(String distributedLocalServiceName) {
-    synchronized (distributedLocalServiceMonitor) {
-      return distributedLocalServices.get(distributedLocalServiceName);
-    }
+    return distributedLocalServices.get(distributedLocalServiceName);
   }
 
   /**

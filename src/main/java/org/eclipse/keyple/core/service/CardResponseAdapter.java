@@ -11,6 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.calypsonet.terminal.card.ApduResponseApi;
 import org.calypsonet.terminal.card.CardResponseApi;
@@ -26,7 +27,7 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
  */
 final class CardResponseAdapter implements CardResponseApi {
 
-  private final List<ApduResponseApi> apduResponses;
+  private final List<ApduResponseAdapter> apduResponses;
   private final boolean isLogicalChannelOpen;
 
   /**
@@ -38,7 +39,7 @@ final class CardResponseAdapter implements CardResponseApi {
    * @param isLogicalChannelOpen true if the logical channel is open, false if not.
    * @since 2.0
    */
-  CardResponseAdapter(List<ApduResponseApi> apduResponses, boolean isLogicalChannelOpen) {
+  CardResponseAdapter(List<ApduResponseAdapter> apduResponses, boolean isLogicalChannelOpen) {
 
     this.apduResponses = apduResponses;
     this.isLogicalChannelOpen = isLogicalChannelOpen;
@@ -51,7 +52,7 @@ final class CardResponseAdapter implements CardResponseApi {
    */
   @Override
   public List<ApduResponseApi> getApduResponses() {
-    return apduResponses;
+    return new ArrayList<ApduResponseApi>(apduResponses);
   }
 
   /**

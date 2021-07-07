@@ -162,15 +162,15 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    */
   @Override
   void unregister() {
-    super.unregister();
     try {
-      notifyObservers(
-          new ReaderEventAdapter(
-              getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));
       stopCardDetection();
-    } finally {
-      clearObservers();
+    } catch (Exception e) {
+      logger.error("Error during the stop card detection of reader '{}'", getName(), e);
     }
+    notifyObservers(
+        new ReaderEventAdapter(getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));
+    clearObservers();
+    super.unregister();
   }
 
   /**
@@ -191,7 +191,10 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    */
   @Override
   public void removeObserver(CardReaderObserverSpi observer) {
-    observationManager.removeObserver(observer);
+    Assert.getInstance().notNull(observer, "observer");
+    if (observationManager.getObservers().contains(observer)) {
+      observationManager.removeObserver(observer);
+    }
   }
 
   /**

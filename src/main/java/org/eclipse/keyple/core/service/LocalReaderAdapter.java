@@ -127,8 +127,12 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    */
   @Override
   void unregister() {
+    try {
+      readerSpi.onUnregister();
+    } catch (Exception e) {
+      logger.error("Error during the unregistration of the extension of reader '{}'", getName(), e);
+    }
     super.unregister();
-    readerSpi.onUnregister();
   }
 
   /**
@@ -318,16 +322,16 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @throws UnexpectedStatusWordException If status word verification is enabled in the card
    *     request and the card returned an unexpected code.
    */
-  private CardResponseApi processCardRequest(CardRequestSpi cardRequest)
+  private CardResponseAdapter processCardRequest(CardRequestSpi cardRequest)
       throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
           UnexpectedStatusWordException {
 
-    List<ApduResponseApi> apduResponses = new ArrayList<ApduResponseApi>();
+    List<ApduResponseAdapter> apduResponses = new ArrayList<ApduResponseAdapter>();
 
     /* Proceeds with the APDU requests present in the CardRequest */
     for (ApduRequestSpi apduRequest : cardRequest.getApduRequests()) {
       try {
-        ApduResponseApi apduResponse = processApduRequest(apduRequest);
+        ApduResponseAdapter apduResponse = processApduRequest(apduRequest);
         apduResponses.add(apduResponse);
         if (cardRequest.stopOnUnsuccessfulStatusWord()
             && !apduRequest.getSuccessfulStatusWords().contains(apduResponse.getStatusWord())) {
@@ -378,10 +382,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
    */
-  private ApduResponseApi processApduRequest(ApduRequestSpi apduRequest)
+  private ApduResponseAdapter processApduRequest(ApduRequestSpi apduRequest)
       throws CardIOException, ReaderIOException {
 
-    ApduResponseApi apduResponse;
+    ApduResponseAdapter apduResponse;
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
       long elapsed10ms = (timeStamp - before) / 100000;
@@ -427,7 +431,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
    */
-  private ApduResponseApi case4HackGetResponse() throws ReaderIOException, CardIOException {
+  private ApduResponseAdapter case4HackGetResponse() throws ReaderIOException, CardIOException {
 
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
@@ -442,7 +446,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     byte[] getResponseHackResponseBytes = readerSpi.transmitApdu(APDU_GET_RESPONSE);
 
-    ApduResponseApi getResponseHackResponse = new ApduResponseAdapter(getResponseHackResponseBytes);
+    ApduResponseAdapter getResponseHackResponse =
+        new ApduResponseAdapter(getResponseHackResponseBytes);
 
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
@@ -479,13 +484,13 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       selectionStatus = processSelection(cardSelectionRequest.getCardSelector());
     } catch (ReaderIOException e) {
       throw new ReaderBrokenCommunicationException(
-          new CardResponseAdapter(new ArrayList<ApduResponseApi>(), false),
+          new CardResponseAdapter(new ArrayList<ApduResponseAdapter>(), false),
           false,
           e.getMessage(),
           e);
     } catch (CardIOException e) {
       throw new CardBrokenCommunicationException(
-          new CardResponseAdapter(new ArrayList<ApduResponseApi>(), false),
+          new CardResponseAdapter(new ArrayList<ApduResponseAdapter>(), false),
           false,
           e.getMessage(),
           e);
@@ -496,12 +501,12 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           selectionStatus.powerOnData,
           selectionStatus.selectApplicationResponse,
           false,
-          new CardResponseAdapter(new ArrayList<ApduResponseApi>(), false));
+          new CardResponseAdapter(new ArrayList<ApduResponseAdapter>(), false));
     }
 
     logicalChannelIsOpen = true;
 
-    CardResponseApi cardResponse;
+    CardResponseAdapter cardResponse;
 
     if (cardSelectionRequest.getCardRequest() != null) {
       cardResponse = processCardRequest(cardSelectionRequest.getCardRequest());
@@ -534,7 +539,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       throws CardIOException, ReaderIOException {
 
     String powerOnData;
-    ApduResponseApi fciResponse;
+    ApduResponseAdapter fciResponse;
     boolean hasMatched = true;
 
     if (cardSelector.getCardProtocol() != null && useDefaultProtocol) {
@@ -616,10 +621,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @return An not null {@link ApduResponseApi} containing the FCI.
    * @see #processSelection(CardSelectorSpi)
    */
-  private ApduResponseApi selectByAid(CardSelectorSpi cardSelector)
+  private ApduResponseAdapter selectByAid(CardSelectorSpi cardSelector)
       throws CardIOException, ReaderIOException {
 
-    ApduResponseApi fciResponse;
+    ApduResponseAdapter fciResponse;
 
     if (readerSpi instanceof AutonomousSelectionReaderSpi) {
       byte[] aid = cardSelector.getAid();
@@ -645,7 +650,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
    */
-  private ApduResponseApi processExplicitAidSelection(CardSelectorSpi cardSelector)
+  private ApduResponseAdapter processExplicitAidSelection(CardSelectorSpi cardSelector)
       throws CardIOException, ReaderIOException {
 
     final byte[] aid = cardSelector.getAid();
@@ -787,7 +792,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private static class SelectionStatus {
 
     private final String powerOnData;
-    private final ApduResponseApi selectApplicationResponse;
+    private final ApduResponseAdapter selectApplicationResponse;
     private final boolean hasMatched;
 
     /**
@@ -798,7 +803,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
      * @param hasMatched A boolean.
      */
     SelectionStatus(
-        String powerOnData, ApduResponseApi selectApplicationResponse, boolean hasMatched) {
+        String powerOnData, ApduResponseAdapter selectApplicationResponse, boolean hasMatched) {
       this.powerOnData = powerOnData;
       this.selectApplicationResponse = selectApplicationResponse;
       this.hasMatched = hasMatched;

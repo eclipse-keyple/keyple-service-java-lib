@@ -17,6 +17,8 @@ import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.PluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
@@ -25,6 +27,8 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
  * @since 2.0
  */
 class LocalPluginAdapter extends AbstractPluginAdapter {
+
+  private static final Logger logger = LoggerFactory.getLogger(LocalPluginAdapter.class);
 
   private final PluginSpi pluginSpi;
 
@@ -76,7 +80,11 @@ class LocalPluginAdapter extends AbstractPluginAdapter {
    */
   @Override
   void unregister() {
+    try {
+      pluginSpi.onUnregister();
+    } catch (Exception e) {
+      logger.error("Error during the unregistration of the extension of plugin '{}'", getName(), e);
+    }
     super.unregister();
-    pluginSpi.onUnregister();
   }
 }

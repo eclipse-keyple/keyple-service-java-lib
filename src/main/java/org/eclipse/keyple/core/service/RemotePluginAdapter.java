@@ -95,13 +95,19 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
       String readerName = entry.getKey();
       boolean isObservable = entry.getValue();
 
-      RemoteReaderAdapter remoteReaderAdapter;
+      RemoteReaderAdapter remoteReaderAdapter = null;
       if (isObservable) {
-        ObservableRemoteReaderSpi observableRemoteReaderSpi =
-            remotePluginSpi.createObservableRemoteReader(readerName);
-        remoteReaderAdapter =
-            new ObservableRemoteReaderAdapter(observableRemoteReaderSpi, getName());
-      } else {
+        try {
+          ObservableRemoteReaderSpi observableRemoteReaderSpi =
+              remotePluginSpi.createObservableRemoteReader(readerName);
+          remoteReaderAdapter =
+              new ObservableRemoteReaderAdapter(observableRemoteReaderSpi, getName());
+        } catch (IllegalStateException e) {
+          logger.warn(e.getMessage());
+          isObservable = false;
+        }
+      }
+      if (!isObservable) {
         RemoteReaderSpi remoteReaderSpi = remotePluginSpi.createRemoteReader(readerName);
         remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName());
       }
@@ -118,8 +124,12 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
    */
   @Override
   void unregister() {
+    try {
+      remotePluginSpi.onUnregister();
+    } catch (Exception e) {
+      logger.error("Error during the unregistration of the extension of plugin '{}'", getName(), e);
+    }
     super.unregister();
-    remotePluginSpi.onUnregister();
   }
 
   /**

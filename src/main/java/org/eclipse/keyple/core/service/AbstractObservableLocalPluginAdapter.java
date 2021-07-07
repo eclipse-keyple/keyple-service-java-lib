@@ -16,6 +16,7 @@ import java.util.Set;
 import org.eclipse.keyple.core.plugin.spi.PluginSpi;
 import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
+import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,11 +113,11 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   @Override
   final void unregister() {
     Set<String> unregisteredReaderNames = new HashSet<String>(this.getReaderNames());
-    super.unregister();
     notifyObservers(
         new PluginEventAdapter(
             this.getName(), unregisteredReaderNames, PluginEvent.Type.UNAVAILABLE));
     clearObservers();
+    super.unregister();
   }
 
   /**
@@ -137,7 +138,10 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    */
   @Override
   public void removeObserver(PluginObserverSpi observer) {
-    observationManager.removeObserver(observer);
+    Assert.getInstance().notNull(observer, "observer");
+    if (observationManager.getObservers().contains(observer)) {
+      observationManager.removeObserver(observer);
+    }
   }
 
   /**

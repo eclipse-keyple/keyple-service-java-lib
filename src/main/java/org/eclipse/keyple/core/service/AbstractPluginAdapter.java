@@ -17,6 +17,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
@@ -26,6 +28,7 @@ import org.eclipse.keyple.core.plugin.PluginIOException;
  */
 abstract class AbstractPluginAdapter implements Plugin {
 
+  private static final Logger logger = LoggerFactory.getLogger(AbstractPluginAdapter.class);
   private final String pluginName;
   private final KeyplePluginExtension pluginExtension;
   private boolean isRegistered;
@@ -77,11 +80,15 @@ abstract class AbstractPluginAdapter implements Plugin {
    * @since 2.0
    */
   void unregister() {
-    isRegistered = false;
-    for (String key : readers.keySet()) {
-      Reader reader = readers.remove(key);
-      ((AbstractReaderAdapter) reader).unregister();
+    for (Reader reader : readers.values()) {
+      try {
+        ((AbstractReaderAdapter) reader).unregister();
+      } catch (Exception e) {
+        logger.error("Error during the unregistration of reader '{}'", reader.getName(), e);
+      }
     }
+    readers.clear();
+    isRegistered = false;
   }
 
   /**

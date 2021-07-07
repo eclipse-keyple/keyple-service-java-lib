@@ -72,8 +72,7 @@ final class DistributedLocalServiceAdapter
    */
   @Override
   public void setPoolPluginNames(String... poolPluginNames) {
-    checkStatus();
-    this.poolPluginNames = Arrays.asList(poolPluginNames);
+    this.poolPluginNames = poolPluginNames != null ? Arrays.asList(poolPluginNames) : null;
   }
 
   /**
@@ -188,7 +187,6 @@ final class DistributedLocalServiceAdapter
    * @since 2.0
    */
   void unregister() {
-    isRegistered = false;
     for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
       if (plugin instanceof ObservablePlugin) {
         ((ObservablePlugin) plugin).removeObserver(this);
@@ -199,6 +197,7 @@ final class DistributedLocalServiceAdapter
         }
       }
     }
+    isRegistered = false;
   }
 
   /**
@@ -332,7 +331,7 @@ final class DistributedLocalServiceAdapter
       CardRequestSpi cardRequest =
           JsonUtil.getParser()
               .fromJson(
-                  input.get(JsonProperty.CARD_REQUEST.name()).getAsString(), CardRequestSpi.class);
+                  input.get(JsonProperty.CARD_REQUEST.name()).getAsString(), CardRequest.class);
 
       // Execute the service on the reader
       CardResponseApi cardResponse = reader.transmitCardRequest(cardRequest, channelControl);
@@ -356,7 +355,7 @@ final class DistributedLocalServiceAdapter
           JsonUtil.getParser()
               .fromJson(
                   input.get(JsonProperty.CARD_SELECTION_REQUESTS.name()).getAsString(),
-                  new TypeToken<ArrayList<CardSelectionRequestSpi>>() {}.getType());
+                  new TypeToken<ArrayList<CardSelectionRequest>>() {}.getType());
 
       MultiSelectionProcessing multiSelectionProcessing =
           MultiSelectionProcessing.valueOf(
