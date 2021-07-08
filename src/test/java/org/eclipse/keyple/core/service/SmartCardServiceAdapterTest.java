@@ -31,6 +31,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
@@ -119,7 +121,14 @@ public class SmartCardServiceAdapterTest {
   public static void beforeClass() throws Exception {
     mockStatic(LoggerFactory.class);
     logger = mock(Logger.class);
-    when(LoggerFactory.getLogger(any(Class.class))).thenReturn(logger);
+    when(LoggerFactory.getLogger(any(Class.class)))
+        .thenAnswer(
+            new Answer<Logger>() {
+              @Override
+              public Logger answer(InvocationOnMock invocation) throws Throwable {
+                return logger;
+              }
+            });
     service = SmartCardServiceAdapter.getInstance();
   }
 

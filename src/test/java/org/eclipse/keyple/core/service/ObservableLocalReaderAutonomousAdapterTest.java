@@ -12,9 +12,13 @@
 package org.eclipse.keyple.core.service;
 
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN_NAME;
-import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER_NAME_1;
+import static org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils.*;
 import static org.mockito.Mockito.*;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.calypsonet.terminal.card.*;
+import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.util.ObservableReaderAutonomousSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
@@ -33,17 +37,27 @@ public class ObservableLocalReaderAutonomousAdapterTest {
   ObservableReaderAutonomousSpiMock readerSpi;
   ReaderObserverSpiMock observer;
   CardReaderObservationExceptionHandlerSpi handler;
-  ObservableLocalReaderSuiteTest testSuite;
+  ObservableLocalReaderSuite testSuite;
+  ExecutorService notificationExecutorService;
+
+  CardSelectionRequestSpi cardSelectionRequestSpi;
+  CardSelectionResponseApi cardSelectionResponseApi;
+  CardResponseApi cardResponseApi;
+  ReaderEvent event;
   /*
    *  With ObservableReaderAutonomousSpi
    */
   @Before
   public void seTup() {
-    readerSpi = new ObservableReaderAutonomousSpiMock(READER_NAME_1);
+    notificationExecutorService = Executors.newSingleThreadExecutor();
+    readerSpi = Mockito.spy(new ObservableReaderAutonomousSpiMock(READER_NAME));
     handler = Mockito.spy(CardReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
     observer = new ReaderObserverSpiMock(null);
-    testSuite = new ObservableLocalReaderSuiteTest(reader, readerSpi, observer, handler, logger);
+    testSuite = new ObservableLocalReaderSuite(reader, readerSpi, observer, handler, logger);
+    cardSelectionRequestSpi = mock(CardSelectionRequestSpi.class);
+    cardSelectionResponseApi = mock(CardSelectionResponseApi.class);
+    cardResponseApi = mock(CardResponseApi.class);
 
     // test with event notification executor service
     reader.register();
@@ -56,17 +70,17 @@ public class ObservableLocalReaderAutonomousAdapterTest {
 
   @Test
   public void initReader_addObserver_startDetection() {
-    testSuite.initReader_addObserver_startDetection();
+    testSuite.addFirstObserver_should_startDetection();
   }
 
   @Test
   public void removeObserver() {
-    testSuite.removeObserver();
+    testSuite.removeLastObserver_shoul_StopDetection();
   }
 
   @Test
   public void clearObservers() {
-    testSuite.clearObservers();
+    testSuite.clearObservers_shouldRemove_allObservers();
   }
 
   @Test
@@ -97,6 +111,6 @@ public class ObservableLocalReaderAutonomousAdapterTest {
     RuntimeException e = new RuntimeException();
     testSuite.setObserver(new ReaderObserverSpiMock(e));
     testSuite.insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
-    verify(handler, times(1)).onReaderObservationError(anyString(), eq(READER_NAME_1), eq(e));
+    verify(handler, times(1)).onReaderObservationError(anyString(), eq(READER_NAME), eq(e));
   }
 }

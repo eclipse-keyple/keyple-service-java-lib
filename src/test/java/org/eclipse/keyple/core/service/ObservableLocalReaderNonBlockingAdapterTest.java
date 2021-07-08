@@ -14,7 +14,7 @@ package org.eclipse.keyple.core.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN_NAME;
-import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER_NAME_1;
+import static org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils.READER_NAME;
 import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.TimeUnit;
@@ -36,7 +36,7 @@ public class ObservableLocalReaderNonBlockingAdapterTest {
   ObservableReaderNonBlockingSpiMock readerSpi;
   ReaderObserverSpiMock observer;
   CardReaderObservationExceptionHandlerSpi handler;
-  ObservableLocalReaderSuiteTest testSuite;
+  ObservableLocalReaderSuite testSuite;
 
   /*
   *  With
@@ -46,11 +46,11 @@ public class ObservableLocalReaderNonBlockingAdapterTest {
   */
   @Before
   public void seTup() {
-    readerSpi = new ObservableReaderNonBlockingSpiMock(READER_NAME_1);
+    readerSpi = new ObservableReaderNonBlockingSpiMock(READER_NAME);
     handler = mock(CardReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
     observer = new ReaderObserverSpiMock(null);
-    testSuite = new ObservableLocalReaderSuiteTest(reader, readerSpi, observer, handler, logger);
+    testSuite = new ObservableLocalReaderSuite(reader, readerSpi, observer, handler, logger);
     reader.register();
   }
 
@@ -61,17 +61,17 @@ public class ObservableLocalReaderNonBlockingAdapterTest {
 
   @Test
   public void initReader_addObserver_startDetection() {
-    testSuite.initReader_addObserver_startDetection();
+    testSuite.addFirstObserver_should_startDetection();
   }
 
   @Test
   public void removeObserver() {
-    testSuite.removeObserver();
+    testSuite.removeLastObserver_shoul_StopDetection();
   }
 
   @Test
   public void clearObservers() {
-    testSuite.clearObservers();
+    testSuite.clearObservers_shouldRemove_allObservers();
   }
 
   @Test

@@ -40,7 +40,6 @@ public class ObservableLocalPluginAdapterTest {
     observablePluginMock = new ObservableLocalPluginSpiMock(PLUGIN_NAME, null);
     observerMock = new PluginObserverSpiMock(null);
     exceptionHandlerMock = new PluginExceptionHandlerMock(null);
-
     pluginAdapter = new ObservableLocalPluginAdapter(observablePluginMock);
   }
 

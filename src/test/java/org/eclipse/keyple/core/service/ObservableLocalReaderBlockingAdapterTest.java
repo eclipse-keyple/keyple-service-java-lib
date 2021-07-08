@@ -12,7 +12,7 @@
 package org.eclipse.keyple.core.service;
 
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN_NAME;
-import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.READER_NAME_1;
+import static org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils.READER_NAME;
 import static org.mockito.Mockito.mock;
 
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
@@ -33,7 +33,7 @@ public class ObservableLocalReaderBlockingAdapterTest {
   ObservableReaderBlockingSpiMock readerSpi;
   ReaderObserverSpiMock observer;
   CardReaderObservationExceptionHandlerSpi handler;
-  ObservableLocalReaderSuiteTest testSuite;
+  ObservableLocalReaderSuite testSuite;
 
   long waitInsertion = 1000;
   long waitRemoval = 1000;
@@ -46,11 +46,11 @@ public class ObservableLocalReaderBlockingAdapterTest {
    */
   @Before
   public void seTup() {
-    readerSpi = new ObservableReaderBlockingSpiMock(READER_NAME_1, waitInsertion, waitRemoval);
+    readerSpi = new ObservableReaderBlockingSpiMock(READER_NAME, waitInsertion, waitRemoval);
     handler = mock(CardReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
     observer = new ReaderObserverSpiMock(null);
-    testSuite = new ObservableLocalReaderSuiteTest(reader, readerSpi, observer, handler, logger);
+    testSuite = new ObservableLocalReaderSuite(reader, readerSpi, observer, handler, logger);
     reader.register();
   }
 
@@ -61,17 +61,17 @@ public class ObservableLocalReaderBlockingAdapterTest {
 
   @Test
   public void initReader_addObserver_startDetection() {
-    testSuite.initReader_addObserver_startDetection();
+    testSuite.addFirstObserver_should_startDetection();
   }
 
   @Test
   public void removeObserver() {
-    testSuite.removeObserver();
+    testSuite.removeLastObserver_shoul_StopDetection();
   }
 
   @Test
   public void clearObservers() {
-    testSuite.clearObservers();
+    testSuite.clearObservers_shouldRemove_allObservers();
   }
 
   @Test
@@ -91,7 +91,7 @@ public class ObservableLocalReaderBlockingAdapterTest {
 
   @Test
   public void removeCard_beforeFinalize_shouldNotify_CardRemoved() {
-    // flaky?
+    // todo flaky?, depends on what values are given for waitInsertion and waitRemoval
     testSuite.removeCard_beforeFinalize_shouldNotify_CardRemoved();
   }
 }

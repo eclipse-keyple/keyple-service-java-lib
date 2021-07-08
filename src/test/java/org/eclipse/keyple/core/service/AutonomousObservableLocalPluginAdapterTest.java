@@ -27,11 +27,11 @@ import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.AutonomousObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
-import org.eclipse.keyple.core.service.util.AutonomousObservablePluginSpiMock;
 import org.eclipse.keyple.core.service.util.PluginExceptionHandlerMock;
 import org.eclipse.keyple.core.service.util.PluginObserverSpiMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class AutonomousObservableLocalPluginAdapterTest {
 
@@ -47,6 +47,9 @@ public class AutonomousObservableLocalPluginAdapterTest {
   public void seTup() throws PluginIOException {
     pluginSpi = mock(AutonomousObservablePluginSpiMock.class);
     when(pluginSpi.getName()).thenReturn(PLUGIN_NAME);
+    pluginSpi = Mockito.mock(AutonomousObservablePluginSpiMock.class);
+    when(pluginSpi.getName()).thenReturn(PLUGIN_NAME);
+    when(pluginSpi.searchAvailableReaders()).thenReturn(new HashSet<ReaderSpi>());
     plugin = new AutonomousObservableLocalPluginAdapter(pluginSpi);
     observer = new PluginObserverSpiMock(null);
     exceptionHandler = new PluginExceptionHandlerMock(null);
