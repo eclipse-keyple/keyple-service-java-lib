@@ -42,7 +42,7 @@ public class ObservableLocalReaderBlockingAdapterTest {
    *  With
    * WaitForCardInsertionBlockingSpi,
    * WaitForCardRemovalBlockingSpi,
-   * WaitForCardRemovalBlockingDuringProcessingSpi
+   * WaitForCardRemovalDuringProcessingBlockingSpi
    */
   @Before
   public void seTup() {

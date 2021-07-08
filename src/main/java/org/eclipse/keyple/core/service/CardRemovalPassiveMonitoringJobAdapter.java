@@ -13,7 +13,7 @@ package org.eclipse.keyple.core.service;
 
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.TaskCanceledException;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.WaitForCardRemovalBlockingDuringProcessingSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.WaitForCardRemovalDuringProcessingBlockingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalBlockingSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Detect the card removal thanks to the method {@link
  * WaitForCardRemovalBlockingSpi#waitForCardRemoval()} or {@link
- * WaitForCardRemovalBlockingDuringProcessingSpi#waitForCardRemovalDuringProcessing()} depending of
+ * WaitForCardRemovalDuringProcessingBlockingSpi#waitForCardRemovalDuringProcessing()} depending of
  * the provided SPI.
  *
  * <p>This method is invoked in another thread
@@ -48,7 +48,7 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
       LoggerFactory.getLogger(CardRemovalPassiveMonitoringJobAdapter.class);
 
   private final WaitForCardRemovalBlockingSpi readerSpi;
-  private final WaitForCardRemovalBlockingDuringProcessingSpi readerProcessingSpi;
+  private final WaitForCardRemovalDuringProcessingBlockingSpi readerProcessingSpi;
 
   /**
    * (package-private)<br>
@@ -65,7 +65,7 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
     } else {
       this.readerSpi = null;
       this.readerProcessingSpi =
-          (WaitForCardRemovalBlockingDuringProcessingSpi) reader.getObservableReaderSpi();
+          (WaitForCardRemovalDuringProcessingBlockingSpi) reader.getObservableReaderSpi();
     }
   }
 
