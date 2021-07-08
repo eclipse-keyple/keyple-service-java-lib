@@ -13,6 +13,7 @@ package org.eclipse.keyple.core.service;
 
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.TaskCanceledException;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.WaitForCardRemovalBlockingDuringProcessingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalBlockingSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,9 @@ import org.slf4j.LoggerFactory;
 /**
  * (package-private)<br>
  * Detect the card removal thanks to the method {@link
- * org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalBlockingSpi#waitForCardAbsentNative()}.
+ * WaitForCardRemovalBlockingSpi#waitForCardRemoval()} or {@link
+ * WaitForCardRemovalBlockingDuringProcessingSpi#waitForCardRemovalDuringProcessing()} depending of
+ * the provided SPI.
  *
  * <p>This method is invoked in another thread
  *
@@ -45,6 +48,7 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
       LoggerFactory.getLogger(CardRemovalPassiveMonitoringJobAdapter.class);
 
   private final WaitForCardRemovalBlockingSpi readerSpi;
+  private final WaitForCardRemovalBlockingDuringProcessingSpi readerProcessingSpi;
 
   /**
    * (package-private)<br>
@@ -55,7 +59,14 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
    */
   public CardRemovalPassiveMonitoringJobAdapter(ObservableLocalReaderAdapter reader) {
     super(reader);
-    this.readerSpi = (WaitForCardRemovalBlockingSpi) reader.getObservableReaderSpi();
+    if (reader.getObservableReaderSpi() instanceof WaitForCardRemovalBlockingSpi) {
+      this.readerSpi = (WaitForCardRemovalBlockingSpi) reader.getObservableReaderSpi();
+      this.readerProcessingSpi = null;
+    } else {
+      this.readerSpi = null;
+      this.readerProcessingSpi =
+          (WaitForCardRemovalBlockingDuringProcessingSpi) reader.getObservableReaderSpi();
+    }
   }
 
   /**
@@ -81,7 +92,11 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
         try {
           while (!Thread.currentThread().isInterrupted()) {
             try {
-              readerSpi.waitForCardRemoval();
+              if (readerSpi != null) {
+                readerSpi.waitForCardRemoval();
+              } else {
+                readerProcessingSpi.waitForCardRemovalDuringProcessing();
+              }
               monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
               break;
             } catch (ReaderIOException e) {
@@ -111,6 +126,10 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
    */
   @Override
   void stop() {
-    readerSpi.stopWaitForCardRemoval();
+    if (readerSpi != null) {
+      readerSpi.stopWaitForCardRemoval();
+    } else {
+      readerProcessingSpi.stopWaitForCardRemovalDuringProcessing();
+    }
   }
 }
