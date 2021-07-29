@@ -72,7 +72,8 @@ public class Main_ProtocolBasedSelection_Pcsc {
     Reader reader =
         ConfigurationUtil.getCardReader(plugin, ConfigurationUtil.CONTACTLESS_READER_NAME_REGEX);
 
-    reader.activateProtocol(PcscSupportedContactlessProtocol.MIFARE_CLASSIC.name(), MIFARE_CLASSIC);
+    ((ConfigurableReader) reader)
+        .activateProtocol(PcscSupportedContactlessProtocol.MIFARE_CLASSIC.name(), MIFARE_CLASSIC);
 
     logger.info(
         "=============== UseCase Generic #2: protocol based card selection ==================");

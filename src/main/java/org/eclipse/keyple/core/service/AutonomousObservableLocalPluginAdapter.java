@@ -16,7 +16,6 @@ import java.util.Set;
 import org.eclipse.keyple.core.plugin.AutonomousObservablePluginApi;
 import org.eclipse.keyple.core.plugin.spi.AutonomousObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,12 +106,7 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
    * @param readerSpi spi to create the reader from
    */
   private void addReader(ReaderSpi readerSpi) {
-    LocalReaderAdapter reader;
-    if (readerSpi instanceof ObservableReaderSpi) {
-      reader = new ObservableLocalReaderAdapter((ObservableReaderSpi) readerSpi, this.getName());
-    } else {
-      reader = new LocalReaderAdapter(readerSpi, this.getName());
-    }
+    LocalReaderAdapter reader = buildLocalReaderAdapter(readerSpi);
     reader.register();
     getReadersMap().put(reader.getName(), reader);
     if (logger.isTraceEnabled()) {

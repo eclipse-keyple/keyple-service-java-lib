@@ -118,11 +118,5 @@ public class AbstractReaderAdapterTest {
     public boolean isCardPresent() {
       return false;
     }
-
-    @Override
-    public void activateProtocol(String readerProtocol, String cardProtocol) {}
-
-    @Override
-    public void deactivateProtocol(String readerProtocol) {}
   }
 }

@@ -16,7 +16,6 @@ import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.PluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,13 +58,7 @@ class LocalPluginAdapter extends AbstractPluginAdapter {
     Set<ReaderSpi> readerSpiList = pluginSpi.searchAvailableReaders();
 
     for (ReaderSpi readerSpi : readerSpiList) {
-      LocalReaderAdapter localReaderAdapter;
-      if (readerSpi instanceof ObservableReaderSpi) {
-        localReaderAdapter =
-            new ObservableLocalReaderAdapter((ObservableReaderSpi) readerSpi, getName());
-      } else {
-        localReaderAdapter = new LocalReaderAdapter(readerSpi, getName());
-      }
+      LocalReaderAdapter localReaderAdapter = buildLocalReaderAdapter(readerSpi);
       getReadersMap().put(readerSpi.getName(), localReaderAdapter);
       localReaderAdapter.register();
     }

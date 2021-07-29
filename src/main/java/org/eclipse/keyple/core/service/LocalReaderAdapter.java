@@ -26,6 +26,7 @@ import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.AutonomousSelectionReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keyple.core.util.Assert;
@@ -156,7 +157,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     /* Open the physical channel if needed, determine the current protocol */
     if (!readerSpi.isPhysicalChannelOpen()) {
       try {
-        openPhysicalChannelAndSetProtocol();
+        readerSpi.openPhysicalChannel();
+        computeCurrentProtocol();
       } catch (ReaderIOException e) {
         throw new ReaderBrokenCommunicationException(
             null, false, "Reader communication failure while opening physical channel", e);
@@ -244,43 +246,40 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * {@inheritDoc}
+   * (package-private)<br>
+   * Activates a protocol (for configurable reader only).
    *
+   * @param readerProtocol The reader protocol.
+   * @param applicationProtocol The corresponding application protocol to associate.
    * @since 2.0
    */
-  @Override
-  public final void activateProtocol(String readerProtocol, String applicationProtocol) {
+  final void activateReaderProtocol(String readerProtocol, String applicationProtocol) {
     checkStatus();
     Assert.getInstance()
         .notEmpty(readerProtocol, "readerProtocol")
         .notEmpty(applicationProtocol, "applicationProtocol");
-
-    if (!readerSpi.isProtocolSupported(readerProtocol)) {
+    if (!((ConfigurableReaderSpi) readerSpi).isProtocolSupported(readerProtocol)) {
       throw new ReaderProtocolNotSupportedException(readerProtocol);
     }
-
-    readerSpi.activateProtocol(readerProtocol);
-
+    ((ConfigurableReaderSpi) readerSpi).activateProtocol(readerProtocol);
     protocolAssociations.put(readerProtocol, applicationProtocol);
   }
 
   /**
-   * {@inheritDoc}
+   * (package-private)<br>
+   * Deactivates a protocol (for configurable reader only).
    *
+   * @param readerProtocol The reader protocol.
    * @since 2.0
    */
-  @Override
-  public final void deactivateProtocol(String readerProtocol) {
+  final void deactivateReaderProtocol(String readerProtocol) {
     checkStatus();
     Assert.getInstance().notEmpty(readerProtocol, "readerProtocol");
-
     protocolAssociations.remove(readerProtocol);
-
-    if (!readerSpi.isProtocolSupported(readerProtocol)) {
+    if (!((ConfigurableReaderSpi) readerSpi).isProtocolSupported(readerProtocol)) {
       throw new ReaderProtocolNotSupportedException(readerProtocol);
     }
-
-    readerSpi.deactivateProtocol(readerProtocol);
+    ((ConfigurableReaderSpi) readerSpi).deactivateProtocol(readerProtocol);
   }
 
   /**
@@ -297,18 +296,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       throw new ReaderBrokenCommunicationException(
           null, false, "Failed to release the physical channel", e);
     }
-  }
-
-  /**
-   * (private)<br>
-   * Opens the physical channel, determines and keep the current protocol.
-   *
-   * @throws ReaderIOException if the communication with the reader has failed.
-   * @throws CardIOException if the communication with the card has failed.
-   */
-  private void openPhysicalChannelAndSetProtocol() throws ReaderIOException, CardIOException {
-    readerSpi.openPhysicalChannel();
-    computeCurrentProtocol();
   }
 
   /**
@@ -618,7 +605,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * Selects the card with the provided AID and gets the FCI response in return.
    *
    * @param cardSelector The card selector.
-   * @return An not null {@link ApduResponseApi} containing the FCI.
+   * @return A not null {@link ApduResponseApi} containing the FCI.
    * @see #processSelection(CardSelectorSpi)
    */
   private ApduResponseAdapter selectByAid(CardSelectorSpi cardSelector)
@@ -778,7 +765,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     } else {
       useDefaultProtocol = false;
       for (Map.Entry<String, String> entry : protocolAssociations.entrySet()) {
-        if (readerSpi.isCurrentProtocol(entry.getKey())) {
+        if (((ConfigurableReaderSpi) readerSpi).isCurrentProtocol(entry.getKey())) {
           currentProtocol = entry.getValue();
         }
       }

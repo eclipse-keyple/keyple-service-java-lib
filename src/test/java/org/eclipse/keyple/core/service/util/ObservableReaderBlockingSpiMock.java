@@ -19,6 +19,7 @@ import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.TaskCanceledException;
+import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionBlockingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.WaitForCardRemovalDuringProcessingBlockingSpi;
@@ -26,6 +27,7 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitFo
 
 public class ObservableReaderBlockingSpiMock
     implements KeypleReaderExtension,
+        ConfigurableReaderSpi,
         ObservableReaderSpi,
         WaitForCardInsertionBlockingSpi,
         WaitForCardRemovalBlockingSpi,

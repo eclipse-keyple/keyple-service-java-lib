@@ -16,7 +16,6 @@ import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.PoolPluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,13 +108,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
           e);
     }
 
-    LocalReaderAdapter localReaderAdapter;
-    if (readerSpi instanceof ObservableReaderSpi) {
-      localReaderAdapter =
-          new ObservableLocalReaderAdapter((ObservableReaderSpi) readerSpi, getName());
-    } else {
-      localReaderAdapter = new LocalReaderAdapter(readerSpi, getName());
-    }
+    LocalReaderAdapter localReaderAdapter = buildLocalReaderAdapter(readerSpi);
     getReadersMap().put(localReaderAdapter.getName(), localReaderAdapter);
     localReaderAdapter.register();
     return localReaderAdapter;

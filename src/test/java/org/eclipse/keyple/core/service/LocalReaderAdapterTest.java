@@ -25,7 +25,7 @@ import org.calypsonet.terminal.reader.ReaderCommunicationException;
 import org.calypsonet.terminal.reader.ReaderProtocolNotSupportedException;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
-import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.junit.After;
@@ -236,7 +236,8 @@ public class LocalReaderAdapterTest {
     when(cardSelector.getCardProtocol()).thenReturn(OTHER_CARD_PROTOCOL);
     when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
-    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    LocalConfigurableReaderAdapter localReaderAdapter =
+        new LocalConfigurableReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     localReaderAdapter.activateProtocol(CARD_PROTOCOL, CARD_PROTOCOL);
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
@@ -333,7 +334,8 @@ public class LocalReaderAdapterTest {
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(responseApdu);
     when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
 
-    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    LocalConfigurableReaderAdapter localReaderAdapter =
+        new LocalConfigurableReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     localReaderAdapter.activateProtocol(CARD_PROTOCOL, CARD_PROTOCOL);
     assertThat(localReaderAdapter.isCardPresent()).isTrue();
@@ -407,8 +409,9 @@ public class LocalReaderAdapterTest {
 
   @Test
   public void deActivateProtocol_shouldInvoke_deActivateProcotol_OnReaderSpi() throws Exception {
-    ReaderSpi spy = getReaderSpiSpy();
-    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(spy, PLUGIN_NAME);
+    ConfigurableReaderSpi spy = getReaderSpiSpy();
+    LocalConfigurableReaderAdapter localReaderAdapter =
+        new LocalConfigurableReaderAdapter(spy, PLUGIN_NAME);
     localReaderAdapter.register();
     localReaderAdapter.activateProtocol(CARD_PROTOCOL, CARD_PROTOCOL);
     localReaderAdapter.deactivateProtocol(CARD_PROTOCOL);
@@ -417,17 +420,19 @@ public class LocalReaderAdapterTest {
 
   @Test(expected = ReaderProtocolNotSupportedException.class)
   public void activateProtocol_whileNotSupported_should_RPNS() throws Exception {
-    ReaderSpi spy = getReaderSpiSpy();
+    ConfigurableReaderSpi spy = getReaderSpiSpy();
     when(spy.isProtocolSupported(ArgumentMatchers.<String>any())).thenReturn(false);
-    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(spy, PLUGIN_NAME);
+    LocalConfigurableReaderAdapter localReaderAdapter =
+        new LocalConfigurableReaderAdapter(spy, PLUGIN_NAME);
     localReaderAdapter.register();
     localReaderAdapter.activateProtocol(CARD_PROTOCOL, CARD_PROTOCOL);
   }
 
   @Test(expected = ReaderProtocolNotSupportedException.class)
   public void deActivateProtocol_whileNotSupported_should_RPNS() throws Exception {
-    ReaderSpi spy = getReaderSpiSpy();
-    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(spy, PLUGIN_NAME);
+    ConfigurableReaderSpi spy = getReaderSpiSpy();
+    LocalConfigurableReaderAdapter localReaderAdapter =
+        new LocalConfigurableReaderAdapter(spy, PLUGIN_NAME);
     localReaderAdapter.register();
     localReaderAdapter.activateProtocol(CARD_PROTOCOL, CARD_PROTOCOL);
     when(spy.isProtocolSupported(ArgumentMatchers.<String>any())).thenReturn(false);

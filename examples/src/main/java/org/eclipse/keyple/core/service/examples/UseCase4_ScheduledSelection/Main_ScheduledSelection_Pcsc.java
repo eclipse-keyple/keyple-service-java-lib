@@ -65,9 +65,10 @@ public class Main_ScheduledSelection_Pcsc {
         ConfigurationUtil.getCardReader(plugin, ConfigurationUtil.CONTACTLESS_READER_NAME_REGEX);
 
     // Activate the ISO14443 card protocol.
-    reader.activateProtocol(
-        PcscSupportedContactlessProtocol.ISO_14443_4.name(),
-        ContactlessCardCommonProtocol.ISO_14443_4.name());
+    ((ConfigurableReader) reader)
+        .activateProtocol(
+            PcscSupportedContactlessProtocol.ISO_14443_4.name(),
+            ContactlessCardCommonProtocol.ISO_14443_4.name());
 
     // Get the generic card extension service
     GenericExtensionService cardExtension = GenericExtensionService.getInstance();
