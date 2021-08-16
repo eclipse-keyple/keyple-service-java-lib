@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0
  */
-final class ObservableLocalReaderAdapter extends LocalReaderAdapter
+class ObservableLocalReaderAdapter extends LocalReaderAdapter
     implements ObservableReader,
         WaitForCardInsertionAutonomousReaderApi,
         WaitForCardRemovalAutonomousReaderApi {
@@ -138,7 +138,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @return A not null reference.
    * @since 2.0
    */
-  ObservableReaderSpi getObservableReaderSpi() {
+  final ObservableReaderSpi getObservableReaderSpi() {
     return observableReaderSpi;
   }
 
@@ -150,7 +150,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @return Null if no exception has been set.
    * @since 2.0
    */
-  CardReaderObservationExceptionHandlerSpi getObservationExceptionHandler() {
+  final CardReaderObservationExceptionHandlerSpi getObservationExceptionHandler() {
     return observationManager.getObservationExceptionHandler();
   }
 
@@ -161,7 +161,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @return Null if the polling mode has not been defined.
    * @since 2.0
    */
-  DetectionMode getDetectionMode() {
+  final DetectionMode getDetectionMode() {
     return detectionMode;
   }
 
@@ -172,7 +172,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @return current getMonitoringState
    * @since 2.0
    */
-  AbstractObservableStateAdapter.MonitoringState getCurrentMonitoringState() {
+  final AbstractObservableStateAdapter.MonitoringState getCurrentMonitoringState() {
     return stateService.getCurrentMonitoringState();
   }
 
@@ -187,7 +187,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @return True if the card still responds, false if not
    * @since 2.0
    */
-  boolean isCardPresentPing() {
+  final boolean isCardPresentPing() {
     // transmits the APDU and checks for the IO exception.
     try {
       if (logger.isTraceEnabled()) {
@@ -235,7 +235,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @return Null if the card has been rejected by the card selection scenario.
    * @since 2.0
    */
-  ReaderEvent processCardInserted() {
+  final ReaderEvent processCardInserted() {
 
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] process the inserted card", getName());
@@ -352,7 +352,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    *
    * @since 2.0
    */
-  void processCardRemoved() {
+  final void processCardRemoved() {
     closeLogicalAndPhysicalChannelsSilently();
     notifyObservers(
         new ReaderEventAdapter(
@@ -366,7 +366,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @param stateId new stateId
    * @since 2.0
    */
-  void switchState(AbstractObservableStateAdapter.MonitoringState stateId) {
+  final void switchState(AbstractObservableStateAdapter.MonitoringState stateId) {
     stateService.switchState(stateId);
   }
 
@@ -380,7 +380,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @param event The reader event.
    * @since 2.0
    */
-  void notifyObservers(final ReaderEvent event) {
+  final void notifyObservers(final ReaderEvent event) {
 
     if (logger.isDebugEnabled()) {
       logger.debug(
@@ -433,7 +433,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @param detectionMode The polling policy (optional).
    * @since 2.0
    */
-  void scheduleCardSelectionScenario(
+  final void scheduleCardSelectionScenario(
       CardSelectionScenarioAdapter cardSelectionScenario,
       NotificationMode notificationMode,
       DetectionMode detectionMode) {
@@ -452,7 +452,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  void unregister() {
+  final void unregister() {
     try {
       stopCardDetection();
       stateService.shutdown();
@@ -471,7 +471,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public boolean isCardPresent() {
+  public final boolean isCardPresent() {
     checkStatus();
     if (super.isCardPresent()) {
       return true;
@@ -493,7 +493,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void addObserver(CardReaderObserverSpi observer) {
+  public final void addObserver(CardReaderObserverSpi observer) {
     checkStatus();
     observationManager.addObserver(observer);
   }
@@ -504,7 +504,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void removeObserver(CardReaderObserverSpi observer) {
+  public final void removeObserver(CardReaderObserverSpi observer) {
     Assert.getInstance().notNull(observer, "observer");
     if (observationManager.getObservers().contains(observer)) {
       observationManager.removeObserver(observer);
@@ -517,7 +517,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public int countObservers() {
+  public final int countObservers() {
     return observationManager.countObservers();
   }
 
@@ -527,7 +527,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void clearObservers() {
+  public final void clearObservers() {
     observationManager.clearObservers();
   }
 
@@ -537,7 +537,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void startCardDetection(DetectionMode detectionMode) {
+  public final void startCardDetection(DetectionMode detectionMode) {
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
@@ -557,7 +557,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void stopCardDetection() {
+  public final void stopCardDetection() {
     if (logger.isDebugEnabled()) {
       logger.debug(
           "The reader '{}' of plugin '{}' is stopping the card detection.",
@@ -572,7 +572,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    *
    * @since 2.0
    */
-  public void finalizeCardProcessing() {
+  public final void finalizeCardProcessing() {
     if (logger.isDebugEnabled()) {
       logger.debug(
           "The reader '{}' of plugin '{}' is starting the removal sequence of the card.",
@@ -588,7 +588,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void setReaderObservationExceptionHandler(
+  public final void setReaderObservationExceptionHandler(
       CardReaderObservationExceptionHandlerSpi exceptionHandler) {
     checkStatus();
     observationManager.setObservationExceptionHandler(exceptionHandler);
@@ -600,7 +600,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void onCardInserted() {
+  public final void onCardInserted() {
     stateService.onEvent(InternalEvent.CARD_INSERTED);
   }
 
@@ -610,7 +610,7 @@ final class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0
    */
   @Override
-  public void onCardRemoved() {
+  public final void onCardRemoved() {
     stateService.onEvent(InternalEvent.CARD_REMOVED);
   }
 }

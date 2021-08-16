@@ -129,9 +129,10 @@ class PluginObserver implements PluginObserverSpi, PluginObservationExceptionHan
         .setSharingMode(PcscReader.SharingMode.SHARED);
 
     // Activate the ISO14443 card protocol.
-    reader.activateProtocol(
-        PcscSupportedContactlessProtocol.ISO_14443_4.name(),
-        ContactlessCardCommonProtocol.ISO_14443_4.name());
+    ((ConfigurableReader) reader)
+        .activateProtocol(
+            PcscSupportedContactlessProtocol.ISO_14443_4.name(),
+            ContactlessCardCommonProtocol.ISO_14443_4.name());
   }
 
   /**

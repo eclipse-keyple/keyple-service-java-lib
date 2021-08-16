@@ -17,6 +17,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
+import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +49,31 @@ abstract class AbstractPluginAdapter implements Plugin {
     this.pluginName = pluginName;
     this.pluginExtension = pluginExtension;
     this.readers = new ConcurrentHashMap<String, Reader>();
+  }
+
+  /**
+   * (package-private)<br>
+   * Builds a local reader adapter using the provided SPI.
+   *
+   * @param readerSpi The associated reader SPI.
+   * @return A new instance.
+   */
+  final LocalReaderAdapter buildLocalReaderAdapter(ReaderSpi readerSpi) {
+    LocalReaderAdapter adapter;
+    if (readerSpi instanceof ObservableReaderSpi) {
+      if (readerSpi instanceof ConfigurableReaderSpi) {
+        adapter =
+            new ObservableLocalConfigurableReaderAdapter(
+                (ConfigurableReaderSpi) readerSpi, getName());
+      } else {
+        adapter = new ObservableLocalReaderAdapter((ObservableReaderSpi) readerSpi, getName());
+      }
+    } else if (readerSpi instanceof ConfigurableReaderSpi) {
+      adapter = new LocalConfigurableReaderAdapter((ConfigurableReaderSpi) readerSpi, getName());
+    } else {
+      adapter = new LocalReaderAdapter(readerSpi, getName());
+    }
+    return adapter;
   }
 
   /**

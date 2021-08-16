@@ -25,6 +25,7 @@ import org.calypsonet.terminal.card.spi.CardSelectorSpi;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
+import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionAutonomousSpi;
@@ -50,13 +51,14 @@ public class ReaderAdapterTestUtils {
 
   public interface ObservableReaderSpiMock
       extends KeypleReaderExtension,
+          ConfigurableReaderSpi,
           ObservableReaderSpi,
           WaitForCardInsertionAutonomousSpi,
           WaitForCardRemovalAutonomousSpi,
           DontWaitForCardRemovalDuringProcessingSpi,
           ControllableReaderSpiMock {}
 
-  public interface ReaderSpiMock extends KeypleReaderExtension, ReaderSpi {}
+  public interface ReaderSpiMock extends KeypleReaderExtension, ReaderSpi, ConfigurableReaderSpi {}
 
   public interface CardSelectorMock extends CardSelectorSpi {}
 
@@ -66,8 +68,8 @@ public class ReaderAdapterTestUtils {
     when(readerSpi.checkCardPresence()).thenReturn(true);
     when(readerSpi.getPowerOnData()).thenReturn(POWER_ON_DATA);
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(ByteArrayUtil.fromHex("6D00"));
-    when(readerSpi.isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
-    when(readerSpi.isCurrentProtocol(CARD_PROTOCOL)).thenReturn(true);
+    when(((ConfigurableReaderSpi) readerSpi).isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
+    when(((ConfigurableReaderSpi) readerSpi).isCurrentProtocol(CARD_PROTOCOL)).thenReturn(true);
     return readerSpi;
   }
 
@@ -77,8 +79,8 @@ public class ReaderAdapterTestUtils {
     when(readerSpi.checkCardPresence()).thenReturn(true);
     when(readerSpi.getPowerOnData()).thenReturn(POWER_ON_DATA);
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(ByteArrayUtil.fromHex("6D00"));
-    when(readerSpi.isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
-    when(readerSpi.isCurrentProtocol(CARD_PROTOCOL)).thenReturn(true);
+    when(((ConfigurableReaderSpi) readerSpi).isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
+    when(((ConfigurableReaderSpi) readerSpi).isCurrentProtocol(CARD_PROTOCOL)).thenReturn(true);
     return readerSpi;
   }
 

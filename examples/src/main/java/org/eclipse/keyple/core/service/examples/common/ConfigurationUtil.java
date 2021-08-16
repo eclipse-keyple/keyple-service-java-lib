@@ -11,6 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service.examples.common;
 
+import org.eclipse.keyple.core.service.ConfigurableReader;
 import org.eclipse.keyple.core.service.Plugin;
 import org.eclipse.keyple.core.service.Reader;
 import org.eclipse.keyple.core.util.protocol.ContactlessCardCommonProtocol;
@@ -55,7 +56,7 @@ public class ConfigurationUtil {
   public static Reader getCardReader(Plugin plugin, String readerNameRegex) {
     for (String readerName : plugin.getReaderNames()) {
       if (readerName.matches(readerNameRegex)) {
-        Reader reader = plugin.getReader(readerName);
+        ConfigurableReader reader = (ConfigurableReader) plugin.getReader(readerName);
         // Configure the reader with parameters suitable for contactless operations.
         reader
             .getExtension(PcscReader.class)
