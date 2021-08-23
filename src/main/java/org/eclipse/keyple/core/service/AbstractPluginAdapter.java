@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 abstract class AbstractPluginAdapter implements Plugin {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractPluginAdapter.class);
+  static final String REMOTE_READER_NAME_SUFFIX = " (Remote)";
   private final String pluginName;
   private final KeyplePluginExtension pluginExtension;
   private boolean isRegistered;

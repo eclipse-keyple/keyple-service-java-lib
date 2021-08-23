@@ -120,12 +120,14 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     input.addProperty(JsonProperty.READER_GROUP_REFERENCE.name(), readerGroupReference);
 
     // Execute the remote service.
-    String readerName;
+    String localReaderName;
+    String remoteReaderName;
     try {
       JsonObject output =
           executePluginServiceRemotely(input, remotePoolPluginSpi, getName(), logger);
 
-      readerName = output.get(JsonProperty.RESULT.name()).getAsString();
+      localReaderName = output.get(JsonProperty.RESULT.name()).getAsString();
+      remoteReaderName = localReaderName + REMOTE_READER_NAME_SUFFIX;
 
     } catch (RuntimeException e) {
       throw e;
@@ -135,7 +137,8 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     }
 
     // Build a remote reader and register it.
-    RemoteReaderSpi remoteReaderSpi = remotePoolPluginSpi.createRemoteReader(readerName);
+    RemoteReaderSpi remoteReaderSpi =
+        remotePoolPluginSpi.createRemoteReader(remoteReaderName, localReaderName);
     RemoteReaderAdapter remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName());
 
     getReadersMap().put(remoteReaderSpi.getName(), remoteReaderAdapter);
@@ -163,7 +166,9 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     // Build the input JSON data.
     JsonObject input = new JsonObject();
     input.addProperty(JsonProperty.SERVICE.name(), PluginService.RELEASE_READER.name());
-    input.addProperty(JsonProperty.READER_NAME.name(), reader.getName()); // NOSONAR
+    input.addProperty(
+        JsonProperty.READER_NAME.name(),
+        reader.getName().replace(REMOTE_READER_NAME_SUFFIX, "")); // NOSONAR
 
     // Execute the remote service.
     try {
@@ -175,7 +180,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
       throwRuntimeException(e);
     } finally {
       getReadersMap().remove(reader.getName());
-      ((LocalReaderAdapter) reader).unregister();
+      ((RemoteReaderAdapter) reader).unregister();
     }
   }
 }

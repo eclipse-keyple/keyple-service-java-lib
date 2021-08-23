@@ -92,14 +92,15 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
     // Build a remote reader for each local reader
     for (Map.Entry<String, Boolean> entry : localReaders.entrySet()) {
 
-      String readerName = entry.getKey();
+      String localReaderName = entry.getKey();
+      String remoteReaderName = localReaderName + REMOTE_READER_NAME_SUFFIX;
       boolean isObservable = entry.getValue();
 
       RemoteReaderAdapter remoteReaderAdapter = null;
       if (isObservable) {
         try {
           ObservableRemoteReaderSpi observableRemoteReaderSpi =
-              remotePluginSpi.createObservableRemoteReader(readerName);
+              remotePluginSpi.createObservableRemoteReader(remoteReaderName, localReaderName);
           remoteReaderAdapter =
               new ObservableRemoteReaderAdapter(observableRemoteReaderSpi, getName());
         } catch (IllegalStateException e) {
@@ -108,11 +109,12 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
         }
       }
       if (!isObservable) {
-        RemoteReaderSpi remoteReaderSpi = remotePluginSpi.createRemoteReader(readerName);
+        RemoteReaderSpi remoteReaderSpi =
+            remotePluginSpi.createRemoteReader(remoteReaderName, localReaderName);
         remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName());
       }
 
-      getReadersMap().put(readerName, remoteReaderAdapter);
+      getReadersMap().put(localReaderName, remoteReaderAdapter);
       remoteReaderAdapter.register();
     }
   }
