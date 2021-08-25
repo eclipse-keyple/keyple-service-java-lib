@@ -37,9 +37,9 @@ dependencies {
     implementation("org.eclipse.keyple:keyple-distributed-remote-java-api:2.0.0-SNAPSHOT") { isChanging = true }
     implementation("org.eclipse.keyple:keyple-distributed-local-java-api:2.0.0-SNAPSHOT") { isChanging = true }
     implementation("org.eclipse.keyple:keyple-util-java-lib:2.0.0-SNAPSHOT") { isChanging = true }
-    implementation("com.google.code.gson:gson:2.8.5")
-    implementation("org.slf4j:slf4j-api:1.7.25")
-    testImplementation("org.slf4j:slf4j-simple:1.7.25")
+    implementation("com.google.code.gson:gson:2.8.8")
+    implementation("org.slf4j:slf4j-api:1.7.32")
+    testImplementation("org.slf4j:slf4j-simple:1.7.32")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.15.0")
     testImplementation("org.mockito:mockito-core:2.28.2")
