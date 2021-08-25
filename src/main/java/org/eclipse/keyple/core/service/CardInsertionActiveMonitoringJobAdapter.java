@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  *
  * <p>All runtime exceptions that may occur during the monitoring process are caught and notified at
  * the application level through the {@link
- * org.eclipse.keyple.core.service.spi.CardReaderObservationExceptionHandlerSpi} mechanism.
+ * org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi} mechanism.
  *
  * @since 2.0.0
  */
