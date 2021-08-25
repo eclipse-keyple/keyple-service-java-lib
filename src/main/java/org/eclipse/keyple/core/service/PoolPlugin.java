@@ -21,7 +21,7 @@ import java.util.SortedSet;
  *
  * <p>A PoolPlugin can't be observable.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 public interface PoolPlugin extends Plugin {
 
@@ -32,7 +32,7 @@ public interface PoolPlugin extends Plugin {
    * (for example, containing a SAM with identical key sets).
    *
    * @return a list of String
-   * @since 2.0
+   * @since 2.0.0
    */
   SortedSet<String> getReaderGroupReferences();
 
@@ -46,7 +46,7 @@ public interface PoolPlugin extends Plugin {
    *     depending on the implementation made).
    * @return A not null reference.
    * @throws KeyplePluginException If the allocation failed due to lack of available reader.
-   * @since 2.0
+   * @since 2.0.0
    */
   Reader allocateReader(String readerGroupReference);
 
@@ -57,7 +57,7 @@ public interface PoolPlugin extends Plugin {
    * allocateReader in order to free the resource.
    *
    * @param reader The Reader to be released.
-   * @since 2.0
+   * @since 2.0.0
    */
   void releaseReader(Reader reader);
 }

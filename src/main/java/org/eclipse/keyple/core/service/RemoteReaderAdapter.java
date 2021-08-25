@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Remote reader adapter.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 class RemoteReaderAdapter extends AbstractReaderAdapter {
 
@@ -48,7 +48,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
    *
    * @param remoteReaderSpi The remote reader SPI.
    * @param pluginName The name of the plugin.
-   * @since 2.0
+   * @since 2.0.0
    */
   RemoteReaderAdapter(RemoteReaderSpi remoteReaderSpi, String pluginName) {
     super(remoteReaderSpi.getName(), (KeypleReaderExtension) remoteReaderSpi, pluginName);
@@ -58,7 +58,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   final List<CardSelectionResponseApi> processCardSelectionRequests(
@@ -110,7 +110,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   final CardResponseApi processCardRequest(
@@ -153,7 +153,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final boolean isContactless() {
@@ -195,7 +195,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final boolean isCardPresent() {
@@ -213,7 +213,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final void releaseChannel() throws ReaderBrokenCommunicationException {

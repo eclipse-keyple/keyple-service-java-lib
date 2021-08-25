@@ -24,7 +24,7 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
  * the card ({@link CardResponseApi}).
  *
  * @see org.calypsonet.terminal.card.spi.CardSelectionRequestSpi
- * @since 2.0
+ * @since 2.0.0
  */
 final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
 
@@ -43,7 +43,7 @@ final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
    *     Select Application command was performed...
    * @param hasMatched True if the card inserted matches the selection filters.
    * @param cardResponse null if no card response is available.
-   * @since 2.0
+   * @since 2.0.0
    */
   CardSelectionResponseAdapter(
       String powerOnData,
@@ -59,7 +59,7 @@ final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public String getPowerOnData() {
@@ -69,7 +69,7 @@ final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public ApduResponseApi getSelectApplicationResponse() {
@@ -79,7 +79,7 @@ final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public boolean hasMatched() {
@@ -89,7 +89,7 @@ final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public CardResponseApi getCardResponse() {
@@ -100,7 +100,7 @@ final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
    * Converts the card selection response into a string where the data is encoded in a json format.
    *
    * @return A not empty String
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public String toString() {

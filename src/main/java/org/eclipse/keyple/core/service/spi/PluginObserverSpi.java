@@ -17,7 +17,7 @@ import org.eclipse.keyple.core.service.PluginEvent;
  * Plugin observer recipient of the {@link PluginEvent} from a {@link
  * org.eclipse.keyple.core.service.ObservablePlugin}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 public interface PluginObserverSpi {
 
@@ -30,7 +30,7 @@ public interface PluginObserverSpi {
    * <p>The same behaviour is used for notification of reader events.
    *
    * @param pluginEvent The plugin event.
-   * @since 2.0
+   * @since 2.0.0
    */
   void onPluginEvent(final PluginEvent pluginEvent);
 }

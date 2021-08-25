@@ -16,7 +16,7 @@ import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
 /**
  * Local Service API of the Keyple Distributed Solution.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 public interface DistributedLocalService {
 
@@ -24,7 +24,7 @@ public interface DistributedLocalService {
    * Returns the name of the distributed local service.
    *
    * @return A not empty string.
-   * @since 2.0
+   * @since 2.0.0
    */
   String getName();
 

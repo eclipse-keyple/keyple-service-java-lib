@@ -20,7 +20,7 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
  * (package-private)<br>
  * Adapter of {@link ApduRequestSpi}
  *
- * @since 2.0
+ * @since 2.0.0
  */
 class ApduRequestAdapter implements ApduRequestSpi {
   private static final int DEFAULT_SUCCESSFUL_CODE = 0x9000;
@@ -35,7 +35,7 @@ class ApduRequestAdapter implements ApduRequestSpi {
    * <p>The default status words list is initialized with the standard successful code 9000h.
    *
    * @param apdu An array of at least 4 bytes.
-   * @since 2.0
+   * @since 2.0.0
    */
   public ApduRequestAdapter(byte[] apdu) {
     this.apdu = apdu;
@@ -50,7 +50,7 @@ class ApduRequestAdapter implements ApduRequestSpi {
    *
    * @param successfulStatusWord A positive int &le; {@code FFFFh}.
    * @return The object instance.
-   * @since 2.0
+   * @since 2.0.0
    */
   public ApduRequestAdapter addSuccessfulStatusWord(int successfulStatusWord) {
     this.successfulStatusWords.add(successfulStatusWord);
@@ -64,7 +64,7 @@ class ApduRequestAdapter implements ApduRequestSpi {
    *
    * @param info The request information (free text).
    * @return The object instance.
-   * @since 2.0
+   * @since 2.0.0
    */
   public ApduRequestAdapter setInfo(final String info) {
     this.info = info;
@@ -74,7 +74,7 @@ class ApduRequestAdapter implements ApduRequestSpi {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public byte[] getApdu() {
@@ -84,7 +84,7 @@ class ApduRequestAdapter implements ApduRequestSpi {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public Set<Integer> getSuccessfulStatusWords() {
@@ -94,7 +94,7 @@ class ApduRequestAdapter implements ApduRequestSpi {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public String getInfo() {
@@ -105,7 +105,7 @@ class ApduRequestAdapter implements ApduRequestSpi {
    * Converts the APDU request into a string where the data is encoded in a json format.
    *
    * @return A not empty String
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public String toString() {

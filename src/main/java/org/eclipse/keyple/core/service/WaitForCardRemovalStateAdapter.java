@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_CARD_DETECTION.
  * </ul>
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapter {
 
@@ -41,7 +41,7 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
    * Creates an instance.
    *
    * @param reader The observable local reader adapter.
-   * @since 2.0
+   * @since 2.0.0
    */
   WaitForCardRemovalStateAdapter(ObservableLocalReaderAdapter reader) {
     this(reader, null, null);
@@ -54,7 +54,7 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
    * @param reader The observable local reader adapter.
    * @param monitoringJob The monitoring job.
    * @param executorService The executor service to use.
-   * @since 2.0
+   * @since 2.0.0
    */
   WaitForCardRemovalStateAdapter(
       ObservableLocalReaderAdapter reader,
@@ -66,7 +66,7 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {

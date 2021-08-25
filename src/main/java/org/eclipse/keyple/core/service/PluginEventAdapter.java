@@ -29,7 +29,7 @@ import java.util.TreeSet;
  *
  * <p>However, only one type of event is notified at a time.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class PluginEventAdapter implements PluginEvent {
 
@@ -46,7 +46,7 @@ final class PluginEventAdapter implements PluginEvent {
    * @param readerName A string containing the name of the reader (should be not null).
    * @param type An event type {@link Type#READER_CONNECTED} or {@link Type#READER_DISCONNECTED}
    *     (should be not null).
-   * @since 2.0
+   * @since 2.0.0
    */
   PluginEventAdapter(String pluginName, String readerName, Type type) {
     this.pluginName = pluginName;
@@ -66,7 +66,7 @@ final class PluginEventAdapter implements PluginEvent {
    * @param readerNames A set of string containing the readers names (must be not empty).
    * @param type An event type {@link Type#READER_CONNECTED} or {@link Type#READER_DISCONNECTED}
    *     (must be not null).
-   * @since 2.0
+   * @since 2.0.0
    */
   PluginEventAdapter(String pluginName, Set<String> readerNames, Type type) {
     this.pluginName = pluginName;
@@ -77,7 +77,7 @@ final class PluginEventAdapter implements PluginEvent {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public String getPluginName() {
@@ -87,7 +87,7 @@ final class PluginEventAdapter implements PluginEvent {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public SortedSet<String> getReaderNames() {
@@ -97,7 +97,7 @@ final class PluginEventAdapter implements PluginEvent {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public Type getType() {

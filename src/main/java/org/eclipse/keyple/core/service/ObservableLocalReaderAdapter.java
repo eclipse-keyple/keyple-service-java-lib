@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * Implementation for {@link ObservableReader}, {@link WaitForCardInsertionAutonomousReaderApi} and
  * {@link WaitForCardRemovalAutonomousReaderApi}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 class ObservableLocalReaderAdapter extends LocalReaderAdapter
     implements ObservableReader,
@@ -64,43 +64,43 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * (package-private)<br>
    * The events that drive the card's observation state machine.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   enum InternalEvent {
     /**
      * A card has been inserted
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     CARD_INSERTED,
     /**
      * The card has been removed
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     CARD_REMOVED,
     /**
      * The application has completed the processing of the card
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     CARD_PROCESSED,
     /**
      * The application has requested the start of card detection
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     START_DETECT,
     /**
      * The application has requested that card detection is to be stopped.
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     STOP_DETECT,
     /**
      * A timeout has occurred (not yet implemented)
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     TIME_OUT
   }
@@ -114,7 +114,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    *
    * @param observableReaderSpi The reader SPI.
    * @param pluginName The plugin name.
-   * @since 2.0
+   * @since 2.0.0
    */
   ObservableLocalReaderAdapter(ObservableReaderSpi observableReaderSpi, String pluginName) {
     super(observableReaderSpi, pluginName);
@@ -136,7 +136,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * Gets the SPI of the reader.
    *
    * @return A not null reference.
-   * @since 2.0
+   * @since 2.0.0
    */
   final ObservableReaderSpi getObservableReaderSpi() {
     return observableReaderSpi;
@@ -148,7 +148,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * observation process.
    *
    * @return Null if no exception has been set.
-   * @since 2.0
+   * @since 2.0.0
    */
   final CardReaderObservationExceptionHandlerSpi getObservationExceptionHandler() {
     return observationManager.getObservationExceptionHandler();
@@ -159,7 +159,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * Gets the current {@link DetectionMode}.
    *
    * @return Null if the polling mode has not been defined.
-   * @since 2.0
+   * @since 2.0.0
    */
   final DetectionMode getDetectionMode() {
     return detectionMode;
@@ -170,7 +170,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * Get the current monitoring state
    *
    * @return current getMonitoringState
-   * @since 2.0
+   * @since 2.0.0
    */
   final AbstractObservableStateAdapter.MonitoringState getCurrentMonitoringState() {
     return stateService.getCurrentMonitoringState();
@@ -185,7 +185,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * <p>This method has to be called regularly until the card no longer respond.
    *
    * @return True if the card still responds, false if not
-   * @since 2.0
+   * @since 2.0.0
    */
   final boolean isCardPresentPing() {
     // transmits the APDU and checks for the IO exception.
@@ -233,7 +233,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * CardSelectionResponseApi}.
    *
    * @return Null if the card has been rejected by the card selection scenario.
-   * @since 2.0
+   * @since 2.0.0
    */
   final ReaderEvent processCardInserted() {
 
@@ -350,7 +350,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * <p>It will also be invoked if {@link #isCardPresent()} is called and at least one of the
    * physical or logical channels is still open.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   final void processCardRemoved() {
     closeLogicalAndPhysicalChannelsSilently();
@@ -364,7 +364,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * Changes the state of the state machine
    *
    * @param stateId new stateId
-   * @since 2.0
+   * @since 2.0.0
    */
   final void switchState(AbstractObservableStateAdapter.MonitoringState stateId) {
     stateService.switchState(stateId);
@@ -378,7 +378,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * using the exception handler.
    *
    * @param event The reader event.
-   * @since 2.0
+   * @since 2.0.0
    */
   final void notifyObservers(final ReaderEvent event) {
 
@@ -431,7 +431,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @param cardSelectionScenario The card selection scenario.
    * @param notificationMode The notification policy.
    * @param detectionMode The polling policy (optional).
-   * @since 2.0
+   * @since 2.0.0
    */
   final void scheduleCardSelectionScenario(
       CardSelectionScenarioAdapter cardSelectionScenario,
@@ -449,7 +449,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * Stops the card detection unconditionally.<br>
    * Shuts down the reader's executor service.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   final void unregister() {
@@ -468,7 +468,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final boolean isCardPresent() {
@@ -490,7 +490,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final void addObserver(CardReaderObserverSpi observer) {
@@ -501,7 +501,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final void removeObserver(CardReaderObserverSpi observer) {
@@ -514,7 +514,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final int countObservers() {
@@ -524,7 +524,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final void clearObservers() {
@@ -534,7 +534,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final void startCardDetection(DetectionMode detectionMode) {
@@ -554,7 +554,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final void stopCardDetection() {
@@ -570,7 +570,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   public final void finalizeCardProcessing() {
     if (logger.isDebugEnabled()) {
@@ -585,7 +585,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final void setReaderObservationExceptionHandler(
@@ -597,7 +597,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final void onCardInserted() {
@@ -607,7 +607,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final void onCardRemoved() {

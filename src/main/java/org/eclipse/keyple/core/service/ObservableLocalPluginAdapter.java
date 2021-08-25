@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Implementation of a local {@link ObservablePlugin}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAdapter {
 
@@ -39,7 +39,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
    * Constructor.
    *
    * @param observablePluginSpi The associated plugin SPI.
-   * @since 2.0
+   * @since 2.0.0
    */
   ObservableLocalPluginAdapter(ObservablePluginSpi observablePluginSpi) {
     super(observablePluginSpi);
@@ -51,7 +51,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
    * Checks whether the background job is monitoring for new readers.
    *
    * @return True, if the background job is monitoring, false in all other cases.
-   * @since 2.0
+   * @since 2.0.0
    */
   boolean isMonitoring() {
     return thread != null && thread.isAlive() && thread.isMonitoring();
@@ -60,7 +60,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void addObserver(PluginObserverSpi observer) {
@@ -86,7 +86,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void removeObserver(PluginObserverSpi observer) {
@@ -107,7 +107,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void clearObservers() {

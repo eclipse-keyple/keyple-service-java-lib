@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * Manages the internal state of an {@link ObservableLocalReaderAdapter} Process InternalEvent
  * against the current state
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class ObservableReaderStateServiceAdapter {
 
@@ -60,7 +60,7 @@ final class ObservableReaderStateServiceAdapter {
    * Initializes the states according to the interfaces implemented by the provided reader.
    *
    * @param reader The observable local reader adapter.
-   * @since 2.0
+   * @since 2.0.0
    */
   ObservableReaderStateServiceAdapter(ObservableLocalReaderAdapter reader) {
     this.reader = reader;
@@ -153,7 +153,7 @@ final class ObservableReaderStateServiceAdapter {
    * the reader of external event like a tag discovered or a card inserted
    *
    * @param event internal event
-   * @since 2.0
+   * @since 2.0.0
    */
   synchronized void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
     switch (event) {
@@ -178,7 +178,7 @@ final class ObservableReaderStateServiceAdapter {
    * its state
    *
    * @param stateId next state to onActivate
-   * @since 2.0
+   * @since 2.0.0
    */
   synchronized void switchState(AbstractObservableStateAdapter.MonitoringState stateId) {
 
@@ -209,7 +209,7 @@ final class ObservableReaderStateServiceAdapter {
    * Get reader current state
    *
    * @return reader current state
-   * @since 2.0
+   * @since 2.0.0
    */
   synchronized AbstractObservableStateAdapter getCurrentState() {
     return currentState;
@@ -220,7 +220,7 @@ final class ObservableReaderStateServiceAdapter {
    * Get the reader current monitoring state
    *
    * @return current monitoring state
-   * @since 2.0
+   * @since 2.0.0
    */
   synchronized AbstractObservableStateAdapter.MonitoringState getCurrentMonitoringState() {
     return this.currentState.getMonitoringState();
@@ -233,7 +233,7 @@ final class ObservableReaderStateServiceAdapter {
    * <p>This method should be invoked when the reader monitoring ends in order to stop any remaining
    * threads.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   void shutdown() {
     executorService.shutdown();

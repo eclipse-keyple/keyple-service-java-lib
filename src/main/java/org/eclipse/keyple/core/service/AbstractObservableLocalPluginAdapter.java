@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Abstract class for all observable local plugin adapters.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
     implements ObservablePlugin {
@@ -40,7 +40,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    * Constructor.
    *
    * @param pluginSpi The associated plugin SPI.
-   * @since 2.0
+   * @since 2.0.0
    */
   AbstractObservableLocalPluginAdapter(PluginSpi pluginSpi) {
     super(pluginSpi);
@@ -54,7 +54,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    * Gets the associated observation manager.
    *
    * @return A not null reference.
-   * @since 2.0
+   * @since 2.0.0
    */
   final ObservationManagerAdapter<PluginObserverSpi, PluginObservationExceptionHandlerSpi>
       getObservationManager() {
@@ -69,7 +69,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    * using the exception handler.
    *
    * @param event The plugin event.
-   * @since 2.0
+   * @since 2.0.0
    */
   final void notifyObservers(final PluginEvent event) {
 
@@ -108,7 +108,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   final void unregister() {
@@ -123,7 +123,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void addObserver(PluginObserverSpi observer) {
@@ -134,7 +134,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void removeObserver(PluginObserverSpi observer) {
@@ -147,7 +147,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void clearObservers() {
@@ -157,7 +157,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final int countObservers() {
@@ -167,7 +167,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final void setPluginObservationExceptionHandler(

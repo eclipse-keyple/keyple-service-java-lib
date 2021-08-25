@@ -19,7 +19,7 @@ import org.eclipse.keyple.core.common.KeyplePluginExtension;
  *
  * <p>Provides the means to get the plugin name, enumerate and retrieve the readers.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 public interface Plugin {
 
@@ -27,7 +27,7 @@ public interface Plugin {
    * Gets the name of the plugin.
    *
    * @return A not empty string.
-   * @since 2.0
+   * @since 2.0.0
    */
   String getName();
 
@@ -39,7 +39,7 @@ public interface Plugin {
    * @param pluginExtensionClass The specific class of the plugin.
    * @param <T> The type of the plugin extension.
    * @return A not null reference.
-   * @since 2.0
+   * @since 2.0.0
    */
   <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionClass);
 
@@ -48,7 +48,7 @@ public interface Plugin {
    *
    * @return An empty set if there's no reader connected.
    * @throws IllegalStateException if plugin is no longer registered.
-   * @since 2.0
+   * @since 2.0.0
    */
   Set<String> getReaderNames();
 
@@ -57,7 +57,7 @@ public interface Plugin {
    *
    * @return An empty Set if there's no reader connected.
    * @throws IllegalStateException if the plugin is no longer registered.
-   * @since 2.0
+   * @since 2.0.0
    */
   Set<Reader> getReaders();
 
@@ -67,7 +67,7 @@ public interface Plugin {
    * @param name The name of the reader.
    * @return Null if the reader has not been found.
    * @throws IllegalStateException if the plugin is no longer registered.
-   * @since 2.0
+   * @since 2.0.0
    */
   Reader getReader(String name);
 }

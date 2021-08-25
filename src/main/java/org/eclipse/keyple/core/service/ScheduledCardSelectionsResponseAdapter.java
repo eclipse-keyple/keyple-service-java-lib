@@ -19,7 +19,7 @@ import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
  * (package-private)<br>
  * POJO containing the card selection responses received during the card selection process.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 class ScheduledCardSelectionsResponseAdapter implements ScheduledCardSelectionsResponse {
 
@@ -30,7 +30,7 @@ class ScheduledCardSelectionsResponseAdapter implements ScheduledCardSelectionsR
    * Constructor
    *
    * @param cardSelectionResponses The card selection responses.
-   * @since 2.0
+   * @since 2.0.0
    */
   ScheduledCardSelectionsResponseAdapter(List<CardSelectionResponseApi> cardSelectionResponses) {
     this.cardSelectionResponses = cardSelectionResponses;
@@ -41,7 +41,7 @@ class ScheduledCardSelectionsResponseAdapter implements ScheduledCardSelectionsR
    * Gets the card responses.
    *
    * @return A list of {@link CardSelectionResponseApi}.
-   * @since 2.0
+   * @since 2.0.0
    */
   List<CardSelectionResponseApi> getCardSelectionResponses() {
     return cardSelectionResponses;

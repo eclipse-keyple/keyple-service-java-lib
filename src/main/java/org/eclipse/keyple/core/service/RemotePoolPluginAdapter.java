@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Implementation of a remote {@link PoolPlugin}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements PoolPlugin {
 
@@ -42,7 +42,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
    * Constructor.
    *
    * @param remotePoolPluginSpi The associated SPI.
-   * @since 2.0
+   * @since 2.0.0
    */
   RemotePoolPluginAdapter(RemotePoolPluginSpi remotePoolPluginSpi) {
     super(remotePoolPluginSpi.getName(), (KeyplePluginExtension) remotePoolPluginSpi);
@@ -52,7 +52,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   void unregister() {
@@ -67,7 +67,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public SortedSet<String> getReaderGroupReferences() {
@@ -100,7 +100,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public Reader allocateReader(String readerGroupReference) {
@@ -149,7 +149,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void releaseReader(Reader reader) {

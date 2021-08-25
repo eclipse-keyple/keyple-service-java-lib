@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * @param <S> The type of the exception handler to use during the observation process ({@link
  *     org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi} or {@link
  *     org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi}).
- * @since 2.0
+ * @since 2.0.0
  */
 final class ObservationManagerAdapter<T, S> {
 
@@ -45,7 +45,7 @@ final class ObservationManagerAdapter<T, S> {
    *
    * @param pluginName The name of the associated plugin (used for log only).
    * @param readerName The name of the associated reader (used for log only) (optional).
-   * @since 2.0
+   * @since 2.0.0
    */
   ObservationManagerAdapter(String pluginName, String readerName) {
     if (readerName == null) {
@@ -64,7 +64,7 @@ final class ObservationManagerAdapter<T, S> {
    * @param observer The observer to add.
    * @throws IllegalArgumentException If the provided observer is null.
    * @throws IllegalStateException If no observation exception handler has been set.
-   * @since 2.0
+   * @since 2.0.0
    */
   void addObserver(T observer) {
     if (logger.isDebugEnabled()) {
@@ -88,7 +88,7 @@ final class ObservationManagerAdapter<T, S> {
    *
    * @param observer The observer to remove.
    * @throws IllegalArgumentException If the provided observer is null.
-   * @since 2.0
+   * @since 2.0.0
    */
   void removeObserver(T observer) {
     if (logger.isDebugEnabled()) {
@@ -106,7 +106,7 @@ final class ObservationManagerAdapter<T, S> {
    * (package-private)<br>
    * Removes all observers.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   void clearObservers() {
     if (logger.isDebugEnabled()) {
@@ -122,7 +122,7 @@ final class ObservationManagerAdapter<T, S> {
    * Gets the number of observers.
    *
    * @return The number of observers.
-   * @since 2.0
+   * @since 2.0.0
    */
   int countObservers() {
     return observers.size();
@@ -134,7 +134,7 @@ final class ObservationManagerAdapter<T, S> {
    *
    * @param exceptionHandler the observation exception handler.
    * @throws IllegalArgumentException If the provided handler is null.
-   * @since 2.0
+   * @since 2.0.0
    */
   void setObservationExceptionHandler(S exceptionHandler) {
     Assert.getInstance().notNull(exceptionHandler, "exceptionHandler");
@@ -146,7 +146,7 @@ final class ObservationManagerAdapter<T, S> {
    * Gets a copy of the set of all observers.
    *
    * @return A not null copy.
-   * @since 2.0
+   * @since 2.0.0
    */
   Set<T> getObservers() {
     synchronized (monitor) {
@@ -160,7 +160,7 @@ final class ObservationManagerAdapter<T, S> {
    * observation process.
    *
    * @return Null if no exception handler has been set.
-   * @since 2.0
+   * @since 2.0.0
    */
   S getObservationExceptionHandler() {
     return exceptionHandler;

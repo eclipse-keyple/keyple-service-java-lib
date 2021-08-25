@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Abstract class for all readers.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
 
@@ -44,7 +44,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * @param readerName The name of the reader.
    * @param readerExtension The associated reader extension SPI.
    * @param pluginName The name of the plugin.
-   * @since 2.0
+   * @since 2.0.0
    */
   AbstractReaderAdapter(
       String readerName, KeypleReaderExtension readerExtension, String pluginName) {
@@ -58,7 +58,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * Gets the plugin name.
    *
    * @return A not empty String.
-   * @since 2.0
+   * @since 2.0.0
    */
   final String getPluginName() {
     return pluginName;
@@ -83,7 +83,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * @return An empty list if no response was received.
    * @throws ReaderBrokenCommunicationException if the communication with the reader has failed.
    * @throws CardBrokenCommunicationException if the communication with the card has failed.
-   * @since 2.0
+   * @since 2.0.0
    */
   final List<CardSelectionResponseApi> transmitCardSelectionRequests(
       List<CardSelectionRequestSpi> cardSelectionRequests,
@@ -134,7 +134,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * Check if the reader status is "registered".
    *
    * @throws IllegalStateException is thrown when reader is not or no longer registered.
-   * @since 2.0
+   * @since 2.0.0
    */
   final void checkStatus() {
     if (!isRegistered)
@@ -146,7 +146,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * (package-private)<br>
    * Changes the reader status to registered.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   final void register() {
     isRegistered = true;
@@ -159,7 +159,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * <p>This method may be overridden in order to meet specific needs in certain implementations of
    * readers.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   void unregister() {
     isRegistered = false;
@@ -178,7 +178,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * @throws CardBrokenCommunicationException if the communication with the card has failed.
    * @throws UnexpectedStatusWordException If status word verification is enabled in the card
    *     request and the card returned an unexpected code.
-   * @since 2.0
+   * @since 2.0.0
    */
   abstract List<CardSelectionResponseApi> processCardSelectionRequests(
       List<CardSelectionRequestSpi> cardSelectionRequests,
@@ -198,7 +198,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * @throws CardBrokenCommunicationException if the communication with the card has failed.
    * @throws UnexpectedStatusWordException If status word verification is enabled in the card
    *     request and the card returned an unexpected code.
-   * @since 2.0
+   * @since 2.0.0
    */
   abstract CardResponseApi processCardRequest(
       CardRequestSpi cardRequest, ChannelControl channelControl)
@@ -208,7 +208,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final String getName() {
@@ -218,7 +218,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionClass) {
@@ -229,7 +229,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public CardResponseApi transmitCardRequest(

@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Implementation of public {@link DistributedLocalService} API.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class DistributedLocalServiceAdapter
     implements DistributedLocalService, PluginObserverSpi, CardReaderObserverSpi, LocalServiceApi {
@@ -57,7 +57,7 @@ final class DistributedLocalServiceAdapter
    * Constructor.
    *
    * @param localServiceSpi The associated SPI.
-   * @since 2.0
+   * @since 2.0.0
    */
   DistributedLocalServiceAdapter(LocalServiceSpi localServiceSpi) {
     this.name = localServiceSpi.getName();
@@ -68,7 +68,7 @@ final class DistributedLocalServiceAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void setPoolPluginNames(String... poolPluginNames) {
@@ -78,7 +78,7 @@ final class DistributedLocalServiceAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public String executeLocally(String jsonData, String readerName) {
@@ -105,7 +105,7 @@ final class DistributedLocalServiceAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public String getName() {
@@ -115,7 +115,7 @@ final class DistributedLocalServiceAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public <T extends KeypleDistributedLocalServiceExtension> T getExtension(
@@ -127,7 +127,7 @@ final class DistributedLocalServiceAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void onPluginEvent(PluginEvent pluginEvent) {
@@ -150,7 +150,7 @@ final class DistributedLocalServiceAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void onReaderEvent(CardReaderEvent readerEvent) {
@@ -174,7 +174,7 @@ final class DistributedLocalServiceAdapter
    * (package-private)<br>
    * Registers the distributed local service.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   final void register() {
     isRegistered = true;
@@ -184,7 +184,7 @@ final class DistributedLocalServiceAdapter
    * (package-private)<br>
    * Unregisters the distributed local service and stop all plugins and readers events observations.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   void unregister() {
     for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {

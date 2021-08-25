@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Local reader adapter.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 class LocalReaderAdapter extends AbstractReaderAdapter {
 
@@ -64,7 +64,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *
    * @param readerSpi The reader SPI.
    * @param pluginName The name of the plugin.
-   * @since 2.0
+   * @since 2.0.0
    */
   LocalReaderAdapter(ReaderSpi readerSpi, String pluginName) {
     super(readerSpi.getName(), (KeypleReaderExtension) readerSpi, pluginName);
@@ -77,7 +77,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * Gets {@link ReaderSpi} associated to this reader.
    *
    * @return A not null reference.
-   * @since 2.0
+   * @since 2.0.0
    */
   public ReaderSpi getReaderSpi() {
     return readerSpi;
@@ -88,7 +88,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * Gets the logical channel's opening state.
    *
    * @return True if the channel is open, false if not.
-   * @since 2.0
+   * @since 2.0.0
    */
   final boolean isLogicalChannelOpen() {
     return logicalChannelIsOpen;
@@ -100,7 +100,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *
    * <p>This method doesn't raise any exception.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   final void closeLogicalAndPhysicalChannelsSilently() {
 
@@ -124,7 +124,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *
    * <p>Invoke {@link ReaderSpi#onUnregister()} on the associated SPI.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   void unregister() {
@@ -139,7 +139,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   final List<CardSelectionResponseApi> processCardSelectionRequests(
@@ -196,7 +196,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   final CardResponseApi processCardRequest(
@@ -222,7 +222,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final boolean isContactless() {
@@ -232,7 +232,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public boolean isCardPresent() {
@@ -251,7 +251,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *
    * @param readerProtocol The reader protocol.
    * @param applicationProtocol The corresponding application protocol to associate.
-   * @since 2.0
+   * @since 2.0.0
    */
   final void activateReaderProtocol(String readerProtocol, String applicationProtocol) {
     checkStatus();
@@ -270,7 +270,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * Deactivates a protocol (for configurable reader only).
    *
    * @param readerProtocol The reader protocol.
-   * @since 2.0
+   * @since 2.0.0
    */
   final void deactivateReaderProtocol(String readerProtocol) {
     checkStatus();
@@ -285,7 +285,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final void releaseChannel() throws ReaderBrokenCommunicationException {

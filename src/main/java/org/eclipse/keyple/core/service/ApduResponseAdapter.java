@@ -19,7 +19,7 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
  * (package-private)<br>
  * This POJO contains a set of data related to an ISO-7816 APDU response.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class ApduResponseAdapter implements ApduResponseApi {
 
@@ -31,7 +31,7 @@ final class ApduResponseAdapter implements ApduResponseApi {
    * Builds an APDU response from an array of bytes from the card, computes the status word.
    *
    * @param apdu A array of at least 2 bytes.
-   * @since 2.0
+   * @since 2.0.0
    */
   ApduResponseAdapter(byte[] apdu) {
     this.apdu = apdu;
@@ -41,7 +41,7 @@ final class ApduResponseAdapter implements ApduResponseApi {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public byte[] getApdu() {
@@ -51,7 +51,7 @@ final class ApduResponseAdapter implements ApduResponseApi {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public byte[] getDataOut() {
@@ -61,7 +61,7 @@ final class ApduResponseAdapter implements ApduResponseApi {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public int getStatusWord() {
@@ -72,7 +72,7 @@ final class ApduResponseAdapter implements ApduResponseApi {
    * Converts the APDU response into a string where the data is encoded in a json format.
    *
    * @return A not empty String
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public String toString() {

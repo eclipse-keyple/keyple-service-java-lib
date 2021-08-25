@@ -24,7 +24,7 @@ import org.calypsonet.terminal.card.AbstractApduException;
  *
  * <p>Only the field "message" is serialized during the process.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 class ApduExceptionJsonSerializerAdapter implements JsonSerializer<AbstractApduException> {
 
@@ -32,14 +32,14 @@ class ApduExceptionJsonSerializerAdapter implements JsonSerializer<AbstractApduE
    * (package-private)<br>
    * Creates an instance.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   ApduExceptionJsonSerializerAdapter() {}
 
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public JsonElement serialize(

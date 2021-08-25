@@ -20,7 +20,7 @@ import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
  * <p>Allows registered observers to receive a {@link PluginEvent} when a reader is
  * connected/disconnected.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 public interface ObservablePlugin extends Plugin {
 
@@ -33,7 +33,7 @@ public interface ObservablePlugin extends Plugin {
    * <p>If applicable, the observation process shall be started when the first observer is added.
    *
    * @param observer An observer object implementing the required interface (should be not null).
-   * @since 2.0
+   * @since 2.0.0
    * @throws IllegalArgumentException if observer is null.
    * @throws IllegalStateException if no exception handler is defined.
    */
@@ -47,7 +47,7 @@ public interface ObservablePlugin extends Plugin {
    * <p>If applicable, the observation process shall be stopped when the last observer is removed.
    *
    * @param observer The observer object to be unregistered (should be not null).
-   * @since 2.0
+   * @since 2.0.0
    * @throws IllegalArgumentException if observer is null.
    */
   void removeObserver(final PluginObserverSpi observer);
@@ -55,7 +55,7 @@ public interface ObservablePlugin extends Plugin {
   /**
    * Unregisters all observers at once.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   void clearObservers();
 
@@ -63,7 +63,7 @@ public interface ObservablePlugin extends Plugin {
    * Provides the current number of registered observers.
    *
    * @return An int.
-   * @since 2.0
+   * @since 2.0.0
    */
   int countObservers();
 
@@ -75,7 +75,7 @@ public interface ObservablePlugin extends Plugin {
    * <p>In case of a fatal error during the observation, the handler will receive a notification.
    *
    * @param exceptionHandler The exception handler implemented by the application.
-   * @since 2.0
+   * @since 2.0.0
    */
   void setPluginObservationExceptionHandler(PluginObservationExceptionHandlerSpi exceptionHandler);
 }

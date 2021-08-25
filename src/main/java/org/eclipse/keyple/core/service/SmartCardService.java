@@ -20,7 +20,7 @@ import org.eclipse.keyple.core.common.KeyplePluginExtensionFactory;
 /**
  * Keyple main service.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 public interface SmartCardService {
 
@@ -31,7 +31,7 @@ public interface SmartCardService {
    * @return A not null reference to the registered {@link Plugin}.
    * @throws KeyplePluginException If instantiation failed.
    * @throws IllegalStateException If the plugin has already been registered.
-   * @since 2.0
+   * @since 2.0.0
    */
   Plugin registerPlugin(KeyplePluginExtensionFactory pluginFactory);
 
@@ -39,7 +39,7 @@ public interface SmartCardService {
    * Attempts to unregister the plugin having the provided name from the service.
    *
    * @param pluginName The plugin name.
-   * @since 2.0
+   * @since 2.0.0
    */
   void unregisterPlugin(String pluginName);
 
@@ -47,7 +47,7 @@ public interface SmartCardService {
    * Gets the names of all registered plugins.
    *
    * @return A not null Set String.
-   * @since 2.0
+   * @since 2.0.0
    */
   Set<String> getPluginNames();
 
@@ -55,7 +55,7 @@ public interface SmartCardService {
    * Gets all registered plugins.
    *
    * @return A not null Set of {@link Plugin}.
-   * @since 2.0
+   * @since 2.0.0
    */
   Set<Plugin> getPlugins();
 
@@ -64,7 +64,7 @@ public interface SmartCardService {
    *
    * @param pluginName The plugin name.
    * @return Null if the plugin is not found or no longer registered.
-   * @since 2.0
+   * @since 2.0.0
    */
   Plugin getPlugin(String pluginName);
 
@@ -74,7 +74,7 @@ public interface SmartCardService {
    * <p>The verification is based on the comparison of the respective API versions.
    *
    * @param cardExtension A not null {@link KeypleCardExtension} reference object
-   * @since 2.0
+   * @since 2.0.0
    */
   void checkCardExtension(KeypleCardExtension cardExtension);
 
@@ -85,7 +85,7 @@ public interface SmartCardService {
    *     Local Service extension
    * @return A not null reference to the registered {@link DistributedLocalService}.
    * @throws IllegalStateException If the distributed local service has already been registered.
-   * @since 2.0
+   * @since 2.0.0
    */
   DistributedLocalService registerDistributedLocalService(
       KeypleDistributedLocalServiceExtensionFactory distributedLocalServiceExtensionFactory);
@@ -94,7 +94,7 @@ public interface SmartCardService {
    * Attempts to unregister the distributed local service having the provided name from the service.
    *
    * @param distributedLocalServiceName The distributed local service name.
-   * @since 2.0
+   * @since 2.0.0
    */
   void unregisterDistributedLocalService(String distributedLocalServiceName);
 
@@ -103,7 +103,7 @@ public interface SmartCardService {
    *
    * @param distributedLocalServiceName The name of the distributed local service to be checked.
    * @return True if the distributed local service is registered.
-   * @since 2.0
+   * @since 2.0.0
    */
   boolean isDistributedLocalServiceRegistered(String distributedLocalServiceName);
 
@@ -112,7 +112,7 @@ public interface SmartCardService {
    *
    * @param distributedLocalServiceName The name of the distributed local service.
    * @return Null if the distributed local service is not found or no longer registered.
-   * @since 2.0
+   * @since 2.0.0
    */
   DistributedLocalService getDistributedLocalService(String distributedLocalServiceName);
 
@@ -120,7 +120,7 @@ public interface SmartCardService {
    * Create a new instance of a {@link CardSelectionManager} in order to perform a card selection.
    *
    * @return A not null reference.
-   * @since 2.0
+   * @since 2.0.0
    */
   CardSelectionManager createCardSelectionManager();
 }

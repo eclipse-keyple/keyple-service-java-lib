@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Implementation of {@link SmartCardService}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class SmartCardServiceAdapter implements SmartCardService {
 
@@ -69,7 +69,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * Gets the single instance of SmartCardServiceAdapter.
    *
    * @return single instance of SmartCardServiceAdapter
-   * @since 2.0
+   * @since 2.0.0
    */
   static SmartCardServiceAdapter getInstance() {
     return INSTANCE;
@@ -292,7 +292,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public Plugin registerPlugin(KeyplePluginExtensionFactory pluginFactory) {
@@ -423,7 +423,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void unregisterPlugin(String pluginName) {
@@ -445,7 +445,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public Set<String> getPluginNames() {
@@ -455,7 +455,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public Set<Plugin> getPlugins() {
@@ -465,7 +465,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public Plugin getPlugin(String pluginName) {
@@ -475,7 +475,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   public void checkCardExtension(KeypleCardExtension cardExtension) {
     checkCardExtensionVersion(cardExtension);
@@ -484,7 +484,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public DistributedLocalService registerDistributedLocalService(
@@ -534,7 +534,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void unregisterDistributedLocalService(String distributedLocalServiceName) {
@@ -556,7 +556,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public boolean isDistributedLocalServiceRegistered(String distributedLocalServiceName) {
@@ -566,7 +566,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public DistributedLocalService getDistributedLocalService(String distributedLocalServiceName) {
@@ -576,7 +576,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public CardSelectionManager createCardSelectionManager() {

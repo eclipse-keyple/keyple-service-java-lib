@@ -25,7 +25,7 @@ import java.util.SortedSet;
  *
  * <p>However, only one type of event is notified at a time.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 public interface PluginEvent {
 
@@ -33,7 +33,7 @@ public interface PluginEvent {
    * Gets the name of the plugin to which the reader that generated the event belongs.
    *
    * @return A not empty string.
-   * @since 2.0
+   * @since 2.0.0
    */
   String getPluginName();
 
@@ -41,7 +41,7 @@ public interface PluginEvent {
    * Gets the names of the readers related to the event in the form of a sorted set.
    *
    * @return A not null reference.
-   * @since 2.0
+   * @since 2.0.0
    */
   SortedSet<String> getReaderNames();
 
@@ -49,35 +49,35 @@ public interface PluginEvent {
    * Gets the plugin event type.
    *
    * @return A not null reference.
-   * @since 2.0
+   * @since 2.0.0
    */
   Type getType();
 
   /**
    * The two types of reader event
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   public enum Type {
 
     /**
      * A reader has been connected.
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     READER_CONNECTED,
 
     /**
      * A reader has been disconnected.
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     READER_DISCONNECTED,
 
     /**
      * This plugin has become unavailable.
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     UNAVAILABLE
   }

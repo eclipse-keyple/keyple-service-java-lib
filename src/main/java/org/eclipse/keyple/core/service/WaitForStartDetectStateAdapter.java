@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  *   <li>Upon START_DETECT event, the machine changes state for WAIT_FOR_CARD_INSERTION.
  * </ul>
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapter {
 
@@ -39,7 +39,7 @@ final class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapte
    * Creates an instance.
    *
    * @param reader The observable local reader adapter.
-   * @since 2.0
+   * @since 2.0.0
    */
   WaitForStartDetectStateAdapter(ObservableLocalReaderAdapter reader) {
     this(reader, null, null);
@@ -52,7 +52,7 @@ final class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapte
    * @param reader The observable local reader adapter.
    * @param monitoringJob The monitoring job.
    * @param executorService The executor service to use.
-   * @since 2.0
+   * @since 2.0.0
    */
   WaitForStartDetectStateAdapter(
       ObservableLocalReaderAdapter reader,
@@ -64,7 +64,7 @@ final class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapte
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {

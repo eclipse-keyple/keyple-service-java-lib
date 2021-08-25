@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * <p>All runtime exceptions that may occur during the monitoring process are caught and notified at
  * the application level through the appropriate exception handler.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
 
@@ -55,7 +55,7 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
    * Constructor.
    *
    * @param reader reference to the reader
-   * @since 2.0
+   * @since 2.0.0
    */
   public CardRemovalPassiveMonitoringJobAdapter(ObservableLocalReaderAdapter reader) {
     super(reader);
@@ -74,7 +74,7 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
    * Gets the monitoring process.
    *
    * @return A not null reference.
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   Runnable getMonitoringJob(final AbstractObservableStateAdapter monitoringState) {
@@ -122,7 +122,7 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
    * (package-private)<br>
    * Terminates the monitoring process.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   void stop() {

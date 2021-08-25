@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Abstract class for all plugins.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 abstract class AbstractPluginAdapter implements Plugin {
 
@@ -44,7 +44,7 @@ abstract class AbstractPluginAdapter implements Plugin {
    *
    * @param pluginName The name of the plugin.
    * @param pluginExtension The associated plugin extension SPI.
-   * @since 2.0
+   * @since 2.0.0
    */
   AbstractPluginAdapter(String pluginName, KeyplePluginExtension pluginExtension) {
     this.pluginName = pluginName;
@@ -82,7 +82,7 @@ abstract class AbstractPluginAdapter implements Plugin {
    * Check if the plugin is registered.
    *
    * @throws IllegalStateException is thrown when plugin is not or no longer registered.
-   * @since 2.0
+   * @since 2.0.0
    */
   final void checkStatus() {
     if (!isRegistered) {
@@ -96,7 +96,7 @@ abstract class AbstractPluginAdapter implements Plugin {
    * Changes the plugin status to registered.
    *
    * @throws PluginIOException If registration failed.
-   * @since 2.0
+   * @since 2.0.0
    */
   void register() throws PluginIOException {
     isRegistered = true;
@@ -106,7 +106,7 @@ abstract class AbstractPluginAdapter implements Plugin {
    * (package-private)<br>
    * Unregisters the plugin and the readers present in its list.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   void unregister() {
     for (Reader reader : readers.values()) {
@@ -123,7 +123,7 @@ abstract class AbstractPluginAdapter implements Plugin {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final String getName() {
@@ -133,7 +133,7 @@ abstract class AbstractPluginAdapter implements Plugin {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionClass) {
@@ -145,7 +145,7 @@ abstract class AbstractPluginAdapter implements Plugin {
    * (package-private)<br>
    * Gets the Map of all connected readers.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   final Map<String, Reader> getReadersMap() {
     return readers;
@@ -154,7 +154,7 @@ abstract class AbstractPluginAdapter implements Plugin {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final Set<String> getReaderNames() {
@@ -165,7 +165,7 @@ abstract class AbstractPluginAdapter implements Plugin {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final Set<Reader> getReaders() {
@@ -176,7 +176,7 @@ abstract class AbstractPluginAdapter implements Plugin {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final Reader getReader(String name) {

@@ -16,19 +16,19 @@ package org.eclipse.keyple.core.service;
  * Indicates whether the selection process should stop after the first matching or process all cases
  * in the selection request list.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 enum MultiSelectionProcessing {
   /**
    * The selection process stops as soon as a selection case is successful.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   FIRST_MATCH,
   /**
    * The selection process performs all the selection cases provided.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   PROCESS_ALL
 }

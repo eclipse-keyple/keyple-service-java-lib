@@ -20,21 +20,21 @@ import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
  * <p>In the case of a card insertion, the responses received by the reader are included in the
  * event.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 public interface ReaderEvent extends CardReaderEvent {
   /**
    * Gets the name of the plugin from which the reader that generated the event comes from.
    *
    * @return A not empty string.
-   * @since 2.0
+   * @since 2.0.0
    */
   String getPluginName();
 
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   String getReaderName();
@@ -42,7 +42,7 @@ public interface ReaderEvent extends CardReaderEvent {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   Type getType();
@@ -50,7 +50,7 @@ public interface ReaderEvent extends CardReaderEvent {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   ScheduledCardSelectionsResponse getScheduledCardSelectionsResponse();

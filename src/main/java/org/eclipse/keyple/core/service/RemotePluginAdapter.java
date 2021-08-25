@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Implementation of a remote {@link Plugin}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginApi {
 
@@ -45,7 +45,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
    * Constructor.
    *
    * @param remotePluginSpi The associated SPI.
-   * @since 2.0
+   * @since 2.0.0
    */
   RemotePluginAdapter(RemotePluginSpi remotePluginSpi) {
     super(remotePluginSpi.getName(), (KeyplePluginExtension) remotePluginSpi);
@@ -58,7 +58,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
    *
    * <p>Populates its list of available remote local readers already registered.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   final void register() throws PluginIOException {
@@ -122,7 +122,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   void unregister() {
@@ -137,7 +137,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final void onReaderEvent(String jsonData) {

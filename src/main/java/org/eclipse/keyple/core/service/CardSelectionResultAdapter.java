@@ -20,7 +20,7 @@ import org.calypsonet.terminal.reader.selection.spi.SmartCard;
  * (package-private)<br>
  * Implementation of {@link CardSelectionResult}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class CardSelectionResultAdapter implements CardSelectionResult {
 
@@ -31,7 +31,7 @@ final class CardSelectionResultAdapter implements CardSelectionResult {
    * (package-private)<br>
    * Constructor
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   CardSelectionResultAdapter() {}
 
@@ -41,7 +41,7 @@ final class CardSelectionResultAdapter implements CardSelectionResult {
    *
    * @param selectionIndex The index of the selection that resulted in the smart card.
    * @param smartCard The smart card.
-   * @since 2.0
+   * @since 2.0.0
    */
   void addSmartCard(int selectionIndex, SmartCard smartCard) {
     smartCardMap.put(selectionIndex, smartCard);
@@ -52,7 +52,7 @@ final class CardSelectionResultAdapter implements CardSelectionResult {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public Map<Integer, SmartCard> getSmartCards() {
@@ -62,7 +62,7 @@ final class CardSelectionResultAdapter implements CardSelectionResult {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public SmartCard getActiveSmartCard() {
@@ -76,7 +76,7 @@ final class CardSelectionResultAdapter implements CardSelectionResult {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public int getActiveSelectionIndex() {

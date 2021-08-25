@@ -18,7 +18,7 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
  * (package-private)<br>
  * Local configurable observable reader adapter.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class ObservableLocalConfigurableReaderAdapter extends ObservableLocalReaderAdapter
     implements ConfigurableReader {
@@ -29,7 +29,7 @@ final class ObservableLocalConfigurableReaderAdapter extends ObservableLocalRead
    *
    * @param configurableReaderSpi The configurable reader SPI.
    * @param pluginName The name of the plugin.
-   * @since 2.0
+   * @since 2.0.0
    */
   ObservableLocalConfigurableReaderAdapter(
       ConfigurableReaderSpi configurableReaderSpi, String pluginName) {
@@ -39,7 +39,7 @@ final class ObservableLocalConfigurableReaderAdapter extends ObservableLocalRead
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void activateProtocol(String readerProtocol, String applicationProtocol) {
@@ -49,7 +49,7 @@ final class ObservableLocalConfigurableReaderAdapter extends ObservableLocalRead
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void deactivateProtocol(String readerProtocol) {

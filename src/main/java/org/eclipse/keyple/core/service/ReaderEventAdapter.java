@@ -17,7 +17,7 @@ import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
  * (package-private)<br>
  * Implementation of {@link ReaderEvent}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class ReaderEventAdapter implements ReaderEvent {
 
@@ -35,7 +35,7 @@ final class ReaderEventAdapter implements ReaderEvent {
    * @param type The type of event (should be not null).
    * @param scheduledCardSelectionsResponse The responses received during the execution of the card
    *     selection scenario (can be null).
-   * @since 2.0
+   * @since 2.0.0
    */
   public ReaderEventAdapter(
       String pluginName,

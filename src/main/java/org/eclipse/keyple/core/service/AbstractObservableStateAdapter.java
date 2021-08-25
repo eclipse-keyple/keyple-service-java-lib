@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Abstract class for all states of a {@link ObservableLocalReaderAdapter}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 abstract class AbstractObservableStateAdapter {
 
@@ -31,31 +31,31 @@ abstract class AbstractObservableStateAdapter {
    * (package-private)<br>
    * The states that the reader monitoring state machine can have
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   enum MonitoringState {
     /**
      * The reader is idle and waiting for a start signal to enter the card detection mode.
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     WAIT_FOR_START_DETECTION,
     /**
      * The reader is in card detection mode and is waiting for a card to be presented.
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     WAIT_FOR_CARD_INSERTION,
     /**
      * The reader waits for the application to finish processing the card.
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     WAIT_FOR_CARD_PROCESSING,
     /**
      * The reader waits for the removal of the card.
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     WAIT_FOR_CARD_REMOVAL
   }
@@ -84,7 +84,7 @@ abstract class AbstractObservableStateAdapter {
    * @param monitoringJob the job to be executed in background (may be null if no background job is
    *     required)
    * @param executorService the executor service
-   * @since 2.0
+   * @since 2.0.0
    */
   AbstractObservableStateAdapter(
       MonitoringState monitoringState,
@@ -103,7 +103,7 @@ abstract class AbstractObservableStateAdapter {
    *
    * @param reader observable reader this currentState is attached to
    * @param monitoringState name of the currentState
-   * @since 2.0
+   * @since 2.0.0
    */
   AbstractObservableStateAdapter(
       MonitoringState monitoringState, ObservableLocalReaderAdapter reader) {
@@ -115,7 +115,7 @@ abstract class AbstractObservableStateAdapter {
    * Get the current state identifier of the state machine
    *
    * @return the current state identifier
-   * @since 2.0
+   * @since 2.0.0
    */
   final MonitoringState getMonitoringState() {
     return monitoringState;
@@ -126,7 +126,7 @@ abstract class AbstractObservableStateAdapter {
    * Gets the reader.
    *
    * @return A not null reference.
-   * @since 2.0
+   * @since 2.0.0
    */
   final ObservableLocalReaderAdapter getReader() {
     return reader;
@@ -137,7 +137,7 @@ abstract class AbstractObservableStateAdapter {
    * Switch state in the parent reader
    *
    * @param stateId the new state
-   * @since 2.0
+   * @since 2.0.0
    */
   final void switchState(AbstractObservableStateAdapter.MonitoringState stateId) {
     reader.switchState(stateId);
@@ -147,7 +147,7 @@ abstract class AbstractObservableStateAdapter {
    * (package-private)<br>
    * Invoked when activated, a custom behaviour can be added here.
    *
-   * @since 2.0
+   * @since 2.0.0
    * @throws IllegalStateException if a job is defined with a null executor service.
    */
   final void onActivate() {
@@ -168,7 +168,7 @@ abstract class AbstractObservableStateAdapter {
    * (package-private)<br>
    * Invoked when deactivated.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   final void onDeactivate() {
 
@@ -196,7 +196,7 @@ abstract class AbstractObservableStateAdapter {
    * Handle Internal Event.
    *
    * @param event internal event received by reader
-   * @since 2.0
+   * @since 2.0.0
    */
   abstract void onEvent(ObservableLocalReaderAdapter.InternalEvent event);
 }

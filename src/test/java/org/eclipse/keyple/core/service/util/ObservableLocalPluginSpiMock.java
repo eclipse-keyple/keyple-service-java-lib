@@ -37,7 +37,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
    * (package-private )constructor
    *
    * @param name name of the plugin
-   * @since 2.0
+   * @since 2.0.0
    */
   public ObservableLocalPluginSpiMock(String name, PluginIOException pluginError) {
     this.name = name;
@@ -47,7 +47,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public int getMonitoringCycleDuration() {
@@ -56,7 +56,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public Set<String> searchAvailableReaderNames() throws PluginIOException {
@@ -68,7 +68,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public ReaderSpi searchReader(String readerName) throws PluginIOException {
@@ -80,7 +80,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public String getName() {
@@ -89,7 +89,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public Set<ReaderSpi> searchAvailableReaders() throws PluginIOException {
@@ -98,7 +98,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void onUnregister() {
@@ -107,7 +107,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   public void addReaderName(String... name) {
     for (String readerName : name) {
@@ -119,7 +119,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   public void removeReaderName(String... name) {
     for (String readerName : name) {

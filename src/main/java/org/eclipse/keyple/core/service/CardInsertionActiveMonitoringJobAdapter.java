@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * the application level through the {@link
  * org.eclipse.keyple.core.service.spi.CardReaderObservationExceptionHandlerSpi} mechanism.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
 
@@ -43,7 +43,7 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
    * @param reader reader that will be polled with the method isCardPresent()
    * @param cycleDurationMillis time interval between two presence polls.
    * @param monitorInsertion if true, polls for CARD_INSERTED, else CARD_REMOVED
-   * @since 2.0
+   * @since 2.0.0
    */
   public CardInsertionActiveMonitoringJobAdapter(
       ObservableLocalReaderAdapter reader, long cycleDurationMillis, boolean monitorInsertion) {
@@ -58,7 +58,7 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
    * Gets the monitoring process.
    *
    * @return A not null reference.
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   Runnable getMonitoringJob(final AbstractObservableStateAdapter monitoringState) {
@@ -131,7 +131,7 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
    * (package-private)<br>
    * Terminates the monitoring process.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   void stop() {

@@ -33,7 +33,7 @@ import org.slf4j.Logger;
  * (package-private)<br>
  * Utility class of distributed components.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class DistributedUtilAdapter {
 
@@ -55,7 +55,7 @@ final class DistributedUtilAdapter {
    * @param logger The logger to use for logging.
    * @return The JSON output data, or null if returned data are null or empty.
    * @throws Exception The embedded exception if exists.
-   * @since 2.0
+   * @since 2.0.0
    */
   static JsonObject executePluginServiceRemotely(
       JsonObject input, AbstractRemotePluginSpi remotePluginSpi, String pluginName, Logger logger)
@@ -87,7 +87,7 @@ final class DistributedUtilAdapter {
    * @param logger The logger to use for logging.
    * @return The JSON output data, or null if returned data are null or empty.
    * @throws Exception The embedded exception if exists.
-   * @since 2.0
+   * @since 2.0.0
    */
   static JsonObject executeReaderServiceRemotely(
       JsonObject input,
@@ -125,7 +125,7 @@ final class DistributedUtilAdapter {
    * @param outputJson The JSON to parse.
    * @return The JSON output data, or null if returned data are null or empty.
    * @throws Exception The embedded exception if exists.
-   * @since 2.0
+   * @since 2.0.0
    */
   private static JsonObject getJsonObject(String outputJson) throws Exception { // NOSONAR
 
@@ -149,7 +149,7 @@ final class DistributedUtilAdapter {
    *
    * @param e The cause.
    * @throws RuntimeException The thrown runtime exception.
-   * @since 2.0
+   * @since 2.0.0
    */
   static void throwRuntimeException(Exception e) {
     throw new RuntimeException( // NOSONAR
@@ -162,50 +162,50 @@ final class DistributedUtilAdapter {
    * (package-private)<br>
    * Enumeration of all available common JSON properties.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   enum JsonProperty {
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     CARD_REQUEST,
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     CARD_SELECTION_REQUESTS,
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     CARD_SELECTION_SCENARIO,
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     CHANNEL_CONTROL,
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     ERROR,
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     MULTI_SELECTION_PROCESSING,
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     NOTIFICATION_MODE,
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     PLUGIN_EVENT,
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     POLLING_MODE,
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     READER_EVENT,
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     READER_GROUP_REFERENCE,
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     READER_NAME,
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     RESULT,
 
-    /** @since 2.0 */
+    /** @since 2.0.0 */
     SERVICE
   }
 
@@ -214,49 +214,49 @@ final class DistributedUtilAdapter {
    * Enumeration of the available local services that can be invoked on local plugins from the
    * remote plugin.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   enum PluginService {
 
     /**
      * Refers to {@link Plugin#getReaders()}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     GET_READERS,
 
     /**
      * Refers to {@link PoolPlugin#getReaderGroupReferences()}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     GET_READER_GROUP_REFERENCES,
 
     /**
      * Refers to {@link PoolPlugin#allocateReader(String)}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     ALLOCATE_READER,
 
     /**
      * Refers to {@link PoolPlugin#releaseReader(Reader)}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     RELEASE_READER,
 
     /**
      * Refers to {@link ObservablePlugin#addObserver(PluginObserverSpi)}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     START_READER_DETECTION,
 
     /**
      * Refers to {@link ObservablePlugin#removeObserver(PluginObserverSpi)}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     STOP_READER_DETECTION
   }
@@ -266,14 +266,14 @@ final class DistributedUtilAdapter {
    * Enumeration of the available local services that can be invoked on a local reader from the
    * remote reader.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   enum ReaderService {
 
     /**
      * Refers to {@link ProxyReaderApi#transmitCardRequest(CardRequestSpi, ChannelControl)}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     TRANSMIT_CARD_REQUEST,
 
@@ -281,7 +281,7 @@ final class DistributedUtilAdapter {
      * Refers to {@link AbstractReaderAdapter#transmitCardSelectionRequests(List,
      * MultiSelectionProcessing, ChannelControl)}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     TRANSMIT_CARD_SELECTION_REQUESTS,
 
@@ -292,49 +292,49 @@ final class DistributedUtilAdapter {
      * ObservableRemoteReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
      * ObservableReader.NotificationMode, ObservableCardReader.DetectionMode)}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     SCHEDULE_CARD_SELECTION_SCENARIO,
 
     /**
      * Refers to {@link Reader#isCardPresent()}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     IS_CARD_PRESENT,
 
     /**
      * Refers to {@link Reader#isContactless()}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     IS_CONTACTLESS,
 
     /**
      * Refers to {@link ObservableReader#startCardDetection(ObservableCardReader.DetectionMode)}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     START_CARD_DETECTION,
 
     /**
      * Refers to {@link ObservableReader#startCardDetection(ObservableCardReader.DetectionMode)}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     STOP_CARD_DETECTION,
 
     /**
      * Refers to {@link ObservableReader#finalizeCardProcessing()}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     FINALIZE_CARD_PROCESSING,
 
     /**
      * Refers to {@link ProxyReaderApi#releaseChannel()}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     RELEASE_CHANNEL
   }
@@ -342,7 +342,7 @@ final class DistributedUtilAdapter {
   /**
    * (package-private)<br>
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   static class CardSelectionRequest implements CardSelectionRequestSpi {
 
@@ -352,7 +352,7 @@ final class DistributedUtilAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     @Override
     public CardSelectorSpi getCardSelector() {
@@ -362,7 +362,7 @@ final class DistributedUtilAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     @Override
     public CardRequestSpi getCardRequest() {
@@ -373,7 +373,7 @@ final class DistributedUtilAdapter {
   /**
    * (package-private)<br>
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   static class CardSelector implements CardSelectorSpi {
 
@@ -387,7 +387,7 @@ final class DistributedUtilAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     @Override
     public String getCardProtocol() {
@@ -397,7 +397,7 @@ final class DistributedUtilAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     @Override
     public String getPowerOnDataRegex() {
@@ -407,7 +407,7 @@ final class DistributedUtilAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     @Override
     public byte[] getAid() {
@@ -417,7 +417,7 @@ final class DistributedUtilAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     @Override
     public FileOccurrence getFileOccurrence() {
@@ -427,7 +427,7 @@ final class DistributedUtilAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     @Override
     public FileControlInformation getFileControlInformation() {
@@ -437,7 +437,7 @@ final class DistributedUtilAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     @Override
     public Set<Integer> getSuccessfulSelectionStatusWords() {
@@ -448,7 +448,7 @@ final class DistributedUtilAdapter {
   /**
    * (package-private)<br>
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   static class CardRequest implements CardRequestSpi {
 
@@ -458,7 +458,7 @@ final class DistributedUtilAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     @Override
     public List<ApduRequestSpi> getApduRequests() {
@@ -468,7 +468,7 @@ final class DistributedUtilAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     @Override
     public boolean stopOnUnsuccessfulStatusWord() {
@@ -479,7 +479,7 @@ final class DistributedUtilAdapter {
   /**
    * (package-private)<br>
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   static class ApduRequest implements ApduRequestSpi {
 
@@ -490,7 +490,7 @@ final class DistributedUtilAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     @Override
     public byte[] getApdu() {
@@ -500,7 +500,7 @@ final class DistributedUtilAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     @Override
     public Set<Integer> getSuccessfulStatusWords() {
@@ -510,7 +510,7 @@ final class DistributedUtilAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.0
+     * @since 2.0.0
      */
     @Override
     public String getInfo() {

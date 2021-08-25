@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Implementation of a local {@link PoolPlugin}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements PoolPlugin {
 
@@ -37,7 +37,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
    * Constructor.
    *
    * @param poolPluginSpi The associated SPI.
-   * @since 2.0
+   * @since 2.0.0
    */
   LocalPoolPluginAdapter(PoolPluginSpi poolPluginSpi) {
     super(poolPluginSpi.getName(), (KeyplePluginExtension) poolPluginSpi);
@@ -49,7 +49,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
    *
    * <p>Unregisters the associated SPI.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   void unregister() {
@@ -64,7 +64,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public SortedSet<String> getReaderGroupReferences() {
@@ -83,7 +83,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public Reader allocateReader(String readerGroupReference) {
@@ -117,7 +117,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void releaseReader(Reader reader) {

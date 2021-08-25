@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Implementation of a remote {@link ObservablePlugin}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     implements ObservablePlugin, ObservableRemotePluginApi {
@@ -50,7 +50,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    * Constructor.
    *
    * @param observableRemotePluginSpi The associated SPI.
-   * @since 2.0
+   * @since 2.0.0
    */
   ObservableRemotePluginAdapter(ObservableRemotePluginSpi observableRemotePluginSpi) {
     super(observableRemotePluginSpi);
@@ -70,7 +70,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    * using the exception handler.
    *
    * @param event The plugin event.
-   * @since 2.0
+   * @since 2.0.0
    */
   void notifyObservers(final PluginEvent event) {
 
@@ -109,7 +109,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   final void unregister() {
@@ -124,7 +124,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void addObserver(PluginObserverSpi observer) {
@@ -160,7 +160,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void removeObserver(PluginObserverSpi observer) {
@@ -176,7 +176,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void clearObservers() {
@@ -215,7 +215,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final int countObservers() {
@@ -225,7 +225,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public final void setPluginObservationExceptionHandler(
@@ -237,7 +237,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void addRemoteReader(RemoteReaderSpi remoteReaderSpi) {
@@ -273,7 +273,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void removeRemoteReader(String remoteReaderName) {
@@ -297,7 +297,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void onPluginEvent(String jsonData) {

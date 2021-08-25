@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Observable Remote reader adapter.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements ObservableReader {
 
@@ -48,7 +48,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    *
    * @param observableRemoteReaderSpi The remote reader SPI.
    * @param pluginName The name of the plugin.
-   * @since 2.0
+   * @since 2.0.0
    */
   ObservableRemoteReaderAdapter(
       ObservableRemoteReaderSpi observableRemoteReaderSpi, String pluginName) {
@@ -65,7 +65,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    * Notifies asynchronously all registered observers with the provided {@link ReaderEvent}.
    *
    * @param event The reader event.
-   * @since 2.0
+   * @since 2.0.0
    */
   void notifyObservers(final ReaderEvent event) {
 
@@ -116,7 +116,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    * @param cardSelectionScenario The card selection scenario.
    * @param notificationMode The notification policy.
    * @param detectionMode The polling policy (optional).
-   * @since 2.0
+   * @since 2.0.0
    */
   void scheduleCardSelectionScenario(
       CardSelectionScenarioAdapter cardSelectionScenario,
@@ -158,7 +158,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    * Stops the card detection unconditionally.<br>
    * Shuts down the reader's executor service.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   void unregister() {
@@ -176,7 +176,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void addObserver(CardReaderObserverSpi observer) {
@@ -187,7 +187,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void removeObserver(CardReaderObserverSpi observer) {
@@ -200,7 +200,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public int countObservers() {
@@ -210,7 +210,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void clearObservers() {
@@ -220,7 +220,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void startCardDetection(DetectionMode detectionMode) {
@@ -258,7 +258,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void stopCardDetection() {
@@ -292,7 +292,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void finalizeCardProcessing() {
@@ -323,7 +323,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void setReaderObservationExceptionHandler(

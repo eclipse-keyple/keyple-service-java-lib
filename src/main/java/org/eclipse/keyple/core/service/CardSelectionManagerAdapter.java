@@ -33,7 +33,7 @@ import org.eclipse.keyple.core.util.Assert;
  * (package-private) <br>
  * Implementation of the {@link CardSelectionManager}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class CardSelectionManagerAdapter implements CardSelectionManager {
 
@@ -47,7 +47,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
    * Creates an instance of the service with which the selection stops as soon as a card matches a
    * selection case.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   CardSelectionManagerAdapter() {
     multiSelectionProcessing = MultiSelectionProcessing.FIRST_MATCH;
@@ -58,7 +58,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void setMultipleSelectionMode() {
@@ -68,7 +68,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public int prepareSelection(CardSelection cardSelection) {
@@ -85,7 +85,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void prepareReleaseChannel() {
@@ -95,7 +95,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public CardSelectionResult processCardSelectionScenario(CardReader reader) {
@@ -126,7 +126,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void scheduleCardSelectionScenario(
@@ -156,7 +156,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public CardSelectionResult parseScheduledCardSelectionsResponse(

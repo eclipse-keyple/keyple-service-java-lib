@@ -32,7 +32,7 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
  *       selection process.
  * </ul>
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class CardSelectionScenarioAdapter {
 
@@ -54,7 +54,7 @@ final class CardSelectionScenarioAdapter {
    * @param channelControl The channel control policy.
    * @throws IllegalArgumentException if the card selection request list is null or empty, if one of
    *     the indicators is null.
-   * @since 2.0
+   * @since 2.0.0
    */
   CardSelectionScenarioAdapter(
       List<CardSelectionRequestSpi> cardSelectionRequests,
@@ -76,7 +76,7 @@ final class CardSelectionScenarioAdapter {
    * Gets the card selection requests list.
    *
    * @return A not null reference
-   * @since 2.0
+   * @since 2.0.0
    */
   List<CardSelectionRequestSpi> getCardSelectionRequests() {
     return cardSelectionRequests;
@@ -87,7 +87,7 @@ final class CardSelectionScenarioAdapter {
    * Gets the multi selection processing policy.
    *
    * @return A not null reference
-   * @since 2.0
+   * @since 2.0.0
    */
   MultiSelectionProcessing getMultiSelectionProcessing() {
     return multiSelectionProcessing;
@@ -98,7 +98,7 @@ final class CardSelectionScenarioAdapter {
    * Gets the channel control policy.
    *
    * @return A not null reference
-   * @since 2.0
+   * @since 2.0.0
    */
   ChannelControl getChannelControl() {
     return channelControl;
@@ -108,7 +108,7 @@ final class CardSelectionScenarioAdapter {
    * Converts the card selection scenario into a string where the data is encoded in a json format.
    *
    * @return A not empty String
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public String toString() {

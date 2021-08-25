@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Implementation of a local {@link Plugin}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 class LocalPluginAdapter extends AbstractPluginAdapter {
 
@@ -36,7 +36,7 @@ class LocalPluginAdapter extends AbstractPluginAdapter {
    * Constructor.
    *
    * @param pluginSpi The associated SPI.
-   * @since 2.0
+   * @since 2.0.0
    */
   LocalPluginAdapter(PluginSpi pluginSpi) {
     super(pluginSpi.getName(), (KeyplePluginExtension) pluginSpi);
@@ -48,7 +48,7 @@ class LocalPluginAdapter extends AbstractPluginAdapter {
    *
    * <p>Populates its list of available readers and registers each of them.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   final void register() throws PluginIOException {
@@ -69,7 +69,7 @@ class LocalPluginAdapter extends AbstractPluginAdapter {
    *
    * <p>Unregisters the associated SPI.
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   void unregister() {

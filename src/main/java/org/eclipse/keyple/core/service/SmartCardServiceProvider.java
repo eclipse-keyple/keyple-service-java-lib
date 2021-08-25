@@ -14,7 +14,7 @@ package org.eclipse.keyple.core.service;
 /**
  * Provider of the {@link SmartCardService}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 public final class SmartCardServiceProvider {
 
@@ -25,7 +25,7 @@ public final class SmartCardServiceProvider {
    * Gets the unique instance of {@link SmartCardService}.
    *
    * @return A not null reference.
-   * @since 2.0
+   * @since 2.0.0
    */
   public static SmartCardService getService() {
     return SmartCardServiceAdapter.getInstance();

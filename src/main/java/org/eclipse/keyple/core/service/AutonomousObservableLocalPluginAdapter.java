@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Implementation of an autonomous local {@link ObservablePlugin}.
  *
- * @since 2.0
+ * @since 2.0.0
  */
 final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLocalPluginAdapter
     implements AutonomousObservablePluginApi {
@@ -37,7 +37,7 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
    * Constructor.
    *
    * @param autonomousObservablePluginSpi The associated plugin SPI.
-   * @since 2.0
+   * @since 2.0.0
    */
   AutonomousObservableLocalPluginAdapter(
       AutonomousObservablePluginSpi autonomousObservablePluginSpi) {
@@ -48,7 +48,7 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void onReaderConnected(Set<ReaderSpi> readers) {
@@ -68,7 +68,7 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
   /**
    * {@inheritDoc}
    *
-   * @since 2.0
+   * @since 2.0.0
    */
   @Override
   public void onReaderDisconnected(Set<String> readerNames) {
