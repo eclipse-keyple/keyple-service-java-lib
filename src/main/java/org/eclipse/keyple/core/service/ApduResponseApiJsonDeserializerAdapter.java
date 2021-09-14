@@ -32,6 +32,6 @@ final class ApduResponseApiJsonDeserializerAdapter
   public ApduResponseAdapter deserialize(
       JsonElement json, Type typeOfT, JsonDeserializationContext context)
       throws JsonParseException {
-    return context.deserialize(jsonElement, ApduResponseAdapter.class);
+    return context.deserialize(json, ApduResponseAdapter.class);
   }
 }
