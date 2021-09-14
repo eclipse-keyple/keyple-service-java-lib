@@ -26,15 +26,7 @@ import org.calypsonet.terminal.card.AbstractApduException;
  *
  * @since 2.0.0
  */
-class ApduExceptionJsonSerializerAdapter implements JsonSerializer<AbstractApduException> {
-
-  /**
-   * (package-private)<br>
-   * Creates an instance.
-   *
-   * @since 2.0.0
-   */
-  ApduExceptionJsonSerializerAdapter() {}
+final class ApduExceptionJsonSerializerAdapter implements JsonSerializer<AbstractApduException> {
 
   /**
    * {@inheritDoc}

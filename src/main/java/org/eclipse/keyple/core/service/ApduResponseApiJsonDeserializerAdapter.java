@@ -14,11 +14,24 @@ package org.eclipse.keyple.core.service;
 import com.google.gson.*;
 import java.lang.reflect.Type;
 
-public class ApduResponseDeserializerAdapter implements JsonDeserializer<ApduResponseAdapter> {
+/**
+ * (package-private)<br>
+ * Deserializer of a {@link org.calypsonet.terminal.card.ApduResponseApi}.
+ *
+ * @since 2.0.0
+ */
+final class ApduResponseApiJsonDeserializerAdapter
+    implements JsonDeserializer<ApduResponseAdapter> {
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0.0
+   */
   @Override
   public ApduResponseAdapter deserialize(
-      JsonElement json, Type typeOfT, JsonDeserializationContext context)
+      JsonElement jsonElement, Type typeOfT, JsonDeserializationContext jsonDeserializationContext)
       throws JsonParseException {
-    return context.deserialize(json, ApduResponseAdapter.class);
+    return jsonDeserializationContext.deserialize(jsonElement, ApduResponseAdapter.class);
   }
 }
