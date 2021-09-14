@@ -30,8 +30,8 @@ final class ApduResponseApiJsonDeserializerAdapter
    */
   @Override
   public ApduResponseAdapter deserialize(
-      JsonElement jsonElement, Type typeOfT, JsonDeserializationContext jsonDeserializationContext)
+      JsonElement json, Type typeOfT, JsonDeserializationContext context)
       throws JsonParseException {
-    return jsonDeserializationContext.deserialize(jsonElement, ApduResponseAdapter.class);
+    return context.deserialize(jsonElement, ApduResponseAdapter.class);
   }
 }
