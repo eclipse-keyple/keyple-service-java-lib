@@ -1,0 +1,739 @@
+@startuml
+title
+    Keyple 2.0 - Adapter of keyple-service-java-lib - 2.0.0 (15/09/2021)
+end title
+
+' == THEME ==
+
+'Couleurs issues de : https://htmlcolorcodes.com/fr/tableau-de-couleur/tableau-de-couleur-design-plat/
+!define C_GREY1 F8F9F9
+!define C_GREY2 F2F3F4
+!define C_GREY3 E5E7E9
+!define C_GREY4 D7DBDD
+!define C_GREY5 CACFD2
+!define C_GREY6 BDC3C7
+!define C_LINK 3498DB
+!define C_USE 27AE60
+
+skinparam Shadowing false
+skinparam ClassFontStyle italic
+skinparam ClassBorderColor #D4AC0D
+skinparam stereotypeABorderColor #A9DCDF
+skinparam stereotypeIBorderColor #B4A7E5
+skinparam stereotypeCBorderColor #ADD1B2
+skinparam stereotypeEBorderColor #EB93DF
+' Red
+skinparam ClassBackgroundColor<<red>> #FDEDEC
+skinparam ClassBorderColor<<red>> #E74C3C
+hide <<red>> stereotype
+' Purple
+skinparam ClassBackgroundColor<<purple>> #F4ECF7
+skinparam ClassBorderColor<<purple>> #8E44AD
+hide <<purple>> stereotype
+' blue
+skinparam ClassBackgroundColor<<blue>> #EBF5FB
+skinparam ClassBorderColor<<blue>> #3498DB
+hide <<blue>> stereotype
+' Green
+skinparam ClassBackgroundColor<<green>> #E9F7EF
+skinparam ClassBorderColor<<green>> #27AE60
+hide <<green>> stereotype
+' Grey
+skinparam ClassBackgroundColor<<grey>> #EAECEE
+skinparam ClassBorderColor<<grey>> #2C3E50
+hide <<grey>> stereotype
+
+' == CONTENT ==
+
+legend top
+    __Colors legend__ :
+    * __External public API references__ :
+    ** <back:cyan>**keyple-common-java-api**</back>
+    ** <back:yellow>**calypsonet-terminal-reader-java-api**</back>
+    ** <back:lightGreen>**calypsonet-terminal-card-java-api**</back>
+    ** <back:gold>**com.google.code.gson**</back>
+    * __External private API references__ :
+    ** <back:pink>**keyple-plugin-java-api**</back>
+    ** <back:plum>**keyple-distributed-remote-java-api**</back>
+    ** <back:orange>**keyple-distributed-local-java-api**</back>
+end legend
+
+package "org.eclipse.keyple.core.service" as service {
+    +class "**final** SmartCardServiceProvider" as SmartCardServiceProvider {
+        ...
+    }
+    ' ADAPTERS
+    ~enum MultiSelectionProcessing {
+        FIRST_MATCH
+        PROCESS_ALL
+    }
+    ~class "<<<back:gold>JsonSerializer</back>>>\n**final** ApduExceptionJsonSerializerAdapter" as ApduExceptionJsonSerializerAdapter {
+        --
+        ~ApduExceptionJsonSerializerAdapter ()
+        -- **JsonSerializer** --
+        +<back:gold>JsonElement</back> serialize (<back:lightGreen>AbstractApduException</back> exception,
+            \t<back:gold>Type</back> type, <back:gold>JsonSerializationContext</back> jsonSerializationContext)
+    }
+    ~class "<<<back:gold>JsonSerializer</back>>>\n**final** ApduResponseApiJsonDeserializerAdapter" as ApduResponseApiJsonDeserializerAdapter {
+        --
+        ~ApduResponseApiJsonDeserializerAdapter ()
+        -- **JsonDeserializer** --
+        +<back:gold>JsonElement</back> deserialize (<back:gold>JsonElement</back> jsonElement,
+            \t<back:gold>Type</back> typeOfT, <back:gold>JsonDeserializationContext</back> jsonDeserializationContext)
+    }
+    ~class "<<SmartCardService>>\n**final** SmartCardServiceAdapter" as SmartCardServiceAdapter {
+        --
+        ~{static} SmartCardServiceAdapter getInstance ()
+        -- **SmartCardService** --
+        +Plugin registerPlugin (<back:cyan>KeyplePluginExtensionFactory</back> pluginFactory)
+        +void unregisterPlugin (String pluginName)
+        +Set<String> getPluginNames ()
+        +Set<Plugin> getPlugins ()
+        +Plugin getPlugin (String pluginName)
+        +void checkCardExtension (<back:cyan>KeypleCardExtension</back> cardExtension)
+        +DistributedLocalService registerDistributedLocalService (<back:cyan>KeypleDistributedLocalServiceExtensionFactory</back> distributedLocalServiceFactory)
+        +void unregisterDistributedLocalService (String distributedLocalServiceName)
+        +DistributedLocalService getDistributedLocalService (String distributedLocalServiceName)
+        +<back:yellow>CardSelectionManager</back> createCardSelectionManager ()
+    }
+    ' PLUGIN
+    ~abstract class "<<Plugin>>\nAbstractPluginAdapter" as AbstractPluginAdapter {
+        ~{static} **final** String REMOTE_READER_NAME_SUFFIX
+        --
+        ~AbstractPluginAdapter (String pluginName, <back:cyan>KeyplePluginExtension</back> pluginExtension)
+
+        ~**final** LocalReaderAdapter buildLocalReaderAdapter (ReaderSpi readerSpi)
+        ~**final** Map<String, Reader> getReadersMap ()
+        ~**final** void checkStatus ()
+        ~void register ()
+        ~void unregister ()
+        -- **Plugin** --
+        +**final** String getName ()
+        +**final** <T extends <back:cyan>KeyplePluginExtension</back>> T getExtension (Class<T> pluginExtensionClass)
+        +**final** Set<String> getReaderNames ()
+        +**final** Set<Reader> getReaders ()
+        +**final** Reader getReader (String readerName)
+    }
+    ~class LocalPluginAdapter extends AbstractPluginAdapter {
+        --
+        ~LocalPluginAdapter (<back:pink>PluginSpi</back> pluginSpi)
+        -- **AbstractPluginAdapter** --
+        ~void register ()
+        ~void unregister ()
+    }
+    ~class "<<<back:plum>RemotePluginApi</back>>>\nRemotePluginAdapter" as RemotePluginAdapter extends AbstractPluginAdapter {
+        --
+        ~RemotePluginAdapter (<back:plum>RemotePluginSpi</back> remotePluginSpi)
+        -- **AbstractPluginAdapter** --
+        ~**final** void register ()
+        ~void unregister ()
+        -- **RemotePluginApi** --
+        +**final** void onReaderEvent (String jsonData)
+    }
+    ' POOL PLUGINS
+    ~class "<<PoolPlugin>>\n**final** LocalPoolPluginAdapter" as LocalPoolPluginAdapter extends AbstractPluginAdapter {
+        --
+        ~LocalPoolPluginAdapter (<back:pink>PoolPluginSpi</back> poolPluginSpi)
+        -- **AbstractPluginAdapter** --
+        ~void unregister ()
+        -- **PoolPlugin** --
+        +SortedSet<String> getReaderGroupReferences ()
+        +Reader allocateReader (String readerGroupReference)
+        +void releaseReader (Reader reader)
+    }
+    ~class "<<PoolPlugin>>\n**final** RemotePoolPluginAdapter" as RemotePoolPluginAdapter extends AbstractPluginAdapter {
+        --
+        ~RemotePoolPluginAdapter (<back:plum>RemotePoolPluginSpi</back> remotePoolPluginSpi)
+        -- **AbstractPluginAdapter** --
+        ~void unregister ()
+        -- **PoolPlugin** --
+        +SortedSet<String> getReaderGroupReferences ()
+        +Reader allocateReader (String readerGroupReference)
+        +void releaseReader (Reader reader)
+    }
+    ' OBSERVATION MANAGER
+    ~class "**final** ObservationManagerAdapter\n\n**T** : PluginObserverSpi\nor <back:yellow>CardReaderObserverSpi</back>\n\n**S** : PluginObservationExceptionHandlerSpi\nor <back:yellow>CardReaderObservationExceptionHandlerSpi</back>" as ObservationManagerAdapter<T, S> {
+        --
+        ~ObservationManagerAdapter (String pluginName, String readerName)
+
+        ~void setObservationExceptionHandler (S exceptionHandler)
+        ~void addObserver (T observer)
+        ~void removeObserver (T observer)
+        ~void clearObservers ()
+        ~int countObservers ()
+
+        ~Set<T> getObservers ()
+        ~S getObservationExceptionHandler ()
+    }
+    ' OBSERVABLE PLUGINS
+    ~abstract class "<<ObservablePlugin>>\nAbstractObservableLocalPluginAdapter" as AbstractObservableLocalPluginAdapter extends LocalPluginAdapter {
+        --
+        ~AbstractObservableLocalPluginAdapter (<back:pink>PluginSpi</back> pluginSpi)
+
+        ~**final** ObservationManagerAdapter<PluginObserverSpi, PluginObservationExceptionHandlerSpi> getObservationManager ()
+        ~**final** void notifyObservers (PluginEvent event)
+        -- **AbstractPluginAdapter** --
+        ~**final** void unregister ()
+        -- **ObservablePlugin** --
+        +**final** void setPluginObservationExceptionHandler (PluginObservationExceptionHandlerSpi exceptionHandler)
+        +void addObserver (PluginObserverSpi observer)
+        +void removeObserver (PluginObserverSpi observer)
+        +void clearObservers ()
+        +**final** int countObservers ()
+    }
+    ~class "**final** ObservableLocalPluginAdapter" as ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAdapter {
+        --
+        ~ObservableLocalPluginAdapter (<back:pink>ObservablePluginSpi</back> observablePluginSpi)
+
+        ~boolean isMonitoring ()
+        -- **ObservablePlugin** --
+        +void addObserver (PluginObserverSpi observer)
+        +void removeObserver (PluginObserverSpi observer)
+        +void clearObservers ()
+    }
+    ~class "<<<back:pink>AutonomousObservablePluginApi</back>>>\n**final** AutonomousObservableLocalPluginAdapter" as AutonomousObservableLocalPluginAdapter extends AbstractObservableLocalPluginAdapter {
+        --
+        ~AutonomousObservableLocalPluginAdapter (
+            \t<back:pink>AutonomousObservablePluginSpi</back> autonomousObservablePluginSpi)
+        -- **AutonomousObservablePluginApi** --
+        +void onReaderConnected (Set<<back:pink>ReaderSpi</back>> readers)
+        +void onReaderDisconnected (Set<String> readerNames)
+    }
+    ~class "<<ObservablePlugin>>\n<<<back:plum>ObservableRemotePluginApi</back>>>\n**final** ObservableRemotePluginAdapter" as ObservableRemotePluginAdapter extends RemotePluginAdapter {
+        --
+        ~ObservableRemotePluginAdapter (<back:plum>ObservableRemotePluginSpi</back> observableRemotePluginSpi)
+
+        ~void notifyObservers (PluginEvent event)
+        -- **AbstractPluginAdapter** --
+        ~void unregister ()
+        -- **ObservablePlugin** --
+        +void setPluginObservationExceptionHandler (PluginObservationExceptionHandlerSpi exceptionHandler)
+        +void addObserver (PluginObserverSpi observer)
+        +void removeObserver (PluginObserverSpi observer)
+        +void clearObservers ()
+        +int countObservers ()
+        -- **ObservableRemotePluginApi** --
+        +void addRemoteReader (<back:plum>RemoteReaderSpi</back> remoteReaderSpi)
+        +boolean removeRemoteReader (remoteReaderName)
+        +void onPluginEvent (String jsonData)
+    }
+    ' DISTRIBUTED LOCAL SERVICE
+    ~class "<<DistributedLocalService>>\n<<PluginObserverSpi>>\n<<<back:yellow>CardReaderObserverSpi</back>>>\n<<<back:orange>LocalServiceApi</back>>>\n**final** DistributedLocalServiceAdapter" as DistributedLocalServiceAdapter {
+        --
+        ~DistributedLocalServiceAdapter (<back:orange>LocalServiceSpi</back> localServiceSpi)
+
+        ~void register ()
+        ~void unregister ()
+        -- **DistributedLocalService** --
+        +String getName ()
+        +<T extends <back:cyan>KeypleDistributedLocalServiceExtension</back>> T getExtension (Class<T> distributedLocalServiceExtensionClass)
+        -- **PluginObserverSpi** --
+        +void onPluginEvent (PluginEvent pluginEvent)
+        -- **CardReaderObserverSpi** --
+        +void onReaderEvent (ReaderEvent readerEvent)
+        -- **LocalServiceApi** --
+        +void setPoolPluginNames (String... poolPluginNames)
+        +String executeLocally (String jsonData, String readerName)
+    }
+    ~class "**final** DistributedUtilAdapter" as DistributedUtilAdapter {
+        --
+        ~{static} JsonObject executePluginServiceRemotely (
+            \tJsonObject input, <back:plum>AbstractRemotePluginSpi</back> remotePluginSpi,
+            \tString pluginName, Logger logger)
+        ~{static} JsonObject executeReaderServiceRemotely (
+            \tJsonObject input, <back:plum>RemoteReaderSpi</back> remoteReaderSpi,
+            \tString readerName, String pluginName, Logger logger)
+        ~{static} void throwRuntimeException (Exception e)
+    }
+    ~enum JsonProperty {
+        ...
+    }
+    ~enum PluginService {
+        ...
+    }
+    ~enum ReaderService {
+        ...
+    }
+    ' READERS
+    ~abstract class "<<Reader>>\n<<<back:lightGreen>ProxyReaderApi</back>>>\nAbstractReaderAdapter" as AbstractReaderAdapter {
+        --
+        ~AbstractReaderAdapter (String readerName, <back:cyan>KeypleReaderExtension</back> readerExtension, String pluginName)
+
+        ~**final** String getPluginName ()
+        ~**final** List<<back:lightGreen>CardSelectionResponseApi</back>> transmitCardSelectionRequests (List<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
+            \tMultiSelectionProcessing multiSelectionProcessing, <back:lightGreen>ChannelControl</back> channelControl)
+
+        ~**final** void checkStatus ()
+        ~**final** void register ()
+        ~void unregister ()
+
+        ~{abstract} **abstract** List<<back:lightGreen>CardSelectionResponseApi</back>> processCardSelectionRequests (List<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
+            \tMultiSelectionProcessing multiSelectionProcessing, <back:lightGreen>ChannelControl</back> channelControl)
+        ~{abstract} **abstract** <back:lightGreen>CardResponseApi</back> processCardRequest (<back:lightGreen>CardRequestSpi</back> cardRequest, <back:lightGreen>ChannelControl</back> channelControl)
+        -- **Reader** --
+        +**final** String getName ()
+        +**final** <T extends <back:cyan>KeypleReaderExtension</back>> T getExtension (Class<T> readerExtensionClass)
+        -- **ProxyReaderApi** --
+        +**final** <back:lightGreen>CardResponseApi</back> transmitCardRequest (<back:lightGreen>CardRequestSpi</back> cardRequest, <back:lightGreen>ChannelControl</back> channelControl)
+    }
+    ~class LocalReaderAdapter extends AbstractReaderAdapter {
+        --
+        ~LocalReaderAdapter (<back:pink>ReaderSpi</back> readerSpi, String pluginName)
+
+        ~**final** <back:pink>ReaderSpi</back> getReaderSpi ()
+        ~**final** boolean isLogicalChannelOpen ()
+        ~**final** void closeLogicalAndPhysicalChannelsSilently ()
+        ~**final** void activateReaderProtocol (String readerProtocol, String cardProtocol)
+        ~**final** void deactivateReaderProtocol (String readerProtocol)
+        -- **AbstractReaderAdapter** --
+        ~void unregister ()
+        ~**final** List<<back:lightGreen>CardSelectionResponseApi</back>> processCardSelectionRequests (
+            \tList<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
+            \tMultiSelectionProcessing multiSelectionProcessing,
+            \t<back:lightGreen>ChannelControl</back> channelControl)
+        ~**final** <back:lightGreen>CardResponseApi</back> processCardRequest (
+            \t<back:lightGreen>CardRequestSpi</back> cardRequest,
+            \t<back:lightGreen>ChannelControl</back> channelControl)
+        -- **Reader** --
+        +**final** boolean isContactless ()
+        +boolean isCardPresent ()
+        -- **ProxyReaderApi** --
+        +**final** void releaseChannel ()
+    }
+    ~class RemoteReaderAdapter extends AbstractReaderAdapter {
+        --
+        ~RemoteReaderAdapter (<back:plum>RemoteReaderSpi</back> remoteReaderSpi, String pluginName)
+        -- **AbstractReaderAdapter** --
+        ~**final** List<<back:lightGreen>CardSelectionResponseApi</back>> processCardSelectionRequests (
+            \tList<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
+            \tMultiSelectionProcessing multiSelectionProcessing,
+            \t<back:lightGreen>ChannelControl</back> channelControl)
+        ~**final** <back:lightGreen>CardResponseApi</back> processCardRequest (
+            \t<back:lightGreen>CardRequestSpi</back> cardRequest,
+            \t<back:lightGreen>ChannelControl</back> channelControl)
+        -- **Reader** --
+        +**final** boolean isContactless ()
+        +**final** boolean isCardPresent ()
+        -- **ProxyReaderApi** --
+        +**final** void releaseChannel ()
+    }
+    ~class "<<ConfigurableReader>>\n**final** LocalConfigurableReaderAdapter" as LocalConfigurableReaderAdapter extends LocalReaderAdapter {
+        --
+        ~LocalConfigurableReaderAdapter (
+            \t<back:pink>ConfigurableReaderSpi</back> configurableReaderSpi,
+            \tString pluginName)
+        -- **ConfigurableReader** --
+        +void activateProtocol (String readerProtocol, String cardProtocol)
+        +void deactivateProtocol (String readerProtocol)
+    }
+    ~class "**final** CardSelectionScenarioAdapter" as CardSelectionScenarioAdapter {
+        --
+        ~CardSelectionScenarioAdapter (
+            \tList<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
+            \tMultiSelectionProcessing multiSelectionProcessing,
+            \t<back:lightGreen>ChannelControl</back> channelControl)
+
+        ~MultiSelectionProcessing getMultiSelectionProcessing ()
+        ~<back:lightGreen>ChannelControl</back> getChannelControl ()
+        ~List<<back:lightGreen>CardSelectionRequestSpi</back>> getCardSelectionRequests ()
+    }
+    ~class "<<ObservableReader>>\n<<<back:pink>WaitForCardInsertionAutonomousReaderApi</back>>>\n<<<back:pink>WaitForCardRemovalAutonomousReaderApi</back>>>\nObservableLocalReaderAdapter" as ObservableLocalReaderAdapter extends LocalReaderAdapter {
+        --
+        ~ObservableLocalReaderAdapter (<back:pink>ObservableReaderSpi</back> observableReaderSpi, String pluginName)
+
+        ~**final** <back:pink>ObservableReaderSpi</back> getObservableReaderSpi ()
+        ~**final** <back:yellow>CardReaderObservationExceptionHandlerSpi</back> getObservationExceptionHandler ()
+        ~**final** <back:yellow>DetectionMode</back> getDetectionMode ()
+        ~**final** MonitoringState getCurrentMonitoringState ()
+        ~**final** boolean isCardPresentPing ()
+
+        ~**final** ReaderEvent processCardInserted ()
+        ~**final** void processCardRemoved ()
+        ~**final** void switchState (MonitoringState stateId)
+        ~**final** void notifyObservers (ReaderEvent event)
+
+        ~**final** void scheduleCardSelectionScenario (
+            \tCardSelectionScenarioAdapter cardSelectionScenario, <back:yellow>DetectionMode</back> detectionMode, <back:yellow>NotificationMode</back> notificationMode)
+        -- **AbstractReaderAdapter** --
+        ~**final** void unregister ()
+        -- **Reader** --
+        +**final** boolean isCardPresent ()
+        -- **ObservableReader** --
+        +**final** void setReaderObservationExceptionHandler (<back:yellow>CardReaderObservationExceptionHandlerSpi</back> exceptionHandler)
+        +**final** void addObserver (<back:yellow>CardReaderObserverSpi</back> observer)
+        +**final** void removeObserver (<back:yellow>CardReaderObserverSpi</back> observer)
+        +**final** int countObservers ()
+        +**final** void clearObservers ()
+        +**final** void startCardDetection (<back:yellow>DetectionMode</back> detectionMode)
+        +**final** void stopCardDetection ()
+        +**final** void finalizeCardProcessing ()
+        -- **WaitForCardInsertionAutonomousReaderApi** --
+        +**final** void onCardInserted ()
+        -- **WaitForCardRemovalAutonomousReaderApi** --
+        +**final** void onCardRemoved ()
+    }
+    ~enum InternalEvent {
+        CARD_INSERTED
+        CARD_REMOVED
+        SE_PROCESSED
+        START_DETECT
+        STOP_DETECT
+        TIME_OUT
+    }
+    ~class "<<ConfigurableReader>>\n**final** ObservableLocalConfigurableReaderAdapter" as ObservableLocalConfigurableReaderAdapter extends ObservableLocalReaderAdapter {
+        --
+        ~ObservableLocalConfigurableReaderAdapter (
+            \t<back:pink>ConfigurableReaderSpi</back> configurableReaderSpi,
+            \tString pluginName)
+        -- **ConfigurableReader** --
+        +void activateProtocol (String readerProtocol, String cardProtocol)
+        +void deactivateProtocol (String readerProtocol)
+    }
+    ~class "<<ObservableReader>>\n**final** ObservableRemoteReaderAdapter" as ObservableRemoteReaderAdapter extends RemoteReaderAdapter {
+        --
+        ~ObservableRemoteReaderAdapter (<back:plum>ObservableRemoteReaderSpi</back> remoteReaderSpi, String pluginName)
+
+        ~void notifyObservers (ReaderEvent event)
+
+        ~void scheduleCardSelectionScenario (CardSelectionScenarioAdapter cardSelectionScenario,
+            \t<back:yellow>DetectionMode</back> detectionMode, <back:yellow>NotificationMode</back> notificationMode)
+        -- **AbstractReaderAdapter** --
+        ~void unregister ()
+        -- **ObservableReader** --
+        +void setReaderObservationExceptionHandler (<back:yellow>CardReaderObservationExceptionHandlerSpi</back> exceptionHandler)
+        +void addObserver (<back:yellow>CardReaderObserverSpi</back> observer)
+        +void removeObserver (<back:yellow>CardReaderObserverSpi</back> observer)
+        +int countObservers ()
+        +void clearObservers ()
+        +void startCardDetection (<back:yellow>DetectionMode</back> detectionMode)
+        +void stopCardDetection ()
+        +void finalizeCardProcessing ()
+    }
+
+    ' Plugin & Reader events
+    ~class "<<PluginEvent>>\n**final** PluginEventAdapter" as PluginEventAdapter {
+        --
+        ~PluginEventAdapter (String pluginName, String readerName, PluginEvent.Type type)
+        ~PluginEventAdapter (String pluginName, Set<String> readerNames, PluginEvent.Type type)
+        -- **PluginEvent** --
+        +String getPluginName ()
+        +SortedSet<String> getReaderNames ()
+        +PluginEvent.Type getType ()
+    }
+    ~class "<<ReaderEvent>>\n**final** ReaderEventAdapter" as ReaderEventAdapter {
+        --
+        ~ReaderEventAdapter (String pluginName, String readerName, <back:yellow>CardReaderEvent.Type</back> type,
+            \t<back:yellow>ScheduledCardSelectionsResponse</back> scheduledCardSelectionsResponse)
+        -- **CardReaderEvent** --
+        +String getReaderName ()
+        +<back:yellow>CardReaderEvent.Type</back> getType ()
+        +<back:yellow>ScheduledCardSelectionsResponse</back> getScheduledCardSelectionsResponse ()
+        -- **ReaderEvent** --
+        +String getPluginName ()
+    }
+
+    ' AUTOMATE
+    ~class "**final** ObservableReaderStateServiceAdapter" as ObservableReaderStateServiceAdapter {
+        --
+        ~ObservableReaderStateServiceAdapter (ObservableLocalReaderAdapter reader)
+
+        ~void onEvent (InternalEvent event)
+        ~void switchState (MonitoringState stateId)
+        ~AbstractObservableStateAdapter getCurrentState ()
+        ~MonitoringState getCurrentMonitoringState ()
+        ~void shutdown ()
+    }
+    ~abstract class AbstractObservableStateAdapter {
+        --
+        ~AbstractObservableStateAdapter (MonitoringState monitoringState, ObservableLocalReaderAdapter reader, AbstractMonitoringJobAdapter monitoringJob, ExecutorService executorService)
+        ~AbstractObservableStateAdapter (MonitoringState monitoringState, ObservableLocalReaderAdapter reader)
+
+        ~**final** MonitoringState getMonitoringState ()
+        ~**final** ObservableLocalReaderAdapter getReader ()
+
+        ~**final** void switchState (MonitoringState stateId)
+
+        ~**final** void onActivate ()
+        ~**final** void onDeactivate ()
+
+        ~{abstract} **abstract** void onEvent (InternalEvent event)
+    }
+    ~enum MonitoringState {
+        WAIT_FOR_START_DETECTION
+        WAIT_FOR_SE_INSERTION
+        WAIT_FOR_SE_PROCESSING
+        WAIT_FOR_SE_REMOVAL
+    }
+
+    ~class "**final** WaitForCardInsertionStateAdapter" as WaitForCardInsertionStateAdapter extends AbstractObservableStateAdapter {
+        --
+        ~WaitForCardInsertionStateAdapter (
+            \tObservableLocalReaderAdapter reader,
+            \tAbstractMonitoringJobAdapter monitoringJob,
+            \tExecutorService executorService)
+        ~WaitForCardInsertionStateAdapter (
+            \tObservableLocalReaderAdapter reader)
+        -- **AbstractObservableStateAdapter** --
+        ~void onEvent (InternalEvent event)
+    }
+    ~class "**final** WaitForCardProcessingStateAdapter" as WaitForCardProcessingStateAdapter extends AbstractObservableStateAdapter {
+        --
+        ~WaitForCardProcessingStateAdapter (
+            \tObservableLocalReaderAdapter reader,
+            \tAbstractMonitoringJobAdapter monitoringJob,
+            \tExecutorService executorService)
+        ~WaitForCardProcessingStateAdapter (
+            \tObservableLocalReaderAdapter reader)
+        -- **AbstractObservableStateAdapter** --
+        ~void onEvent (InternalEvent event)
+    }
+    ~class "**final** WaitForCardRemovalStateAdapter" as WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapter {
+        --
+        ~WaitForCardRemovalStateAdapter (
+            \tObservableLocalReaderAdapter reader,
+            \tAbstractMonitoringJobAdapter monitoringJob,
+            \tExecutorService executorService)
+        ~WaitForCardRemovalStateAdapter (
+            \tObservableLocalReaderAdapter reader)
+        -- **AbstractObservableStateAdapter** --
+        ~void onEvent (InternalEvent event)
+    }
+    ~class "**final** WaitForStartDetectStateAdapter" as WaitForStartDetectStateAdapter extends AbstractObservableStateAdapter {
+        --
+        ~WaitForStartDetectStateAdapter (
+            \tObservableLocalReaderAdapter reader,
+            \tAbstractMonitoringJobAdapter monitoringJob,
+            \tExecutorService executorService)
+        ~WaitForStartDetectStateAdapter (
+            \tObservableLocalReaderAdapter reader)
+        -- **AbstractObservableStateAdapter** --
+        ~void onEvent (InternalEvent event)
+    }
+
+    ~abstract class AbstractMonitoringJobAdapter {
+        --
+        ~AbstractMonitoringJobAdapter (ObservableLocalReaderAdapter reader)
+
+        ~**final** ObservableLocalReaderAdapter getReader ()
+
+        ~{abstract} **abstract** Runnable getMonitoringJob (AbstractObservableStateAdapter monitoringState)
+        ~{abstract} **abstract** void stop ()
+    }
+    ~class "**final** CardRemovalActiveMonitoringJobAdapter" as CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+        --
+        ~CardRemovalActiveMonitoringJobAdapter (
+            \tObservableLocalReaderAdapter reader,
+            \tlong cycleDurationMillis)
+        -- **AbstractMonitoringJobAdapter** --
+        ~Runnable getMonitoringJob (
+            \tAbstractObservableStateAdapter monitoringState)
+        ~void stop ()
+    }
+    ~class "**final** CardInsertionActiveMonitoringJobAdapter" as CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+        --
+        ~CardInsertionActiveMonitoringJobAdapter (
+            \tObservableLocalReaderAdapter reader,
+            \tlong cycleDurationMillis,
+            \tboolean monitorInsertion)
+        -- **AbstractMonitoringJobAdapter** --
+        ~Runnable getMonitoringJob (
+            \tAbstractObservableStateAdapter monitoringState)
+        ~void stop ()
+    }
+    ~class "**final** CardInsertionPassiveMonitoringJobAdapter" as CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+        --
+        ~CardInsertionPassiveMonitoringJobAdapter (
+            \tObservableLocalReaderAdapter reader)
+        -- **AbstractMonitoringJobAdapter** --
+        ~Runnable getMonitoringJob (
+            \tAbstractObservableStateAdapter monitoringState)
+        ~void stop ()
+    }
+    ~class "**final** CardRemovalPassiveMonitoringJobAdapter" as CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+        --
+        ~CardRemovalPassiveMonitoringJobAdapter (
+            \tObservableLocalReaderAdapter reader)
+        -- **AbstractMonitoringJobAdapter** --
+        ~Runnable getMonitoringJob (
+            \tAbstractObservableStateAdapter monitoringState)
+        ~void stop ()
+    }
+
+    ' ADAPTERS
+    ~class "<<<back:yellow>CardSelectionManager</back>>>\n**final** CardSelectionManagerAdapter" as CardSelectionManagerAdapter {
+        --
+        ~CardSelectionManagerAdapter (MultiSelectionProcessing multiSelectionProcessing)
+        -- **CardSelectionManager** --
+        +void setMultipleSelectionMode ()
+        +int prepareSelection (<back:yellow>CardSelection</back> cardSelection)
+        +void prepareReleaseChannel ()
+        +<back:yellow>CardSelectionResult</back> processCardSelectionScenario (Reader reader)
+        +void scheduleCardSelectionScenario (ObservableReader observableReader, <back:yellow>DetectionMode</back> detectionMode, <back:yellow>NotificationMode</back> notificationMode)
+        +<back:yellow>CardSelectionResult</back> parseScheduledCardSelectionsResponse (ScheduledCardSelectionsResponseAdapter scheduledCardSelectionsResponse)
+    }
+    ~class "<<<back:yellow>ScheduledCardSelectionsResponse</back>>>\n**final** ScheduledCardSelectionsResponseAdapter" as ScheduledCardSelectionsResponseAdapter {
+        --
+        ~ScheduledCardSelectionsResponseAdapter (
+            \tList<<back:lightGreen>CardSelectionResponseApi</back>> cardSelectionResponses)
+
+        ~List<<back:lightGreen>CardSelectionResponseApi</back>> getCardSelectionResponses ()
+    }
+    ~class "<<<back:yellow>CardSelectionResult</back>>>\n**final** CardSelectionResultAdapter" as CardSelectionResultAdapter {
+        --
+        ~CardSelectionResultAdapter ()
+
+        ~void addSmartCard (int selectionIndex, <back:yellow>SmartCard</back> smartCard, boolean isSelected)
+        -- **CardSelectionResult** --
+        +int getActiveSelectionIndex ()
+        +boolean hasSelectionMatched (int selectionIndex)
+        +Map<Integer, <back:yellow>SmartCard</back>> getSmartCards ()
+        +<back:yellow>SmartCard</back> getSmartCard (int selectionIndex)
+        +<back:yellow>SmartCard</back> getActiveSmartCard ()
+    }
+
+    ' RESPONSE
+    together {
+        +class "<<<back:lightGreen>CardSelectionResponseApi</back>>>\n**final** CardSelectionResponseAdapter" as CardSelectionResponseAdapter {
+            --
+            ~CardSelectionResponseAdapter (
+                \tbyte[] powerOnData,
+                \t<back:lightGreen>ApduResponseApi</back> selectApplicationResponse,
+                \tboolean hasMatched,
+                \t<back:lightGreen>CardResponseApi</back> cardResponseApi)
+            -- **CardSelectionResponseApi** --
+            +String getPowerOnData ()
+            +<back:lightGreen>ApduResponseApi</back> getSelectApplicationResponse ()
+            +boolean hasMatched ()
+            +<back:lightGreen>CardResponseApi</back> getCardResponse ()
+        }
+        +class "<<<back:lightGreen>CardResponseApi</back>>>\n**final** CardResponseAdapter" as CardResponseAdapter {
+            --
+            ~CardResponseAdapter (List<<back:lightGreen>ApduResponseApi</back>> apduResponses,
+                \tboolean isLogicalChannelOpen)
+            -- **CardResponseApi** --
+            +List<<back:lightGreen>ApduResponseApi</back>> getApduResponses ()
+            +boolean isLogicalChannelOpen ()
+        }
+        +class "<<<back:lightGreen>ApduResponseApi</back>>>\n**final** ApduResponseAdapter" as ApduResponseAdapter {
+            --
+            ~ApduResponseAdapter (byte[] bytes)
+            -- **ApduResponseApi** --
+            +byte[] getApdu ()
+            +byte[] getDataOut ()
+            +int getStatusWord ()
+        }
+    }
+}
+
+' Associations
+
+SmartCardServiceProvider ..> SmartCardServiceAdapter #C_LINK : provide >
+
+SmartCardServiceAdapter *-- "0..N" AbstractPluginAdapter #C_LINK
+SmartCardServiceAdapter *-- "0..N" DistributedLocalServiceAdapter #C_LINK
+
+DistributedUtilAdapter +-- JsonProperty
+DistributedUtilAdapter +-- PluginService
+DistributedUtilAdapter +-- ReaderService
+
+AbstractObservableLocalPluginAdapter *-- "1" ObservationManagerAdapter #C_LINK
+
+ObservableRemotePluginAdapter *-- "1" ObservationManagerAdapter #C_LINK
+
+ObservableLocalReaderAdapter +-- InternalEvent
+ObservableLocalReaderAdapter *-- "1" ObservationManagerAdapter #C_LINK
+ObservableLocalReaderAdapter "1" *--* "1" ObservableReaderStateServiceAdapter #C_LINK
+ObservableLocalReaderAdapter ..> CardSelectionScenarioAdapter #C_USE : use >
+
+ObservableReaderStateServiceAdapter *-- "1..N" AbstractObservableStateAdapter #C_LINK
+
+AbstractObservableStateAdapter +-- MonitoringState
+AbstractObservableStateAdapter *-- "1" MonitoringState #C_LINK
+AbstractObservableStateAdapter *-- "1" ObservableLocalReaderAdapter #C_LINK
+AbstractObservableStateAdapter *-- "0..1" AbstractMonitoringJobAdapter #C_LINK
+
+AbstractMonitoringJobAdapter *-- "1" ObservableLocalReaderAdapter #C_LINK
+
+AbstractPluginAdapter *-- "0..N" AbstractReaderAdapter #C_LINK
+
+ObservableRemoteReaderAdapter *-- "1" ObservationManagerAdapter #C_LINK
+ObservableRemoteReaderAdapter ..> CardSelectionScenarioAdapter #C_USE : use >
+
+SmartCardServiceAdapter .right.> CardSelectionManagerAdapter #C_LINK : create >
+
+CardSelectionManagerAdapter ..> CardSelectionResultAdapter #C_LINK : create >
+CardSelectionManagerAdapter ..> ScheduledCardSelectionsResponseAdapter #C_USE : use >
+
+CardSelectionResponseAdapter *-- "0..1" ApduResponseAdapter #C_LINK
+CardSelectionResponseAdapter *-- "1" CardResponseAdapter #C_LINK
+
+CardResponseAdapter *-- "1..N" ApduResponseAdapter #C_LINK
+
+' == LAYOUT ==
+
+WaitForStartDetectStateAdapter -[hidden]- AbstractMonitoringJobAdapter
+ObservationManagerAdapter -[hidden]- PluginEventAdapter
+PluginEventAdapter -[hidden]- ReaderEventAdapter
+ReaderEventAdapter -[hidden]- CardSelectionResponseAdapter
+
+' == STYLE ==
+
+package service #C_GREY1 {}
+
+enum MultiSelectionProcessing <<blue>>
+
+class ApduExceptionJsonSerializerAdapter <<blue>>
+class ApduResponseApiJsonDeserializerAdapter <<blue>>
+class SmartCardServiceAdapter <<blue>>
+abstract class AbstractReaderAdapter <<blue>>
+class LocalReaderAdapter <<blue>>
+class LocalConfigurableReaderAdapter <<blue>>
+class RemoteReaderAdapter <<blue>>
+class ObservableLocalReaderAdapter <<blue>>
+class ObservableLocalConfigurableReaderAdapter <<blue>>
+class ObservableRemoteReaderAdapter <<blue>>
+class CardSelectionScenarioAdapter <<blue>>
+enum InternalEvent <<blue>>
+abstract class AbstractObservableStateAdapter <<blue>>
+enum MonitoringState <<blue>>
+abstract class AbstractMonitoringJobAdapter <<blue>>
+class CardRemovalActiveMonitoringJobAdapter <<blue>>
+class CardInsertionActiveMonitoringJobAdapter <<blue>>
+class CardInsertionPassiveMonitoringJobAdapter <<blue>>
+class CardRemovalPassiveMonitoringJobAdapter <<blue>>
+class WaitForCardInsertionStateAdapter <<blue>>
+class WaitForCardProcessingStateAdapter <<blue>>
+class WaitForCardRemovalStateAdapter <<blue>>
+class WaitForStartDetectStateAdapter <<blue>>
+class ObservableReaderStateServiceAdapter <<blue>>
+
+class ObservationManagerAdapter <<blue>>
+
+abstract class AbstractPluginAdapter <<blue>>
+class LocalPluginAdapter <<blue>>
+class RemotePluginAdapter <<blue>>
+class LocalPoolPluginAdapter <<blue>>
+class RemotePoolPluginAdapter <<blue>>
+abstract class AbstractObservableLocalPluginAdapter <<blue>>
+class ObservableLocalPluginAdapter <<blue>>
+class AutonomousObservableLocalPluginAdapter <<blue>>
+class ObservableRemotePluginAdapter <<blue>>
+
+class DistributedLocalServiceAdapter <<blue>>
+class DistributedUtilAdapter <<blue>>
+enum JsonProperty <<blue>>
+enum PluginService <<blue>>
+enum ReaderService <<blue>>
+
+class CardSelectionManagerAdapter <<blue>>
+class CardSelectionResultAdapter <<blue>>
+class ScheduledCardSelectionsResponseAdapter <<blue>>
+
+class CardSelectionResponseAdapter <<blue>>
+class CardResponseAdapter <<blue>>
+class ApduResponseAdapter <<blue>>
+
+class PluginEventAdapter <<blue>>
+class ReaderEventAdapter <<blue>>
+
+@enduml

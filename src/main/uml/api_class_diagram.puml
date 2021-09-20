@@ -1,0 +1,168 @@
+@startuml
+title
+    Keyple 2.0 - keyple-service-java-lib - 2.0.0 (30/07/2021)
+end title
+
+' == THEME ==
+
+'Couleurs issues de : https://htmlcolorcodes.com/fr/tableau-de-couleur/tableau-de-couleur-design-plat/
+!define C_GREY1 F8F9F9
+!define C_GREY2 F2F3F4
+!define C_GREY3 E5E7E9
+!define C_GREY4 D7DBDD
+!define C_GREY5 CACFD2
+!define C_GREY6 BDC3C7
+!define C_LINK 3498DB
+!define C_USE 27AE60
+
+skinparam Shadowing false
+skinparam ClassFontStyle italic
+skinparam ClassBorderColor #D4AC0D
+skinparam stereotypeABorderColor #A9DCDF
+skinparam stereotypeIBorderColor #B4A7E5
+skinparam stereotypeCBorderColor #ADD1B2
+skinparam stereotypeEBorderColor #EB93DF
+' Red
+skinparam ClassBackgroundColor<<red>> #FDEDEC
+skinparam ClassBorderColor<<red>> #E74C3C
+hide <<red>> stereotype
+' Purple
+skinparam ClassBackgroundColor<<purple>> #F4ECF7
+skinparam ClassBorderColor<<purple>> #8E44AD
+hide <<purple>> stereotype
+' blue
+skinparam ClassBackgroundColor<<blue>> #EBF5FB
+skinparam ClassBorderColor<<blue>> #3498DB
+hide <<blue>> stereotype
+' Green
+skinparam ClassBackgroundColor<<green>> #E9F7EF
+skinparam ClassBorderColor<<green>> #27AE60
+hide <<green>> stereotype
+' Grey
+skinparam ClassBackgroundColor<<grey>> #EAECEE
+skinparam ClassBorderColor<<grey>> #2C3E50
+hide <<grey>> stereotype
+
+' == CONTENT ==
+
+legend top
+    __Colors legend__ :
+    * __External public API references__ :
+    ** <back:yellow>**calypsonet-terminal-reader-java-api**</back>
+    ** <back:cyan>**keyple-common-java-api**</back>
+end legend
+
+package "org.eclipse.keyple.core.service" as service {
+    ' SERVICE
+    +class "**final** SmartCardServiceProvider" as SmartCardServiceProvider {
+        +{static} SmartCardService getService ()
+    }
+    +interface SmartCardService {
+        +Plugin registerPlugin (<back:cyan>KeyplePluginExtensionFactory</back> pluginFactory)
+        +void unregisterPlugin (String pluginName)
+        +Set<String> getPluginNames ()
+        +Set<Plugin> getPlugins ()
+        +Plugin getPlugin (String pluginName)
+
+        +void checkCardExtension (<back:cyan>KeypleCardExtension</back> cardExtension)
+
+        +DistributedLocalService registerDistributedLocalService (<back:cyan>KeypleDistributedLocalServiceExtensionFactory</back> distributedLocalServiceFactory)
+        +void unregisterDistributedLocalService (String distributedLocalServiceName)
+        +DistributedLocalService getDistributedLocalService (String distributedLocalServiceName)
+
+        +<back:yellow>CardSelectionManager</back> createCardSelectionManager ()
+    }
+    +interface Plugin {
+        +String getName ()
+        +<T extends <back:cyan>KeyplePluginExtension</back>> T getExtension (Class<T> pluginExtensionClass)
+
+        +Set<String> getReaderNames ()
+        +Set<Reader> getReaders ()
+        +Reader getReader (String readerName)
+    }
+    +interface DistributedLocalService {
+        +String getName ()
+        +<T extends <back:cyan>KeypleDistributedLocalServiceExtension</back>> T getExtension (
+            \tClass<T> distributedLocalServiceExtensionClass)
+    }
+    +interface ObservablePlugin extends Plugin {
+        +void setPluginObservationExceptionHandler (
+            \tPluginObservationExceptionHandlerSpi exceptionHandler)
+
+        +void addObserver (PluginObserverSpi observer)
+        +void removeObserver (PluginObserverSpi observer)
+        +void clearObservers ()
+        +int countObservers ()
+    }
+    +interface PoolPlugin extends Plugin {
+        +SortedSet<String> getReaderGroupReferences ()
+
+        +Reader allocateReader (String readerGroupReference)
+        +void releaseReader (Reader reader)
+    }
+    +interface "<<<back:yellow>CardReader</back>>>\nReader" as Reader {
+        +<T extends <back:cyan>KeypleReaderExtension</back>> T getExtension (Class<T> readerExtensionClass)
+    }
+    +interface "<<<back:yellow>ObservableCardReader</back>>>\nObservableReader" as ObservableReader extends Reader {
+    }
+    +interface "<<<back:yellow>ConfigurableCardReader</back>>>\nConfigurableReader" as ConfigurableReader extends Reader {
+    }
+    ' SPI
+    package spi {
+        +interface PluginObserverSpi {
+            +void onPluginEvent (PluginEvent pluginEvent)
+        }
+        +interface PluginObservationExceptionHandlerSpi {
+            +void onPluginObservationError (String pluginName, Throwable e)
+        }
+    }
+
+    +interface "<<<back:yellow>CardReaderEvent</back>>>\nReaderEvent" as ReaderEvent {
+        +String getPluginName ()
+    }
+    +interface PluginEvent {
+        +String getPluginName ()
+        +SortedSet<String> getReaderNames ()
+        +Type getType ()
+    }
+    +enum "Type" as PluginEventType {
+        READER_CONNECTED
+        READER_DISCONNECTED
+        UNAVAILABLE
+    }
+    ' EXCEPTIONS
+    +class "<<RuntimeException>>\nKeyplePluginException" as KeyplePluginException {
+        +KeyplePluginException (String message)
+        +KeyplePluginException (String message, Throwable cause)
+    }
+}
+
+' Associations
+'LocalServiceClient ..> RemoteServiceParameters #C_USE : use >
+
+SmartCardServiceProvider ..> SmartCardService #C_LINK : provide >
+
+SmartCardService ..> Plugin #C_LINK : provide >
+SmartCardService ..> DistributedLocalService #C_LINK : provide >
+
+PluginEvent +-- PluginEventType
+PluginEvent ..> PluginEventType #C_LINK : provide >
+
+Plugin ..> Reader #C_LINK : provide >
+
+ObservablePlugin ..> PluginObserverSpi #C_USE : use >
+ObservablePlugin ..> PluginObservationExceptionHandlerSpi #C_USE : use >
+
+PluginObserverSpi ..> PluginEvent #C_USE : use >
+
+' == LAYOUT ==
+
+ObservableReader -[hidden]- ReaderEvent
+ReaderEvent -[hidden]- KeyplePluginException
+
+' == STYLE ==
+
+package service #C_GREY1 {}
+package spi #C_GREY2 {}
+
+@enduml

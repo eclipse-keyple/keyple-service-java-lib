@@ -8,9 +8,9 @@ The **Keyple Service Java Library** contains the Keyple core components.
 
 The full documentation, including the **user guide**, **download information** and **contribution guide**, is available on the Keyple website [keyple.org](https://keyple.org).
 
-## Javadoc
+## API documentation
 
-The javadoc is available online: [eclipse.github.io/keyple-service-java-lib/](https://eclipse.github.io/keyple-service-java-lib/)
+API documentation & class diagram is available online: [eclipse.github.io/keyple-service-java-lib](https://eclipse.github.io/keyple-service-java-lib)
 
 ## Examples
 
