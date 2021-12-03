@@ -53,7 +53,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
   private final ReaderSpi readerSpi;
   private long before;
-  private boolean logicalChannelIsOpen;
+  private boolean isLogicalChannelOpen;
   private boolean useDefaultProtocol;
   private String currentProtocol;
   private final Map<String, String> protocolAssociations;
@@ -91,7 +91,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0.0
    */
   final boolean isLogicalChannelOpen() {
-    return logicalChannelIsOpen;
+    return isLogicalChannelOpen;
   }
 
   /**
@@ -178,7 +178,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         /* multi CardRequest case: just close the logical channel and go on with the next selection. */
         closeLogicalChannel();
       } else {
-        if (logicalChannelIsOpen) {
+        if (isLogicalChannelOpen) {
           /* the logical channel being open, we stop here */
           break; // exit for loop
         }
@@ -354,7 +354,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       }
     }
 
-    return new CardResponseAdapter(apduResponses, logicalChannelIsOpen);
+    return new CardResponseAdapter(apduResponses, isLogicalChannelOpen);
   }
 
   /**
@@ -466,6 +466,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
           UnexpectedStatusWordException {
 
+    isLogicalChannelOpen = false;
     SelectionStatus selectionStatus;
     try {
       selectionStatus = processSelection(cardSelectionRequest.getCardSelector());
@@ -491,7 +492,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           new CardResponseAdapter(new ArrayList<ApduResponseAdapter>(), false));
     }
 
-    logicalChannelIsOpen = true;
+    isLogicalChannelOpen = true;
 
     CardResponseAdapter cardResponse;
 
@@ -736,7 +737,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       /* AutonomousSelectionReader have an explicit method for closing channels */
       ((AutonomousSelectionReaderSpi) readerSpi).closeLogicalChannel();
     }
-    logicalChannelIsOpen = false;
+    isLogicalChannelOpen = false;
   }
 
   /**
