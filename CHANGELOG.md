@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - "CHANGELOG.md" file (issue [eclipse/keyple#6]).
 - CI: Forbid the publication of a version already released (issue [#34]).
+### Fixed
+- Logical channel management for multiple selections (issue [#38]).
 
 ## [2.0.0] - 2021-10-06
 This is the initial release.
@@ -17,6 +19,7 @@ It also brings many major API changes.
 [unreleased]: https://github.com/eclipse/keyple-service-java-lib/compare/2.0.0...HEAD
 [2.0.0]: https://github.com/eclipse/keyple-service-java-lib/releases/tag/2.0.0
 
+[#38]: https://github.com/eclipse/keyple-service-java-lib/issues/38
 [#34]: https://github.com/eclipse/keyple-service-java-lib/issues/34
 
 [eclipse/keyple#6]: https://github.com/eclipse/keyple/issues/6
