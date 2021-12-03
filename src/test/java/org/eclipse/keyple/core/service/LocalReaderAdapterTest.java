@@ -484,4 +484,33 @@ public class LocalReaderAdapterTest {
     localReaderAdapter.register();
     localReaderAdapter.isCardPresent();
   }
+
+  @Test
+  public void transmitCardSelectionRequests_whenFirstMatchAndSecondSelectionFails_shouldNotMatch() throws Exception {
+    when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    // first successful selection
+    List<CardSelectionResponseApi> cardSelectionResponses =
+            localReaderAdapter.transmitCardSelectionRequests(
+                    new ArrayList<CardSelectionRequestSpi>(
+                            Collections.singletonList(cardSelectionRequestSpi)),
+                    MultiSelectionProcessing.FIRST_MATCH,
+                    ChannelControl.KEEP_OPEN);
+    assertThat(cardSelectionResponses).hasSize(1);
+    assertThat(cardSelectionResponses.get(0).getPowerOnData()).isEqualTo(POWER_ON_DATA);
+    assertThat(cardSelectionResponses.get(0).hasMatched()).isTrue();
+    assertThat(localReaderAdapter.isLogicalChannelOpen()).isTrue();
+    // second not matching selection
+    cardSelectionResponses =
+            localReaderAdapter.transmitCardSelectionRequests(
+                    new ArrayList<CardSelectionRequestSpi>(
+                            Collections.singletonList(cardSelectionRequestSpi)),
+                    MultiSelectionProcessing.FIRST_MATCH,
+                    ChannelControl.KEEP_OPEN);
+    assertThat(cardSelectionResponses).hasSize(1);
+    assertThat(cardSelectionResponses.get(0).getPowerOnData()).isEqualTo(POWER_ON_DATA);
+    assertThat(cardSelectionResponses.get(0).hasMatched()).isTrue();
+    assertThat(localReaderAdapter.isLogicalChannelOpen()).isTrue();  }
 }
