@@ -487,11 +487,16 @@ public class LocalReaderAdapterTest {
 
   @Test
   public void transmitCardSelectionRequests_whenFirstMatchAndSecondSelectionFails_shouldNotMatch() throws Exception {
+
+    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("1122334455"));
     when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
+
     // first successful selection
+    when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(ByteArrayUtil.fromHex("AABBCCDDEE9000"));
+
     List<CardSelectionResponseApi> cardSelectionResponses =
             localReaderAdapter.transmitCardSelectionRequests(
                     new ArrayList<CardSelectionRequestSpi>(
@@ -499,10 +504,12 @@ public class LocalReaderAdapterTest {
                     MultiSelectionProcessing.FIRST_MATCH,
                     ChannelControl.KEEP_OPEN);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(cardSelectionResponses.get(0).getPowerOnData()).isEqualTo(POWER_ON_DATA);
     assertThat(cardSelectionResponses.get(0).hasMatched()).isTrue();
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isTrue();
+
     // second not matching selection
+    when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(ByteArrayUtil.fromHex("6B00"));
+
     cardSelectionResponses =
             localReaderAdapter.transmitCardSelectionRequests(
                     new ArrayList<CardSelectionRequestSpi>(
@@ -510,7 +517,7 @@ public class LocalReaderAdapterTest {
                     MultiSelectionProcessing.FIRST_MATCH,
                     ChannelControl.KEEP_OPEN);
     assertThat(cardSelectionResponses).hasSize(1);
-    assertThat(cardSelectionResponses.get(0).getPowerOnData()).isEqualTo(POWER_ON_DATA);
-    assertThat(cardSelectionResponses.get(0).hasMatched()).isTrue();
-    assertThat(localReaderAdapter.isLogicalChannelOpen()).isTrue();  }
+    assertThat(cardSelectionResponses.get(0).hasMatched()).isFalse();
+    assertThat(localReaderAdapter.isLogicalChannelOpen()).isFalse();
+  }
 }
