@@ -38,6 +38,12 @@ import org.slf4j.LoggerFactory;
  * (package-private)<br>
  * Local reader adapter.
  *
+ * <ul>
+ *   <li>RL-CMD-USED.1
+ *   <li>RL-CLA-ACCEPTED.1
+ *   <li>RL-PERF-TIME.1
+ * </ul>
+ *
  * @since 2.0.0
  */
 class LocalReaderAdapter extends AbstractReaderAdapter {
@@ -236,6 +242,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    */
   @Override
   public boolean isCardPresent() {
+    // RL-DET-PCRQ.1
+    // RL-DET-PCAPDU.1
     checkStatus();
     try {
       return readerSpi.checkCardPresence();
@@ -254,6 +262,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0.0
    */
   final void activateReaderProtocol(String readerProtocol, String applicationProtocol) {
+    // RL-CL-PROTOCOL.1
     checkStatus();
     Assert.getInstance()
         .notEmpty(readerProtocol, "readerProtocol")
@@ -273,6 +282,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0.0
    */
   final void deactivateReaderProtocol(String readerProtocol) {
+    // RL-CL-PROTOCOL.1
     checkStatus();
     Assert.getInstance().notEmpty(readerProtocol, "readerProtocol");
     protocolAssociations.remove(readerProtocol);
@@ -386,6 +396,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     apduResponse = new ApduResponseAdapter(readerSpi.transmitApdu(apduRequest.getApdu()));
 
+    // RL-SW-ANALYSIS.1
     if (ApduUtil.isCase4(apduRequest.getApdu())
         && apduResponse.getDataOut().length == 0
         && apduResponse.getStatusWord() == DEFAULT_SUCCESSFUL_CODE) {
@@ -526,6 +537,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private SelectionStatus processSelection(CardSelectorSpi cardSelector)
       throws CardIOException, ReaderIOException {
 
+    // RL-CLA-CHAAUTO.1
     String powerOnData;
     ApduResponseAdapter fciResponse;
     boolean hasMatched = true;
@@ -539,6 +551,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     if (cardSelector.getCardProtocol() == null
         || cardSelector.getCardProtocol().equals(currentProtocol)) {
       // protocol check succeeded, check power-on data if enabled
+      // RL-ATR-FILTER
+      // RL-SEL-USAGE.1
       powerOnData = readerSpi.getPowerOnData();
       if (checkPowerOnData(powerOnData, cardSelector)) {
         // no power-on data filter or power-on data check succeeded, select by AID if enabled.
@@ -652,6 +666,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
      * build a get response command the actual length expected by the card in the get response
      * command is handled in transmitApdu
      */
+    // RL-SEL-CLA.1
+    // RL-SEL-P2LC.1
     byte[] selectApplicationCommand = new byte[6 + aid.length];
     selectApplicationCommand[0] = (byte) 0x00; // CLA
     selectApplicationCommand[1] = (byte) 0xA4; // INS

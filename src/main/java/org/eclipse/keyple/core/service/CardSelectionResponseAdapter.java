@@ -63,6 +63,7 @@ final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
    */
   @Override
   public String getPowerOnData() {
+    // RL-ATR-IDENTIFY.1
     return powerOnData;
   }
 

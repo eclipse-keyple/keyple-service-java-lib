@@ -237,6 +237,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   final ReaderEvent processCardInserted() {
 
+    // RL-DET-INSNOTIF.1
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] process the inserted card", getName());
     }
@@ -353,6 +354,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0.0
    */
   final void processCardRemoved() {
+    // RL-DET-REMNOTIF.1
     closeLogicalAndPhysicalChannelsSilently();
     notifyObservers(
         new ReaderEventAdapter(
@@ -538,6 +540,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public final void startCardDetection(DetectionMode detectionMode) {
+    // RL-DET-REMCTRL.1
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
@@ -558,6 +561,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public final void stopCardDetection() {
+    // RL-DET-REMCTRL.1
     if (logger.isDebugEnabled()) {
       logger.debug(
           "The reader '{}' of plugin '{}' is stopping the card detection.",
