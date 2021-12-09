@@ -51,11 +51,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private static final Logger logger = LoggerFactory.getLogger(LocalReaderAdapter.class);
 
   /** predefined ISO values */
-  private static final byte[] APDU_GET_RESPONSE = {
-    (byte) 0x00, (byte) 0xC0, (byte) 0x00, (byte) 0x00, (byte) 0x00
-  };
+  private static final int SW_9000 = 0x9000;
 
-  private static final int DEFAULT_SUCCESSFUL_CODE = 0x9000;
+  private static final int SW_61XX_MASK = 0x6100;
+  private static final int SW_6CXX_MASK = 0x6C00;
 
   private final ReaderSpi readerSpi;
   private long before;
@@ -396,14 +395,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     apduResponse = new ApduResponseAdapter(readerSpi.transmitApdu(apduRequest.getApdu()));
 
-    // RL-SW-ANALYSIS.1
-    if (ApduUtil.isCase4(apduRequest.getApdu())
-        && apduResponse.getDataOut().length == 0
-        && apduResponse.getStatusWord() == DEFAULT_SUCCESSFUL_CODE) {
-      // do the get response command
-      apduResponse = case4HackGetResponse();
-    }
-
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
       long elapsed10ms = (timeStamp - before) / 100000;
@@ -415,50 +406,50 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           elapsed10ms / 10.0);
     }
 
+    if (apduResponse.getDataOut().length == 0) {
+
+      if ((apduResponse.getStatusWord() & SW_61XX_MASK) == SW_61XX_MASK) {
+        // RL-SW-61XX.1
+        // Build a GetResponse APDU command with the provided "le"
+        byte[] getResponseApdu = {
+          (byte) 0x00,
+          (byte) 0xC0,
+          (byte) 0x00,
+          (byte) 0x00,
+          (byte) (apduResponse.getStatusWord() & 0xFF)
+        };
+        // Execute APDU
+        apduResponse =
+            processApduRequest(
+                new ApduRequestAdapter(getResponseApdu).setInfo("Internal Get Response"));
+
+      } else if ((apduResponse.getStatusWord() & SW_6CXX_MASK) == SW_6CXX_MASK) {
+        // RL-SW-6CXX.1
+        // Update the last command with the provided "le"
+        apduRequest.getApdu()[apduRequest.getApdu().length - 1] =
+            (byte) (apduResponse.getStatusWord() & 0xFF);
+        // Replay the last command APDU
+        apduResponse = processApduRequest(apduRequest);
+
+      } else if (ApduUtil.isCase4(apduRequest.getApdu())
+          && apduResponse.getStatusWord() == SW_9000) {
+        // RL-SW-ANALYSIS.1
+        // Build a GetResponse APDU command with the original "le"
+        byte[] getResponseApdu = {
+          (byte) 0x00,
+          (byte) 0xC0,
+          (byte) 0x00,
+          (byte) 0x00,
+          apduRequest.getApdu()[apduRequest.getApdu().length - 1]
+        };
+        // Execute GetResponse APDU
+        apduResponse =
+            processApduRequest(
+                new ApduRequestAdapter(getResponseApdu).setInfo("Internal Get Response"));
+      }
+    }
+
     return apduResponse;
-  }
-
-  /**
-   * (private)<br>
-   * Process dedicated to some cards not following the ISO standard for case 4 management.
-   *
-   * <p>Execute an explicit get response command in order to get the outgoing data from specific
-   * cards answering 9000 with no data although the command has outgoing data.
-   *
-   * @return ApduResponse the response to the get response command
-   * @throws ReaderIOException if the communication with the reader has failed.
-   * @throws CardIOException if the communication with the card has failed.
-   */
-  private ApduResponseAdapter case4HackGetResponse() throws ReaderIOException, CardIOException {
-
-    if (logger.isDebugEnabled()) {
-      long timeStamp = System.nanoTime();
-      long elapsed10ms = (timeStamp - before) / 100000;
-      this.before = timeStamp;
-      logger.debug(
-          "[{}] case4HackGetResponse => ApduRequest: NAME = \"Internal Get Response\", RAWDATA = {}, elapsed = {}",
-          this.getName(),
-          ByteArrayUtil.toHex(APDU_GET_RESPONSE),
-          elapsed10ms / 10.0);
-    }
-
-    byte[] getResponseHackResponseBytes = readerSpi.transmitApdu(APDU_GET_RESPONSE);
-
-    ApduResponseAdapter getResponseHackResponse =
-        new ApduResponseAdapter(getResponseHackResponseBytes);
-
-    if (logger.isDebugEnabled()) {
-      long timeStamp = System.nanoTime();
-      long elapsed10ms = (timeStamp - before) / 100000;
-      this.before = timeStamp;
-      logger.debug(
-          "[{}] case4HackGetResponse => Internal {}, elapsed {} ms.",
-          this.getName(),
-          getResponseHackResponseBytes,
-          elapsed10ms / 10.0);
-    }
-
-    return getResponseHackResponse;
   }
 
   /**
