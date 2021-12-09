@@ -66,11 +66,7 @@ final class CardSelectionResultAdapter implements CardSelectionResult {
    */
   @Override
   public SmartCard getActiveSmartCard() {
-    SmartCard smartCard = smartCardMap.get(activeSelectionIndex);
-    if (smartCard == null) {
-      throw new IllegalStateException("No active matching card is available");
-    }
-    return smartCard;
+    return smartCardMap.get(activeSelectionIndex);
   }
 
   /**

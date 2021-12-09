@@ -77,10 +77,10 @@ public class CardSelectionResultAdapterTest {
     assertThat(cardSelectionResult.getSmartCards().get(0)).isEqualTo(smartCard);
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void getActiveSmartCard_whenNoSmartCard_shouldISE() {
+  @Test
+  public void getActiveSmartCard_whenNoSmartCard_shouldReturnNull() {
     CardSelectionResultAdapter cardSelectionResult = new CardSelectionResultAdapter();
-    cardSelectionResult.getActiveSmartCard();
+    assertThat(cardSelectionResult.getActiveSmartCard()).isNull();
   }
 
   @Test
