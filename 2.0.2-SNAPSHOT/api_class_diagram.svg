@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="3712.5px" preserveAspectRatio="none" style="width:2992px;height:3712px;background:#FFFFFF;" version="1.1" viewBox="0 0 2992 3712" width="2992.5px" zoomAndPan="magnify"><defs><filter height="1" id="b1ibzvqdcyl25c0" width="1" x="0" y="0"><feFlood flood-color="#FFFF00" result="flood"/><feComposite in="SourceGraphic" in2="flood" operator="over"/></filter><filter height="1" id="b1ibzvqdcyl25c1" width="1" x="0" y="0"><feFlood flood-color="#00FFFF" result="flood"/><feComposite in="SourceGraphic" in2="flood" operator="over"/></filter></defs><g><text fill="#000000" font-family="sans-serif" font-size="45" lengthAdjust="spacing" textLength="1032.5" x="963.75" y="46.7139">Keyple - keyple-service-java-lib - 2.0.+ (30/07/2021)</text><rect fill="#DDDDDD" height="201.0938" rx="12.5" ry="12.5" style="stroke:#000000;stroke-width:2.5;" width="720" x="1118.75" y="76.6016"/><text fill="#000000" font-family="sans-serif" font-size="35" lengthAdjust="spacing" text-decoration="underline" textLength="220" x="1133.75" y="125.4346">Colors legend</text><text fill="#000000" font-family="sans-serif" font-size="35" lengthAdjust="spacing" textLength="10" x="1363.75" y="125.4346">:</text><ellipse cx="1147.5" cy="158.3984" fill="#000000" rx="6.25" ry="6.25" style="stroke:#000000;stroke-width:0.0;"/><text fill="#000000" font-family="sans-serif" font-size="35" lengthAdjust="spacing" text-decoration="underline" textLength="472.5" x="1166.25" y="169.458">External public API references</text><text fill="#000000" font-family="sans-serif" font-size="35" lengthAdjust="spacing" textLength="10" x="1648.75" y="169.458">:</text><rect fill="#000000" height="8.75" style="stroke:#000000;stroke-width:0.0;" width="8.75" x="1186.25" y="201.1719"/><text fill="#000000" filter="url(#b1ibzvqdcyl25c0)" font-family="sans-serif" font-size="35" font-weight="bold" lengthAdjust="spacing" textLength="625" x="1198.75" y="213.4814">calypsonet-terminal-reader-java-api</text><rect fill="#000000" height="8.75" style="stroke:#000000;stroke-width:0.0;" width="8.75" x="1186.25" y="245.1953"/><text fill="#000000" filter="url(#b1ibzvqdcyl25c1)" font-family="sans-serif" font-size="35" font-weight="bold" lengthAdjust="spacing" textLength="425" x="1198.75" y="257.5049">keyple-common-java-api</text><!--MD5=[7579d5565d2521d5936cec86ed3dadee]
+cluster service--><polygon fill="#F8F9F9" points="40,315.1953,610,315.1953,627.5,374.2188,2950,374.2188,2950,3695.1953,40,3695.1953,40,315.1953" style="stroke:#000000;stroke-width:3.75;"/><line style="stroke:#000000;stroke-width:3.75;" x1="40" x2="627.5" y1="374.2188" y2="374.2188"/><text fill="#000000" font-family="sans-serif" font-size="35" font-weight="bold" lengthAdjust="spacing" textLength="555" x="50" y="356.5283">org.eclipse.keyple.core.service</text><!--MD5=[f7e0e2453c87923036c1ac2adfb9cbf0]
+cluster spi--><polygon fill="#F2F3F4" points="112.5,2565.1953,180,2565.1953,197.5,2624.2188,1720,2624.2188,1720,2850.1953,112.5,2850.1953,112.5,2565.1953" style="stroke:#000000;stroke-width:3.75;"/><line style="stroke:#000000;stroke-width:3.75;" x1="112.5" x2="197.5" y1="2624.2188" y2="2624.2188"/><text fill="#000000" font-family="sans-serif" font-size="35" font-weight="bold" lengthAdjust="spacing" textLength="52.5" x="122.5" y="2606.5283">spi</text><!--MD5=[28295972733bc8add2f44d28a858566b]
+class SmartCardServiceProvider--><rect codeLine="56" fill="#FEFECE" height="154.5898" id="SmartCardServiceProvider" style="stroke:#D4AC0D;stroke-width:3.75;" width="542.5" x="1543.75" y="405.1953"/><ellipse cx="1581.25" cy="445.1953" fill="#ADD1B2" rx="27.5" ry="27.5" style="stroke:#ADD1B2;stroke-width:2.5;"/><path d="M1586.25,436.4453 Q1586.7578,435.1953 1587.3438,434.5703 Q1587.9297,433.9453 1588.5938,433.9453 Q1589.7656,433.9453 1590.5078,434.6484 Q1591.25,435.3516 1591.25,436.9922 L1591.25,440.8984 Q1591.25,442.5391 1590.5469,443.2422 Q1589.8438,443.9453 1588.75,443.9453 Q1587.7734,443.9453 1587.1484,443.5156 Q1586.5234,443.0859 1586.25,441.9531 Q1586.1328,441.1719 1585.7031,440.7422 Q1584.9219,439.9219 1583.5156,439.4531 Q1582.1094,438.9453 1580.7031,438.9453 Q1578.9453,438.9453 1577.4609,439.6484 Q1576.0156,440.3516 1574.8828,441.9141 Q1573.75,443.4766 1573.75,445.625 L1573.75,447.9297 Q1573.75,450.5078 1575.8594,452.2266 Q1577.9688,453.9453 1581.7188,453.9453 Q1583.9453,453.9453 1585.5078,453.4375 Q1586.4063,453.1641 1587.4219,452.2656 Q1588.0859,451.7578 1588.4375,451.6016 Q1588.7891,451.4453 1589.2188,451.4453 Q1590.0391,451.4453 1590.625,452.1094 Q1591.25,452.7344 1591.25,453.6328 Q1591.25,454.4922 1590.3906,455.5078 Q1589.1406,456.9922 1587.1484,457.8125 Q1584.5313,458.9453 1581.3281,458.9453 Q1577.5781,458.9453 1574.5703,457.4609 Q1572.1484,456.2891 1570.4297,453.75 Q1568.75,451.2109 1568.75,448.2031 L1568.75,445.4688 Q1568.75,442.3438 1570.2344,439.6094 Q1571.7578,436.875 1574.375,435.4297 Q1577.0313,433.9453 1580,433.9453 Q1581.7969,433.9453 1583.3594,434.5703 Q1584.9219,435.1953 1586.25,436.4453 Z " fill="#000000"/><ellipse cx="1628.75" cy="443.9453" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" font-weight="bold" lengthAdjust="spacing" textLength="60" x="1643.75" y="457.4707">final</text><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="367.5" x="1711.25" y="457.4707">SmartCardServiceProvider</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="1546.25" x2="2083.75" y1="485.1953" y2="485.1953"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="1546.25" x2="2083.75" y1="505.1953" y2="505.1953"/><ellipse cx="1571.25" cy="532.6953" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" text-decoration="underline" textLength="385" x="1593.75" y="543.7427">SmartCardService getService ()</text><!--MD5=[bc3f57c567736ad71a70f1388d085699]
+class SmartCardService--><rect codeLine="59" fill="#FEFECE" height="569.668" id="SmartCardService" style="stroke:#D4AC0D;stroke-width:3.75;" width="1722.5" x="953.75" y="755.1953"/><ellipse cx="1664.375" cy="795.1953" fill="#B4A7E5" rx="27.5" ry="27.5" style="stroke:#B4A7E5;stroke-width:2.5;"/><path d="M1666.875,787.6953 L1666.875,802.6953 L1671.875,802.6953 L1673.0859,802.6953 L1674.375,804.2578 L1674.375,805.1953 L1674.375,806.1328 L1673.0859,807.6953 L1671.875,807.6953 L1656.875,807.6953 L1655.6641,807.6953 L1654.375,806.1328 L1654.375,805.1953 L1654.375,804.2578 L1655.6641,802.6953 L1656.875,802.6953 L1661.875,802.6953 L1661.875,787.6953 L1656.875,787.6953 L1655.6641,787.6953 L1654.375,786.1328 L1654.375,785.1953 L1654.375,784.2578 L1655.6641,782.6953 L1656.875,782.6953 L1671.875,782.6953 L1673.0859,782.6953 L1674.375,784.2578 L1674.375,785.1953 L1674.375,786.1328 L1673.0859,787.6953 L1671.875,787.6953 L1666.875,787.6953 Z " fill="#000000"/><ellipse cx="1728.125" cy="793.9453" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="252.5" x="1743.125" y="807.4707">SmartCardService</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="956.25" x2="2673.75" y1="835.1953" y2="835.1953"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="956.25" x2="2673.75" y1="855.1953" y2="855.1953"/><ellipse cx="981.25" cy="882.6953" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="257.5" x="1003.75" y="893.7427">Plugin registerPlugin (</text><text fill="#000000" filter="url(#b1ibzvqdcyl25c1)" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="362.5" x="1261.25" y="893.7427">KeyplePluginExtensionFactory</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="172.5" x="1631.25" y="893.7427">pluginFactory)</text><ellipse cx="981.25" cy="917.2852" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="492.5" x="1003.75" y="928.3325">void unregisterPlugin (String pluginName)</text><ellipse cx="981.25" cy="951.875" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="365" x="1003.75" y="962.9224">Set&lt;String&gt; getPluginNames ()</text><ellipse cx="981.25" cy="986.4648" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="297.5" x="1003.75" y="997.5122">Set&lt;Plugin&gt; getPlugins ()</text><ellipse cx="981.25" cy="1021.0547" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="427.5" x="1003.75" y="1032.1021">Plugin getPlugin (String pluginName)</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="0" x="1011.25" y="1066.6919"/><ellipse cx="981.25" cy="1090.2344" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="322.5" x="1003.75" y="1101.2817">void checkCardExtension (</text><text fill="#000000" filter="url(#b1ibzvqdcyl25c1)" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="257.5" x="1326.25" y="1101.2817">KeypleCardExtension</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="182.5" x="1591.25" y="1101.2817">cardExtension)</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="0" x="1011.25" y="1135.8716"/><ellipse cx="981.25" cy="1159.4141" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="687.5" x="1003.75" y="1170.4614">DistributedLocalService registerDistributedLocalService (</text><text fill="#000000" filter="url(#b1ibzvqdcyl25c1)" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="577.5" x="1691.25" y="1170.4614">KeypleDistributedLocalServiceExtensionFactory</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="385" x="2276.25" y="1170.4614">distributedLocalServiceFactory)</text><ellipse cx="981.25" cy="1194.0039" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="920" x="1003.75" y="1205.0513">void unregisterDistributedLocalService (String distributedLocalServiceName)</text><ellipse cx="981.25" cy="1228.5938" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="1070" x="1003.75" y="1239.6411">DistributedLocalService getDistributedLocalService (String distributedLocalServiceName)</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="0" x="1011.25" y="1274.231"/><ellipse cx="981.25" cy="1297.7734" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" filter="url(#b1ibzvqdcyl25c0)" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="272.5" x="1003.75" y="1308.8208">CardSelectionManager</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="377.5" x="1283.75" y="1308.8208">createCardSelectionManager ()</text><!--MD5=[b628511dd50102041730ee0512f882c8]
+class Plugin--><rect codeLine="74" fill="#FEFECE" height="327.5391" id="Plugin" style="stroke:#D4AC0D;stroke-width:3.75;" width="1080" x="810" y="1520.1953"/><ellipse cx="1281.875" cy="1560.1953" fill="#B4A7E5" rx="27.5" ry="27.5" style="stroke:#B4A7E5;stroke-width:2.5;"/><path d="M1284.375,1552.6953 L1284.375,1567.6953 L1289.375,1567.6953 L1290.5859,1567.6953 L1291.875,1569.2578 L1291.875,1570.1953 L1291.875,1571.1328 L1290.5859,1572.6953 L1289.375,1572.6953 L1274.375,1572.6953 L1273.1641,1572.6953 L1271.875,1571.1328 L1271.875,1570.1953 L1271.875,1569.2578 L1273.1641,1567.6953 L1274.375,1567.6953 L1279.375,1567.6953 L1279.375,1552.6953 L1274.375,1552.6953 L1273.1641,1552.6953 L1271.875,1551.1328 L1271.875,1550.1953 L1271.875,1549.2578 L1273.1641,1547.6953 L1274.375,1547.6953 L1289.375,1547.6953 L1290.5859,1547.6953 L1291.875,1549.2578 L1291.875,1550.1953 L1291.875,1551.1328 L1290.5859,1552.6953 L1289.375,1552.6953 L1284.375,1552.6953 Z " fill="#000000"/><ellipse cx="1345.625" cy="1558.9453" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="87.5" x="1360.625" y="1572.4707">Plugin</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="812.5" x2="1887.5" y1="1600.1953" y2="1600.1953"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="812.5" x2="1887.5" y1="1620.1953" y2="1620.1953"/><ellipse cx="837.5" cy="1647.6953" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="210" x="860" y="1658.7427">String getName ()</text><ellipse cx="837.5" cy="1682.2852" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="135" x="860" y="1693.3325">&lt;T extends</text><text fill="#000000" filter="url(#b1ibzvqdcyl25c1)" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="270" x="1002.5" y="1693.3325">KeyplePluginExtension</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="602.5" x="1272.5" y="1693.3325">&gt; T getExtension (Class&lt;T&gt; pluginExtensionClass)</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="0" x="867.5" y="1727.9224"/><ellipse cx="837.5" cy="1751.4648" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="382.5" x="860" y="1762.5122">Set&lt;String&gt; getReaderNames ()</text><ellipse cx="837.5" cy="1786.0547" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="332.5" x="860" y="1797.1021">Set&lt;Reader&gt; getReaders ()</text><ellipse cx="837.5" cy="1820.6445" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="472.5" x="860" y="1831.6919">Reader getReader (String readerName)</text><!--MD5=[f7984cadeded08cae48982a67518e715]
+class DistributedLocalService--><rect codeLine="82" fill="#FEFECE" height="223.7695" id="DistributedLocalService" style="stroke:#D4AC0D;stroke-width:3.75;" width="910" x="1977.5" y="1571.4453"/><ellipse cx="2244.375" cy="1611.4453" fill="#B4A7E5" rx="27.5" ry="27.5" style="stroke:#B4A7E5;stroke-width:2.5;"/><path d="M2246.875,1603.9453 L2246.875,1618.9453 L2251.875,1618.9453 L2253.0859,1618.9453 L2254.375,1620.5078 L2254.375,1621.4453 L2254.375,1622.3828 L2253.0859,1623.9453 L2251.875,1623.9453 L2236.875,1623.9453 L2235.6641,1623.9453 L2234.375,1622.3828 L2234.375,1621.4453 L2234.375,1620.5078 L2235.6641,1618.9453 L2236.875,1618.9453 L2241.875,1618.9453 L2241.875,1603.9453 L2236.875,1603.9453 L2235.6641,1603.9453 L2234.375,1602.3828 L2234.375,1601.4453 L2234.375,1600.5078 L2235.6641,1598.9453 L2236.875,1598.9453 L2251.875,1598.9453 L2253.0859,1598.9453 L2254.375,1600.5078 L2254.375,1601.4453 L2254.375,1602.3828 L2253.0859,1603.9453 L2251.875,1603.9453 L2246.875,1603.9453 Z " fill="#000000"/><ellipse cx="2308.125" cy="1610.1953" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="327.5" x="2323.125" y="1623.7207">DistributedLocalService</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="1980" x2="2885" y1="1651.4453" y2="1651.4453"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="1980" x2="2885" y1="1671.4453" y2="1671.4453"/><ellipse cx="2005" cy="1698.9453" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="210" x="2027.5" y="1709.9927">String getName ()</text><ellipse cx="2005" cy="1733.5352" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="135" x="2027.5" y="1744.5825">&lt;T extends</text><text fill="#000000" filter="url(#b1ibzvqdcyl25c1)" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="485" x="2170" y="1744.5825">KeypleDistributedLocalServiceExtension</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="217.5" x="2655" y="1744.5825">&gt; T getExtension (</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="597.5" x="2087.5" y="1779.1724">Class&lt;T&gt; distributedLocalServiceExtensionClass)</text><!--MD5=[1fa9a61019755e60a0cb03f0bc3590aa]
+class ObservablePlugin--><rect codeLine="87" fill="#FEFECE" height="362.1289" id="ObservablePlugin" style="stroke:#D4AC0D;stroke-width:3.75;" width="817.5" x="81.25" y="2042.6953"/><ellipse cx="340.625" cy="2082.6953" fill="#B4A7E5" rx="27.5" ry="27.5" style="stroke:#B4A7E5;stroke-width:2.5;"/><path d="M343.125,2075.1953 L343.125,2090.1953 L348.125,2090.1953 L349.3359,2090.1953 L350.625,2091.7578 L350.625,2092.6953 L350.625,2093.6328 L349.3359,2095.1953 L348.125,2095.1953 L333.125,2095.1953 L331.9141,2095.1953 L330.625,2093.6328 L330.625,2092.6953 L330.625,2091.7578 L331.9141,2090.1953 L333.125,2090.1953 L338.125,2090.1953 L338.125,2075.1953 L333.125,2075.1953 L331.9141,2075.1953 L330.625,2073.6328 L330.625,2072.6953 L330.625,2071.7578 L331.9141,2070.1953 L333.125,2070.1953 L348.125,2070.1953 L349.3359,2070.1953 L350.625,2071.7578 L350.625,2072.6953 L350.625,2073.6328 L349.3359,2075.1953 L348.125,2075.1953 L343.125,2075.1953 Z " fill="#000000"/><ellipse cx="404.375" cy="2081.4453" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="250" x="419.375" y="2094.9707">ObservablePlugin</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="83.75" x2="896.25" y1="2122.6953" y2="2122.6953"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="83.75" x2="896.25" y1="2142.6953" y2="2142.6953"/><ellipse cx="108.75" cy="2170.1953" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="540" x="131.25" y="2181.2427">void setPluginObservationExceptionHandler (</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="692.5" x="191.25" y="2215.8325">PluginObservationExceptionHandlerSpi exceptionHandler)</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="0" x="138.75" y="2250.4224"/><ellipse cx="108.75" cy="2273.9648" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="585" x="131.25" y="2285.0122">void addObserver (PluginObserverSpi observer)</text><ellipse cx="108.75" cy="2308.5547" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="630" x="131.25" y="2319.6021">void removeObserver (PluginObserverSpi observer)</text><ellipse cx="108.75" cy="2343.1445" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="275" x="131.25" y="2354.1919">void clearObservers ()</text><ellipse cx="108.75" cy="2377.7344" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="260" x="131.25" y="2388.7817">int countObservers ()</text><!--MD5=[c8cbac6d6d9e600bce6d5400427f5af6]
+class PoolPlugin--><rect codeLine="96" fill="#FEFECE" height="258.3594" id="PoolPlugin" style="stroke:#D4AC0D;stroke-width:3.75;" width="727.5" x="986.25" y="2095.1953"/><ellipse cx="1250.625" cy="2135.1953" fill="#B4A7E5" rx="27.5" ry="27.5" style="stroke:#B4A7E5;stroke-width:2.5;"/><path d="M1253.125,2127.6953 L1253.125,2142.6953 L1258.125,2142.6953 L1259.3359,2142.6953 L1260.625,2144.2578 L1260.625,2145.1953 L1260.625,2146.1328 L1259.3359,2147.6953 L1258.125,2147.6953 L1243.125,2147.6953 L1241.9141,2147.6953 L1240.625,2146.1328 L1240.625,2145.1953 L1240.625,2144.2578 L1241.9141,2142.6953 L1243.125,2142.6953 L1248.125,2142.6953 L1248.125,2127.6953 L1243.125,2127.6953 L1241.9141,2127.6953 L1240.625,2126.1328 L1240.625,2125.1953 L1240.625,2124.2578 L1241.9141,2122.6953 L1243.125,2122.6953 L1258.125,2122.6953 L1259.3359,2122.6953 L1260.625,2124.2578 L1260.625,2125.1953 L1260.625,2126.1328 L1259.3359,2127.6953 L1258.125,2127.6953 L1253.125,2127.6953 Z " fill="#000000"/><ellipse cx="1314.375" cy="2133.9453" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="150" x="1329.375" y="2147.4707">PoolPlugin</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="988.75" x2="1711.25" y1="2175.1953" y2="2175.1953"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="988.75" x2="1711.25" y1="2195.1953" y2="2195.1953"/><ellipse cx="1013.75" cy="2222.6953" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="597.5" x="1036.25" y="2233.7427">SortedSet&lt;String&gt; getReaderGroupReferences ()</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="0" x="1043.75" y="2268.3325"/><ellipse cx="1013.75" cy="2291.875" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="662.5" x="1036.25" y="2302.9224">Reader allocateReader (String readerGroupReference)</text><ellipse cx="1013.75" cy="2326.4648" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="437.5" x="1036.25" y="2337.5122">void releaseReader (Reader reader)</text><!--MD5=[e86a4777f2c0372cf9fb3cd047e1466e]
+class Reader--><rect codeLine="102" fill="#FEFECE" height="175.0586" id="Reader" style="stroke:#D4AC0D;stroke-width:3.75;" width="1107.5" x="1801.25" y="2136.4453"/><ellipse cx="2210.625" cy="2186.6797" fill="#B4A7E5" rx="27.5" ry="27.5" style="stroke:#B4A7E5;stroke-width:2.5;"/><path d="M2213.125,2179.1797 L2213.125,2194.1797 L2218.125,2194.1797 L2219.3359,2194.1797 L2220.625,2195.7422 L2220.625,2196.6797 L2220.625,2197.6172 L2219.3359,2199.1797 L2218.125,2199.1797 L2203.125,2199.1797 L2201.9141,2199.1797 L2200.625,2197.6172 L2200.625,2196.6797 L2200.625,2195.7422 L2201.9141,2194.1797 L2203.125,2194.1797 L2208.125,2194.1797 L2208.125,2179.1797 L2203.125,2179.1797 L2201.9141,2179.1797 L2200.625,2177.6172 L2200.625,2176.6797 L2200.625,2175.7422 L2201.9141,2174.1797 L2203.125,2174.1797 L2218.125,2174.1797 L2219.3359,2174.1797 L2220.625,2175.7422 L2220.625,2176.6797 L2220.625,2177.6172 L2219.3359,2179.1797 L2218.125,2179.1797 L2213.125,2179.1797 Z " fill="#000000"/><ellipse cx="2274.375" cy="2185.4297" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="35" x="2289.375" y="2180.0879">&lt;&lt;</text><text fill="#000000" filter="url(#b1ibzvqdcyl25c0)" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="170" x="2324.375" y="2180.0879">CardReader</text><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="35" x="2494.375" y="2180.0879">&gt;&gt;</text><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="102.5" x="2358.125" y="2217.8223">Reader</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="1803.75" x2="2906.25" y1="2236.9141" y2="2236.9141"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="1803.75" x2="2906.25" y1="2256.9141" y2="2256.9141"/><ellipse cx="1828.75" cy="2284.4141" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="135" x="1851.25" y="2295.4614">&lt;T extends</text><text fill="#000000" filter="url(#b1ibzvqdcyl25c1)" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="287.5" x="1993.75" y="2295.4614">KeypleReaderExtension</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="612.5" x="2281.25" y="2295.4614">&gt; T getExtension (Class&lt;T&gt; readerExtensionClass)</text><!--MD5=[e2341a3d5316e117132fc49473ae3219]
+class ObservableReader--><rect codeLine="105" fill="#FEFECE" height="140.4688" id="ObservableReader" style="stroke:#D4AC0D;stroke-width:3.75;" width="510" x="1775" y="2662.6953"/><ellipse cx="1812.5" cy="2712.9297" fill="#B4A7E5" rx="27.5" ry="27.5" style="stroke:#B4A7E5;stroke-width:2.5;"/><path d="M1815,2705.4297 L1815,2720.4297 L1820,2720.4297 L1821.2109,2720.4297 L1822.5,2721.9922 L1822.5,2722.9297 L1822.5,2723.8672 L1821.2109,2725.4297 L1820,2725.4297 L1805,2725.4297 L1803.7891,2725.4297 L1802.5,2723.8672 L1802.5,2722.9297 L1802.5,2721.9922 L1803.7891,2720.4297 L1805,2720.4297 L1810,2720.4297 L1810,2705.4297 L1805,2705.4297 L1803.7891,2705.4297 L1802.5,2703.8672 L1802.5,2702.9297 L1802.5,2701.9922 L1803.7891,2700.4297 L1805,2700.4297 L1820,2700.4297 L1821.2109,2700.4297 L1822.5,2701.9922 L1822.5,2702.9297 L1822.5,2703.8672 L1821.2109,2705.4297 L1820,2705.4297 L1815,2705.4297 Z " fill="#000000"/><ellipse cx="1860" cy="2711.6797" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="35" x="1875" y="2706.3379">&lt;&lt;</text><text fill="#000000" filter="url(#b1ibzvqdcyl25c0)" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="332.5" x="1910" y="2706.3379">ObservableCardReader</text><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="35" x="2242.5" y="2706.3379">&gt;&gt;</text><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="265" x="1943.75" y="2744.0723">ObservableReader</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="1777.5" x2="2282.5" y1="2763.1641" y2="2763.1641"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="1777.5" x2="2282.5" y1="2783.1641" y2="2783.1641"/><!--MD5=[a9c5efde5873e4826c975d5b9d0f268f]
+class ConfigurableReader--><rect codeLine="107" fill="#FEFECE" height="140.4688" id="ConfigurableReader" style="stroke:#D4AC0D;stroke-width:3.75;" width="527.5" x="2373.75" y="2662.6953"/><ellipse cx="2411.25" cy="2712.9297" fill="#B4A7E5" rx="27.5" ry="27.5" style="stroke:#B4A7E5;stroke-width:2.5;"/><path d="M2413.75,2705.4297 L2413.75,2720.4297 L2418.75,2720.4297 L2419.9609,2720.4297 L2421.25,2721.9922 L2421.25,2722.9297 L2421.25,2723.8672 L2419.9609,2725.4297 L2418.75,2725.4297 L2403.75,2725.4297 L2402.5391,2725.4297 L2401.25,2723.8672 L2401.25,2722.9297 L2401.25,2721.9922 L2402.5391,2720.4297 L2403.75,2720.4297 L2408.75,2720.4297 L2408.75,2705.4297 L2403.75,2705.4297 L2402.5391,2705.4297 L2401.25,2703.8672 L2401.25,2702.9297 L2401.25,2701.9922 L2402.5391,2700.4297 L2403.75,2700.4297 L2418.75,2700.4297 L2419.9609,2700.4297 L2421.25,2701.9922 L2421.25,2702.9297 L2421.25,2703.8672 L2419.9609,2705.4297 L2418.75,2705.4297 L2413.75,2705.4297 Z " fill="#000000"/><ellipse cx="2458.75" cy="2711.6797" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="35" x="2473.75" y="2706.3379">&lt;&lt;</text><text fill="#000000" filter="url(#b1ibzvqdcyl25c0)" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="350" x="2508.75" y="2706.3379">ConfigurableCardReader</text><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="35" x="2858.75" y="2706.3379">&gt;&gt;</text><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="282.5" x="2542.5" y="2744.0723">ConfigurableReader</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="2376.25" x2="2898.75" y1="2763.1641" y2="2763.1641"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="2376.25" x2="2898.75" y1="2783.1641" y2="2783.1641"/><!--MD5=[9a5f54023274c57ee24edb1ade6872b1]
+class ReaderEvent--><rect codeLine="119" fill="#FEFECE" height="175.0586" id="ReaderEvent" style="stroke:#D4AC0D;stroke-width:3.75;" width="425" x="1817.5" y="3035.1953"/><ellipse cx="1855" cy="3085.4297" fill="#B4A7E5" rx="27.5" ry="27.5" style="stroke:#B4A7E5;stroke-width:2.5;"/><path d="M1857.5,3077.9297 L1857.5,3092.9297 L1862.5,3092.9297 L1863.7109,3092.9297 L1865,3094.4922 L1865,3095.4297 L1865,3096.3672 L1863.7109,3097.9297 L1862.5,3097.9297 L1847.5,3097.9297 L1846.2891,3097.9297 L1845,3096.3672 L1845,3095.4297 L1845,3094.4922 L1846.2891,3092.9297 L1847.5,3092.9297 L1852.5,3092.9297 L1852.5,3077.9297 L1847.5,3077.9297 L1846.2891,3077.9297 L1845,3076.3672 L1845,3075.4297 L1845,3074.4922 L1846.2891,3072.9297 L1847.5,3072.9297 L1862.5,3072.9297 L1863.7109,3072.9297 L1865,3074.4922 L1865,3075.4297 L1865,3076.3672 L1863.7109,3077.9297 L1862.5,3077.9297 L1857.5,3077.9297 Z " fill="#000000"/><ellipse cx="1902.5" cy="3084.1797" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="35" x="1917.5" y="3078.8379">&lt;&lt;</text><text fill="#000000" filter="url(#b1ibzvqdcyl25c0)" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="247.5" x="1952.5" y="3078.8379">CardReaderEvent</text><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="35" x="2200" y="3078.8379">&gt;&gt;</text><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="180" x="1986.25" y="3116.5723">ReaderEvent</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="1820" x2="2240" y1="3135.6641" y2="3135.6641"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="1820" x2="2240" y1="3155.6641" y2="3155.6641"/><ellipse cx="1845" cy="3183.1641" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="280" x="1867.5" y="3194.2114">String getPluginName ()</text><!--MD5=[df72700ac22eeb6165072f159208e08c]
+class PluginEvent--><rect codeLine="122" fill="#FEFECE" height="223.7695" id="PluginEvent" style="stroke:#D4AC0D;stroke-width:3.75;" width="527.5" x="188.75" y="3010.1953"/><ellipse cx="345.625" cy="3050.1953" fill="#B4A7E5" rx="27.5" ry="27.5" style="stroke:#B4A7E5;stroke-width:2.5;"/><path d="M348.125,3042.6953 L348.125,3057.6953 L353.125,3057.6953 L354.3359,3057.6953 L355.625,3059.2578 L355.625,3060.1953 L355.625,3061.1328 L354.3359,3062.6953 L353.125,3062.6953 L338.125,3062.6953 L336.9141,3062.6953 L335.625,3061.1328 L335.625,3060.1953 L335.625,3059.2578 L336.9141,3057.6953 L338.125,3057.6953 L343.125,3057.6953 L343.125,3042.6953 L338.125,3042.6953 L336.9141,3042.6953 L335.625,3041.1328 L335.625,3040.1953 L335.625,3039.2578 L336.9141,3037.6953 L338.125,3037.6953 L353.125,3037.6953 L354.3359,3037.6953 L355.625,3039.2578 L355.625,3040.1953 L355.625,3041.1328 L354.3359,3042.6953 L353.125,3042.6953 L348.125,3042.6953 Z " fill="#000000"/><ellipse cx="409.375" cy="3048.9453" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="165" x="424.375" y="3062.4707">PluginEvent</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="191.25" x2="713.75" y1="3090.1953" y2="3090.1953"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="191.25" x2="713.75" y1="3110.1953" y2="3110.1953"/><ellipse cx="216.25" cy="3137.6953" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="280" x="238.75" y="3148.7427">String getPluginName ()</text><ellipse cx="216.25" cy="3172.2852" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="462.5" x="238.75" y="3183.3325">SortedSet&lt;String&gt; getReaderNames ()</text><ellipse cx="216.25" cy="3206.875" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="192.5" x="238.75" y="3217.9224">Type getType ()</text><!--MD5=[615672f8f9e7dc1c0373737ea5be9f3b]
+class PluginEventType--><rect codeLine="127" fill="#FEFECE" height="223.7695" id="PluginEventType" style="stroke:#D4AC0D;stroke-width:3.75;" width="340" x="285" y="3430.1953"/><ellipse cx="396.875" cy="3470.1953" fill="#EB937F" rx="27.5" ry="27.5" style="stroke:#EB93DF;stroke-width:2.5;"/><path d="M393.125,3472.6953 L393.125,3477.6953 L403.125,3477.6953 L403.125,3475.1953 L403.125,3473.9844 L404.6875,3472.6953 L405.625,3472.6953 L406.5625,3472.6953 L408.125,3473.9844 L408.125,3475.1953 L408.125,3482.6953 L388.125,3482.6953 L386.9141,3482.6953 L385.625,3481.1328 L385.625,3480.1953 L385.625,3479.2578 L386.9141,3477.6953 L388.125,3477.6953 L388.125,3477.6953 L388.125,3462.6953 L388.125,3462.6953 L386.9141,3462.6953 L385.625,3461.1328 L385.625,3460.1953 L385.625,3459.2578 L386.9141,3457.6953 L388.125,3457.6953 L408.125,3457.6953 L408.125,3465.1953 L408.125,3466.4063 L406.5625,3467.6953 L405.625,3467.6953 L404.6875,3467.6953 L403.125,3466.4063 L403.125,3465.1953 L403.125,3462.6953 L393.125,3462.6953 L393.125,3467.6953 L395.625,3467.6953 L395.625,3466.4844 L395.625,3466.4844 L397.1875,3465.1953 L398.125,3465.1953 L399.0625,3465.1953 L400.625,3466.4844 L400.625,3467.6953 L400.625,3472.6953 L400.625,3473.9063 L399.0625,3475.1953 L399.0625,3475.1953 L398.125,3475.1953 L397.1875,3475.1953 L395.625,3473.9063 L395.625,3473.9063 L395.625,3472.6953 L393.125,3472.6953 Z " fill="#000000"/><ellipse cx="460.625" cy="3468.9453" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="67.5" x="475.625" y="3482.4707">Type</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="287.5" x2="622.5" y1="3510.1953" y2="3510.1953"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="270" x="300" y="3548.7427">READER_CONNECTED</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="310" x="300" y="3583.3325">READER_DISCONNECTED</text><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="182.5" x="300" y="3617.9224">UNAVAILABLE</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="287.5" x2="622.5" y1="3633.9648" y2="3633.9648"/><!--MD5=[e28c18b0b47d723f04b587528ac0b111]
+class KeyplePluginException--><rect codeLine="133" fill="#FEFECE" height="209.6484" id="KeyplePluginException" style="stroke:#D4AC0D;stroke-width:3.75;" width="777.5" x="1641.25" y="3437.6953"/><ellipse cx="1844.375" cy="3487.9297" fill="#ADD1B2" rx="27.5" ry="27.5" style="stroke:#ADD1B2;stroke-width:2.5;"/><path d="M1849.375,3479.1797 Q1849.8828,3477.9297 1850.4688,3477.3047 Q1851.0547,3476.6797 1851.7188,3476.6797 Q1852.8906,3476.6797 1853.6328,3477.3828 Q1854.375,3478.0859 1854.375,3479.7266 L1854.375,3483.6328 Q1854.375,3485.2734 1853.6719,3485.9766 Q1852.9688,3486.6797 1851.875,3486.6797 Q1850.8984,3486.6797 1850.2734,3486.25 Q1849.6484,3485.8203 1849.375,3484.6875 Q1849.2578,3483.9063 1848.8281,3483.4766 Q1848.0469,3482.6563 1846.6406,3482.1875 Q1845.2344,3481.6797 1843.8281,3481.6797 Q1842.0703,3481.6797 1840.5859,3482.3828 Q1839.1406,3483.0859 1838.0078,3484.6484 Q1836.875,3486.2109 1836.875,3488.3594 L1836.875,3490.6641 Q1836.875,3493.2422 1838.9844,3494.9609 Q1841.0938,3496.6797 1844.8438,3496.6797 Q1847.0703,3496.6797 1848.6328,3496.1719 Q1849.5313,3495.8984 1850.5469,3495 Q1851.2109,3494.4922 1851.5625,3494.3359 Q1851.9141,3494.1797 1852.3438,3494.1797 Q1853.1641,3494.1797 1853.75,3494.8438 Q1854.375,3495.4688 1854.375,3496.3672 Q1854.375,3497.2266 1853.5156,3498.2422 Q1852.2656,3499.7266 1850.2734,3500.5469 Q1847.6563,3501.6797 1844.4531,3501.6797 Q1840.7031,3501.6797 1837.6953,3500.1953 Q1835.2734,3499.0234 1833.5547,3496.4844 Q1831.875,3493.9453 1831.875,3490.9375 L1831.875,3488.2031 Q1831.875,3485.0781 1833.3594,3482.3438 Q1834.8828,3479.6094 1837.5,3478.1641 Q1840.1563,3476.6797 1843.125,3476.6797 Q1844.9219,3476.6797 1846.4844,3477.3047 Q1848.0469,3477.9297 1849.375,3479.1797 Z " fill="#000000"/><ellipse cx="1908.125" cy="3486.6797" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="322.5" x="1923.125" y="3481.3379">&lt;&lt;RuntimeException&gt;&gt;</text><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="317.5" x="1925.625" y="3519.0723">KeyplePluginException</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="1643.75" x2="2416.25" y1="3538.1641" y2="3538.1641"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="1643.75" x2="2416.25" y1="3558.1641" y2="3558.1641"/><ellipse cx="1668.75" cy="3585.6641" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="485" x="1691.25" y="3596.7114">KeyplePluginException (String message)</text><ellipse cx="1668.75" cy="3620.2539" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="712.5" x="1691.25" y="3631.3013">KeyplePluginException (String message, Throwable cause)</text><!--MD5=[bb05bfd1c5059058d457654d4573d9ac]
+class PluginObserverSpi--><rect codeLine="111" fill="#FEFECE" height="154.5898" id="PluginObserverSpi" style="stroke:#D4AC0D;stroke-width:3.75;" width="600" x="152.5" y="2655.1953"/><ellipse cx="298.125" cy="2695.1953" fill="#B4A7E5" rx="27.5" ry="27.5" style="stroke:#B4A7E5;stroke-width:2.5;"/><path d="M300.625,2687.6953 L300.625,2702.6953 L305.625,2702.6953 L306.8359,2702.6953 L308.125,2704.2578 L308.125,2705.1953 L308.125,2706.1328 L306.8359,2707.6953 L305.625,2707.6953 L290.625,2707.6953 L289.4141,2707.6953 L288.125,2706.1328 L288.125,2705.1953 L288.125,2704.2578 L289.4141,2702.6953 L290.625,2702.6953 L295.625,2702.6953 L295.625,2687.6953 L290.625,2687.6953 L289.4141,2687.6953 L288.125,2686.1328 L288.125,2685.1953 L288.125,2684.2578 L289.4141,2682.6953 L290.625,2682.6953 L305.625,2682.6953 L306.8359,2682.6953 L308.125,2684.2578 L308.125,2685.1953 L308.125,2686.1328 L306.8359,2687.6953 L305.625,2687.6953 L300.625,2687.6953 Z " fill="#000000"/><ellipse cx="361.875" cy="2693.9453" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="260" x="376.875" y="2707.4707">PluginObserverSpi</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="155" x2="750" y1="2735.1953" y2="2735.1953"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="155" x2="750" y1="2755.1953" y2="2755.1953"/><ellipse cx="180" cy="2782.6953" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="535" x="202.5" y="2793.7427">void onPluginEvent (PluginEvent pluginEvent)</text><!--MD5=[f9fcd30113853d8738bc1c3769de9355]
+class PluginObservationExceptionHandlerSpi--><rect codeLine="114" fill="#FEFECE" height="154.5898" id="PluginObservationExceptionHandlerSpi" style="stroke:#D4AC0D;stroke-width:3.75;" width="840" x="840" y="2655.1953"/><ellipse cx="963.125" cy="2695.1953" fill="#B4A7E5" rx="27.5" ry="27.5" style="stroke:#B4A7E5;stroke-width:2.5;"/><path d="M965.625,2687.6953 L965.625,2702.6953 L970.625,2702.6953 L971.8359,2702.6953 L973.125,2704.2578 L973.125,2705.1953 L973.125,2706.1328 L971.8359,2707.6953 L970.625,2707.6953 L955.625,2707.6953 L954.4141,2707.6953 L953.125,2706.1328 L953.125,2705.1953 L953.125,2704.2578 L954.4141,2702.6953 L955.625,2702.6953 L960.625,2702.6953 L960.625,2687.6953 L955.625,2687.6953 L954.4141,2687.6953 L953.125,2686.1328 L953.125,2685.1953 L953.125,2684.2578 L954.4141,2682.6953 L955.625,2682.6953 L970.625,2682.6953 L971.8359,2682.6953 L973.125,2684.2578 L973.125,2685.1953 L973.125,2686.1328 L971.8359,2687.6953 L970.625,2687.6953 L965.625,2687.6953 Z " fill="#000000"/><ellipse cx="1026.875" cy="2693.9453" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="30" font-style="italic" lengthAdjust="spacing" textLength="545" x="1041.875" y="2707.4707">PluginObservationExceptionHandlerSpi</text><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="842.5" x2="1677.5" y1="2735.1953" y2="2735.1953"/><line style="stroke:#D4AC0D;stroke-width:3.75;" x1="842.5" x2="1677.5" y1="2755.1953" y2="2755.1953"/><ellipse cx="867.5" cy="2782.6953" fill="#84BE84" rx="7.5" ry="7.5" style="stroke:#038048;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="27.5" lengthAdjust="spacing" textLength="775" x="890" y="2793.7427">void onPluginObservationError (String pluginName, Throwable e)</text><!--MD5=[550a12816f88094ca7e979a72eedae9c]
+reverse link Plugin to ObservablePlugin--><path d="M1046.175,1875.4528 C958.985,1929.6928 864.2025,1988.6553 777.9975,2042.2828 " fill="none" id="Plugin-backto-ObservablePlugin" style="stroke:#A80036;stroke-width:2.5;"/><polygon fill="none" points="1037.9375,1859.9678,1089.6375,1848.4153,1056.4275,1889.6853,1037.9375,1859.9678" style="stroke:#A80036;stroke-width:2.5;"/><!--MD5=[2219806bdc996f946b60beec9aa5725f]
+reverse link Plugin to PoolPlugin--><path d="M1350,1899.0803 C1350,1965.3878 1350,2036.3928 1350,2094.8403 " fill="none" id="Plugin-backto-PoolPlugin" style="stroke:#A80036;stroke-width:2.5;"/><polygon fill="none" points="1332.5,1898.4153,1350,1848.4153,1367.5,1898.4153,1332.5,1898.4153" style="stroke:#A80036;stroke-width:2.5;"/><!--MD5=[495ccb80ac82bdc45a1b0288016f2c00]
+reverse link Reader to ObservableReader--><path d="M2272.5575,2354.2328 C2209.385,2452.1503 2124.695,2583.4203 2073.915,2662.1253 " fill="none" id="Reader-backto-ObservableReader" style="stroke:#A80036;stroke-width:2.5;"/><polygon fill="none" points="2258.0575,2344.4278,2299.8675,2311.9003,2287.4675,2363.4028,2258.0575,2344.4278" style="stroke:#A80036;stroke-width:2.5;"/><!--MD5=[c16e25121bbd4792db78f8542ba1e196]
+reverse link Reader to ConfigurableReader--><path d="M2427.405,2355.5578 C2482.2375,2453.3328 2555.4,2583.7728 2599.325,2662.1253 " fill="none" id="Reader-backto-ConfigurableReader" style="stroke:#A80036;stroke-width:2.5;"/><polygon fill="none" points="2412.115,2364.0703,2402.9225,2311.9003,2442.6425,2346.9503,2412.115,2364.0703" style="stroke:#A80036;stroke-width:2.5;"/><!--MD5=[5cdd6db3f87ea720c4af6714bfe3a64b]
+link SmartCardServiceProvider to SmartCardService--><path codeLine="142" d="M1815,560.8703 C1815,608.9953 1815,674.7453 1815,742.0453 " fill="none" id="SmartCardServiceProvider-to-SmartCardService" style="stroke:#3498DB;stroke-width:2.5;stroke-dasharray:7.0,7.0;"/><polygon fill="#3498DB" points="1815,754.6453,1825,732.1453,1815,742.1453,1805,732.1453,1815,754.6453" style="stroke:#3498DB;stroke-width:2.5;"/><polygon fill="#000000" points="1827.5,670.6348,1834.8473,648.0221,1820.1527,648.0221,1827.5,670.6348" style="stroke:#000000;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="32.5" lengthAdjust="spacing" textLength="100" x="1850" y="671.4331">provide</text><!--MD5=[230717490673261be3b1e9de94e2929c]
+link SmartCardService to Plugin--><path codeLine="144" d="M1609.0125,1325.6503 C1563.5025,1388.1653 1516.62,1452.5653 1475.4625,1509.1028 " fill="none" id="SmartCardService-to-Plugin" style="stroke:#3498DB;stroke-width:2.5;stroke-dasharray:7.0,7.0;"/><polygon fill="#3498DB" points="1467.845,1519.5678,1489.1714,1507.2619,1475.2014,1509.4617,1473.0016,1495.4917,1467.845,1519.5678" style="stroke:#3498DB;stroke-width:2.5;"/><polygon fill="#000000" points="1557.6432,1433.2406,1576.8918,1419.2832,1565.0118,1410.6348,1557.6432,1433.2406" style="stroke:#000000;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="32.5" lengthAdjust="spacing" textLength="100" x="1587.5" y="1436.4331">provide</text><!--MD5=[f48b7937c7540434699c851cdd554ad5]
+link SmartCardService to DistributedLocalService--><path codeLine="145" d="M2088.54,1325.6503 C2168.485,1408.3453 2251.62,1494.3403 2316.1275,1561.0678 " fill="none" id="SmartCardService-to-DistributedLocalService" style="stroke:#3498DB;stroke-width:2.5;stroke-dasharray:7.0,7.0;"/><polygon fill="#3498DB" points="2325.5075,1570.7703,2317.0599,1547.6427,2316.8199,1561.7828,2302.6798,1561.5428,2325.5075,1570.7703" style="stroke:#3498DB;stroke-width:2.5;"/><polygon fill="#000000" points="2216.1881,1432.1218,2205.7536,1410.7574,2195.1887,1420.9709,2216.1881,1432.1218" style="stroke:#000000;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="32.5" lengthAdjust="spacing" textLength="100" x="2230" y="1436.4331">provide</text><!--MD5=[dbf27993ab668861900a3380d05f6dc2]
+reverse link PluginEvent to PluginEventType--><path codeLine="147" d="M416.4925,3273.4253 C413.2775,3300.5553 412.165,3328.6728 415,3355.1953 C417.585,3379.3753 422.0175,3405.0328 427.0125,3429.2953 " fill="none" id="PluginEvent-backto-PluginEventType" style="stroke:#A80036;stroke-width:2.5;"/><ellipse cx="419.2071" cy="3255.7658" fill="#FFFFFF" rx="20" ry="20" style="stroke:#A80036;stroke-width:2.5;"/><line style="stroke:#A80036;stroke-width:2.5;" x1="416.1693" x2="422.245" y1="3275.5337" y2="3235.9978"/><line style="stroke:#A80036;stroke-width:2.5;" x1="399.4392" x2="438.9751" y1="3252.7279" y2="3258.8036"/><!--MD5=[a3bdeda43de7112adffede22a7220b58]
+link PluginEvent to PluginEventType--><path codeLine="148" d="M453.1625,3235.3178 C453.5,3291.1303 453.91,3359.0953 454.255,3416.6803 " fill="none" id="PluginEvent-to-PluginEventType" style="stroke:#3498DB;stroke-width:2.5;stroke-dasharray:7.0,7.0;"/><polygon fill="#3498DB" points="454.3325,3429.5578,464.1973,3406.9982,454.2575,3417.058,444.1977,3407.1182,454.3325,3429.5578" style="stroke:#3498DB;stroke-width:2.5;"/><polygon fill="#000000" points="467.5753,3345.6345,474.7863,3322.978,460.0919,3323.0665,467.5753,3345.6345" style="stroke:#000000;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="32.5" lengthAdjust="spacing" textLength="100" x="490" y="3346.4331">provide</text><!--MD5=[8b513e08943f8bfe5c241563ffc49ec0]
+link Plugin to Reader--><path codeLine="150" d="M1653.5775,1848.0503 C1827.3175,1940.5403 2038.89,2053.1678 2183.945,2130.3878 " fill="none" id="Plugin-to-Reader" style="stroke:#3498DB;stroke-width:2.5;stroke-dasharray:7.0,7.0;"/><polygon fill="#3498DB" points="2195.145,2136.3478,2179.9833,2116.9475,2184.1111,2130.4738,2170.5848,2134.6017,2195.145,2136.3478" style="stroke:#3498DB;stroke-width:2.5;"/><polygon fill="#000000" points="1876.0339,1951.5086,1859.5259,1934.3971,1852.6208,1947.3683,1876.0339,1951.5086" style="stroke:#000000;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="32.5" lengthAdjust="spacing" textLength="100" x="1887.5" y="1958.9331">provide</text><!--MD5=[06097ac9a1874e227666b9f6d6984d89]
+link ObservablePlugin to PluginObserverSpi--><path codeLine="152" d="M476.6725,2405.4678 C470.6925,2485.8003 463.9075,2576.9503 459.0525,2642.1853 " fill="none" id="ObservablePlugin-to-PluginObserverSpi" style="stroke:#27AE60;stroke-width:2.5;stroke-dasharray:7.0,7.0;"/><polygon fill="#27AE60" points="458.1075,2654.8778,469.7515,2633.1829,459.0362,2642.4124,449.8067,2631.6971,458.1075,2654.8778" style="stroke:#27AE60;stroke-width:2.5;"/><polygon fill="#000000" points="484.0721,2515.6003,493.0777,2493.5953,478.4236,2492.5046,484.0721,2515.6003" style="stroke:#000000;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="32.5" lengthAdjust="spacing" textLength="52.5" x="507.5" y="2516.4331">use</text><!--MD5=[a4e3f5334d7819c77690e9f437f50f0d]
+link ObservablePlugin to PluginObservationExceptionHandlerSpi--><path codeLine="153" d="M763.6425,2405.4678 C890.0125,2488.1428 1033.9,2582.2753 1134.0975,2647.8278 " fill="none" id="ObservablePlugin-to-PluginObservationExceptionHandlerSpi" style="stroke:#27AE60;stroke-width:2.5;stroke-dasharray:7.0,7.0;"/><polygon fill="#27AE60" points="1144.8725,2654.8778,1131.5176,2634.1922,1134.4118,2648.035,1120.569,2650.9293,1144.8725,2654.8778" style="stroke:#27AE60;stroke-width:2.5;"/><polygon fill="#000000" points="965.4603,2509.9781,950.5599,2491.4499,942.515,2503.7468,965.4603,2509.9781" style="stroke:#000000;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="32.5" lengthAdjust="spacing" textLength="52.5" x="977.5" y="2516.4331">use</text><!--MD5=[20506b77ae2afba69d710e66d82eebdc]
+link PluginObserverSpi to PluginEvent--><path codeLine="155" d="M452.5,2810.3403 C452.5,2863.2553 452.5,2935.2978 452.5,2996.6003 " fill="none" id="PluginObserverSpi-to-PluginEvent" style="stroke:#27AE60;stroke-width:2.5;stroke-dasharray:7.0,7.0;"/><polygon fill="#27AE60" points="452.5,3009.5103,462.5,2987.0103,452.5,2997.0103,442.5,2987.0103,452.5,3009.5103" style="stroke:#27AE60;stroke-width:2.5;"/><polygon fill="#000000" points="465,2925.6348,472.3473,2903.0221,457.6527,2903.0221,465,2925.6348" style="stroke:#000000;stroke-width:2.5;"/><text fill="#000000" font-family="sans-serif" font-size="32.5" lengthAdjust="spacing" textLength="52.5" x="487.5" y="2926.4331">use</text><!--MD5=[c0f89b2aed0b76ce749560a9f695051c]
+link ObservableReader to ReaderEvent--><!--MD5=[4a25b8a08adb3b34002f8b527adaec44]
+link ReaderEvent to KeyplePluginException--><!--MD5=[e70c3f2c8422dabeb27b9041c44a3cf3]
+@startuml
+title
+    Keyple - keyple-service-java-lib - 2.0.+ (30/07/2021)
+end title
+
+' == THEME ==
+
+'Couleurs issues de : https://htmlcolorcodes.com/fr/tableau-de-couleur/tableau-de-couleur-design-plat/
+!define C_GREY1 F8F9F9
+!define C_GREY2 F2F3F4
+!define C_GREY3 E5E7E9
+!define C_GREY4 D7DBDD
+!define C_GREY5 CACFD2
+!define C_GREY6 BDC3C7
+!define C_LINK 3498DB
+!define C_USE 27AE60
+
+skinparam Shadowing false
+skinparam ClassFontStyle italic
+skinparam ClassBorderColor #D4AC0D
+skinparam stereotypeABorderColor #A9DCDF
+skinparam stereotypeIBorderColor #B4A7E5
+skinparam stereotypeCBorderColor #ADD1B2
+skinparam stereotypeEBorderColor #EB93DF
+' Red
+skinparam ClassBackgroundColor<<red>> #FDEDEC
+skinparam ClassBorderColor<<red>> #E74C3C
+hide <<red>> stereotype
+' Purple
+skinparam ClassBackgroundColor<<purple>> #F4ECF7
+skinparam ClassBorderColor<<purple>> #8E44AD
+hide <<purple>> stereotype
+' blue
+skinparam ClassBackgroundColor<<blue>> #EBF5FB
+skinparam ClassBorderColor<<blue>> #3498DB
+hide <<blue>> stereotype
+' Green
+skinparam ClassBackgroundColor<<green>> #E9F7EF
+skinparam ClassBorderColor<<green>> #27AE60
+hide <<green>> stereotype
+' Grey
+skinparam ClassBackgroundColor<<grey>> #EAECEE
+skinparam ClassBorderColor<<grey>> #2C3E50
+hide <<grey>> stereotype
+
+' == CONTENT ==
+
+legend top
+    __Colors legend__ :
+    * __External public API references__ :
+    ** <back:yellow>**calypsonet-terminal-reader-java-api**</back>
+    ** <back:cyan>**keyple-common-java-api**</back>
+end legend
+
+package "org.eclipse.keyple.core.service" as service {
+    ' SERVICE
+    +class "**final** SmartCardServiceProvider" as SmartCardServiceProvider {
+        +{static} SmartCardService getService ()
+    }
+    +interface SmartCardService {
+        +Plugin registerPlugin (<back:cyan>KeyplePluginExtensionFactory</back> pluginFactory)
+        +void unregisterPlugin (String pluginName)
+        +Set<String> getPluginNames ()
+        +Set<Plugin> getPlugins ()
+        +Plugin getPlugin (String pluginName)
+
+        +void checkCardExtension (<back:cyan>KeypleCardExtension</back> cardExtension)
+
+        +DistributedLocalService registerDistributedLocalService (<back:cyan>KeypleDistributedLocalServiceExtensionFactory</back> distributedLocalServiceFactory)
+        +void unregisterDistributedLocalService (String distributedLocalServiceName)
+        +DistributedLocalService getDistributedLocalService (String distributedLocalServiceName)
+
+        +<back:yellow>CardSelectionManager</back> createCardSelectionManager ()
+    }
+    +interface Plugin {
+        +String getName ()
+        +<T extends <back:cyan>KeyplePluginExtension</back>> T getExtension (Class<T> pluginExtensionClass)
+
+        +Set<String> getReaderNames ()
+        +Set<Reader> getReaders ()
+        +Reader getReader (String readerName)
+    }
+    +interface DistributedLocalService {
+        +String getName ()
+        +<T extends <back:cyan>KeypleDistributedLocalServiceExtension</back>> T getExtension (
+            \tClass<T> distributedLocalServiceExtensionClass)
+    }
+    +interface ObservablePlugin extends Plugin {
+        +void setPluginObservationExceptionHandler (
+            \tPluginObservationExceptionHandlerSpi exceptionHandler)
+
+        +void addObserver (PluginObserverSpi observer)
+        +void removeObserver (PluginObserverSpi observer)
+        +void clearObservers ()
+        +int countObservers ()
+    }
+    +interface PoolPlugin extends Plugin {
+        +SortedSet<String> getReaderGroupReferences ()
+
+        +Reader allocateReader (String readerGroupReference)
+        +void releaseReader (Reader reader)
+    }
+    +interface "<<<back:yellow>CardReader</back>>>\nReader" as Reader {
+        +<T extends <back:cyan>KeypleReaderExtension</back>> T getExtension (Class<T> readerExtensionClass)
+    }
+    +interface "<<<back:yellow>ObservableCardReader</back>>>\nObservableReader" as ObservableReader extends Reader {
+    }
+    +interface "<<<back:yellow>ConfigurableCardReader</back>>>\nConfigurableReader" as ConfigurableReader extends Reader {
+    }
+    ' SPI
+    package spi {
+        +interface PluginObserverSpi {
+            +void onPluginEvent (PluginEvent pluginEvent)
+        }
+        +interface PluginObservationExceptionHandlerSpi {
+            +void onPluginObservationError (String pluginName, Throwable e)
+        }
+    }
+
+    +interface "<<<back:yellow>CardReaderEvent</back>>>\nReaderEvent" as ReaderEvent {
+        +String getPluginName ()
+    }
+    +interface PluginEvent {
+        +String getPluginName ()
+        +SortedSet<String> getReaderNames ()
+        +Type getType ()
+    }
+    +enum "Type" as PluginEventType {
+        READER_CONNECTED
+        READER_DISCONNECTED
+        UNAVAILABLE
+    }
+    ' EXCEPTIONS
+    +class "<<RuntimeException>>\nKeyplePluginException" as KeyplePluginException {
+        +KeyplePluginException (String message)
+        +KeyplePluginException (String message, Throwable cause)
+    }
+}
+
+' Associations
+'LocalServiceClient ..> RemoteServiceParameters #C_USE : use >
+
+SmartCardServiceProvider ..> SmartCardService #C_LINK : provide >
+
+SmartCardService ..> Plugin #C_LINK : provide >
+SmartCardService ..> DistributedLocalService #C_LINK : provide >
+
+PluginEvent +- - PluginEventType
+PluginEvent ..> PluginEventType #C_LINK : provide >
+
+Plugin ..> Reader #C_LINK : provide >
+
+ObservablePlugin ..> PluginObserverSpi #C_USE : use >
+ObservablePlugin ..> PluginObservationExceptionHandlerSpi #C_USE : use >
+
+PluginObserverSpi ..> PluginEvent #C_USE : use >
+
+' == LAYOUT ==
+
+ObservableReader -[hidden]- ReaderEvent
+ReaderEvent -[hidden]- KeyplePluginException
+
+' == STYLE ==
+
+package service #C_GREY1 {}
+package spi #C_GREY2 {}
+
+@enduml
+
+@startuml
+title
+    Keyple - keyple-service-java-lib - 2.0.+ (30/07/2021)
+end title
+
+
+
+skinparam Shadowing false
+skinparam ClassFontStyle italic
+skinparam ClassBorderColor #D4AC0D
+skinparam stereotypeABorderColor #A9DCDF
+skinparam stereotypeIBorderColor #B4A7E5
+skinparam stereotypeCBorderColor #ADD1B2
+skinparam stereotypeEBorderColor #EB93DF
+skinparam ClassBackgroundColor<<red>> #FDEDEC
+skinparam ClassBorderColor<<red>> #E74C3C
+hide <<red>> stereotype
+skinparam ClassBackgroundColor<<purple>> #F4ECF7
+skinparam ClassBorderColor<<purple>> #8E44AD
+hide <<purple>> stereotype
+skinparam ClassBackgroundColor<<blue>> #EBF5FB
+skinparam ClassBorderColor<<blue>> #3498DB
+hide <<blue>> stereotype
+skinparam ClassBackgroundColor<<green>> #E9F7EF
+skinparam ClassBorderColor<<green>> #27AE60
+hide <<green>> stereotype
+skinparam ClassBackgroundColor<<grey>> #EAECEE
+skinparam ClassBorderColor<<grey>> #2C3E50
+hide <<grey>> stereotype
+
+
+legend top
+    __Colors legend__ :
+    * __External public API references__ :
+    ** <back:yellow>**calypsonet-terminal-reader-java-api**</back>
+    ** <back:cyan>**keyple-common-java-api**</back>
+end legend
+
+package "org.eclipse.keyple.core.service" as service {
+    +class "**final** SmartCardServiceProvider" as SmartCardServiceProvider {
+        +{static} SmartCardService getService ()
+    }
+    +interface SmartCardService {
+        +Plugin registerPlugin (<back:cyan>KeyplePluginExtensionFactory</back> pluginFactory)
+        +void unregisterPlugin (String pluginName)
+        +Set<String> getPluginNames ()
+        +Set<Plugin> getPlugins ()
+        +Plugin getPlugin (String pluginName)
+
+        +void checkCardExtension (<back:cyan>KeypleCardExtension</back> cardExtension)
+
+        +DistributedLocalService registerDistributedLocalService (<back:cyan>KeypleDistributedLocalServiceExtensionFactory</back> distributedLocalServiceFactory)
+        +void unregisterDistributedLocalService (String distributedLocalServiceName)
+        +DistributedLocalService getDistributedLocalService (String distributedLocalServiceName)
+
+        +<back:yellow>CardSelectionManager</back> createCardSelectionManager ()
+    }
+    +interface Plugin {
+        +String getName ()
+        +<T extends <back:cyan>KeyplePluginExtension</back>> T getExtension (Class<T> pluginExtensionClass)
+
+        +Set<String> getReaderNames ()
+        +Set<Reader> getReaders ()
+        +Reader getReader (String readerName)
+    }
+    +interface DistributedLocalService {
+        +String getName ()
+        +<T extends <back:cyan>KeypleDistributedLocalServiceExtension</back>> T getExtension (
+            \tClass<T> distributedLocalServiceExtensionClass)
+    }
+    +interface ObservablePlugin extends Plugin {
+        +void setPluginObservationExceptionHandler (
+            \tPluginObservationExceptionHandlerSpi exceptionHandler)
+
+        +void addObserver (PluginObserverSpi observer)
+        +void removeObserver (PluginObserverSpi observer)
+        +void clearObservers ()
+        +int countObservers ()
+    }
+    +interface PoolPlugin extends Plugin {
+        +SortedSet<String> getReaderGroupReferences ()
+
+        +Reader allocateReader (String readerGroupReference)
+        +void releaseReader (Reader reader)
+    }
+    +interface "<<<back:yellow>CardReader</back>>>\nReader" as Reader {
+        +<T extends <back:cyan>KeypleReaderExtension</back>> T getExtension (Class<T> readerExtensionClass)
+    }
+    +interface "<<<back:yellow>ObservableCardReader</back>>>\nObservableReader" as ObservableReader extends Reader {
+    }
+    +interface "<<<back:yellow>ConfigurableCardReader</back>>>\nConfigurableReader" as ConfigurableReader extends Reader {
+    }
+    package spi {
+        +interface PluginObserverSpi {
+            +void onPluginEvent (PluginEvent pluginEvent)
+        }
+        +interface PluginObservationExceptionHandlerSpi {
+            +void onPluginObservationError (String pluginName, Throwable e)
+        }
+    }
+
+    +interface "<<<back:yellow>CardReaderEvent</back>>>\nReaderEvent" as ReaderEvent {
+        +String getPluginName ()
+    }
+    +interface PluginEvent {
+        +String getPluginName ()
+        +SortedSet<String> getReaderNames ()
+        +Type getType ()
+    }
+    +enum "Type" as PluginEventType {
+        READER_CONNECTED
+        READER_DISCONNECTED
+        UNAVAILABLE
+    }
+    +class "<<RuntimeException>>\nKeyplePluginException" as KeyplePluginException {
+        +KeyplePluginException (String message)
+        +KeyplePluginException (String message, Throwable cause)
+    }
+}
+
+
+SmartCardServiceProvider ..> SmartCardService #3498DB : provide >
+
+SmartCardService ..> Plugin #3498DB : provide >
+SmartCardService ..> DistributedLocalService #3498DB : provide >
+
+PluginEvent +- - PluginEventType
+PluginEvent ..> PluginEventType #3498DB : provide >
+
+Plugin ..> Reader #3498DB : provide >
+
+ObservablePlugin ..> PluginObserverSpi #27AE60 : use >
+ObservablePlugin ..> PluginObservationExceptionHandlerSpi #27AE60 : use >
+
+PluginObserverSpi ..> PluginEvent #27AE60 : use >
+
+
+ObservableReader -[hidden]- ReaderEvent
+ReaderEvent -[hidden]- KeyplePluginException
+
+
+package service #F8F9F9 {}
+package spi #F2F3F4 {}
+
+@enduml
+
+PlantUML version 1.2021.7(Sun May 23 14:40:07 CEST 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: Cp1252
+Language: fr
+Country: FR
+--></g></svg>
