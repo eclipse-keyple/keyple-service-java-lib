@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Returned value of `getActiveSmartCard` method when there is no active smart card (issue [#40]).
 
 ## [2.0.1] - 2021-12-08
 ### Added
@@ -22,6 +24,7 @@ It also brings many major API changes.
 [2.0.1]: https://github.com/eclipse/keyple-service-java-lib/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/eclipse/keyple-service-java-lib/releases/tag/2.0.0
 
+[#40]: https://github.com/eclipse/keyple-service-java-lib/issues/40
 [#38]: https://github.com/eclipse/keyple-service-java-lib/issues/38
 [#34]: https://github.com/eclipse/keyple-service-java-lib/issues/34
 
