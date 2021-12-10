@@ -46,8 +46,10 @@ public class LocalReaderAdapterTest {
     cardSelector = ReaderAdapterTestUtils.getCardSelectorSpi();
     cardSelectionRequestSpi = mock(CardSelectionRequestSpi.class);
 
-    cardRequestSpi = mock(CardRequestSpi.class);
     apduRequestSpi = mock(ApduRequestSpi.class);
+    when(apduRequestSpi.getSuccessfulStatusWords())
+        .thenReturn(new HashSet<Integer>(Arrays.asList(0x9000)));
+    cardRequestSpi = mock(CardRequestSpi.class);
     when(cardRequestSpi.getApduRequests()).thenReturn(Arrays.asList(apduRequestSpi));
   }
 
@@ -388,19 +390,19 @@ public class LocalReaderAdapterTest {
 
   @Test
   public void transmitCardRequest_isCase4() throws Exception {
-    byte[] requestApdu = ByteArrayUtil.fromHex("11223344041234567803");
+    byte[] requestApdu = ByteArrayUtil.fromHex("11223344041234567802");
     byte[] responseApdu = ByteArrayUtil.fromHex("9000");
-    byte[] responseCase4Apdu = ByteArrayUtil.fromHex("0000");
-    byte[] APDU_GET_RESPONSE = {(byte) 0x00, (byte) 0xC0, (byte) 0x00, (byte) 0x00, (byte) 0x00};
+    byte[] getResponseRApdu = ByteArrayUtil.fromHex("00C0000002");
+    byte[] getResponseCApdu = ByteArrayUtil.fromHex("00009000");
     when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
     when(readerSpi.transmitApdu(requestApdu)).thenReturn(responseApdu);
-    when(readerSpi.transmitApdu(APDU_GET_RESPONSE)).thenReturn(responseCase4Apdu);
+    when(readerSpi.transmitApdu(getResponseRApdu)).thenReturn(getResponseCApdu);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
     localReaderAdapter.register();
     CardResponseApi response =
         localReaderAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.CLOSE_AFTER);
-    assertThat(response.getApduResponses().get(0).getApdu()).isEqualTo(responseCase4Apdu);
+    assertThat(response.getApduResponses().get(0).getApdu()).isEqualTo(getResponseCApdu);
   }
 
   @Test(expected = UnexpectedStatusWordException.class)
