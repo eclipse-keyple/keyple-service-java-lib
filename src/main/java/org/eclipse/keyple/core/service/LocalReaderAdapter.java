@@ -53,8 +53,11 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   /** predefined ISO values */
   private static final int SW_9000 = 0x9000;
 
-  private static final int SW_61XX_MASK = 0x6100;
-  private static final int SW_6CXX_MASK = 0x6C00;
+  private static final int SW_6100 = 0x6100;
+  private static final int SW_6C00 = 0x6C00;
+
+  private static final int SW1_MASK = 0xFF00;
+  private static final int SW2_MASK = 0x00FF;
 
   private final ReaderSpi readerSpi;
   private long before;
@@ -408,7 +411,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     if (apduResponse.getDataOut().length == 0) {
 
-      if ((apduResponse.getStatusWord() & SW_61XX_MASK) == SW_61XX_MASK) {
+      if ((apduResponse.getStatusWord() & SW1_MASK) == SW_6100) {
         // RL-SW-61XX.1
         // Build a GetResponse APDU command with the provided "le"
         byte[] getResponseApdu = {
@@ -416,24 +419,25 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           (byte) 0xC0,
           (byte) 0x00,
           (byte) 0x00,
-          (byte) (apduResponse.getStatusWord() & 0xFF)
+          (byte) (apduResponse.getStatusWord() & SW2_MASK)
         };
         // Execute APDU
         apduResponse =
             processApduRequest(
                 new ApduRequestAdapter(getResponseApdu).setInfo("Internal Get Response"));
 
-      } else if ((apduResponse.getStatusWord() & SW_6CXX_MASK) == SW_6CXX_MASK) {
+      } else if ((apduResponse.getStatusWord() & SW1_MASK) == SW_6C00) {
         // RL-SW-6CXX.1
         // Update the last command with the provided "le"
         apduRequest.getApdu()[apduRequest.getApdu().length - 1] =
-            (byte) (apduResponse.getStatusWord() & 0xFF);
+            (byte) (apduResponse.getStatusWord() & SW2_MASK);
         // Replay the last command APDU
         apduResponse = processApduRequest(apduRequest);
 
       } else if (ApduUtil.isCase4(apduRequest.getApdu())
-          && apduResponse.getStatusWord() == SW_9000) {
+          && apduRequest.getSuccessfulStatusWords().contains(apduResponse.getStatusWord())) {
         // RL-SW-ANALYSIS.1
+        // RL-SW-CASE4.1 (SW=6200 not taken into account here)
         // Build a GetResponse APDU command with the original "le"
         byte[] getResponseApdu = {
           (byte) 0x00,

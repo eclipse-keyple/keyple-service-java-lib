@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- Auto management of 61XX and 6CXX status words and case 4 commands (Calypsonet Terminal Requirements: `RL-SW-61XX.1`, `RL-SW-6CXX.1`, `RL-SW-ANALYSIS.1` and `RL-SW-CASE4.1`) (issue [#37]).
 - Returned value of `getActiveSmartCard` method when there is no active smart card (issue [#40]).
 
 ## [2.0.1] - 2021-12-08
@@ -26,6 +27,7 @@ It also brings many major API changes.
 
 [#40]: https://github.com/eclipse/keyple-service-java-lib/issues/40
 [#38]: https://github.com/eclipse/keyple-service-java-lib/issues/38
+[#37]: https://github.com/eclipse/keyple-service-java-lib/issues/37
 [#34]: https://github.com/eclipse/keyple-service-java-lib/issues/34
 
 [eclipse/keyple#6]: https://github.com/eclipse/keyple/issues/6
