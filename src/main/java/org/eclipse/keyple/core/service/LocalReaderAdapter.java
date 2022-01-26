@@ -623,6 +623,12 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     ApduResponseAdapter fciResponse;
 
+    // RL-SEL-P2LC.1
+    // RL-SEL-DFNAME.1
+    Assert.getInstance()
+        .notNull(cardSelector.getAid(), "aid")
+        .isInRange(cardSelector.getAid().length, 0, 16, "aid");
+
     if (readerSpi instanceof AutonomousSelectionReaderSpi) {
       byte[] aid = cardSelector.getAid();
       byte p2 =
