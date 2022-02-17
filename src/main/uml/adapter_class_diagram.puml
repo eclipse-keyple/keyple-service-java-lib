@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 2.0.0 (15/09/2021)
+    Keyple - Adapter of keyple-service-java-lib - 2.0.2 (17/02/2022)
 end title
 
 ' == THEME ==
@@ -67,19 +67,22 @@ package "org.eclipse.keyple.core.service" as service {
         FIRST_MATCH
         PROCESS_ALL
     }
-    ~class "<<<back:gold>JsonSerializer</back>>>\n**final** ApduExceptionJsonSerializerAdapter" as ApduExceptionJsonSerializerAdapter {
+    ~class "<<<back:gold>JsonSerializer<<back:lightGreen>AbstractApduException</back>>>>\n**final** ApduExceptionJsonSerializerAdapter" as ApduExceptionJsonSerializerAdapter {
         --
         ~ApduExceptionJsonSerializerAdapter ()
         -- **JsonSerializer** --
-        +<back:gold>JsonElement</back> serialize (<back:lightGreen>AbstractApduException</back> exception,
-            \t<back:gold>Type</back> type, <back:gold>JsonSerializationContext</back> jsonSerializationContext)
+        +<back:gold>JsonElement</back> serialize (<back:lightGreen>AbstractApduException</back> src, <back:gold>Type</back> typeOfSrc,
+            \t<back:gold>JsonSerializationContext</back> context)
     }
-    ~class "<<<back:gold>JsonSerializer</back>>>\n**final** ApduResponseApiJsonDeserializerAdapter" as ApduResponseApiJsonDeserializerAdapter {
+    ~class "<<<back:gold>JsonSerializer<ApduResponseAdapter></back>>>\n<<<back:gold>JsonDeserializer<ApduResponseAdapter></back>>>\n**final** ApduResponseApiJsonAdapter" as ApduResponseApiJsonAdapter {
         --
-        ~ApduResponseApiJsonDeserializerAdapter ()
+        ~ApduResponseApiJsonAdapter ()
+        -- **JsonSerializer** --
+        +<back:gold>JsonElement</back> serialize (ApduResponseAdapter src, <back:gold>Type</back> typeOfSrc,
+            \t<back:gold>JsonSerializationContext</back> context)
         -- **JsonDeserializer** --
-        +<back:gold>JsonElement</back> deserialize (<back:gold>JsonElement</back> jsonElement,
-            \t<back:gold>Type</back> typeOfT, <back:gold>JsonDeserializationContext</back> jsonDeserializationContext)
+        +ApduResponseAdapter deserialize (<back:gold>JsonElement</back> json, <back:gold>Type</back> typeOfT,
+            \t<back:gold>JsonDeserializationContext</back> context)
     }
     ~class "<<SmartCardService>>\n**final** SmartCardServiceAdapter" as SmartCardServiceAdapter {
         --
@@ -683,7 +686,7 @@ package service #C_GREY1 {}
 enum MultiSelectionProcessing <<blue>>
 
 class ApduExceptionJsonSerializerAdapter <<blue>>
-class ApduResponseApiJsonDeserializerAdapter <<blue>>
+class ApduResponseApiJsonAdapter <<blue>>
 class SmartCardServiceAdapter <<blue>>
 abstract class AbstractReaderAdapter <<blue>>
 class LocalReaderAdapter <<blue>>
