@@ -5,9 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Upgraded
+- "Keyple Util Library" to version `2.1.0`.
 ### Fixed
 - Auto management of 61XX and 6CXX status words and case 4 commands (Calypsonet Terminal Requirements: `RL-SW-61XX.1`, `RL-SW-6CXX.1`, `RL-SW-ANALYSIS.1` and `RL-SW-CASE4.1`) (issue [#37]).
 - Returned value of `getActiveSmartCard` method when there is no active smart card (issue [#40]).
+- JSON serialization for interfaces in objects trees (issue [#43]).
 
 ## [2.0.1] - 2021-12-08
 ### Added
@@ -25,6 +28,7 @@ It also brings many major API changes.
 [2.0.1]: https://github.com/eclipse/keyple-service-java-lib/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/eclipse/keyple-service-java-lib/releases/tag/2.0.0
 
+[#43]: https://github.com/eclipse/keyple-service-java-lib/issues/43
 [#40]: https://github.com/eclipse/keyple-service-java-lib/issues/40
 [#38]: https://github.com/eclipse/keyple-service-java-lib/issues/38
 [#37]: https://github.com/eclipse/keyple-service-java-lib/issues/37
