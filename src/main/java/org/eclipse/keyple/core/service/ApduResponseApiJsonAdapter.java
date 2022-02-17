@@ -16,12 +16,28 @@ import java.lang.reflect.Type;
 
 /**
  * (package-private)<br>
- * Deserializer of a {@link org.calypsonet.terminal.card.ApduResponseApi}.
+ * JSON serializer/deserializer of a {@link org.calypsonet.terminal.card.ApduResponseApi}.
+ *
+ * <p>It is necessary to define a serializer because the type of the associated object registered is
+ * an interface, and therefore has no fields. Gson will then use its default reflexivity mechanism
+ * to serialize the object only if explicitly requested in the "serialize" method. This is only
+ * necessary for serializations of object trees.
  *
  * @since 2.0.0
  */
-final class ApduResponseApiJsonDeserializerAdapter
-    implements JsonDeserializer<ApduResponseAdapter> {
+final class ApduResponseApiJsonAdapter
+    implements JsonSerializer<ApduResponseAdapter>, JsonDeserializer<ApduResponseAdapter> {
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0.2
+   */
+  @Override
+  public JsonElement serialize(
+      ApduResponseAdapter src, Type typeOfSrc, JsonSerializationContext context) {
+    return context.serialize(src);
+  }
 
   /**
    * {@inheritDoc}
