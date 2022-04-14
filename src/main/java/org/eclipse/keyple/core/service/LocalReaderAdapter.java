@@ -30,7 +30,7 @@ import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keyple.core.util.Assert;
-import org.eclipse.keyple.core.util.ByteArrayUtil;
+import org.eclipse.keyple.core.util.HexUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -661,7 +661,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       logger.debug(
           "[{}] openLogicalChannel => Select Application with AID = {}",
           this.getName(),
-          ByteArrayUtil.toHex(aid));
+          HexUtil.toHex(aid));
     }
     /*
      * build a get response command the actual length expected by the card in the get response

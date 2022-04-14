@@ -31,7 +31,7 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionAutonomousSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.DontWaitForCardRemovalDuringProcessingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalAutonomousSpi;
-import org.eclipse.keyple.core.util.ByteArrayUtil;
+import org.eclipse.keyple.core.util.HexUtil;
 import org.mockito.Mockito;
 
 public class ReaderAdapterTestUtils {
@@ -41,11 +41,11 @@ public class ReaderAdapterTestUtils {
   public static final String POWER_ON_DATA = "12345678";
 
   public static final List<CardSelectionResponseApi> NOT_MATCHING_RESPONSES =
-      Arrays.asList(getNotMatchingResponse());
+      Collections.singletonList(getNotMatchingResponse());
   public static final List<CardSelectionResponseApi> MULTI_NOT_MATCHING_RESPONSES =
       Arrays.asList(getNotMatchingResponse(), getNotMatchingResponse());
   public static final List<CardSelectionResponseApi> MATCHING_RESPONSES =
-      Arrays.asList(getMatchingResponse());
+      Collections.singletonList(getMatchingResponse());
   public static final List<CardSelectionResponseApi> MULTI_MATCHING_RESPONSES =
       Arrays.asList(getNotMatchingResponse(), getMatchingResponse(), getMatchingResponse());
 
@@ -67,9 +67,9 @@ public class ReaderAdapterTestUtils {
     when(readerSpi.getName()).thenReturn(READER_NAME);
     when(readerSpi.checkCardPresence()).thenReturn(true);
     when(readerSpi.getPowerOnData()).thenReturn(POWER_ON_DATA);
-    when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(ByteArrayUtil.fromHex("6D00"));
-    when(((ConfigurableReaderSpi) readerSpi).isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
-    when(((ConfigurableReaderSpi) readerSpi).isCurrentProtocol(CARD_PROTOCOL)).thenReturn(true);
+    when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(HexUtil.toByteArray("6D00"));
+    when(readerSpi.isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
+    when(readerSpi.isCurrentProtocol(CARD_PROTOCOL)).thenReturn(true);
     return readerSpi;
   }
 
@@ -78,9 +78,9 @@ public class ReaderAdapterTestUtils {
     when(readerSpi.getName()).thenReturn(READER_NAME);
     when(readerSpi.checkCardPresence()).thenReturn(true);
     when(readerSpi.getPowerOnData()).thenReturn(POWER_ON_DATA);
-    when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(ByteArrayUtil.fromHex("6D00"));
-    when(((ConfigurableReaderSpi) readerSpi).isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
-    when(((ConfigurableReaderSpi) readerSpi).isCurrentProtocol(CARD_PROTOCOL)).thenReturn(true);
+    when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(HexUtil.toByteArray("6D00"));
+    when(readerSpi.isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
+    when(readerSpi.isCurrentProtocol(CARD_PROTOCOL)).thenReturn(true);
     return readerSpi;
   }
 
@@ -90,7 +90,7 @@ public class ReaderAdapterTestUtils {
     when(readerSpi.getName()).thenReturn(READER_NAME);
     when(readerSpi.checkCardPresence()).thenReturn(true);
     when(readerSpi.getPowerOnData()).thenReturn(POWER_ON_DATA);
-    when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(ByteArrayUtil.fromHex("6D00"));
+    when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(HexUtil.toByteArray("6D00"));
     when(readerSpi.isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
     when(readerSpi.isCurrentProtocol(CARD_PROTOCOL)).thenReturn(true);
     return readerSpi;

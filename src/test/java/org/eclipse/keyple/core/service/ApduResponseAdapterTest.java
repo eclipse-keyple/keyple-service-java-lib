@@ -13,7 +13,7 @@ package org.eclipse.keyple.core.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.eclipse.keyple.core.util.ByteArrayUtil;
+import org.eclipse.keyple.core.util.HexUtil;
 import org.junit.Test;
 
 public class ApduResponseAdapterTest {
@@ -24,9 +24,9 @@ public class ApduResponseAdapterTest {
 
   @Test
   public void buildApduResponseAdapter() {
-    apduResponseAdapter = new ApduResponseAdapter(ByteArrayUtil.fromHex(HEX_REQUEST));
-    assertThat(apduResponseAdapter.getApdu()).isEqualTo(ByteArrayUtil.fromHex(HEX_REQUEST));
+    apduResponseAdapter = new ApduResponseAdapter(HexUtil.toByteArray(HEX_REQUEST));
+    assertThat(apduResponseAdapter.getApdu()).isEqualTo(HexUtil.toByteArray(HEX_REQUEST));
     assertThat(apduResponseAdapter.getStatusWord()).isEqualTo(0x9000);
-    assertThat(apduResponseAdapter.getDataOut()).isEqualTo(ByteArrayUtil.fromHex(HEX_REQUEST_DATA));
+    assertThat(apduResponseAdapter.getDataOut()).isEqualTo(HexUtil.toByteArray(HEX_REQUEST_DATA));
   }
 }

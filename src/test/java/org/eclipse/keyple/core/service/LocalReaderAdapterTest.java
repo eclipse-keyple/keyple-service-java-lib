@@ -27,7 +27,7 @@ import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils;
-import org.eclipse.keyple.core.util.ByteArrayUtil;
+import org.eclipse.keyple.core.util.HexUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,9 +48,9 @@ public class LocalReaderAdapterTest {
 
     apduRequestSpi = mock(ApduRequestSpi.class);
     when(apduRequestSpi.getSuccessfulStatusWords())
-        .thenReturn(new HashSet<Integer>(Arrays.asList(0x9000)));
+        .thenReturn(new HashSet<Integer>(Collections.singletonList(0x9000)));
     cardRequestSpi = mock(CardRequestSpi.class);
-    when(cardRequestSpi.getApduRequests()).thenReturn(Arrays.asList(apduRequestSpi));
+    when(cardRequestSpi.getApduRequests()).thenReturn(Collections.singletonList(apduRequestSpi));
   }
 
   @After
@@ -133,7 +133,7 @@ public class LocalReaderAdapterTest {
   public void
       transmitCardSelectionRequests_withNonMatchingDFNameFilteringCardSelector_shouldReturnNotMatchingResponseAndNotOpenChannel()
           throws Exception {
-    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("1122334455"));
+    when(cardSelector.getAid()).thenReturn(HexUtil.toByteArray("1122334455"));
     when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
@@ -155,9 +155,9 @@ public class LocalReaderAdapterTest {
   public void
       transmitCardSelectionRequests_withMatchingDFNameFilteringCardSelector_shouldReturnMatchingResponseAndOpenChannel()
           throws Exception {
-    byte[] selectResponseApdu = ByteArrayUtil.fromHex("123456789000");
+    byte[] selectResponseApdu = HexUtil.toByteArray("123456789000");
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(selectResponseApdu);
-    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("1122334455"));
+    when(cardSelector.getAid()).thenReturn(HexUtil.toByteArray("1122334455"));
     when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
@@ -181,9 +181,9 @@ public class LocalReaderAdapterTest {
   public void
       transmitCardSelectionRequests_withMatchingDFNameFilteringCardSelectorInvalidatedRejected_shouldReturnNotMatchingResponseAndNotOpenChannel()
           throws Exception {
-    byte[] selectResponseApdu = ByteArrayUtil.fromHex("123456786283");
+    byte[] selectResponseApdu = HexUtil.toByteArray("123456786283");
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(selectResponseApdu);
-    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("1122334455"));
+    when(cardSelector.getAid()).thenReturn(HexUtil.toByteArray("1122334455"));
     when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
@@ -207,9 +207,9 @@ public class LocalReaderAdapterTest {
   public void
       transmitCardSelectionRequests_withMatchingDFNameFilteringCardSelectorInvalidatedAccepted_shouldReturnMatchingResponseAndOpenChannel()
           throws Exception {
-    byte[] selectResponseApdu = ByteArrayUtil.fromHex("123456786283");
+    byte[] selectResponseApdu = HexUtil.toByteArray("123456786283");
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(selectResponseApdu);
-    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("1122334455"));
+    when(cardSelector.getAid()).thenReturn(HexUtil.toByteArray("1122334455"));
     when(cardSelector.getSuccessfulSelectionStatusWords())
         .thenReturn(new HashSet<Integer>(Arrays.asList(0x9000, 0x6283)));
     when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
@@ -290,7 +290,7 @@ public class LocalReaderAdapterTest {
   public void transmitCardSelectionRequests_whenTransmitApduThrowsCardIOException_shouldCCE()
       throws Exception {
     when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
-    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("12341234"));
+    when(cardSelector.getAid()).thenReturn(HexUtil.toByteArray("12341234"));
     doThrow(new CardIOException("Card IO Exception"))
         .when(readerSpi)
         .transmitApdu(ArgumentMatchers.<byte[]>any());
@@ -308,7 +308,7 @@ public class LocalReaderAdapterTest {
   public void transmitCardSelectionRequests_whenTransmitApduThrowsReaderIOException_shouldRCE()
       throws Exception {
     when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
-    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("12341234"));
+    when(cardSelector.getAid()).thenReturn(HexUtil.toByteArray("12341234"));
     doThrow(new ReaderIOException("Reader IO Exception"))
         .when(readerSpi)
         .transmitApdu(ArgumentMatchers.<byte[]>any());
@@ -326,7 +326,7 @@ public class LocalReaderAdapterTest {
   public void transmitCardSelectionRequests_whenFirstMatchAndSecondSelectionFails_shouldNotMatch()
       throws Exception {
 
-    when(cardSelector.getAid()).thenReturn(ByteArrayUtil.fromHex("1122334455"));
+    when(cardSelector.getAid()).thenReturn(HexUtil.toByteArray("1122334455"));
     when(cardSelectionRequestSpi.getCardSelector()).thenReturn(cardSelector);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
@@ -334,7 +334,7 @@ public class LocalReaderAdapterTest {
 
     // first successful selection
     when(readerSpi.transmitApdu(any(byte[].class)))
-        .thenReturn(ByteArrayUtil.fromHex("AABBCCDDEE9000"));
+        .thenReturn(HexUtil.toByteArray("AABBCCDDEE9000"));
 
     List<CardSelectionResponseApi> cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
@@ -348,7 +348,7 @@ public class LocalReaderAdapterTest {
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isTrue();
 
     // second not matching selection
-    when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(ByteArrayUtil.fromHex("6B00"));
+    when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(HexUtil.toByteArray("6B00"));
 
     cardSelectionResponses =
         localReaderAdapter.transmitCardSelectionRequests(
@@ -370,8 +370,8 @@ public class LocalReaderAdapterTest {
 
   @Test
   public void transmitCardRequest_shouldReturnResponse() throws Exception {
-    byte[] responseApdu = ByteArrayUtil.fromHex("123456786283");
-    byte[] requestApdu = ByteArrayUtil.fromHex("0000");
+    byte[] responseApdu = HexUtil.toByteArray("123456786283");
+    byte[] requestApdu = HexUtil.toByteArray("0000");
 
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(responseApdu);
     when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
@@ -390,10 +390,10 @@ public class LocalReaderAdapterTest {
 
   @Test
   public void transmitCardRequest_isCase4() throws Exception {
-    byte[] requestApdu = ByteArrayUtil.fromHex("11223344041234567802");
-    byte[] responseApdu = ByteArrayUtil.fromHex("9000");
-    byte[] getResponseRApdu = ByteArrayUtil.fromHex("00C0000002");
-    byte[] getResponseCApdu = ByteArrayUtil.fromHex("00009000");
+    byte[] requestApdu = HexUtil.toByteArray("11223344041234567802");
+    byte[] responseApdu = HexUtil.toByteArray("9000");
+    byte[] getResponseRApdu = HexUtil.toByteArray("00C0000002");
+    byte[] getResponseCApdu = HexUtil.toByteArray("00009000");
     when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
     when(readerSpi.transmitApdu(requestApdu)).thenReturn(responseApdu);
     when(readerSpi.transmitApdu(getResponseRApdu)).thenReturn(getResponseCApdu);
@@ -407,13 +407,13 @@ public class LocalReaderAdapterTest {
 
   @Test(expected = UnexpectedStatusWordException.class)
   public void transmitCardRequest_withUnsuccessfulStatusWord_shouldThrow_USW() throws Exception {
-    byte[] responseApdu = ByteArrayUtil.fromHex("123456789000");
-    byte[] requestApdu = ByteArrayUtil.fromHex("0000");
+    byte[] responseApdu = HexUtil.toByteArray("123456789000");
+    byte[] requestApdu = HexUtil.toByteArray("0000");
 
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(responseApdu);
     when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
     when(apduRequestSpi.getSuccessfulStatusWords())
-        .thenReturn(new HashSet<Integer>(Arrays.asList(0x9001)));
+        .thenReturn(new HashSet<Integer>(Collections.singletonList(0x9001)));
     when(cardRequestSpi.stopOnUnsuccessfulStatusWord()).thenReturn(true);
 
     LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
@@ -423,7 +423,7 @@ public class LocalReaderAdapterTest {
 
   @Test(expected = CardBrokenCommunicationException.class)
   public void transmitCardRequest_withCardExceptionOnTransmit_shouldThrow_CBCE() throws Exception {
-    byte[] requestApdu = ByteArrayUtil.fromHex("0000");
+    byte[] requestApdu = HexUtil.toByteArray("0000");
 
     when(readerSpi.transmitApdu(any(byte[].class))).thenThrow(new CardIOException(""));
     when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
@@ -435,7 +435,7 @@ public class LocalReaderAdapterTest {
 
   @Test(expected = ReaderBrokenCommunicationException.class)
   public void transmitCardRequest_withCardExceptionOnTransmit_shouldThrow_RBCE() throws Exception {
-    byte[] requestApdu = ByteArrayUtil.fromHex("0000");
+    byte[] requestApdu = HexUtil.toByteArray("0000");
 
     when(readerSpi.transmitApdu(any(byte[].class))).thenThrow(new ReaderIOException(""));
     when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
