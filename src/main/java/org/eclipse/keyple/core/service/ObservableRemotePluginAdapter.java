@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.distributed.remote.ObservableRemotePluginApi;
 import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemoteReaderSpi;
@@ -284,7 +285,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     }
     Assert.getInstance().notEmpty(remoteReaderName, "remoteReaderName");
 
-    Reader reader = getReader(remoteReaderName);
+    CardReader reader = getReader(remoteReaderName);
 
     if (reader instanceof RemoteReaderAdapter) {
       getReadersMap().remove(reader.getName());

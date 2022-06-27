@@ -12,13 +12,14 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.calypsonet.terminal.reader.CardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * (package-private)<br>
- * This monitoring job polls the {@link Reader#isCardPresent()} method to detect a card insertion or
- * a card removal.
+ * This monitoring job polls the {@link CardReader#isCardPresent()} method to detect a card
+ * insertion or a card removal.
  *
  * <p>All runtime exceptions that may occur during the monitoring process are caught and notified at
  * the application level through the {@link

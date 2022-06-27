@@ -12,9 +12,10 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.SortedSet;
+import org.calypsonet.terminal.reader.CardReader;
 
 /**
- * Plugin able to handle the access to an undefined number of {@link Reader}.
+ * Plugin able to handle the access to an undefined number of {@link CardReader}.
  *
  * <p>It is typically used to define a plugin built on top of an HSM interface that can allocate a
  * large number of virtual reader slots.
@@ -37,7 +38,7 @@ public interface PoolPlugin extends Plugin {
   SortedSet<String> getReaderGroupReferences();
 
   /**
-   * Gets a {@link Reader} and makes it exclusive to the caller until the {@link
+   * Gets a {@link CardReader} and makes it exclusive to the caller until the {@link
    * #releaseReader(Reader)} method is invoked.
    *
    * <p>The allocated reader belongs to the group targeted with provided reference.

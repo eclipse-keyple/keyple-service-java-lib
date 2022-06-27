@@ -12,7 +12,6 @@
 package org.eclipse.keyple.core.service;
 
 import org.calypsonet.terminal.reader.CardReaderEvent;
-import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
 
 /**
  * All information about a change of card state within an {@link ObservableReader}.
@@ -21,37 +20,17 @@ import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
  * event.
  *
  * @since 2.0.0
+ * @deprecated Use {@link CardReaderEvent} instead.
  */
+@Deprecated
 public interface ReaderEvent extends CardReaderEvent {
   /**
    * Gets the name of the plugin from which the reader that generated the event comes from.
    *
    * @return A not empty string.
    * @since 2.0.0
+   * @deprecated No longer supported.
    */
+  @Deprecated
   String getPluginName();
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0.0
-   */
-  @Override
-  String getReaderName();
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0.0
-   */
-  @Override
-  Type getType();
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0.0
-   */
-  @Override
-  ScheduledCardSelectionsResponse getScheduledCardSelectionsResponse();
 }

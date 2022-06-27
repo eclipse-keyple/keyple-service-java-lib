@@ -17,5 +17,7 @@ import org.calypsonet.terminal.reader.ObservableCardReader;
  * Keyple observable card reader.
  *
  * @since 2.0.0
+ * @deprecated Use {@link ObservableCardReader} instead.
  */
+@Deprecated
 public interface ObservableReader extends Reader, ObservableCardReader {}

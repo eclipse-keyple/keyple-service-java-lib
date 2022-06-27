@@ -240,7 +240,7 @@ final class DistributedUtilAdapter {
     ALLOCATE_READER,
 
     /**
-     * Refers to {@link PoolPlugin#releaseReader(Reader)}
+     * Refers to {@link PoolPlugin#releaseReader(CardReader)}
      *
      * @since 2.0.0
      */
@@ -297,14 +297,14 @@ final class DistributedUtilAdapter {
     SCHEDULE_CARD_SELECTION_SCENARIO,
 
     /**
-     * Refers to {@link Reader#isCardPresent()}
+     * Refers to {@link CardReader#isCardPresent()}
      *
      * @since 2.0.0
      */
     IS_CARD_PRESENT,
 
     /**
-     * Refers to {@link Reader#isContactless()}
+     * Refers to {@link CardReader#isContactless()}
      *
      * @since 2.0.0
      */

@@ -12,10 +12,12 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.Set;
+import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
+import org.eclipse.keyple.core.common.KeypleReaderExtension;
 
 /**
- * Manager for one or more {@link Reader} from the same family.
+ * Manager for one or more {@link CardReader} from the same family.
  *
  * <p>Provides the means to get the plugin name, enumerate and retrieve the readers.
  *
@@ -44,6 +46,22 @@ public interface Plugin {
   <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionClass);
 
   /**
+   * Returns the {@link KeypleReaderExtension} that is reader-specific.
+   *
+   * <p>Note: the provided argument is used at compile time to check the type consistency.
+   *
+   * @param readerExtensionClass The specific class of the reader.
+   * @param readerName The name of the reader.
+   * @param <T> The type of the reader extension.
+   * @return A {@link KeypleReaderExtension}.
+   * @throws IllegalStateException If plugin or reader is no longer registered.
+   * @throws IllegalArgumentException If the reader name is unknown.
+   * @since 2.1.0
+   */
+  <T extends KeypleReaderExtension> T getReaderExtension(
+      Class<T> readerExtensionClass, String readerName);
+
+  /**
    * Gets the names of all connected readers.
    *
    * @return An empty set if there's no reader connected.
@@ -62,7 +80,7 @@ public interface Plugin {
   Set<Reader> getReaders();
 
   /**
-   * Gets the {@link Reader} whose name is provided.
+   * Gets the {@link CardReader} whose name is provided.
    *
    * @param name The name of the reader.
    * @return Null if the reader has not been found.

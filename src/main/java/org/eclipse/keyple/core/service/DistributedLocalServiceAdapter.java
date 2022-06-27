@@ -19,6 +19,7 @@ import java.util.*;
 import org.calypsonet.terminal.card.*;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
+import org.calypsonet.terminal.reader.CardReader;
 import org.calypsonet.terminal.reader.CardReaderEvent;
 import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
@@ -161,7 +162,7 @@ final class DistributedLocalServiceAdapter
           name,
           readerEvent.getType().name(),
           readerEvent.getReaderName(),
-          ((ReaderEvent) readerEvent).getPluginName());
+          ((ReaderEventAdapter) readerEvent).getPluginName());
     }
 
     JsonObject body = new JsonObject();
@@ -176,7 +177,7 @@ final class DistributedLocalServiceAdapter
    *
    * @since 2.0.0
    */
-  final void register() {
+  void register() {
     isRegistered = true;
   }
 
@@ -191,9 +192,9 @@ final class DistributedLocalServiceAdapter
       if (plugin instanceof ObservablePlugin) {
         ((ObservablePlugin) plugin).removeObserver(this);
       }
-      for (Reader reader : plugin.getReaders()) {
-        if (reader instanceof ObservableReader) {
-          ((ObservableReader) reader).removeObserver(this);
+      for (CardReader reader : plugin.getReaders()) {
+        if (reader instanceof ObservableCardReader) {
+          ((ObservableCardReader) reader).removeObserver(this);
         }
       }
     }
@@ -252,7 +253,7 @@ final class DistributedLocalServiceAdapter
     private AbstractReaderAdapter getReader(String readerName) {
       for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
         try {
-          Reader localReader = plugin.getReader(readerName);
+          CardReader localReader = plugin.getReader(readerName);
           if (localReader != null) {
             return (AbstractReaderAdapter) localReader;
           }
@@ -556,7 +557,7 @@ final class DistributedLocalServiceAdapter
       // Execute the service on the plugins
       Map<String, Boolean> readers = new HashMap<String, Boolean>();
       for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
-        for (Reader reader : plugin.getReaders()) {
+        for (CardReader reader : plugin.getReaders()) {
           readers.put(reader.getName(), reader instanceof ObservableReader);
         }
       }
@@ -620,7 +621,7 @@ final class DistributedLocalServiceAdapter
                 "There is no local pool plugin registered having the reader group name '%s'.",
                 readerGroupReference));
       }
-      Reader reader = poolPlugin.allocateReader(readerGroupReference);
+      CardReader reader = poolPlugin.allocateReader(readerGroupReference);
 
       // Build result
       output.addProperty(JsonProperty.RESULT.name(), reader.getName());
