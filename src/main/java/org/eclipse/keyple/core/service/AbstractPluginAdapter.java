@@ -15,7 +15,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
+import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
@@ -109,7 +111,7 @@ abstract class AbstractPluginAdapter implements Plugin {
    * @since 2.0.0
    */
   void unregister() {
-    for (Reader reader : readers.values()) {
+    for (CardReader reader : readers.values()) {
       try {
         ((AbstractReaderAdapter) reader).unregister();
       } catch (Exception e) {
@@ -139,6 +141,22 @@ abstract class AbstractPluginAdapter implements Plugin {
   public final <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionClass) {
     checkStatus();
     return (T) pluginExtension;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.1.0
+   */
+  @Override
+  public final <T extends KeypleReaderExtension> T getReaderExtension(
+      Class<T> readerExtensionClass, String readerName) {
+    checkStatus();
+    AbstractReaderAdapter reader = (AbstractReaderAdapter) getReader(readerName);
+    if (reader == null) {
+      throw new IllegalArgumentException("Reader '" + readerName + "'not found!");
+    }
+    return reader.getExtension(readerExtensionClass);
   }
 
   /**

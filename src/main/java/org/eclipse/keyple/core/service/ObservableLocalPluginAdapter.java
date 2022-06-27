@@ -14,6 +14,7 @@ package org.eclipse.keyple.core.service;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.ConcurrentSkipListSet;
+import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.ObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
@@ -172,7 +173,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
      * (private)<br>
      * Removes a reader from the list of known readers (by the plugin)
      */
-    private void removeReader(Reader reader) {
+    private void removeReader(CardReader reader) {
       ((LocalReaderAdapter) reader).unregister();
       getReadersMap().remove(reader.getName());
       if (logger.isTraceEnabled()) {
@@ -222,7 +223,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       /* notify disconnections if any and update the reader list */
       if (!changedReaderNames.isEmpty()) {
         /* list update */
-        for (Reader reader : readers) {
+        for (CardReader reader : readers) {
           if (!actualNativeReaderNames.contains(reader.getName())) {
             removeReader(reader);
           }

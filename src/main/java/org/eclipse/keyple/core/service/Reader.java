@@ -18,7 +18,9 @@ import org.eclipse.keyple.core.common.KeypleReaderExtension;
  * Drives the underlying hardware to configure the search and check for the presence of cards.
  *
  * @since 2.0.0
+ * @deprecated Use {@link CardReader} instead.
  */
+@Deprecated
 public interface Reader extends CardReader {
 
   /**
@@ -31,6 +33,8 @@ public interface Reader extends CardReader {
    * @return A {@link KeypleReaderExtension}.
    * @throws IllegalStateException If reader is no longer registered.
    * @since 2.0.0
+   * @deprecated Use {@link Plugin#getReaderExtension(Class, String)} instead.
    */
+  @Deprecated
   <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionClass);
 }

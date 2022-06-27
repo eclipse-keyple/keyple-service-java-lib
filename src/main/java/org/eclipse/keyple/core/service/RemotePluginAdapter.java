@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.HashMap;
 import java.util.Map;
+import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.distributed.remote.RemotePluginApi;
 import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemoteReaderSpi;
@@ -164,7 +165,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
     }
 
     // Get the target reader.
-    Reader reader = getReader(readerEvent.getReaderName());
+    CardReader reader = getReader(readerEvent.getReaderName());
     if (!(reader instanceof ObservableReader)) {
       throw new IllegalArgumentException(
           String.format(

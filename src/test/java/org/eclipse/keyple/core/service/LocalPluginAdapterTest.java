@@ -156,4 +156,34 @@ public class LocalPluginAdapterTest {
     assertThat(localPluginAdapter.getExtension(PluginSpiMock.class))
         .isInstanceOf(PluginSpiMock.class);
   }
+
+  @Test
+  public void getReaderExtension_whenReaderIsRegistered_shouldReturnExtension() throws Exception {
+    Set<ReaderSpi> readerSpis = new HashSet<ReaderSpi>();
+    readerSpis.add(readerSpi1);
+    when(pluginSpi.searchAvailableReaders()).thenReturn(readerSpis);
+    LocalPluginAdapter localPluginAdapter = new LocalPluginAdapter(pluginSpi);
+    localPluginAdapter.register();
+    assertThat(localPluginAdapter.getReaderExtension(ReaderSpiMock.class, READER_NAME_1))
+        .isEqualTo(readerSpi1);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void getReaderExtension_whenReaderNameIsUnknown_shouldReturnIAE() throws Exception {
+    Set<ReaderSpi> readerSpis = new HashSet<ReaderSpi>();
+    readerSpis.add(readerSpi1);
+    when(pluginSpi.searchAvailableReaders()).thenReturn(readerSpis);
+    LocalPluginAdapter localPluginAdapter = new LocalPluginAdapter(pluginSpi);
+    localPluginAdapter.register();
+    localPluginAdapter.getReaderExtension(ReaderSpiMock.class, "UNKNOWN");
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void getReaderExtension_whenPluginIsNotRegistered_shouldISE() throws Exception {
+    Set<ReaderSpi> readerSpis = new HashSet<ReaderSpi>();
+    readerSpis.add(readerSpi1);
+    when(pluginSpi.searchAvailableReaders()).thenReturn(readerSpis);
+    LocalPluginAdapter localPluginAdapter = new LocalPluginAdapter(pluginSpi);
+    localPluginAdapter.getReaderExtension(ReaderSpiMock.class, READER_NAME_1);
+  }
 }

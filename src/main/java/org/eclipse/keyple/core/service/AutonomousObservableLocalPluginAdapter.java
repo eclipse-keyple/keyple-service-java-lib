@@ -13,6 +13,7 @@ package org.eclipse.keyple.core.service;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.plugin.AutonomousObservablePluginApi;
 import org.eclipse.keyple.core.plugin.spi.AutonomousObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
@@ -76,7 +77,7 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
     Set<String> notifyReaders = new HashSet<String>();
 
     for (String readerName : readerNames) {
-      Reader reader = this.getReader(readerName);
+      CardReader reader = this.getReader(readerName);
       if (reader == null) {
         logger.warn(
             "[{}] ObservableLocalPlugin => Impossible to remove reader, reader not found with name : {}",

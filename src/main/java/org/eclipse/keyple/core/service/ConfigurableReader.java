@@ -17,5 +17,7 @@ import org.calypsonet.terminal.reader.ConfigurableCardReader;
  * Drives the underlying hardware to configure the protocol to use.
  *
  * @since 2.0.0
+ * @deprecated Use {@link ConfigurableCardReader} instead.
  */
+@Deprecated
 public interface ConfigurableReader extends Reader, ConfigurableCardReader {}
