@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 2.0.2 (17/02/2022)
+    Keyple - Adapter of keyple-service-java-lib - 2.1.0 (27/06/2022)
 end title
 
 ' == THEME ==
@@ -15,13 +15,19 @@ end title
 !define C_LINK 3498DB
 !define C_USE 27AE60
 
-skinparam Shadowing false
-skinparam ClassFontStyle italic
-skinparam ClassBorderColor #D4AC0D
+' -- Styles that don't work with new version of plantuml --
 skinparam stereotypeABorderColor #A9DCDF
 skinparam stereotypeIBorderColor #B4A7E5
 skinparam stereotypeCBorderColor #ADD1B2
 skinparam stereotypeEBorderColor #EB93DF
+' -- END --
+
+skinparam ClassBorderThickness 2
+skinparam ArrowThickness 2
+
+' Yellow
+skinparam ClassBackgroundColor #FEFECE
+skinparam ClassBorderColor #D4AC0D
 ' Red
 skinparam ClassBackgroundColor<<red>> #FDEDEC
 skinparam ClassBorderColor<<red>> #E74C3C
@@ -113,6 +119,7 @@ package "org.eclipse.keyple.core.service" as service {
         -- **Plugin** --
         +**final** String getName ()
         +**final** <T extends <back:cyan>KeyplePluginExtension</back>> T getExtension (Class<T> pluginExtensionClass)
+        +**final** <T extends <back:cyan>KeypleReaderExtension</back>> T getReaderExtension (Class<T> readerExtensionClass, String readerName)
         +**final** Set<String> getReaderNames ()
         +**final** Set<Reader> getReaders ()
         +**final** Reader getReader (String readerName)
