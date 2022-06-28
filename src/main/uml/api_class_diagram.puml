@@ -105,7 +105,7 @@ package "org.eclipse.keyple.core.service" as service {
         +SortedSet<String> getReaderGroupReferences ()
 
         +Reader allocateReader (String readerGroupReference)
-        +void releaseReader (Reader reader)
+        +void releaseReader (<back:yellow>CardReader</back> reader)
     }
     +interface "<<<back:yellow>CardReader</back>>>\n<s>Reader</s>" as Reader {
         +<s><T extends <back:cyan>KeypleReaderExtension</back>> T getExtension (Class<T> readerExtensionClass)</s>

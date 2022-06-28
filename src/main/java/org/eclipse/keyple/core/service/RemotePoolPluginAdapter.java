@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePoolPluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
@@ -152,7 +153,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
    * @since 2.0.0
    */
   @Override
-  public void releaseReader(Reader reader) {
+  public void releaseReader(CardReader reader) {
 
     checkStatus();
     if (logger.isDebugEnabled()) {

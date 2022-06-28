@@ -149,7 +149,7 @@ package "org.eclipse.keyple.core.service" as service {
         -- **PoolPlugin** --
         +SortedSet<String> getReaderGroupReferences ()
         +Reader allocateReader (String readerGroupReference)
-        +void releaseReader (Reader reader)
+        +void releaseReader (<back:yellow>CardReader</back> reader)
     }
     ~class "<<PoolPlugin>>\n**final** RemotePoolPluginAdapter" as RemotePoolPluginAdapter extends AbstractPluginAdapter {
         --
@@ -159,7 +159,7 @@ package "org.eclipse.keyple.core.service" as service {
         -- **PoolPlugin** --
         +SortedSet<String> getReaderGroupReferences ()
         +Reader allocateReader (String readerGroupReference)
-        +void releaseReader (Reader reader)
+        +void releaseReader (<back:yellow>CardReader</back> reader)
     }
     ' OBSERVATION MANAGER
     ~class "**final** ObservationManagerAdapter\n\n**T** : PluginObserverSpi\nor <back:yellow>CardReaderObserverSpi</back>\n\n**S** : PluginObservationExceptionHandlerSpi\nor <back:yellow>CardReaderObservationExceptionHandlerSpi</back>" as ObservationManagerAdapter<T, S> {
@@ -577,7 +577,7 @@ package "org.eclipse.keyple.core.service" as service {
         +void setMultipleSelectionMode ()
         +int prepareSelection (<back:yellow>CardSelection</back> cardSelection)
         +void prepareReleaseChannel ()
-        +<back:yellow>CardSelectionResult</back> processCardSelectionScenario (Reader reader)
+        +<back:yellow>CardSelectionResult</back> processCardSelectionScenario (<back:yellow>CardReader</back> reader)
         +void scheduleCardSelectionScenario (ObservableReader observableReader, <back:yellow>DetectionMode</back> detectionMode, <back:yellow>NotificationMode</back> notificationMode)
         +<back:yellow>CardSelectionResult</back> parseScheduledCardSelectionsResponse (ScheduledCardSelectionsResponseAdapter scheduledCardSelectionsResponse)
     }

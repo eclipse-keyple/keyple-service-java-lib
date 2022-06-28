@@ -39,7 +39,7 @@ public interface PoolPlugin extends Plugin {
 
   /**
    * Gets a {@link CardReader} and makes it exclusive to the caller until the {@link
-   * #releaseReader(Reader)} method is invoked.
+   * #releaseReader(CardReader)} method is invoked.
    *
    * <p>The allocated reader belongs to the group targeted with provided reference.
    *
@@ -60,5 +60,5 @@ public interface PoolPlugin extends Plugin {
    * @param reader The Reader to be released.
    * @since 2.0.0
    */
-  void releaseReader(Reader reader);
+  void releaseReader(CardReader reader);
 }

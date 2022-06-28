@@ -12,6 +12,7 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.SortedSet;
+import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.PoolPluginSpi;
@@ -120,7 +121,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
    * @since 2.0.0
    */
   @Override
-  public void releaseReader(Reader reader) {
+  public void releaseReader(CardReader reader) {
 
     checkStatus();
     if (logger.isDebugEnabled()) {
