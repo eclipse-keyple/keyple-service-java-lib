@@ -164,7 +164,7 @@ extends <a href="Plugin.html" title="interface in org.eclipse.keyple.core.servic
 <td class="colFirst"><code><a href="Reader.html" title="interface in org.eclipse.keyple.core.service">Reader</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#allocateReader(java.lang.String)">allocateReader</a></span>&#8203;(java.lang.String&nbsp;readerGroupReference)</code></th>
 <td class="colLast">
-<div class="block">Gets a <code>CardReader</code> and makes it exclusive to the caller until the <a href="#releaseReader(org.eclipse.keyple.core.service.Reader)"><code>releaseReader(Reader)</code></a> method is invoked.</div>
+<div class="block">Gets a <code>CardReader</code> and makes it exclusive to the caller until the <a href="#releaseReader(org.calypsonet.terminal.reader.CardReader)"><code>releaseReader(CardReader)</code></a> method is invoked.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -176,7 +176,7 @@ extends <a href="Plugin.html" title="interface in org.eclipse.keyple.core.servic
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#releaseReader(org.eclipse.keyple.core.service.Reader)">releaseReader</a></span>&#8203;(<a href="Reader.html" title="interface in org.eclipse.keyple.core.service">Reader</a>&nbsp;reader)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#releaseReader(org.calypsonet.terminal.reader.CardReader)">releaseReader</a></span>&#8203;(org.calypsonet.terminal.reader.CardReader&nbsp;reader)</code></th>
 <td class="colLast">
 <div class="block">Releases a Reader previously allocated with allocateReader.</div>
 </td>
@@ -231,7 +231,7 @@ extends <a href="Plugin.html" title="interface in org.eclipse.keyple.core.servic
 <li class="blockList">
 <h4>allocateReader</h4>
 <pre class="methodSignature"><a href="Reader.html" title="interface in org.eclipse.keyple.core.service">Reader</a>&nbsp;allocateReader&#8203;(java.lang.String&nbsp;readerGroupReference)</pre>
-<div class="block">Gets a <code>CardReader</code> and makes it exclusive to the caller until the <a href="#releaseReader(org.eclipse.keyple.core.service.Reader)"><code>releaseReader(Reader)</code></a> method is invoked.
+<div class="block">Gets a <code>CardReader</code> and makes it exclusive to the caller until the <a href="#releaseReader(org.calypsonet.terminal.reader.CardReader)"><code>releaseReader(CardReader)</code></a> method is invoked.
 
  <p>The allocated reader belongs to the group targeted with provided reference.</div>
 <dl>
@@ -247,13 +247,13 @@ extends <a href="Plugin.html" title="interface in org.eclipse.keyple.core.servic
 </dl>
 </li>
 </ul>
-<a id="releaseReader(org.eclipse.keyple.core.service.Reader)">
+<a id="releaseReader(org.calypsonet.terminal.reader.CardReader)">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>releaseReader</h4>
-<pre class="methodSignature">void&nbsp;releaseReader&#8203;(<a href="Reader.html" title="interface in org.eclipse.keyple.core.service">Reader</a>&nbsp;reader)</pre>
+<pre class="methodSignature">void&nbsp;releaseReader&#8203;(org.calypsonet.terminal.reader.CardReader&nbsp;reader)</pre>
 <div class="block">Releases a Reader previously allocated with allocateReader.
 
  <p>This method must be invoked as soon as the reader is no longer needed by the caller of

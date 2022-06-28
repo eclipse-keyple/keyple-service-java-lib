@@ -162,7 +162,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colFirst"><code><a href="../Reader.html" title="interface in org.eclipse.keyple.core.service">Reader</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">PoolPlugin.</span><code><span class="memberNameLink"><a href="../PoolPlugin.html#allocateReader(java.lang.String)">allocateReader</a></span>&#8203;(java.lang.String&nbsp;readerGroupReference)</code></th>
 <td class="colLast">
-<div class="block">Gets a <code>CardReader</code> and makes it exclusive to the caller until the <a href="../PoolPlugin.html#releaseReader(org.eclipse.keyple.core.service.Reader)"><code>PoolPlugin.releaseReader(Reader)</code></a> method is invoked.</div>
+<div class="block">Gets a <code>CardReader</code> and makes it exclusive to the caller until the <a href="../PoolPlugin.html#releaseReader(org.calypsonet.terminal.reader.CardReader)"><code>PoolPlugin.releaseReader(CardReader)</code></a> method is invoked.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -187,23 +187,6 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <th class="colSecond" scope="row"><span class="typeNameLabel">Plugin.</span><code><span class="memberNameLink"><a href="../Plugin.html#getReaders()">getReaders</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Gets all connected readers.</div>
-</td>
-</tr>
-</tbody>
-</table>
-<table class="useSummary">
-<caption><span>Methods in <a href="../package-summary.html">org.eclipse.keyple.core.service</a> with parameters of type <a href="../Reader.html" title="interface in org.eclipse.keyple.core.service">Reader</a></span><span class="tabEnd">&nbsp;</span></caption>
-<tr>
-<th class="colFirst" scope="col">Modifier and Type</th>
-<th class="colSecond" scope="col">Method</th>
-<th class="colLast" scope="col">Description</th>
-</tr>
-<tbody>
-<tr class="altColor">
-<td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">PoolPlugin.</span><code><span class="memberNameLink"><a href="../PoolPlugin.html#releaseReader(org.eclipse.keyple.core.service.Reader)">releaseReader</a></span>&#8203;(<a href="../Reader.html" title="interface in org.eclipse.keyple.core.service">Reader</a>&nbsp;reader)</code></th>
-<td class="colLast">
-<div class="block">Releases a Reader previously allocated with allocateReader.</div>
 </td>
 </tr>
 </tbody>
