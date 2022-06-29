@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - keyple-service-java-lib - 2.1.+ (27/06/2022)
+    Keyple - keyple-service-java-lib - 2.1.+ (29/06/2022)
 end title
 
 ' == THEME ==
@@ -69,6 +69,8 @@ package "org.eclipse.keyple.core.service" as service {
         +Set<String> getPluginNames ()
         +Set<Plugin> getPlugins ()
         +Plugin getPlugin (String pluginName)
+        +Plugin getPlugin (<back:yellow>CardReader</back> reader)
+        +<back:yellow>CardReader</back> getReader (String readerName)
 
         +void checkCardExtension (<back:cyan>KeypleCardExtension</back> cardExtension)
 

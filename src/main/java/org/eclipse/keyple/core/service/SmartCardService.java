@@ -72,11 +72,11 @@ public interface SmartCardService {
   /**
    * Returns the plugin associated to the provided {@link CardReader}.
    *
-   * @param cardReader The card reader.
+   * @param reader The card reader.
    * @return Null if the plugin is not found or no longer registered.
    * @since 2.1.0
    */
-  Plugin getPlugin(CardReader cardReader);
+  Plugin getPlugin(CardReader reader);
 
   /**
    * Returns the reader associated to the provided unique name.
