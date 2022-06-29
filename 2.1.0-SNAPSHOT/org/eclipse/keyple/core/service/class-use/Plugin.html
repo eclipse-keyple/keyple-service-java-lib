@@ -158,10 +158,17 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colFirst"><code><a href="../Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">SmartCardService.</span><code><span class="memberNameLink"><a href="../SmartCardService.html#getPlugin(java.lang.String)">getPlugin</a></span>&#8203;(java.lang.String&nbsp;pluginName)</code></th>
 <td class="colLast">
-<div class="block">Gets the plugin whose name is provided as an argument.</div>
+<div class="block">Returns the plugin whose name is provided as an argument.</div>
 </td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code><a href="../Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a></code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">SmartCardService.</span><code><span class="memberNameLink"><a href="../SmartCardService.html#getPlugin(org.calypsonet.terminal.reader.CardReader)">getPlugin</a></span>&#8203;(org.calypsonet.terminal.reader.CardReader&nbsp;reader)</code></th>
+<td class="colLast">
+<div class="block">Returns the plugin associated to the provided <code>CardReader</code>.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code><a href="../Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">SmartCardService.</span><code><span class="memberNameLink"><a href="../SmartCardService.html#registerPlugin(org.eclipse.keyple.core.common.KeyplePluginExtensionFactory)">registerPlugin</a></span>&#8203;(org.eclipse.keyple.core.common.KeyplePluginExtensionFactory&nbsp;pluginFactory)</code></th>
 <td class="colLast">
@@ -182,7 +189,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colFirst"><code>java.util.Set&lt;<a href="../Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a>&gt;</code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">SmartCardService.</span><code><span class="memberNameLink"><a href="../SmartCardService.html#getPlugins()">getPlugins</a></span>()</code></th>
 <td class="colLast">
-<div class="block">Gets all registered plugins.</div>
+<div class="block">Returns all registered plugins.</div>
 </td>
 </tr>
 </tbody>

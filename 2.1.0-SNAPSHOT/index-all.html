@@ -152,7 +152,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dl>
 <dt><span class="memberNameLink"><a href="org/eclipse/keyple/core/service/SmartCardService.html#getDistributedLocalService(java.lang.String)">getDistributedLocalService(String)</a></span> - Method in interface org.eclipse.keyple.core.service.<a href="org/eclipse/keyple/core/service/SmartCardService.html" title="interface in org.eclipse.keyple.core.service">SmartCardService</a></dt>
 <dd>
-<div class="block">Gets the distributed local service having the provided name.</div>
+<div class="block">Returns the distributed local service having the provided name.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="org/eclipse/keyple/core/service/DistributedLocalService.html#getExtension(java.lang.Class)">getExtension(Class&lt;T&gt;)</a></span> - Method in interface org.eclipse.keyple.core.service.<a href="org/eclipse/keyple/core/service/DistributedLocalService.html" title="interface in org.eclipse.keyple.core.service">DistributedLocalService</a></dt>
 <dd>
@@ -178,7 +178,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dd>
 <dt><span class="memberNameLink"><a href="org/eclipse/keyple/core/service/SmartCardService.html#getPlugin(java.lang.String)">getPlugin(String)</a></span> - Method in interface org.eclipse.keyple.core.service.<a href="org/eclipse/keyple/core/service/SmartCardService.html" title="interface in org.eclipse.keyple.core.service">SmartCardService</a></dt>
 <dd>
-<div class="block">Gets the plugin whose name is provided as an argument.</div>
+<div class="block">Returns the plugin whose name is provided as an argument.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="org/eclipse/keyple/core/service/SmartCardService.html#getPlugin(org.calypsonet.terminal.reader.CardReader)">getPlugin(CardReader)</a></span> - Method in interface org.eclipse.keyple.core.service.<a href="org/eclipse/keyple/core/service/SmartCardService.html" title="interface in org.eclipse.keyple.core.service">SmartCardService</a></dt>
+<dd>
+<div class="block">Returns the plugin associated to the provided <code>CardReader</code>.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="org/eclipse/keyple/core/service/PluginEvent.html#getPluginName()">getPluginName()</a></span> - Method in interface org.eclipse.keyple.core.service.<a href="org/eclipse/keyple/core/service/PluginEvent.html" title="interface in org.eclipse.keyple.core.service">PluginEvent</a></dt>
 <dd>
@@ -192,15 +196,19 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dd>
 <dt><span class="memberNameLink"><a href="org/eclipse/keyple/core/service/SmartCardService.html#getPluginNames()">getPluginNames()</a></span> - Method in interface org.eclipse.keyple.core.service.<a href="org/eclipse/keyple/core/service/SmartCardService.html" title="interface in org.eclipse.keyple.core.service">SmartCardService</a></dt>
 <dd>
-<div class="block">Gets the names of all registered plugins.</div>
+<div class="block">Returns the names of all registered plugins.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="org/eclipse/keyple/core/service/SmartCardService.html#getPlugins()">getPlugins()</a></span> - Method in interface org.eclipse.keyple.core.service.<a href="org/eclipse/keyple/core/service/SmartCardService.html" title="interface in org.eclipse.keyple.core.service">SmartCardService</a></dt>
 <dd>
-<div class="block">Gets all registered plugins.</div>
+<div class="block">Returns all registered plugins.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="org/eclipse/keyple/core/service/Plugin.html#getReader(java.lang.String)">getReader(String)</a></span> - Method in interface org.eclipse.keyple.core.service.<a href="org/eclipse/keyple/core/service/Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a></dt>
 <dd>
 <div class="block">Gets the <code>CardReader</code> whose name is provided.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="org/eclipse/keyple/core/service/SmartCardService.html#getReader(java.lang.String)">getReader(String)</a></span> - Method in interface org.eclipse.keyple.core.service.<a href="org/eclipse/keyple/core/service/SmartCardService.html" title="interface in org.eclipse.keyple.core.service">SmartCardService</a></dt>
+<dd>
+<div class="block">Returns the reader associated to the provided unique name.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="org/eclipse/keyple/core/service/Plugin.html#getReaderExtension(java.lang.Class,java.lang.String)">getReaderExtension(Class&lt;T&gt;, String)</a></span> - Method in interface org.eclipse.keyple.core.service.<a href="org/eclipse/keyple/core/service/Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a></dt>
 <dd>

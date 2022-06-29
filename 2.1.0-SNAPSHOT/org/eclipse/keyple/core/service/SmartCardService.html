@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6};
+var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -168,59 +168,73 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colFirst"><code><a href="DistributedLocalService.html" title="interface in org.eclipse.keyple.core.service">DistributedLocalService</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDistributedLocalService(java.lang.String)">getDistributedLocalService</a></span>&#8203;(java.lang.String&nbsp;distributedLocalServiceName)</code></th>
 <td class="colLast">
-<div class="block">Gets the distributed local service having the provided name.</div>
+<div class="block">Returns the distributed local service having the provided name.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPlugin(java.lang.String)">getPlugin</a></span>&#8203;(java.lang.String&nbsp;pluginName)</code></th>
 <td class="colLast">
-<div class="block">Gets the plugin whose name is provided as an argument.</div>
+<div class="block">Returns the plugin whose name is provided as an argument.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPluginNames()">getPluginNames</a></span>()</code></th>
+<td class="colFirst"><code><a href="Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPlugin(org.calypsonet.terminal.reader.CardReader)">getPlugin</a></span>&#8203;(org.calypsonet.terminal.reader.CardReader&nbsp;reader)</code></th>
 <td class="colLast">
-<div class="block">Gets the names of all registered plugins.</div>
+<div class="block">Returns the plugin associated to the provided <code>CardReader</code>.</div>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code>java.util.Set&lt;<a href="Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPlugins()">getPlugins</a></span>()</code></th>
+<td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPluginNames()">getPluginNames</a></span>()</code></th>
 <td class="colLast">
-<div class="block">Gets all registered plugins.</div>
+<div class="block">Returns the names of all registered plugins.</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
+<td class="colFirst"><code>java.util.Set&lt;<a href="Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPlugins()">getPlugins</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Returns all registered plugins.</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code>org.calypsonet.terminal.reader.CardReader</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getReader(java.lang.String)">getReader</a></span>&#8203;(java.lang.String&nbsp;readerName)</code></th>
+<td class="colLast">
+<div class="block">Returns the reader associated to the provided unique name.</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isDistributedLocalServiceRegistered(java.lang.String)">isDistributedLocalServiceRegistered</a></span>&#8203;(java.lang.String&nbsp;distributedLocalServiceName)</code></th>
 <td class="colLast">
 <div class="block">Checks whether a distributed local service is already registered to the service or not.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code><a href="DistributedLocalService.html" title="interface in org.eclipse.keyple.core.service">DistributedLocalService</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#registerDistributedLocalService(org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory)">registerDistributedLocalService</a></span>&#8203;(org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory&nbsp;distributedLocalServiceExtensionFactory)</code></th>
 <td class="colLast">
 <div class="block">Registers a new distributed local service to the service.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code><a href="Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#registerPlugin(org.eclipse.keyple.core.common.KeyplePluginExtensionFactory)">registerPlugin</a></span>&#8203;(org.eclipse.keyple.core.common.KeyplePluginExtensionFactory&nbsp;pluginFactory)</code></th>
 <td class="colLast">
 <div class="block">Registers a new plugin to the service.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#unregisterDistributedLocalService(java.lang.String)">unregisterDistributedLocalService</a></span>&#8203;(java.lang.String&nbsp;distributedLocalServiceName)</code></th>
 <td class="colLast">
 <div class="block">Attempts to unregister the distributed local service having the provided name from the service.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#unregisterPlugin(java.lang.String)">unregisterPlugin</a></span>&#8203;(java.lang.String&nbsp;pluginName)</code></th>
 <td class="colLast">
@@ -288,7 +302,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <h4>getPluginNames</h4>
 <pre class="methodSignature">java.util.Set&lt;java.lang.String&gt;&nbsp;getPluginNames()</pre>
-<div class="block">Gets the names of all registered plugins.</div>
+<div class="block">Returns the names of all registered plugins.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A not null Set String.</dd>
@@ -304,7 +318,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <h4>getPlugins</h4>
 <pre class="methodSignature">java.util.Set&lt;<a href="Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a>&gt;&nbsp;getPlugins()</pre>
-<div class="block">Gets all registered plugins.</div>
+<div class="block">Returns all registered plugins.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A not null Set of <a href="Plugin.html" title="interface in org.eclipse.keyple.core.service"><code>Plugin</code></a>.</dd>
@@ -320,7 +334,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <h4>getPlugin</h4>
 <pre class="methodSignature"><a href="Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a>&nbsp;getPlugin&#8203;(java.lang.String&nbsp;pluginName)</pre>
-<div class="block">Gets the plugin whose name is provided as an argument.</div>
+<div class="block">Returns the plugin whose name is provided as an argument.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>pluginName</code> - The plugin name.</dd>
@@ -328,6 +342,42 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>Null if the plugin is not found or no longer registered.</dd>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>2.0.0</dd>
+</dl>
+</li>
+</ul>
+<a id="getPlugin(org.calypsonet.terminal.reader.CardReader)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getPlugin</h4>
+<pre class="methodSignature"><a href="Plugin.html" title="interface in org.eclipse.keyple.core.service">Plugin</a>&nbsp;getPlugin&#8203;(org.calypsonet.terminal.reader.CardReader&nbsp;reader)</pre>
+<div class="block">Returns the plugin associated to the provided <code>CardReader</code>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>reader</code> - The card reader.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Null if the plugin is not found or no longer registered.</dd>
+<dt><span class="simpleTagLabel">Since:</span></dt>
+<dd>2.1.0</dd>
+</dl>
+</li>
+</ul>
+<a id="getReader(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getReader</h4>
+<pre class="methodSignature">org.calypsonet.terminal.reader.CardReader&nbsp;getReader&#8203;(java.lang.String&nbsp;readerName)</pre>
+<div class="block">Returns the reader associated to the provided unique name.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>readerName</code> - The name of the card reader.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Null if the reader is not found or no longer registered.</dd>
+<dt><span class="simpleTagLabel">Since:</span></dt>
+<dd>2.1.0</dd>
 </dl>
 </li>
 </ul>
@@ -411,7 +461,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <h4>getDistributedLocalService</h4>
 <pre class="methodSignature"><a href="DistributedLocalService.html" title="interface in org.eclipse.keyple.core.service">DistributedLocalService</a>&nbsp;getDistributedLocalService&#8203;(java.lang.String&nbsp;distributedLocalServiceName)</pre>
-<div class="block">Gets the distributed local service having the provided name.</div>
+<div class="block">Returns the distributed local service having the provided name.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>distributedLocalServiceName</code> - The name of the distributed local service.</dd>
