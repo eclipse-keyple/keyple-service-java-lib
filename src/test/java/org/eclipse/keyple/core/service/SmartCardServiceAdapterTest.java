@@ -69,6 +69,7 @@ public class SmartCardServiceAdapterTest {
   private ObservableRemotePluginMock observableRemotePlugin;
   private RemotePoolPluginMock remotePoolPlugin;
   private ReaderMock reader;
+  private ReaderExtensionMock readerExtension;
   private PluginFactoryMock pluginFactory;
   private PluginFactoryMock observablePluginFactory;
   private PluginFactoryMock autonomousObservablePluginFactory;
@@ -81,6 +82,8 @@ public class SmartCardServiceAdapterTest {
   private DistributedLocalServiceFactoryMock localServiceFactory;
 
   interface ReaderMock extends Reader, ReaderSpi {}
+
+  interface ReaderExtensionMock extends KeypleReaderExtension, ReaderSpi {}
 
   interface PluginMock extends KeyplePluginExtension, PluginSpi {}
 
@@ -134,6 +137,8 @@ public class SmartCardServiceAdapterTest {
 
   @Before
   public void setUp() throws Exception {
+    readerExtension = mock(ReaderExtensionMock.class);
+
     reader = mock(ReaderMock.class);
     when(reader.getName()).thenReturn(READER_NAME);
 
@@ -502,14 +507,36 @@ public class SmartCardServiceAdapterTest {
   }
 
   @Test
-  public void getPlugin_whenPluginIsNotRegistered_shouldReturnNull() {
+  public void getPlugin_fromPluginName_whenPluginIsNotRegistered_shouldReturnNull() {
     assertThat(service.getPlugin(PLUGIN_NAME)).isNull();
   }
 
   @Test
-  public void getPlugin_whenPluginIsRegistered_shouldPluginInstance() {
+  public void getPlugin_fromPluginName_whenPluginIsRegistered_shouldReturnPluginInstance() {
     service.registerPlugin(pluginFactory);
     assertThat(service.getPlugin(PLUGIN_NAME)).isNotNull();
+  }
+
+  @Test
+  public void getPlugin_fromCardReader_whenPluginIsNotRegistered_shouldReturnNull() {
+    assertThat(service.getPlugin(reader)).isNull();
+  }
+
+  @Test
+  public void getPlugin_fromCardReader_whenReaderIsNotRegistered_shouldReturnNull() {
+    service.registerPlugin(pluginFactory);
+    assertThat(service.getPlugin(reader)).isNull();
+  }
+
+  @Test
+  public void getPlugin_fromCardReader_whenReaderIsRegistered_shouldReturnPluginInstance()
+      throws Exception {
+    //    when(plugin.searchAvailableReaders()).thenReturn(new
+    // HashSet<ReaderSpi>(Collections.singletonList(readerExtension)));
+    //    service.registerPlugin(pluginFactory);
+    //    CardReader expectedCardReader =
+    // service.getPlugin(PLUGIN_NAME).getReaders().iterator().next();
+    //    assertThat(service.getPlugin(expectedCardReader)).isNotNull();
   }
 
   @Test

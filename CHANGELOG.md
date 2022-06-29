@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- `SmartCardService.getPlugin` from a `CardReader` reference. 
+- `SmartCardService.getReader` from a `CardReader` name.
 - `Plugin.getReaderExtension` to access the reader's extension class.
 ### Deprecated
 - `Reader` in favor of `CardReader` from the "Calypsonet Terminal Reader API".

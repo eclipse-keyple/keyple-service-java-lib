@@ -12,6 +12,7 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.Set;
+import org.calypsonet.terminal.reader.CardReader;
 import org.calypsonet.terminal.reader.selection.CardSelectionManager;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory;
@@ -44,7 +45,7 @@ public interface SmartCardService {
   void unregisterPlugin(String pluginName);
 
   /**
-   * Gets the names of all registered plugins.
+   * Returns the names of all registered plugins.
    *
    * @return A not null Set String.
    * @since 2.0.0
@@ -52,7 +53,7 @@ public interface SmartCardService {
   Set<String> getPluginNames();
 
   /**
-   * Gets all registered plugins.
+   * Returns all registered plugins.
    *
    * @return A not null Set of {@link Plugin}.
    * @since 2.0.0
@@ -60,13 +61,31 @@ public interface SmartCardService {
   Set<Plugin> getPlugins();
 
   /**
-   * Gets the plugin whose name is provided as an argument.
+   * Returns the plugin whose name is provided as an argument.
    *
    * @param pluginName The plugin name.
    * @return Null if the plugin is not found or no longer registered.
    * @since 2.0.0
    */
   Plugin getPlugin(String pluginName);
+
+  /**
+   * Returns the plugin associated to the provided {@link CardReader}.
+   *
+   * @param cardReader The card reader.
+   * @return Null if the plugin is not found or no longer registered.
+   * @since 2.1.0
+   */
+  Plugin getPlugin(CardReader cardReader);
+
+  /**
+   * Returns the reader associated to the provided unique name.
+   *
+   * @param readerName The name of the card reader.
+   * @return Null if the reader is not found or no longer registered.
+   * @since 2.1.0
+   */
+  CardReader getReader(String readerName);
 
   /**
    * Verifies the compatibility with the service of the provided card extension.
@@ -108,7 +127,7 @@ public interface SmartCardService {
   boolean isDistributedLocalServiceRegistered(String distributedLocalServiceName);
 
   /**
-   * Gets the distributed local service having the provided name.
+   * Returns the distributed local service having the provided name.
    *
    * @param distributedLocalServiceName The name of the distributed local service.
    * @return Null if the distributed local service is not found or no longer registered.
