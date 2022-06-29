@@ -16,6 +16,8 @@ import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.util.Collections;
+import java.util.HashSet;
+import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.common.*;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceFactorySpi;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceSpi;
@@ -80,7 +82,7 @@ public class SmartCardServiceAdapterTest {
   private DistributedLocalServiceMock localService;
   private DistributedLocalServiceFactoryMock localServiceFactory;
 
-  interface ReaderMock extends Reader, ReaderSpi {}
+  interface ReaderMock extends KeypleReaderExtension, ReaderSpi {}
 
   interface PluginMock extends KeyplePluginExtension, PluginSpi {}
 
@@ -134,6 +136,7 @@ public class SmartCardServiceAdapterTest {
 
   @Before
   public void setUp() throws Exception {
+
     reader = mock(ReaderMock.class);
     when(reader.getName()).thenReturn(READER_NAME);
 
@@ -502,14 +505,49 @@ public class SmartCardServiceAdapterTest {
   }
 
   @Test
-  public void getPlugin_whenPluginIsNotRegistered_shouldReturnNull() {
+  public void getPlugin_fromPluginName_whenPluginIsNotRegistered_shouldReturnNull() {
     assertThat(service.getPlugin(PLUGIN_NAME)).isNull();
   }
 
   @Test
-  public void getPlugin_whenPluginIsRegistered_shouldPluginInstance() {
+  public void getPlugin_fromPluginName_whenPluginIsRegistered_shouldReturnPluginInstance() {
     service.registerPlugin(pluginFactory);
     assertThat(service.getPlugin(PLUGIN_NAME)).isNotNull();
+  }
+
+  @Test
+  public void getPlugin_fromCardReader_whenPluginIsNotRegistered_shouldReturnNull() {
+    assertThat(service.getPlugin(mock(CardReader.class))).isNull();
+  }
+
+  @Test
+  public void getPlugin_fromCardReader_whenReaderIsNotFound_shouldReturnNull() {
+    service.registerPlugin(pluginFactory);
+    assertThat(service.getPlugin(mock(CardReader.class))).isNull();
+  }
+
+  @Test
+  public void getPlugin_fromCardReader_whenPluginIsRegistered_shouldReturnPluginInstance()
+      throws Exception {
+    when(plugin.searchAvailableReaders())
+        .thenReturn(new HashSet<ReaderSpi>(Collections.singletonList(reader)));
+    Plugin p = service.registerPlugin(pluginFactory);
+    CardReader cardReader = service.getPlugin(PLUGIN_NAME).getReaders().iterator().next();
+    assertThat(service.getPlugin(cardReader)).isSameAs(p);
+  }
+
+  @Test
+  public void getReader_whenReaderDoesNotExist_shouldReturnNull() {
+    assertThat(service.getReader(READER_NAME)).isNull();
+  }
+
+  @Test
+  public void getReader_whenReaderExists_shouldReturnReaderInstance() throws Exception {
+    when(plugin.searchAvailableReaders())
+        .thenReturn(new HashSet<ReaderSpi>(Collections.singletonList(reader)));
+    service.registerPlugin(pluginFactory);
+    CardReader cardReader = service.getPlugin(PLUGIN_NAME).getReaders().iterator().next();
+    assertThat(service.getReader(READER_NAME)).isSameAs(cardReader);
   }
 
   @Test

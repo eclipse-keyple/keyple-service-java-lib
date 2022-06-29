@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.calypsonet.terminal.card.AbstractApduException;
 import org.calypsonet.terminal.card.ApduResponseApi;
 import org.calypsonet.terminal.card.CardApiProperties;
+import org.calypsonet.terminal.reader.CardReader;
 import org.calypsonet.terminal.reader.ReaderApiProperties;
 import org.calypsonet.terminal.reader.selection.CardSelectionManager;
 import org.eclipse.keyple.core.common.CommonApiProperties;
@@ -472,6 +473,40 @@ final class SmartCardServiceAdapter implements SmartCardService {
   @Override
   public Plugin getPlugin(String pluginName) {
     return plugins.get(pluginName);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.1.0
+   */
+  @Override
+  public Plugin getPlugin(CardReader cardReader) {
+    for (Plugin plugin : plugins.values()) {
+      for (CardReader reader : plugin.getReaders()) {
+        if (reader == cardReader) {
+          return plugin;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.1.0
+   */
+  @Override
+  public CardReader getReader(String readerName) {
+    for (Plugin plugin : plugins.values()) {
+      for (CardReader reader : plugin.getReaders()) {
+        if (reader.getName().equals(readerName)) {
+          return reader;
+        }
+      }
+    }
+    return null;
   }
 
   /**
