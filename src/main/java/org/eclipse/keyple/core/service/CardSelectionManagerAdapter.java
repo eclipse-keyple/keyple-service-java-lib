@@ -116,9 +116,6 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
       throw new CardCommunicationException(e.getMessage(), e);
     }
 
-    // clear the selection requests list
-    cardSelectionRequests.clear();
-
     // Analyze the received responses
     return processCardSelectionResponses(cardSelectionResponses);
   }

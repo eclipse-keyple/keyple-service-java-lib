@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auto management of 61XX and 6CXX status words and case 4 commands (Calypsonet Terminal Requirements: `RL-SW-61XX.1`, `RL-SW-6CXX.1`, `RL-SW-ANALYSIS.1` and `RL-SW-CASE4.1`) (issue [#37]).
 - Returned value of `getActiveSmartCard` method when there is no active smart card (issue [#40]).
 - JSON serialization for interfaces in objects trees (issue [#43]).
+- No longer clear the selection requests after processing the card selection.
 ### Upgraded
 - "Keyple Util Library" to version `2.1.0` by removing the use of deprecated methods.
 
