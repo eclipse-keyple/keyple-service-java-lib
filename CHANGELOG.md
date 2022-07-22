@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Returned value of `getActiveSmartCard` method when there is no active smart card (issue [#40]).
 - JSON serialization for interfaces in objects trees (issue [#43]).
 - No longer clear the selection requests after processing the card selection.
+- Closing the physical channel when unregistering a reader.
 ### Upgraded
 - "Keyple Util Library" to version `2.1.0` by removing the use of deprecated methods.
 
