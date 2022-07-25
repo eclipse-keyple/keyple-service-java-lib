@@ -36,7 +36,7 @@ dependencies {
     implementation("org.eclipse.keyple:keyple-plugin-java-api:2.0.0")
     implementation("org.eclipse.keyple:keyple-distributed-remote-java-api:2.0.0")
     implementation("org.eclipse.keyple:keyple-distributed-local-java-api:2.0.0")
-    implementation("org.eclipse.keyple:keyple-util-java-lib:2.1.0-SNAPSHOT") { isChanging = true }
+    implementation("org.eclipse.keyple:keyple-util-java-lib:2.1.0")
     implementation("com.google.code.gson:gson:2.8.8")
     implementation("org.slf4j:slf4j-api:1.7.32")
     testImplementation("org.slf4j:slf4j-simple:1.7.32")
