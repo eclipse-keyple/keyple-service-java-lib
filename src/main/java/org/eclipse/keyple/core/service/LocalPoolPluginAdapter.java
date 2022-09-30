@@ -75,7 +75,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
     } catch (PluginIOException e) {
       throw new KeyplePluginException(
           String.format(
-              "The pool plugin '%s' is unable to get reader group references : %s",
+              "Pool plugin '%s' is unable to get reader group references : %s",
               getName(), e.getMessage()),
           e);
     }
@@ -92,7 +92,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The pool plugin '{}' is allocating a reader of the group reference '{}'.",
+          "Pool plugin '{}' allocates a reader of the group reference '{}'.",
           getName(),
           readerGroupReference);
     }
@@ -104,7 +104,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
     } catch (PluginIOException e) {
       throw new KeyplePluginException(
           String.format(
-              "The pool plugin '%s' is unable to allocate a reader of the reader group reference '%s' : %s",
+              "Pool plugin '%s' is unable to allocate a reader of the reader group reference '%s' : %s",
               getName(), readerGroupReference, e.getMessage()),
           e);
     }
@@ -126,7 +126,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The pool plugin '{}' is releasing the reader '{}'.",
+          "Pool plugin '{}' releases the reader '{}'.",
           getName(),
           reader != null ? reader.getName() : null);
     }
@@ -138,7 +138,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
     } catch (PluginIOException e) {
       throw new KeyplePluginException(
           String.format(
-              "The pool plugin '%s' is unable to release the reader '%s' : %s",
+              "Pool plugin '%s' is unable to release the reader '%s' : %s",
               getName(), reader.getName(), e.getMessage()),
           e);
     } finally {

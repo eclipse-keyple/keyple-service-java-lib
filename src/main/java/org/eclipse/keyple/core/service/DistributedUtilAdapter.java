@@ -12,15 +12,11 @@
 package org.eclipse.keyple.core.service;
 
 import com.google.gson.JsonObject;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import org.calypsonet.terminal.card.ChannelControl;
 import org.calypsonet.terminal.card.ProxyReaderApi;
-import org.calypsonet.terminal.card.spi.ApduRequestSpi;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
-import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
-import org.calypsonet.terminal.card.spi.CardSelectorSpi;
+import org.calypsonet.terminal.reader.CardReader;
 import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.eclipse.keyple.core.distributed.remote.spi.AbstractRemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
@@ -45,9 +41,9 @@ final class DistributedUtilAdapter {
 
   /**
    * (package-private)<br>
-   * Executes remotely the provided JSON input data of a specific plugin service, parses the provide
-   * JSON output data, checks if the JSON contains an error and throws the embedded exception if
-   * exists..
+   * Executes remotely the provided JSON input data of a specific plugin service, parses the
+   * provided JSON output data, checks if the JSON contains an error and throws the embedded
+   * exception if exists..
    *
    * @param input The JSON input data to process.
    * @param remotePluginSpi The SPI in charge of carrying out the treatment.
@@ -62,13 +58,13 @@ final class DistributedUtilAdapter {
       throws Exception { // NOSONAR
 
     if (logger.isDebugEnabled()) {
-      logger.debug("The plugin '{}' is sending the following JSON data : {}", pluginName, input);
+      logger.debug("Plugin '{}' sends JSON data : {}", pluginName, input);
     }
 
     String outputJson = remotePluginSpi.executeRemotely(input.toString());
 
     if (logger.isDebugEnabled()) {
-      logger.debug("The plugin '{}' received the following JSON data : {}", pluginName, outputJson);
+      logger.debug("Plugin '{}' receives JSON data : {}", pluginName, outputJson);
     }
 
     return getJsonObject(outputJson);
@@ -76,9 +72,9 @@ final class DistributedUtilAdapter {
 
   /**
    * (package-private)<br>
-   * Executes remotely the provided JSON input data of a specific reader service, parses the provide
-   * JSON output data, checks if the JSON contains an error and throws the embedded exception if
-   * exists.
+   * Executes remotely the provided JSON input data of a specific reader service, parses the
+   * provided JSON output data, checks if the JSON contains an error and throws the embedded
+   * exception if exists.
    *
    * @param input The JSON input data to process.
    * @param remoteReaderSpi The SPI in charge of carrying out the treatment.
@@ -99,20 +95,14 @@ final class DistributedUtilAdapter {
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The reader '{}' of plugin '{}' is sending the following JSON data : {}",
-          readerName,
-          pluginName,
-          input);
+          "Reader '{}' of plugin '{}' sends JSON data : {}", readerName, pluginName, input);
     }
 
     String outputJson = remoteReaderSpi.executeRemotely(input.toString());
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The reader '{}' of plugin '{}' received the following JSON data : {}",
-          readerName,
-          pluginName,
-          outputJson);
+          "Reader '{}' of plugin '{}' receives JSON data : {}", readerName, pluginName, outputJson);
     }
 
     return getJsonObject(outputJson);
@@ -290,7 +280,7 @@ final class DistributedUtilAdapter {
      * ObservableLocalReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
      * ObservableCardReader.NotificationMode, ObservableCardReader.DetectionMode)} and {@link
      * ObservableRemoteReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
-     * ObservableReader.NotificationMode, ObservableCardReader.DetectionMode)}
+     * ObservableCardReader.NotificationMode, ObservableCardReader.DetectionMode)}
      *
      * @since 2.0.0
      */
@@ -311,21 +301,21 @@ final class DistributedUtilAdapter {
     IS_CONTACTLESS,
 
     /**
-     * Refers to {@link ObservableReader#startCardDetection(ObservableCardReader.DetectionMode)}
+     * Refers to {@link ObservableCardReader#startCardDetection(ObservableCardReader.DetectionMode)}
      *
      * @since 2.0.0
      */
     START_CARD_DETECTION,
 
     /**
-     * Refers to {@link ObservableReader#startCardDetection(ObservableCardReader.DetectionMode)}
+     * Refers to {@link ObservableCardReader#startCardDetection(ObservableCardReader.DetectionMode)}
      *
      * @since 2.0.0
      */
     STOP_CARD_DETECTION,
 
     /**
-     * Refers to {@link ObservableReader#finalizeCardProcessing()}
+     * Refers to {@link ObservableCardReader#finalizeCardProcessing()}
      *
      * @since 2.0.0
      */
@@ -337,184 +327,5 @@ final class DistributedUtilAdapter {
      * @since 2.0.0
      */
     RELEASE_CHANNEL
-  }
-
-  /**
-   * (package-private)<br>
-   *
-   * @since 2.0.0
-   */
-  static class CardSelectionRequest implements CardSelectionRequestSpi {
-
-    private CardSelector cardSelector;
-    private CardRequest cardRequest;
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.0.0
-     */
-    @Override
-    public CardSelectorSpi getCardSelector() {
-      return cardSelector;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.0.0
-     */
-    @Override
-    public CardRequestSpi getCardRequest() {
-      return cardRequest;
-    }
-  }
-
-  /**
-   * (package-private)<br>
-   *
-   * @since 2.0.0
-   */
-  static class CardSelector implements CardSelectorSpi {
-
-    private String cardProtocol;
-    private String powerOnDataRegex;
-    private byte[] aid;
-    private FileOccurrence fileOccurrence;
-    private FileControlInformation fileControlInformation;
-    private Set<Integer> successfulSelectionStatusWords;
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.0.0
-     */
-    @Override
-    public String getCardProtocol() {
-      return cardProtocol;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.0.0
-     */
-    @Override
-    public String getPowerOnDataRegex() {
-      return powerOnDataRegex;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.0.0
-     */
-    @Override
-    public byte[] getAid() {
-      return aid;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.0.0
-     */
-    @Override
-    public FileOccurrence getFileOccurrence() {
-      return fileOccurrence;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.0.0
-     */
-    @Override
-    public FileControlInformation getFileControlInformation() {
-      return fileControlInformation;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.0.0
-     */
-    @Override
-    public Set<Integer> getSuccessfulSelectionStatusWords() {
-      return successfulSelectionStatusWords;
-    }
-  }
-
-  /**
-   * (package-private)<br>
-   *
-   * @since 2.0.0
-   */
-  static class CardRequest implements CardRequestSpi {
-
-    private List<ApduRequest> apduRequests;
-    private boolean stopOnUnsuccessfulStatusWord;
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.0.0
-     */
-    @Override
-    public List<ApduRequestSpi> getApduRequests() {
-      return new ArrayList<ApduRequestSpi>(apduRequests);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.0.0
-     */
-    @Override
-    public boolean stopOnUnsuccessfulStatusWord() {
-      return stopOnUnsuccessfulStatusWord;
-    }
-  }
-
-  /**
-   * (package-private)<br>
-   *
-   * @since 2.0.0
-   */
-  static class ApduRequest implements ApduRequestSpi {
-
-    private byte[] apdu;
-    private Set<Integer> successfulStatusWords;
-    private String info;
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.0.0
-     */
-    @Override
-    public byte[] getApdu() {
-      return apdu;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.0.0
-     */
-    @Override
-    public Set<Integer> getSuccessfulStatusWords() {
-      return successfulStatusWords;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.0.0
-     */
-    @Override
-    public String getInfo() {
-      return info;
-    }
   }
 }

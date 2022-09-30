@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 2.1.0 (29/06/2022)
+    Keyple - Adapter of keyple-service-java-lib - 2.1.1 (2022-09-30)
 end title
 
 ' == THEME ==
@@ -605,7 +605,7 @@ package "org.eclipse.keyple.core.service" as service {
 
     ' RESPONSE
     together {
-        +class "<<<back:lightGreen>CardSelectionResponseApi</back>>>\n**final** CardSelectionResponseAdapter" as CardSelectionResponseAdapter {
+        ~class "<<<back:lightGreen>CardSelectionResponseApi</back>>>\n**final** CardSelectionResponseAdapter" as CardSelectionResponseAdapter {
             --
             ~CardSelectionResponseAdapter (
                 \tbyte[] powerOnData,
@@ -618,7 +618,7 @@ package "org.eclipse.keyple.core.service" as service {
             +boolean hasMatched ()
             +<back:lightGreen>CardResponseApi</back> getCardResponse ()
         }
-        +class "<<<back:lightGreen>CardResponseApi</back>>>\n**final** CardResponseAdapter" as CardResponseAdapter {
+        ~class "<<<back:lightGreen>CardResponseApi</back>>>\n**final** CardResponseAdapter" as CardResponseAdapter {
             --
             ~CardResponseAdapter (List<<back:lightGreen>ApduResponseApi</back>> apduResponses,
                 \tboolean isLogicalChannelOpen)
@@ -626,7 +626,7 @@ package "org.eclipse.keyple.core.service" as service {
             +List<<back:lightGreen>ApduResponseApi</back>> getApduResponses ()
             +boolean isLogicalChannelOpen ()
         }
-        +class "<<<back:lightGreen>ApduResponseApi</back>>>\n**final** ApduResponseAdapter" as ApduResponseAdapter {
+        ~class "<<<back:lightGreen>ApduResponseApi</back>>>\n**final** ApduResponseAdapter" as ApduResponseAdapter {
             --
             ~ApduResponseAdapter (byte[] bytes)
             -- **ApduResponseApi** --

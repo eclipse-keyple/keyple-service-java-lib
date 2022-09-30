@@ -12,9 +12,11 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.calypsonet.terminal.card.*;
 import org.calypsonet.terminal.card.spi.ApduRequestSpi;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
@@ -31,6 +33,7 @@ import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.HexUtil;
+import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,9 +54,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private static final Logger logger = LoggerFactory.getLogger(LocalReaderAdapter.class);
 
   /** predefined ISO values */
-  private static final int SW_9000 = 0x9000;
-
   private static final int SW_6100 = 0x6100;
+
   private static final int SW_6C00 = 0x6C00;
 
   private static final int SW1_MASK = 0xFF00;
@@ -428,8 +430,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         };
         // Execute APDU
         apduResponse =
-            processApduRequest(
-                new ApduRequestAdapter(getResponseApdu).setInfo("Internal Get Response"));
+            processApduRequest(new ApduRequest(getResponseApdu).setInfo("Internal Get Response"));
 
       } else if ((apduResponse.getStatusWord() & SW1_MASK) == SW_6C00) {
         // RL-SW-6CXX.1
@@ -453,8 +454,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         };
         // Execute GetResponse APDU
         apduResponse =
-            processApduRequest(
-                new ApduRequestAdapter(getResponseApdu).setInfo("Internal Get Response"));
+            processApduRequest(new ApduRequest(getResponseApdu).setInfo("Internal Get Response"));
       }
     }
 
@@ -687,7 +687,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     System.arraycopy(aid, 0, selectApplicationCommand, 5, aid.length); // data
     selectApplicationCommand[5 + aid.length] = (byte) 0x00; // Le
 
-    ApduRequestAdapter apduRequest = new ApduRequestAdapter(selectApplicationCommand);
+    ApduRequest apduRequest = new ApduRequest(selectApplicationCommand);
 
     if (logger.isDebugEnabled()) {
       apduRequest.setInfo("Internal Select Application");
@@ -817,6 +817,50 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       this.powerOnData = powerOnData;
       this.selectApplicationResponse = selectApplicationResponse;
       this.hasMatched = hasMatched;
+    }
+  }
+
+  /**
+   * (private)<br>
+   * Local POJO of type {@link ApduRequestSpi}.
+   */
+  private static final class ApduRequest implements ApduRequestSpi {
+
+    private static final int DEFAULT_SUCCESSFUL_CODE = 0x9000;
+
+    private final byte[] apdu;
+    private final Set<Integer> successfulStatusWords;
+    private String info;
+
+    private ApduRequest(byte[] apdu) {
+      this.apdu = apdu;
+      this.successfulStatusWords = new HashSet<Integer>();
+      this.successfulStatusWords.add(DEFAULT_SUCCESSFUL_CODE);
+    }
+
+    private ApduRequest setInfo(final String info) {
+      this.info = info;
+      return this;
+    }
+
+    @Override
+    public byte[] getApdu() {
+      return this.apdu;
+    }
+
+    @Override
+    public Set<Integer> getSuccessfulStatusWords() {
+      return successfulStatusWords;
+    }
+
+    @Override
+    public String getInfo() {
+      return info;
+    }
+
+    @Override
+    public String toString() {
+      return "APDU_REQUEST = " + JsonUtil.toJson(this);
     }
   }
 }

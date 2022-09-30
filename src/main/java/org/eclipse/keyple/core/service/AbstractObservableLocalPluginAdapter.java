@@ -75,7 +75,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The plugin '{}' is notifying the plugin event '{}' to {} observers.",
+          "Plugin '{}' notifies the plugin event '{}' to {} observer(s).",
           getName(),
           event.getType().name(),
           countObservers());

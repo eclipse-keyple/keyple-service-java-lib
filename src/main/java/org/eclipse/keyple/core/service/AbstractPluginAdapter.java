@@ -89,7 +89,7 @@ abstract class AbstractPluginAdapter implements Plugin {
   final void checkStatus() {
     if (!isRegistered) {
       throw new IllegalStateException(
-          String.format("The plugin '%s' is not or no longer registered.", pluginName));
+          String.format("Plugin '%s' is not or no longer registered.", pluginName));
     }
   }
 

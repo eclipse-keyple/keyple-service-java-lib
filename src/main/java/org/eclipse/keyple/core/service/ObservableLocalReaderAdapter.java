@@ -386,7 +386,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The reader '{}' is notifying the reader event '{}' to {} observers.",
+          "Reader '{}' notifies the reader event '{}' to {} observer(s).",
           getName(),
           event.getType().name(),
           countObservers());
@@ -544,7 +544,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The reader '{}' of plugin '{}' is starting the card detection with polling mode '{}'.",
+          "Reader '{}' of plugin '{}' starts the card detection with polling mode '{}'.",
           getName(),
           getPluginName(),
           detectionMode);
@@ -564,9 +564,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
     // RL-DET-REMCTRL.1
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The reader '{}' of plugin '{}' is stopping the card detection.",
-          getName(),
-          getPluginName());
+          "Reader '{}' of plugin '{}' stops the card detection.", getName(), getPluginName());
     }
     stateService.onEvent(InternalEvent.STOP_DETECT);
   }
@@ -579,7 +577,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   public final void finalizeCardProcessing() {
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The reader '{}' of plugin '{}' is starting the removal sequence of the card.",
+          "Reader '{}' of plugin '{}' starts the removal sequence of the card.",
           getName(),
           getPluginName());
     }

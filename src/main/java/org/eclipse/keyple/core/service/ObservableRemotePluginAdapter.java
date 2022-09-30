@@ -77,7 +77,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The plugin '{}' is notifying the plugin event '{}' to {} observers.",
+          "Plugin '{}' notifies the plugin event '{}' to {} observer(s).",
           getName(),
           event.getType().name(),
           countObservers());
@@ -246,7 +246,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The plugin '{}' is registering the remote reader '{}'.",
+          "Plugin '{}' registers the remote reader '{}'.",
           getName(),
           remoteReaderSpi != null ? remoteReaderSpi.getName() : null);
     }
@@ -280,8 +280,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   public void removeRemoteReader(String remoteReaderName) {
 
     if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The plugin '{}' is unregistering the reader '{}'.", getName(), remoteReaderName);
+      logger.debug("Plugin '{}' unregisters the reader '{}'.", getName(), remoteReaderName);
     }
     Assert.getInstance().notEmpty(remoteReaderName, "remoteReaderName");
 
@@ -291,7 +290,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
       getReadersMap().remove(reader.getName());
       ((RemoteReaderAdapter) reader).unregister();
     } else {
-      throw new IllegalArgumentException("The reader is not found, not registered or not remote.");
+      throw new IllegalArgumentException("Reader is not found, not registered or not remote.");
     }
   }
 
@@ -305,8 +304,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
 
     checkStatus();
     if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The plugin '{}' is receiving the following plugin event : {}", getName(), jsonData);
+      logger.debug("Plugin '{}' receives a plugin event : {}", getName(), jsonData);
     }
     Assert.getInstance().notEmpty(jsonData, "jsonData");
 
@@ -320,7 +318,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
                   json.get(JsonProperty.PLUGIN_EVENT.name()).getAsString(), PluginEvent.class);
     } catch (RuntimeException e) {
       throw new IllegalArgumentException(
-          String.format("The JSON data of the plugin event is malformed : %s", e.getMessage()), e);
+          String.format("JSON data of the plugin event is malformed : %s", e.getMessage()), e);
     }
 
     // Notify the observers for a plugin event.

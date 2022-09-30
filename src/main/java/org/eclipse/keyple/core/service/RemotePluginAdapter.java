@@ -145,8 +145,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
 
     checkStatus();
     if (logger.isDebugEnabled()) {
-      logger.debug(
-          "The plugin '{}' is receiving the following reader event : {}", getName(), jsonData);
+      logger.debug("Plugin '{}' receives a reader event : {}", getName(), jsonData);
     }
     Assert.getInstance().notEmpty(jsonData, "jsonData");
 
@@ -161,7 +160,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
                   ReaderEventAdapter.class);
     } catch (RuntimeException e) {
       throw new IllegalArgumentException(
-          String.format("The JSON data of the reader event is malformed : %s", e.getMessage()), e);
+          String.format("JSON data of the reader event is malformed : %s", e.getMessage()), e);
     }
 
     // Get the target reader.
@@ -169,7 +168,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
     if (!(reader instanceof ObservableReader)) {
       throw new IllegalArgumentException(
           String.format(
-              "The reader '%s' does not exists or is not observable : %s",
+              "Reader '%s' does not exists or is not observable : %s",
               readerEvent.getReaderName(), reader));
     }
 

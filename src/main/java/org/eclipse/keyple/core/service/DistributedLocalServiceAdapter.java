@@ -17,8 +17,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.*;
 import org.calypsonet.terminal.card.*;
+import org.calypsonet.terminal.card.spi.ApduRequestSpi;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
+import org.calypsonet.terminal.card.spi.CardSelectorSpi;
 import org.calypsonet.terminal.reader.CardReader;
 import org.calypsonet.terminal.reader.CardReaderEvent;
 import org.calypsonet.terminal.reader.ObservableCardReader;
@@ -86,18 +88,12 @@ final class DistributedLocalServiceAdapter
     if (readerName != null) {
       if (logger.isDebugEnabled()) {
         logger.debug(
-            "The distributed local service '{}' is processing the following data on the reader '{}' : {}",
-            name,
-            readerName,
-            jsonData);
+            "Service '{}' processes data on the reader '{}' : {}", name, readerName, jsonData);
       }
       return new LocalReaderExecutor(jsonData, readerName).execute();
     } else {
       if (logger.isDebugEnabled()) {
-        logger.debug(
-            "The distributed local service '{}' is processing the following data on plugins : {}",
-            name,
-            jsonData);
+        logger.debug("Service '{}' processes data on plugins : {}", name, jsonData);
       }
       return new LocalPluginExecutor(jsonData).execute();
     }
@@ -135,7 +131,7 @@ final class DistributedLocalServiceAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The distributed local service '{}' is forwarding the plugin event '{}' associated to the local reader '{}' of the local plugin '{}'.",
+          "Service '{}' forwards the plugin event '{}' associated to the local reader '{}' of the local plugin '{}'.",
           name,
           pluginEvent.getType().name(),
           pluginEvent.getReaderNames().first(),
@@ -158,7 +154,7 @@ final class DistributedLocalServiceAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The distributed local service '{}' is forwarding the reader event '{}' associated to the local reader '{}' of the local plugin '{}'.",
+          "Service '{}' forwards the reader event '{}' associated to the local reader '{}' of the local plugin '{}'.",
           name,
           readerEvent.getType().name(),
           readerEvent.getReaderName(),
@@ -211,8 +207,7 @@ final class DistributedLocalServiceAdapter
   private void checkStatus() {
     if (!isRegistered) {
       throw new IllegalStateException(
-          String.format(
-              "The distributed local service '%s' is not or no longer registered.", name));
+          String.format("Service '%s' is not or no longer registered.", name));
     }
   }
 
@@ -332,7 +327,8 @@ final class DistributedLocalServiceAdapter
       CardRequestSpi cardRequest =
           JsonUtil.getParser()
               .fromJson(
-                  input.get(JsonProperty.CARD_REQUEST.name()).getAsString(), CardRequest.class);
+                  input.get(JsonProperty.CARD_REQUEST.name()).getAsString(),
+                  CardRequestAdapter.class);
 
       // Execute the service on the reader
       CardResponseApi cardResponse = reader.transmitCardRequest(cardRequest, channelControl);
@@ -407,7 +403,7 @@ final class DistributedLocalServiceAdapter
             .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, detectionMode);
       } else {
         throw new IllegalStateException(
-            String.format("The reader '%s' is not observable", reader.getName()));
+            String.format("Reader '%s' is not observable", reader.getName()));
       }
     }
 
@@ -449,8 +445,8 @@ final class DistributedLocalServiceAdapter
               input.get(JsonProperty.POLLING_MODE.name()).getAsString());
 
       // Execute the service on the reader
-      ((ObservableReader) reader).addObserver(DistributedLocalServiceAdapter.this);
-      ((ObservableReader) reader).startCardDetection(detectionMode);
+      ((ObservableCardReader) reader).addObserver(DistributedLocalServiceAdapter.this);
+      ((ObservableCardReader) reader).startCardDetection(detectionMode);
     }
 
     /**
@@ -460,8 +456,8 @@ final class DistributedLocalServiceAdapter
     private void stopCardDetection() {
 
       // Execute the service on the reader
-      ((ObservableReader) reader).removeObserver(DistributedLocalServiceAdapter.this);
-      ((ObservableReader) reader).stopCardDetection();
+      ((ObservableCardReader) reader).removeObserver(DistributedLocalServiceAdapter.this);
+      ((ObservableCardReader) reader).stopCardDetection();
     }
 
     /**
@@ -471,7 +467,7 @@ final class DistributedLocalServiceAdapter
     private void finalizeCardProcessing() {
 
       // Execute the service on the reader
-      ((ObservableReader) reader).finalizeCardProcessing();
+      ((ObservableCardReader) reader).finalizeCardProcessing();
     }
 
     /**
@@ -558,7 +554,7 @@ final class DistributedLocalServiceAdapter
       Map<String, Boolean> readers = new HashMap<String, Boolean>();
       for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
         for (CardReader reader : plugin.getReaders()) {
-          readers.put(reader.getName(), reader instanceof ObservableReader);
+          readers.put(reader.getName(), reader instanceof ObservableCardReader);
         }
       }
 
@@ -677,6 +673,131 @@ final class DistributedLocalServiceAdapter
           ((ObservablePlugin) plugin).removeObserver(DistributedLocalServiceAdapter.this);
         }
       }
+    }
+  }
+
+  /**
+   * (private)<br>
+   * Local POJO of type {@link CardSelectionRequestSpi}.
+   */
+  private static final class CardSelectionRequest implements CardSelectionRequestSpi {
+
+    private CardSelector cardSelector;
+    private CardRequestAdapter cardRequest;
+
+    @Override
+    public CardSelectorSpi getCardSelector() {
+      return cardSelector;
+    }
+
+    @Override
+    public CardRequestSpi getCardRequest() {
+      return cardRequest;
+    }
+
+    @Override
+    public String toString() {
+      return "CARD_SELECTION_REQUEST = " + JsonUtil.toJson(this);
+    }
+  }
+
+  /**
+   * (private)<br>
+   * Local POJO of type {@link CardSelectorSpi}.
+   */
+  private static final class CardSelector implements CardSelectorSpi {
+
+    private String cardProtocol;
+    private String powerOnDataRegex;
+    private byte[] aid;
+    private FileOccurrence fileOccurrence;
+    private FileControlInformation fileControlInformation;
+    private Set<Integer> successfulSelectionStatusWords;
+
+    @Override
+    public String getCardProtocol() {
+      return cardProtocol;
+    }
+
+    @Override
+    public String getPowerOnDataRegex() {
+      return powerOnDataRegex;
+    }
+
+    @Override
+    public byte[] getAid() {
+      return aid;
+    }
+
+    @Override
+    public FileOccurrence getFileOccurrence() {
+      return fileOccurrence;
+    }
+
+    @Override
+    public FileControlInformation getFileControlInformation() {
+      return fileControlInformation;
+    }
+
+    @Override
+    public Set<Integer> getSuccessfulSelectionStatusWords() {
+      return successfulSelectionStatusWords;
+    }
+  }
+
+  /**
+   * (private)<br>
+   * Local POJO of type {@link CardRequestSpi}.
+   */
+  private static final class CardRequestAdapter implements CardRequestSpi {
+
+    private List<ApduRequest> apduRequests;
+    private boolean stopOnUnsuccessfulStatusWord;
+
+    @Override
+    public List<ApduRequestSpi> getApduRequests() {
+      return new ArrayList<ApduRequestSpi>(apduRequests);
+    }
+
+    @Override
+    public boolean stopOnUnsuccessfulStatusWord() {
+      return stopOnUnsuccessfulStatusWord;
+    }
+
+    @Override
+    public String toString() {
+      return "CARD_REQUEST = " + JsonUtil.toJson(null);
+    }
+  }
+
+  /**
+   * (private)<br>
+   * Local POJO of type {@link ApduRequestSpi}.
+   */
+  private static class ApduRequest implements ApduRequestSpi {
+
+    private byte[] apdu;
+    private Set<Integer> successfulStatusWords;
+    private String info;
+
+    @Override
+    public byte[] getApdu() {
+      return apdu;
+    }
+
+    @Override
+    public Set<Integer> getSuccessfulStatusWords() {
+      return successfulStatusWords;
+    }
+
+    @Override
+    public String getInfo() {
+      return info;
+    }
+
+    @Override
+    public String toString() {
+      return "APDU_REQUEST = " + JsonUtil.toJson(this);
     }
   }
 }

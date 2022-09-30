@@ -71,7 +71,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The reader '{}' is notifying the reader event '{}' to {} observers.",
+          "Reader '{}' notifies the reader event '{}' to {} observer(s).",
           getName(),
           event.getType().name(),
           countObservers());
@@ -228,7 +228,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The reader '{}' of plugin '{}' is starting the card detection with polling mode '{}'.",
+          "Reader '{}' of plugin '{}' starts the card detection with polling mode '{}'.",
           getName(),
           getPluginName(),
           detectionMode);
@@ -265,9 +265,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The reader '{}' of plugin '{}' is stopping the card detection.",
-          getName(),
-          getPluginName());
+          "Reader '{}' of plugin '{}' stops the card detection.", getName(), getPluginName());
     }
 
     // Notify the SPI first.
@@ -299,7 +297,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The reader '{}' of plugin '{}' is starting the removal sequence of the card.",
+          "Reader '{}' of plugin '{}' starts the removal sequence of the card.",
           getName(),
           getPluginName());
     }

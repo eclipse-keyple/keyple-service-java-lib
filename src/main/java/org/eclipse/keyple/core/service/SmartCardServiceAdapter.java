@@ -269,7 +269,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     Assert.getInstance().notEmpty(pluginName, "pluginName");
     if (plugins.containsKey(pluginName)) {
       throw new IllegalStateException(
-          String.format("The plugin '%s' has already been registered to the service.", pluginName));
+          String.format("Plugin '%s' has already been registered to the service.", pluginName));
     }
   }
 
@@ -287,7 +287,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     if (isDistributedLocalServiceRegistered(distributedLocalServiceName)) {
       throw new IllegalStateException(
           String.format(
-              "The distributed local service '%s' has already been registered to the service.",
+              "Service '%s' has already been registered to the service.",
               distributedLocalServiceName));
     }
   }
@@ -351,7 +351,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     if (!pluginSpi.getName().equals(pluginFactorySpi.getPluginName())) {
       throw new IllegalArgumentException(
           String.format(
-              "The plugin name '%s' mismatches the expected name '%s' provided by the factory",
+              "Plugin name '%s' mismatches the expected name '%s' provided by the factory",
               pluginSpi.getName(), pluginFactorySpi.getPluginName()));
     }
 
@@ -384,7 +384,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     if (!poolPluginSpi.getName().equals(poolPluginFactorySpi.getPoolPluginName())) {
       throw new IllegalArgumentException(
           String.format(
-              "The pool plugin name '%s' mismatches the expected name '%s' provided by the factory",
+              "Pool plugin name '%s' mismatches the expected name '%s' provided by the factory",
               poolPluginSpi.getName(), poolPluginFactorySpi.getPoolPluginName()));
     }
 
@@ -408,7 +408,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     if (!remotePluginSpi.getName().equals(remotePluginFactorySpi.getRemotePluginName())) {
       throw new IllegalArgumentException(
           String.format(
-              "The remote plugin name '%s' mismatches the expected name '%s' provided by the factory",
+              "Remote plugin name '%s' mismatches the expected name '%s' provided by the factory",
               remotePluginSpi.getName(), remotePluginFactorySpi.getRemotePluginName()));
     }
 
@@ -440,7 +440,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
           plugins.remove(pluginName);
         }
       } else {
-        logger.warn("The plugin '{}' is not registered", pluginName);
+        logger.warn("Plugin '{}' is not registered", pluginName);
       }
     }
   }
@@ -584,8 +584,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
       if (localService != null) {
         ((DistributedLocalServiceAdapter) localService).unregister();
       } else {
-        logger.warn(
-            "The distributed local service '{}' is not registered", distributedLocalServiceName);
+        logger.warn("Service '{}' is not registered", distributedLocalServiceName);
       }
     }
   }

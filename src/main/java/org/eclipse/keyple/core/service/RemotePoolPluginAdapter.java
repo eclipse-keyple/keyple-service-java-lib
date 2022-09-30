@@ -109,7 +109,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The pool plugin '{}' is allocating a reader of the group reference '{}'.",
+          "Pool plugin '{}' allocates a reader of the group reference '{}'.",
           getName(),
           readerGroupReference);
     }
@@ -158,7 +158,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "The pool plugin '{}' is releasing the reader '{}'.",
+          "Pool plugin '{}' releases the reader '{}'.",
           getName(),
           reader != null ? reader.getName() : null);
     }

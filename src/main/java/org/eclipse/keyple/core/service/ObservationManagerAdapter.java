@@ -49,9 +49,9 @@ final class ObservationManagerAdapter<T, S> {
    */
   ObservationManagerAdapter(String pluginName, String readerName) {
     if (readerName == null) {
-      this.ownerComponent = String.format("The plugin '%s'", pluginName);
+      this.ownerComponent = String.format("Plugin '%s'", pluginName);
     } else {
-      this.ownerComponent = String.format("The reader '%s' of plugin '%s'", readerName, pluginName);
+      this.ownerComponent = String.format("Reader '%s' of plugin '%s'", readerName, pluginName);
     }
     this.observers = new LinkedHashSet<T>(1);
     this.monitor = new Object();
