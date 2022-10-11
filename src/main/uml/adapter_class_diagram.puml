@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 2.1.1 (2022-09-30)
+    Keyple - Adapter of keyple-service-java-lib - 2.1.1 (2022-10-11)
 end title
 
 ' == THEME ==
@@ -73,22 +73,13 @@ package "org.eclipse.keyple.core.service" as service {
         FIRST_MATCH
         PROCESS_ALL
     }
-    ~class "<<<back:gold>JsonSerializer<<back:lightGreen>AbstractApduException</back>>>>\n**final** ApduExceptionJsonSerializerAdapter" as ApduExceptionJsonSerializerAdapter {
-        --
-        ~ApduExceptionJsonSerializerAdapter ()
-        -- **JsonSerializer** --
-        +<back:gold>JsonElement</back> serialize (<back:lightGreen>AbstractApduException</back> src, <back:gold>Type</back> typeOfSrc,
-            \t<back:gold>JsonSerializationContext</back> context)
+    ~class "**final** JsonAdapter" as JsonAdapter {
+        __
+        ...
     }
-    ~class "<<<back:gold>JsonSerializer<ApduResponseAdapter></back>>>\n<<<back:gold>JsonDeserializer<ApduResponseAdapter></back>>>\n**final** ApduResponseApiJsonAdapter" as ApduResponseApiJsonAdapter {
-        --
-        ~ApduResponseApiJsonAdapter ()
-        -- **JsonSerializer** --
-        +<back:gold>JsonElement</back> serialize (ApduResponseAdapter src, <back:gold>Type</back> typeOfSrc,
-            \t<back:gold>JsonSerializationContext</back> context)
-        -- **JsonDeserializer** --
-        +ApduResponseAdapter deserialize (<back:gold>JsonElement</back> json, <back:gold>Type</back> typeOfT,
-            \t<back:gold>JsonDeserializationContext</back> context)
+    ~class "**final** InternalDto" as InternalDto {
+        __
+        ...
     }
     ~class "<<SmartCardService>>\n**final** SmartCardServiceAdapter" as SmartCardServiceAdapter {
         --
@@ -249,11 +240,11 @@ package "org.eclipse.keyple.core.service" as service {
     }
     ~class "**final** DistributedUtilAdapter" as DistributedUtilAdapter {
         --
-        ~{static} JsonObject executePluginServiceRemotely (
-            \tJsonObject input, <back:plum>AbstractRemotePluginSpi</back> remotePluginSpi,
+        ~{static} <back:gold>JsonObject</back> executePluginServiceRemotely (
+            \t<back:gold>JsonObject</back> input, <back:plum>AbstractRemotePluginSpi</back> remotePluginSpi,
             \tString pluginName, Logger logger)
-        ~{static} JsonObject executeReaderServiceRemotely (
-            \tJsonObject input, <back:plum>RemoteReaderSpi</back> remoteReaderSpi,
+        ~{static} <back:gold>JsonObject</back> executeReaderServiceRemotely (
+            \t<back:gold>JsonObject</back> input, <back:plum>RemoteReaderSpi</back> remoteReaderSpi,
             \tString readerName, String pluginName, Logger logger)
         ~{static} void throwRuntimeException (Exception e)
     }
@@ -579,8 +570,11 @@ package "org.eclipse.keyple.core.service" as service {
         +void setMultipleSelectionMode ()
         +int prepareSelection (<back:yellow>CardSelection</back> cardSelection)
         +void prepareReleaseChannel ()
+        +String exportCardSelectionScenario (<back:yellow>DetectionMode</back> detectionMode, <back:yellow>NotificationMode</back> notificationMode)
+        +int importCardSelectionScenario (String cardSelectionScenario)
         +<back:yellow>CardSelectionResult</back> processCardSelectionScenario (<back:yellow>CardReader</back> reader)
-        +void scheduleCardSelectionScenario (ObservableReader observableReader, <back:yellow>DetectionMode</back> detectionMode, <back:yellow>NotificationMode</back> notificationMode)
+        +void scheduleCardSelectionScenario (<back:yellow>ObservableCardReader</back> observableCardReader, <back:yellow>DetectionMode</back> detectionMode, <back:yellow>NotificationMode</back> notificationMode)
+        +void scheduleCardSelectionScenario (<back:yellow>ObservableCardReader</back> observableCardReader)
         +<back:yellow>CardSelectionResult</back> parseScheduledCardSelectionsResponse (ScheduledCardSelectionsResponseAdapter scheduledCardSelectionsResponse)
     }
     ~class "<<<back:yellow>ScheduledCardSelectionsResponse</back>>>\n**final** ScheduledCardSelectionsResponseAdapter" as ScheduledCardSelectionsResponseAdapter {
@@ -694,8 +688,8 @@ package service #C_GREY1 {}
 
 enum MultiSelectionProcessing <<blue>>
 
-class ApduExceptionJsonSerializerAdapter <<blue>>
-class ApduResponseApiJsonAdapter <<blue>>
+class JsonAdapter <<blue>>
+class InternalDto <<blue>>
 class SmartCardServiceAdapter <<blue>>
 abstract class AbstractReaderAdapter <<blue>>
 class LocalReaderAdapter <<blue>>

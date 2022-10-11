@@ -12,15 +12,14 @@
 package org.eclipse.keyple.core.service;
 
 import static org.eclipse.keyple.core.service.DistributedUtilAdapter.*;
+import static org.eclipse.keyple.core.service.InternalDto.*;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.*;
 import org.calypsonet.terminal.card.*;
-import org.calypsonet.terminal.card.spi.ApduRequestSpi;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
-import org.calypsonet.terminal.card.spi.CardSelectorSpi;
 import org.calypsonet.terminal.reader.CardReader;
 import org.calypsonet.terminal.reader.CardReaderEvent;
 import org.calypsonet.terminal.reader.ObservableCardReader;
@@ -327,8 +326,7 @@ final class DistributedLocalServiceAdapter
       CardRequestSpi cardRequest =
           JsonUtil.getParser()
               .fromJson(
-                  input.get(JsonProperty.CARD_REQUEST.name()).getAsString(),
-                  CardRequestAdapter.class);
+                  input.get(JsonProperty.CARD_REQUEST.name()).getAsString(), CardRequest.class);
 
       // Execute the service on the reader
       CardResponseApi cardResponse = reader.transmitCardRequest(cardRequest, channelControl);
@@ -673,131 +671,6 @@ final class DistributedLocalServiceAdapter
           ((ObservablePlugin) plugin).removeObserver(DistributedLocalServiceAdapter.this);
         }
       }
-    }
-  }
-
-  /**
-   * (private)<br>
-   * Local POJO of type {@link CardSelectionRequestSpi}.
-   */
-  private static final class CardSelectionRequest implements CardSelectionRequestSpi {
-
-    private CardSelector cardSelector;
-    private CardRequestAdapter cardRequest;
-
-    @Override
-    public CardSelectorSpi getCardSelector() {
-      return cardSelector;
-    }
-
-    @Override
-    public CardRequestSpi getCardRequest() {
-      return cardRequest;
-    }
-
-    @Override
-    public String toString() {
-      return "CARD_SELECTION_REQUEST = " + JsonUtil.toJson(this);
-    }
-  }
-
-  /**
-   * (private)<br>
-   * Local POJO of type {@link CardSelectorSpi}.
-   */
-  private static final class CardSelector implements CardSelectorSpi {
-
-    private String cardProtocol;
-    private String powerOnDataRegex;
-    private byte[] aid;
-    private FileOccurrence fileOccurrence;
-    private FileControlInformation fileControlInformation;
-    private Set<Integer> successfulSelectionStatusWords;
-
-    @Override
-    public String getCardProtocol() {
-      return cardProtocol;
-    }
-
-    @Override
-    public String getPowerOnDataRegex() {
-      return powerOnDataRegex;
-    }
-
-    @Override
-    public byte[] getAid() {
-      return aid;
-    }
-
-    @Override
-    public FileOccurrence getFileOccurrence() {
-      return fileOccurrence;
-    }
-
-    @Override
-    public FileControlInformation getFileControlInformation() {
-      return fileControlInformation;
-    }
-
-    @Override
-    public Set<Integer> getSuccessfulSelectionStatusWords() {
-      return successfulSelectionStatusWords;
-    }
-  }
-
-  /**
-   * (private)<br>
-   * Local POJO of type {@link CardRequestSpi}.
-   */
-  private static final class CardRequestAdapter implements CardRequestSpi {
-
-    private List<ApduRequest> apduRequests;
-    private boolean stopOnUnsuccessfulStatusWord;
-
-    @Override
-    public List<ApduRequestSpi> getApduRequests() {
-      return new ArrayList<ApduRequestSpi>(apduRequests);
-    }
-
-    @Override
-    public boolean stopOnUnsuccessfulStatusWord() {
-      return stopOnUnsuccessfulStatusWord;
-    }
-
-    @Override
-    public String toString() {
-      return "CARD_REQUEST = " + JsonUtil.toJson(null);
-    }
-  }
-
-  /**
-   * (private)<br>
-   * Local POJO of type {@link ApduRequestSpi}.
-   */
-  private static class ApduRequest implements ApduRequestSpi {
-
-    private byte[] apdu;
-    private Set<Integer> successfulStatusWords;
-    private String info;
-
-    @Override
-    public byte[] getApdu() {
-      return apdu;
-    }
-
-    @Override
-    public Set<Integer> getSuccessfulStatusWords() {
-      return successfulStatusWords;
-    }
-
-    @Override
-    public String getInfo() {
-      return info;
-    }
-
-    @Override
-    public String toString() {
-      return "APDU_REQUEST = " + JsonUtil.toJson(this);
     }
   }
 }

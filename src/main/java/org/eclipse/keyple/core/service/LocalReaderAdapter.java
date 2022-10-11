@@ -822,7 +822,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
   /**
    * (private)<br>
-   * Local POJO of type {@link ApduRequestSpi}.
+   * Local implementation of {@link ApduRequestSpi}.
    */
   private static final class ApduRequest implements ApduRequestSpi {
 
