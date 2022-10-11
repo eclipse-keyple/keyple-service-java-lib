@@ -11,6 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import static org.eclipse.keyple.core.service.JsonAdapter.*;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

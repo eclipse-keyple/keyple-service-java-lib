@@ -60,7 +60,7 @@ public class SmartCardServiceAdapterTest {
   private static final String PLUGIN_API_VERSION = "2.0";
   private static final String DISTRIBUTED_REMOTE_API_VERSION = "2.0";
   private static final String DISTRIBUTED_LOCAL_API_VERSION = "2.0";
-  private static final String READER_API_VERSION = "1.0";
+  private static final String READER_API_VERSION = "1.1";
   private static final String CARD_API_VERSION = "1.0";
 
   private PluginMock plugin;
