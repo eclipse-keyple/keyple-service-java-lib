@@ -46,8 +46,6 @@ import org.slf4j.LoggerFactory;
 final class CardSelectionManagerAdapter implements CardSelectionManager {
 
   private static final Logger logger = LoggerFactory.getLogger(CardSelectionManagerAdapter.class);
-  private static final String DETECTION_MODE = "detectionMode";
-  private static final String NOTIFICATION_MODE = "notificationMode";
   private static final String MULTI_SELECTION_PROCESSING = "multiSelectionProcessing";
   private static final String CHANNEL_CONTROL = "channelControl";
   private static final String CARD_SELECTIONS_TYPES = "cardSelectionsTypes";
@@ -58,10 +56,6 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   private final List<CardSelectionRequestSpi> cardSelectionRequests;
   private MultiSelectionProcessing multiSelectionProcessing;
   private ChannelControl channelControl = ChannelControl.KEEP_OPEN;
-  private ObservableCardReader.DetectionMode detectionMode =
-      ObservableCardReader.DetectionMode.REPEATING;
-  private ObservableCardReader.NotificationMode notificationMode =
-      ObservableCardReader.NotificationMode.ALWAYS;
 
   /**
    * (package-private) <br>
@@ -119,21 +113,13 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
    * @since 2.1.1
    */
   @Override
-  public String exportCardSelectionScenario(
-      ObservableCardReader.DetectionMode detectionMode,
-      ObservableCardReader.NotificationMode notificationMode) {
-
-    Assert.getInstance()
-        .notNull(detectionMode, DETECTION_MODE)
-        .notNull(notificationMode, NOTIFICATION_MODE);
+  public String exportCardSelectionScenario() {
 
     JsonObject jsonObject = new JsonObject();
 
     // Basic fields
     jsonObject.addProperty(MULTI_SELECTION_PROCESSING, multiSelectionProcessing.name());
     jsonObject.addProperty(CHANNEL_CONTROL, channelControl.name());
-    jsonObject.addProperty(DETECTION_MODE, detectionMode.name());
-    jsonObject.addProperty(NOTIFICATION_MODE, notificationMode.name());
 
     // Original card selections
     List<String> cardSelectionsTypes = new ArrayList<String>(cardSelections.size());
@@ -168,11 +154,6 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
     multiSelectionProcessing =
         MultiSelectionProcessing.valueOf(jsonObject.get(MULTI_SELECTION_PROCESSING).getAsString());
     channelControl = ChannelControl.valueOf(jsonObject.get(CHANNEL_CONTROL).getAsString());
-    detectionMode =
-        ObservableCardReader.DetectionMode.valueOf(jsonObject.get(DETECTION_MODE).getAsString());
-    notificationMode =
-        ObservableCardReader.NotificationMode.valueOf(
-            jsonObject.get(NOTIFICATION_MODE).getAsString());
 
     // Card selections
     List<String> cardSelectionsTypes =
@@ -254,8 +235,8 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
 
     Assert.getInstance()
         .notNull(observableCardReader, "observableCardReader")
-        .notNull(detectionMode, DETECTION_MODE)
-        .notNull(notificationMode, NOTIFICATION_MODE);
+        .notNull(detectionMode, "detectionMode")
+        .notNull(notificationMode, "notificationMode");
 
     CardSelectionScenarioAdapter cardSelectionScenario =
         new CardSelectionScenarioAdapter(
@@ -269,16 +250,6 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
     } else {
       throw new IllegalArgumentException("Not a Keyple reader implementation.");
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.1.1
-   */
-  @Override
-  public void scheduleCardSelectionScenario(ObservableCardReader observableCardReader) {
-    scheduleCardSelectionScenario(observableCardReader, detectionMode, notificationMode);
   }
 
   /**

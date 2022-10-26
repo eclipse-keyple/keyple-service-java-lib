@@ -5,8 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Added
-- The possibility to import/export a card selection scenario.
+
+## [2.1.1] - 2022-10-26
 ### Fixed
 - Logging format for distributed service.
 ### Upgraded
@@ -44,7 +44,8 @@ This is the initial release.
 It follows the extraction of Keyple 1.0 components contained in the `eclipse/keyple-java` repository to dedicated repositories.
 It also brings many major API changes.
 
-[unreleased]: https://github.com/eclipse/keyple-service-java-lib/compare/2.1.0...HEAD
+[unreleased]: https://github.com/eclipse/keyple-service-java-lib/compare/2.1.1...HEAD
+[2.1.1]: https://github.com/eclipse/keyple-service-java-lib/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/eclipse/keyple-service-java-lib/compare/2.0.1...2.1.0
 [2.0.1]: https://github.com/eclipse/keyple-service-java-lib/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/eclipse/keyple-service-java-lib/releases/tag/2.0.0
