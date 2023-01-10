@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 2.1.1 (2022-10-11)
+    Keyple - Adapter of keyple-service-java-lib - 2.1.2 (2023-01-10)
 end title
 
 ' == THEME ==
@@ -286,8 +286,9 @@ package "org.eclipse.keyple.core.service" as service {
         ~**final** <back:pink>ReaderSpi</back> getReaderSpi ()
         ~**final** boolean isLogicalChannelOpen ()
         ~**final** void closeLogicalAndPhysicalChannelsSilently ()
-        ~**final** void activateReaderProtocol (String readerProtocol, String cardProtocol)
-        ~**final** void deactivateReaderProtocol (String readerProtocol)
+        ~**final** void activateReaderProtocol (String physicalProtocolName, String logicalProtocolName)
+        ~**final** void deactivateReaderProtocol (String physicalProtocolName)
+        ~**final** String getCurrentPhysicalProtocolName ()
         -- **AbstractReaderAdapter** --
         ~void unregister ()
         ~**final** List<<back:lightGreen>CardSelectionResponseApi</back>> processCardSelectionRequests (
@@ -326,8 +327,9 @@ package "org.eclipse.keyple.core.service" as service {
             \t<back:pink>ConfigurableReaderSpi</back> configurableReaderSpi,
             \tString pluginName)
         -- **ConfigurableReader** --
-        +void activateProtocol (String readerProtocol, String cardProtocol)
-        +void deactivateProtocol (String readerProtocol)
+        +void activateProtocol (String physicalProtocolName, String logicalProtocolName)
+        +void deactivateProtocol (String physicalProtocolName)
+        +String getCurrentProtocol ()
     }
     ~class "**final** CardSelectionScenarioAdapter" as CardSelectionScenarioAdapter {
         --
@@ -389,9 +391,10 @@ package "org.eclipse.keyple.core.service" as service {
             \t<back:pink>ConfigurableReaderSpi</back> configurableReaderSpi,
             \tString pluginName)
         -- **ConfigurableReader** --
-        +void activateProtocol (String readerProtocol, String cardProtocol)
-        +void deactivateProtocol (String readerProtocol)
-    }
+        +void activateProtocol (String physicalProtocolName, String logicalProtocolName)
+        +void deactivateProtocol (String physicalProtocolName)
+        +String getCurrentProtocol ()
+}
     ~class "<<ObservableReader>>\n**final** ObservableRemoteReaderAdapter" as ObservableRemoteReaderAdapter extends RemoteReaderAdapter {
         --
         ~ObservableRemoteReaderAdapter (<back:plum>ObservableRemoteReaderSpi</back> remoteReaderSpi, String pluginName)
