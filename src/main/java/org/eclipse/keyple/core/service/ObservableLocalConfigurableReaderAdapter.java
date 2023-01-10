@@ -55,4 +55,14 @@ final class ObservableLocalConfigurableReaderAdapter extends ObservableLocalRead
   public void deactivateProtocol(String readerProtocol) {
     deactivateReaderProtocol(readerProtocol);
   }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.1.2
+   */
+  @Override
+  public String getCurrentProtocol() {
+    return getCurrentPhysicalProtocolName();
+  }
 }

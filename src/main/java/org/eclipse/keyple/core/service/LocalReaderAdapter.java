@@ -65,7 +65,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private long before;
   private boolean isLogicalChannelOpen;
   private boolean useDefaultProtocol;
-  private String currentProtocol;
+  private String currentLogicalProtocolName;
+  private String currentPhysicalProtocolName;
   private final Map<String, String> protocolAssociations;
 
   /**
@@ -116,7 +117,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     closeLogicalChannel();
     // Closes the physical channel and resets the current protocol info.
-    currentProtocol = null;
+    currentLogicalProtocolName = null;
     useDefaultProtocol = false;
     try {
       readerSpi.closePhysicalChannel();
@@ -549,7 +550,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     // check protocol if enabled
     if (cardSelector.getCardProtocol() == null
-        || cardSelector.getCardProtocol().equals(currentProtocol)) {
+        || cardSelector.getCardProtocol().equals(currentLogicalProtocolName)) {
       // protocol check succeeded, check power-on data if enabled
       // RL-ATR-FILTER
       // RL-SEL-USAGE.1
@@ -772,27 +773,36 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * <p>If the Map is not empty:
    * <li>The boolean {@link #useDefaultProtocol} is set to false.
    * <li>If the test provided by the reader SPI is positive (the protocol presented is the one used
-   *     by the current card) then the field {@link #currentProtocol} is set with the name of the
-   *     protocol known to the application.
-   * <li>If none of the protocols present in the Map matches then the {@link #currentProtocol} is
-   *     set to null.
+   *     by the current card) then the field {@link #currentLogicalProtocolName} is set with the
+   *     name of the protocol known to the application.
+   * <li>If none of the protocols present in the Map matches then the {@link
+   *     #currentLogicalProtocolName} is set to null.
    * </ul>
    *
-   * <p>If the Map is empty, no other check is done, the String field {@link #currentProtocol} is
-   * set to null and the boolean field {@link #useDefaultProtocol} is set to true.
+   * <p>If the Map is empty, no other check is done, the String field {@link
+   * #currentLogicalProtocolName} is set to null and the boolean field {@link #useDefaultProtocol}
+   * is set to true.
    */
   private void computeCurrentProtocol() {
-    currentProtocol = null;
+    currentLogicalProtocolName = null;
+    currentPhysicalProtocolName = null;
     if (protocolAssociations.size() == 0) {
       useDefaultProtocol = true;
     } else {
       useDefaultProtocol = false;
       for (Map.Entry<String, String> entry : protocolAssociations.entrySet()) {
         if (((ConfigurableReaderSpi) readerSpi).isCurrentProtocol(entry.getKey())) {
-          currentProtocol = entry.getValue();
+          currentLogicalProtocolName = entry.getValue();
+          currentPhysicalProtocolName = entry.getKey();
+          return;
         }
       }
     }
+  }
+
+  /** @return null or the name of the physical protocol used for the last card communication. */
+  final String getCurrentPhysicalProtocolName() {
+    return currentPhysicalProtocolName;
   }
 
   /**
