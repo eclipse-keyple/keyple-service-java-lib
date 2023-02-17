@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Implementation for {@link ObservableReader}, {@link WaitForCardInsertionAutonomousReaderApi} and
  * {@link WaitForCardRemovalAutonomousReaderApi}.
  *
@@ -61,7 +60,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   private DetectionMode detectionMode;
 
   /**
-   * (package-private)<br>
    * The events that drive the card's observation state machine.
    *
    * @since 2.0.0
@@ -106,7 +104,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * (package-private)<br>
    * Creates an instance of {@link ObservableLocalReaderAdapter}.
    *
    * <p>Creates the {@link ObservableReaderStateServiceAdapter} with the possible states and their
@@ -132,7 +129,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * (package-private)<br>
    * Gets the SPI of the reader.
    *
    * @return A not null reference.
@@ -143,7 +139,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * (package-private)<br>
    * Gets the exception handler used to notify the application of exceptions raised during the
    * observation process.
    *
@@ -155,7 +150,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * (package-private)<br>
    * Gets the current {@link DetectionMode}.
    *
    * @return Null if the polling mode has not been defined.
@@ -166,7 +160,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * (package-private)<br>
    * Get the current monitoring state
    *
    * @return current getMonitoringState
@@ -177,7 +170,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * (package-private)<br>
    * Sends a neutral APDU to the card to check its presence. The status of the response is not
    * verified as long as the mere fact that the card responds is sufficient to indicate whether or
    * not it is present.
@@ -212,7 +204,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * (package-private)<br>
    * This method is invoked by the card insertion monitoring process when a card is inserted.
    *
    * <p>It will return a {@link ReaderEvent} or null:
@@ -344,7 +335,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * (package-private)<br>
    * This method is invoked when a card is removed to notify the application of the {@link
    * CardReaderEvent.Type#CARD_REMOVED} event.
    *
@@ -362,7 +352,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * (package-private)<br>
    * Changes the state of the state machine
    *
    * @param stateId new stateId
@@ -373,7 +362,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * (package-private)<br>
    * Notifies all registered observers with the provided {@link ReaderEvent}.
    *
    * <p>This method never throws an exception. Any errors at runtime are notified to the application
@@ -419,7 +407,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * (package-private)<br>
    * If defined, the prepared {@link CardSelectionScenarioAdapter} will be processed as soon as a
    * card is inserted. The result of this request set will be added to the reader event notified to
    * the application.

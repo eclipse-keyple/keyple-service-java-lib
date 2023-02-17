@@ -38,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Local reader adapter.
  *
  * <ul>
@@ -70,7 +69,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private final Map<String, String> protocolAssociations;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param readerSpi The reader SPI.
@@ -84,7 +82,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Gets {@link ReaderSpi} associated to this reader.
    *
    * @return A not null reference.
@@ -95,7 +92,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Gets the logical channel's opening state.
    *
    * @return True if the channel is open, false if not.
@@ -106,7 +102,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Close both logical and physical channels
    *
    * <p>This method doesn't raise any exception.
@@ -269,7 +264,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Activates a protocol (for configurable reader only).
    *
    * @param readerProtocol The reader protocol.
@@ -290,7 +284,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Deactivates a protocol (for configurable reader only).
    *
    * @param readerProtocol The reader protocol.
@@ -324,8 +317,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (private)<br>
-   * Transmits a {@link CardRequestSpi} and returns a {@link CardResponseApi}.
+   * Builds on Transmits a {@link CardRequestSpi} and returns a {@link CardResponseApi}.
    *
    * @param cardRequest The card request to transmit.
    * @return A not null reference.
@@ -383,8 +375,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (private)<br>
-   * Transmits an {@link ApduRequestSpi} and receives the {@link ApduResponseApi}.
+   * Builds on Transmits an {@link ApduRequestSpi} and receives the {@link ApduResponseApi}.
    *
    * <p>The time measurement is carried out and logged with the detailed information of the
    * exchanges (TRACE level).
@@ -468,8 +459,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (private)<br>
-   * Attempts to select the card and executes the optional requests if any.
+   * Builds on Attempts to select the card and executes the optional requests if any.
    *
    * @param cardSelectionRequest The {@link CardSelectionRequestSpi} to be processed.
    * @return A not null reference.
@@ -524,8 +514,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (private)<br>
-   * Select the card according to the {@link CardSelectorSpi}.
+   * Builds on Select the card according to the {@link CardSelectorSpi}.
    *
    * <p>The selection status is returned.<br>
    * 3 levels of filtering/selection are applied successively if they are enabled: protocol, power
@@ -586,8 +575,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (private)<br>
-   * Checks the provided power-on data with the PowerOnDataFilter.
+   * Builds on Checks the provided power-on data with the PowerOnDataFilter.
    *
    * <p>Returns true if the power-on data is accepted by the filter.
    *
@@ -622,8 +610,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (private)<br>
-   * Selects the card with the provided AID and gets the FCI response in return.
+   * Builds on Selects the card with the provided AID and gets the FCI response in return.
    *
    * @param cardSelector The card selector.
    * @return A not null {@link ApduResponseApi} containing the FCI.
@@ -655,9 +642,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (private)<br>
-   * Sends the select application command to the card and returns the requested data according to
-   * AidSelector attributes (ISO7816-4 selection data) into an {@link ApduResponseApi}.
+   * Builds on Sends the select application command to the card and returns the requested data
+   * according to AidSelector attributes (ISO7816-4 selection data) into an {@link ApduResponseApi}.
    *
    * @param cardSelector The card selector.
    * @return A not null {@link ApduResponseApi}.
@@ -703,9 +689,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (private)<br>
-   * Computes the P2 parameter of the ISO7816-4 Select Application APDU command from the provided
-   * FileOccurrence and FileControlInformation.
+   * Builds on Computes the P2 parameter of the ISO7816-4 Select Application APDU command from the
+   * provided FileOccurrence and FileControlInformation.
    *
    * @param fileOccurrence The file's position relative to the current file.
    * @param fileControlInformation The file control information output.
@@ -753,10 +738,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     return p2;
   }
 
-  /**
-   * (private)<br>
-   * Close the logical channel.
-   */
+  /** Builds on Close the logical channel. */
   private void closeLogicalChannel() {
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] closeLogicalChannel => Closing of the logical channel.", this.getName());
@@ -769,8 +751,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (private)<br>
-   * Determines the current protocol used by the card.
+   * Builds on Determines the current protocol used by the card.
    *
    * <p>The Map {@link #protocolAssociations} containing the protocol names (reader and application)
    * is iterated and the reader protocol (key of the Map) is checked with the reader.<br>
@@ -810,10 +791,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     return currentPhysicalProtocolName;
   }
 
-  /**
-   * (private)<br>
-   * This POJO contains the card selection status.
-   */
+  /** Builds on This POJO contains the card selection status. */
   private static class SelectionStatus {
 
     private final String powerOnData;
@@ -835,10 +813,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     }
   }
 
-  /**
-   * (private)<br>
-   * Local implementation of {@link ApduRequestSpi}.
-   */
+  /** Builds on Local implementation of {@link ApduRequestSpi}. */
   private static final class ApduRequest implements ApduRequestSpi {
 
     private static final int DEFAULT_SUCCESSFUL_CODE = 0x9000;

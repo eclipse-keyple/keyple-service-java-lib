@@ -18,7 +18,6 @@ import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 
 /**
- * (package-private)<br>
  * This POJO contains a selection scenario composed of one or more card selection requests and
  * indicators specifying the expected behavior.
  *
@@ -41,7 +40,6 @@ final class CardSelectionScenarioAdapter {
   private final ChannelControl channelControl;
 
   /**
-   * (package-private)<br>
    * Builds a card selection scenario from a list of selection cases and two enum constants guiding
    * the expected behaviour of the selection process.
    *
@@ -72,7 +70,6 @@ final class CardSelectionScenarioAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Gets the card selection requests list.
    *
    * @return A not null reference
@@ -83,7 +80,6 @@ final class CardSelectionScenarioAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Gets the multi selection processing policy.
    *
    * @return A not null reference
@@ -94,7 +90,6 @@ final class CardSelectionScenarioAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Gets the channel control policy.
    *
    * @return A not null reference

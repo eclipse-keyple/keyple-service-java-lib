@@ -12,7 +12,6 @@
 package org.eclipse.keyple.core.service;
 
 /**
- * (package-private)<br>
  * Indicates whether the selection process should stop after the first matching or process all cases
  * in the selection request list.
  *

@@ -14,7 +14,6 @@ package org.eclipse.keyple.core.service;
 import java.util.SortedSet;
 
 /**
- * (package-private)<br>
  * All information about a change of reader state within an {@link ObservablePlugin}.
  *
  * <p>The {@link #getReaderNames()} and {@link #getType()} methods allow the event recipient to

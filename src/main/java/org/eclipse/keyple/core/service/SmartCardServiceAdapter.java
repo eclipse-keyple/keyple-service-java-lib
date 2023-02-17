@@ -41,7 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Implementation of {@link SmartCardService}.
  *
  * @since 2.0.0
@@ -70,7 +69,6 @@ final class SmartCardServiceAdapter implements SmartCardService {
   private SmartCardServiceAdapter() {}
 
   /**
-   * (package-private)<br>
    * Gets the single instance of SmartCardServiceAdapter.
    *
    * @return single instance of SmartCardServiceAdapter
@@ -81,8 +79,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * (private)<br>
-   * Compare versions.
+   * Builds on Compare versions.
    *
    * @param providedVersion The provided version string.
    * @param localVersion The local version string.
@@ -118,8 +115,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * (private)<br>
-   * Checks for consistency in the versions of external APIs shared by the plugin and the service.
+   * Builds on Checks for consistency in the versions of external APIs shared by the plugin and the
+   * service.
    *
    * <p>Generates warnings into the log.
    *
@@ -143,9 +140,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * (private)<br>
-   * Checks for consistency in the versions of external APIs shared by the remote plugin and the
-   * service.
+   * Builds on Checks for consistency in the versions of external APIs shared by the remote plugin
+   * and the service.
    *
    * <p>Generates warnings into the log.
    *
@@ -173,9 +169,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * (private)<br>
-   * Checks for consistency in the versions of external APIs shared by the pool plugin and the
-   * service.
+   * Builds on Checks for consistency in the versions of external APIs shared by the pool plugin and
+   * the service.
    *
    * <p>Generates warnings into the log.
    *
@@ -201,9 +196,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * (private)<br>
-   * Checks for consistency in the versions of external APIs shared by the card extension and the
-   * service.
+   * Builds on Checks for consistency in the versions of external APIs shared by the card extension
+   * and the service.
    *
    * <p>Generates warnings into the log.
    *
@@ -231,9 +225,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * (private)<br>
-   * Checks for consistency in the versions of external APIs shared by the distributed local service
-   * and the service.
+   * Builds on Checks for consistency in the versions of external APIs shared by the distributed
+   * local service and the service.
    *
    * <p>Generates warnings into the log.
    *
@@ -337,8 +330,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * (private)<br>
-   * Creates an instance of local plugin.
+   * Builds on Creates an instance of local plugin.
    *
    * @param pluginFactorySpi The plugin factory SPI.
    * @return A not null reference.
@@ -370,8 +362,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * (private)<br>
-   * Creates an instance of local pool plugin.
+   * Builds on Creates an instance of local pool plugin.
    *
    * @param poolPluginFactorySpi The pool plugin factory SPI.
    * @return A not null reference.
@@ -394,8 +385,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * (private)<br>
-   * Creates an instance of remote plugin.
+   * Builds on Creates an instance of remote plugin.
    *
    * @param remotePluginFactorySpi The plugin factory SPI.
    * @return A not null reference.

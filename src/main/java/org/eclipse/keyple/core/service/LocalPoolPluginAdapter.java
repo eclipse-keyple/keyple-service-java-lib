@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Implementation of a local {@link PoolPlugin}.
  *
  * @since 2.0.0
@@ -34,7 +33,6 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
   private final PoolPluginSpi poolPluginSpi;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param poolPluginSpi The associated SPI.

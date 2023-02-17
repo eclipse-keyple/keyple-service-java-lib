@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Abstract class for all readers.
  *
  * @since 2.0.0
@@ -38,7 +37,6 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
   private long before;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param readerName The name of the reader.
@@ -65,7 +63,6 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
   }
 
   /**
-   * (package-private)<br>
    * Performs a selection scenario following a card detection.
    *
    * <p>Each scenario selection case consists in checking if the card matches the profile defined in
@@ -130,7 +127,6 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
   }
 
   /**
-   * (package-private)<br>
    * Check if the reader status is "registered".
    *
    * @throws IllegalStateException is thrown when reader is not or no longer registered.
@@ -143,7 +139,6 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
   }
 
   /**
-   * (package-private)<br>
    * Changes the reader status to registered.
    *
    * @since 2.0.0
@@ -153,7 +148,6 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
   }
 
   /**
-   * (package-private)<br>
    * Changes the reader status to unregistered if is not already unregistered.
    *
    * <p>This method may be overridden in order to meet specific needs in certain implementations of
@@ -166,7 +160,6 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
   }
 
   /**
-   * (package-private)<br>
    * Abstract method performing the actual card selection process.
    *
    * @param cardSelectionRequests A list of selection cases composed of one or more {@link
@@ -188,7 +181,6 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
           UnexpectedStatusWordException;
 
   /**
-   * (package-private)<br>
    * Abstract method performing the actual transmission of the card request.
    *
    * @param cardRequest The card request.

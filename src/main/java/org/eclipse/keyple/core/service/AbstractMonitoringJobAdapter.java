@@ -12,7 +12,6 @@
 package org.eclipse.keyple.core.service;
 
 /**
- * (package-private)<br>
  * Abstract class for all monitoring jobs.
  *
  * @since 2.0.0
@@ -21,7 +20,6 @@ abstract class AbstractMonitoringJobAdapter {
   private final ObservableLocalReaderAdapter reader;
 
   /**
-   * (package-private)<br>
    * Creates an instance.
    *
    * @param reader The reader.
@@ -32,7 +30,6 @@ abstract class AbstractMonitoringJobAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Gets the reader.
    *
    * @return A not null reference.
@@ -43,7 +40,6 @@ abstract class AbstractMonitoringJobAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Gets the task of the monitoring job.
    *
    * @param monitoringState reference to the state the monitoring job in running against.
@@ -53,7 +49,6 @@ abstract class AbstractMonitoringJobAdapter {
   abstract Runnable getMonitoringJob(AbstractObservableStateAdapter monitoringState);
 
   /**
-   * (package-private)<br>
    * Stops/interrupts the monitoring job
    *
    * @since 2.0.0

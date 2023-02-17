@@ -18,7 +18,6 @@ import org.calypsonet.terminal.card.CardResponseApi;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 
 /**
- * (package-private)<br>
  * This POJO contains an ordered list of the responses received following a card request and
  * indicators related to the status of the channel and the completion of the card request.
  *
@@ -31,7 +30,6 @@ final class CardResponseAdapter implements CardResponseApi {
   private final boolean isLogicalChannelOpen;
 
   /**
-   * (package-private)<br>
    * Builds a card response from all {@link ApduResponseApi} received from the card and booleans
    * indicating if the logical channel is still open.
    *

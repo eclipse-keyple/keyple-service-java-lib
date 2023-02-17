@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Implementation of a local {@link ObservablePlugin}.
  *
  * @since 2.0.0
@@ -36,7 +35,6 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
   private final ObservablePluginSpi observablePluginSpi;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param observablePluginSpi The associated plugin SPI.
@@ -48,7 +46,6 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
   }
 
   /**
-   * (package-private)<br>
    * Checks whether the background job is monitoring for new readers.
    *
    * @return True, if the background job is monitoring, false in all other cases.
@@ -141,17 +138,13 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       interrupt();
     }
 
-    /**
-     * (private)<br>
-     * Indicate whether the thread is running or not
-     */
+    /** Builds on Indicate whether the thread is running or not */
     private boolean isMonitoring() {
       return running;
     }
 
     /**
-     * (private)<br>
-     * Adds a reader to the list of known readers (by the plugin)
+     * Builds on Adds a reader to the list of known readers (by the plugin)
      *
      * @param readerName The name of the reader.
      * @throws PluginIOException if an error occurs while searching the reader.
@@ -169,10 +162,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       }
     }
 
-    /**
-     * (private)<br>
-     * Removes a reader from the list of known readers (by the plugin)
-     */
+    /** Builds on Removes a reader from the list of known readers (by the plugin) */
     private void removeReader(CardReader reader) {
       ((LocalReaderAdapter) reader).unregister();
       getReadersMap().remove(reader.getName());
@@ -184,10 +174,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       }
     }
 
-    /**
-     * (private)<br>
-     * Notifies observers of changes in the list of readers
-     */
+    /** Builds on Notifies observers of changes in the list of readers */
     private void notifyChanges(PluginEvent.Type type, SortedSet<String> changedReaderNames) {
       /* grouped notification */
       if (logger.isTraceEnabled()) {
@@ -200,9 +187,8 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
     }
 
     /**
-     * (private)<br>
-     * Compares the list of current readers to the list provided by the system and adds or removes
-     * readers accordingly.<br>
+     * Builds on Compares the list of current readers to the list provided by the system and adds or
+     * removes readers accordingly.<br>
      * Observers are notified of changes.
      *
      * @param actualNativeReaderNames the list of readers currently known by the system

@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Wait for card removal state implementation.
  *
  * <p>The state in which the card is still present and awaiting removal.
@@ -37,7 +36,6 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
       LoggerFactory.getLogger(WaitForCardRemovalStateAdapter.class);
 
   /**
-   * (package-private)<br>
    * Creates an instance.
    *
    * @param reader The observable local reader adapter.
@@ -48,7 +46,6 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
   }
 
   /**
-   * (package-private)<br>
    * Creates an instance.
    *
    * @param reader The observable local reader adapter.

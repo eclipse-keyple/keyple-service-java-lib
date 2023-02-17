@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Abstract class for all plugins.
  *
  * @since 2.0.0
@@ -41,7 +40,6 @@ abstract class AbstractPluginAdapter implements Plugin {
   private final Map<String, Reader> readers;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param pluginName The name of the plugin.
@@ -55,7 +53,6 @@ abstract class AbstractPluginAdapter implements Plugin {
   }
 
   /**
-   * (package-private)<br>
    * Builds a local reader adapter using the provided SPI.
    *
    * @param readerSpi The associated reader SPI.
@@ -80,7 +77,6 @@ abstract class AbstractPluginAdapter implements Plugin {
   }
 
   /**
-   * (package-private)<br>
    * Check if the plugin is registered.
    *
    * @throws IllegalStateException is thrown when plugin is not or no longer registered.
@@ -94,7 +90,6 @@ abstract class AbstractPluginAdapter implements Plugin {
   }
 
   /**
-   * (package-private)<br>
    * Changes the plugin status to registered.
    *
    * @throws PluginIOException If registration failed.
@@ -105,7 +100,6 @@ abstract class AbstractPluginAdapter implements Plugin {
   }
 
   /**
-   * (package-private)<br>
    * Unregisters the plugin and the readers present in its list.
    *
    * @since 2.0.0
@@ -160,7 +154,6 @@ abstract class AbstractPluginAdapter implements Plugin {
   }
 
   /**
-   * (package-private)<br>
    * Gets the Map of all connected readers.
    *
    * @since 2.0.0

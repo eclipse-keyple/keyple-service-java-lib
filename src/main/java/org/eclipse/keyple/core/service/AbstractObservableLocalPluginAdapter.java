@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Abstract class for all observable local plugin adapters.
  *
  * @since 2.0.0
@@ -36,7 +35,6 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
       observationManager;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param pluginSpi The associated plugin SPI.
@@ -50,7 +48,6 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   }
 
   /**
-   * (package-private)<br>
    * Gets the associated observation manager.
    *
    * @return A not null reference.
@@ -62,7 +59,6 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
   }
 
   /**
-   * (package-private)<br>
    * Notifies all registered observers with the provided {@link PluginEventAdapter}.
    *
    * <p>This method never throws an exception. Any errors at runtime are notified to the application

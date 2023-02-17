@@ -17,7 +17,6 @@ import org.calypsonet.terminal.reader.selection.CardSelectionResult;
 import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 
 /**
- * (package-private)<br>
  * Implementation of {@link CardSelectionResult}.
  *
  * @since 2.0.0
@@ -28,7 +27,6 @@ final class CardSelectionResultAdapter implements CardSelectionResult {
   private final Map<Integer, SmartCard> smartCardMap = new HashMap<Integer, SmartCard>();
 
   /**
-   * (package-private)<br>
    * Constructor
    *
    * @since 2.0.0
@@ -36,7 +34,6 @@ final class CardSelectionResultAdapter implements CardSelectionResult {
   CardSelectionResultAdapter() {}
 
   /**
-   * (package-private)<br>
    * Append a {@link SmartCard} to the internal list
    *
    * @param selectionIndex The index of the selection that resulted in the smart card.

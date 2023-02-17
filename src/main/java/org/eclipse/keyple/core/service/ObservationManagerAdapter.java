@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Manager of event observations for plugins and readers.
  *
  * @param <T> The type of the observers ({@link
@@ -40,7 +39,6 @@ final class ObservationManagerAdapter<T, S> {
   private S exceptionHandler;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param pluginName The name of the associated plugin (used for log only).
@@ -58,7 +56,6 @@ final class ObservationManagerAdapter<T, S> {
   }
 
   /**
-   * (package-private)<br>
    * Adds the provided observer if it is not already present.
    *
    * @param observer The observer to add.
@@ -83,7 +80,6 @@ final class ObservationManagerAdapter<T, S> {
   }
 
   /**
-   * (package-private)<br>
    * Removes the provided observer if it is present.
    *
    * @param observer The observer to remove.
@@ -103,7 +99,6 @@ final class ObservationManagerAdapter<T, S> {
   }
 
   /**
-   * (package-private)<br>
    * Removes all observers.
    *
    * @since 2.0.0
@@ -118,7 +113,6 @@ final class ObservationManagerAdapter<T, S> {
   }
 
   /**
-   * (package-private)<br>
    * Gets the number of observers.
    *
    * @return The number of observers.
@@ -129,7 +123,6 @@ final class ObservationManagerAdapter<T, S> {
   }
 
   /**
-   * (package-private)<br>
    * Sets the observation exception handler.
    *
    * @param exceptionHandler the observation exception handler.
@@ -142,7 +135,6 @@ final class ObservationManagerAdapter<T, S> {
   }
 
   /**
-   * (package-private)<br>
    * Gets a copy of the set of all observers.
    *
    * @return A not null copy.
@@ -155,7 +147,6 @@ final class ObservationManagerAdapter<T, S> {
   }
 
   /**
-   * (package-private)<br>
    * Gets the exception handler used to notify the application of exceptions raised during the
    * observation process.
    *

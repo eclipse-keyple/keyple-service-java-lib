@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Implementation of a local {@link Plugin}.
  *
  * @since 2.0.0
@@ -32,7 +31,6 @@ class LocalPluginAdapter extends AbstractPluginAdapter {
   private final PluginSpi pluginSpi;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param pluginSpi The associated SPI.

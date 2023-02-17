@@ -22,7 +22,6 @@ import java.lang.reflect.Type;
 import org.calypsonet.terminal.card.AbstractApduException;
 
 /**
- * (package-private)<br>
  * Contains all JSON adapters used for serialization and deserialization processes.<br>
  * These adapters are required for interfaces and abstract classes.
  *
@@ -31,7 +30,6 @@ import org.calypsonet.terminal.card.AbstractApduException;
 final class JsonAdapter {
 
   /**
-   * (package-private)<br>
    * Serializer of a {@link AbstractApduException}.
    *
    * <p>Only the field "message" is serialized during the process.
@@ -59,7 +57,6 @@ final class JsonAdapter {
   }
 
   /**
-   * (package-private)<br>
    * JSON serializer/deserializer of a {@link org.calypsonet.terminal.card.ApduResponseApi}.
    *
    * @since 2.0.0

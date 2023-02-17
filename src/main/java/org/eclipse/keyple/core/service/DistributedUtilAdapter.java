@@ -26,21 +26,16 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;
 
 /**
- * (package-private)<br>
  * Utility class of distributed components.
  *
  * @since 2.0.0
  */
 final class DistributedUtilAdapter {
 
-  /**
-   * (private)<br>
-   * Constructor.
-   */
+  /** Builds on Constructor. */
   private DistributedUtilAdapter() {}
 
   /**
-   * (package-private)<br>
    * Executes remotely the provided JSON input data of a specific plugin service, parses the
    * provided JSON output data, checks if the JSON contains an error and throws the embedded
    * exception if exists..
@@ -71,7 +66,6 @@ final class DistributedUtilAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Executes remotely the provided JSON input data of a specific reader service, parses the
    * provided JSON output data, checks if the JSON contains an error and throws the embedded
    * exception if exists.
@@ -134,7 +128,6 @@ final class DistributedUtilAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Throws a runtime exception containing the provided exception.
    *
    * @param e The cause.
@@ -149,7 +142,6 @@ final class DistributedUtilAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Enumeration of all available common JSON properties.
    *
    * @since 2.0.0
@@ -200,7 +192,6 @@ final class DistributedUtilAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Enumeration of the available local services that can be invoked on local plugins from the
    * remote plugin.
    *
@@ -252,7 +243,6 @@ final class DistributedUtilAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Enumeration of the available local services that can be invoked on a local reader from the
    * remote reader.
    *

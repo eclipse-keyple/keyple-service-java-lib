@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * This monitoring job polls the {@link CardReader#isCardPresent()} method to detect a card
  * insertion or a card removal.
  *
@@ -38,7 +37,6 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
   private final AtomicBoolean loop = new AtomicBoolean();
 
   /**
-   * (package-private)<br>
    * Build a monitoring job to detect the card insertion
    *
    * @param reader reader that will be polled with the method isCardPresent()
@@ -55,7 +53,6 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
   }
 
   /**
-   * (package-private)<br>
    * Gets the monitoring process.
    *
    * @return A not null reference.
@@ -129,7 +126,6 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
   }
 
   /**
-   * (package-private)<br>
    * Terminates the monitoring process.
    *
    * @since 2.0.0

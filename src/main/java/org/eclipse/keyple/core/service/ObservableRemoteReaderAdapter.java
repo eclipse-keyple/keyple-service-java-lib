@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Observable Remote reader adapter.
  *
  * @since 2.0.0
@@ -43,7 +42,6 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   private final ExecutorService eventNotificationExecutorService;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param observableRemoteReaderSpi The remote reader SPI.
@@ -61,7 +59,6 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   }
 
   /**
-   * (package-private)<br>
    * Notifies asynchronously all registered observers with the provided {@link ReaderEvent}.
    *
    * @param event The reader event.
@@ -102,7 +99,6 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   }
 
   /**
-   * (package-private)<br>
    * If defined, the prepared {@link CardSelectionScenarioAdapter} will be processed as soon as a
    * card is inserted. The result of this request set will be added to the reader event notified to
    * the application.

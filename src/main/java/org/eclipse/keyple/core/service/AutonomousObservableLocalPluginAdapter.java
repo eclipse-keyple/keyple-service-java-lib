@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Implementation of an autonomous local {@link ObservablePlugin}.
  *
  * @since 2.0.0
@@ -34,7 +33,6 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
       LoggerFactory.getLogger(AutonomousObservableLocalPluginAdapter.class);
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param autonomousObservablePluginSpi The associated plugin SPI.
