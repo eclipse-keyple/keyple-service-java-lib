@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Detect the card insertion thanks to the method {@link
  * WaitForCardInsertionBlockingSpi#waitForCardPresent()}.
  *
@@ -42,7 +41,6 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
   private final WaitForCardInsertionBlockingSpi readerSpi;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param reader The reader.
@@ -54,7 +52,6 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
   }
 
   /**
-   * (package-private)<br>
    * Gets the monitoring process.
    *
    * @return A not null reference.
@@ -100,7 +97,6 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
   }
 
   /**
-   * (package-private)<br>
    * Terminates the monitoring process.
    *
    * @since 2.0.0

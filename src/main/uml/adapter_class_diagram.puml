@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 2.1.2 (2023-01-10)
+    Keyple - Adapter of keyple-service-java-lib - 2.1.3 (2023-02-17)
 end title
 
 ' == THEME ==
@@ -205,8 +205,6 @@ package "org.eclipse.keyple.core.service" as service {
     ~class "<<ObservablePlugin>>\n<<<back:plum>ObservableRemotePluginApi</back>>>\n**final** ObservableRemotePluginAdapter" as ObservableRemotePluginAdapter extends RemotePluginAdapter {
         --
         ~ObservableRemotePluginAdapter (<back:plum>ObservableRemotePluginSpi</back> observableRemotePluginSpi)
-
-        ~void notifyObservers (PluginEvent event)
         -- **AbstractPluginAdapter** --
         ~void unregister ()
         -- **ObservablePlugin** --

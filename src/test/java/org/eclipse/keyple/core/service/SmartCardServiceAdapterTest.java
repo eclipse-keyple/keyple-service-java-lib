@@ -58,7 +58,7 @@ public class SmartCardServiceAdapterTest {
   private static final String SERVICE_API_VERSION = "2.0";
   private static final String COMMON_API_VERSION = "2.0";
   private static final String PLUGIN_API_VERSION = "2.0";
-  private static final String DISTRIBUTED_REMOTE_API_VERSION = "2.0";
+  private static final String DISTRIBUTED_REMOTE_API_VERSION = "2.1";
   private static final String DISTRIBUTED_LOCAL_API_VERSION = "2.0";
   private static final String READER_API_VERSION = "1.2";
   private static final String CARD_API_VERSION = "1.0";
@@ -429,11 +429,11 @@ public class SmartCardServiceAdapterTest {
 
   @Test
   public void registerPlugin_Remote_whenPluginApiVersionDiffers_shouldRegister_and_LogWarn() {
-    when(remotePluginFactory.getDistributedRemoteApiVersion()).thenReturn("2.1");
+    when(remotePluginFactory.getDistributedRemoteApiVersion()).thenReturn("2.0");
     service.registerPlugin(remotePluginFactory);
     assertThat(service.getPluginNames().contains(REMOTE_PLUGIN_NAME)).isTrue();
     verify(logger)
-        .warn(anyString(), eq(REMOTE_PLUGIN_NAME), eq("2.1"), eq(DISTRIBUTED_REMOTE_API_VERSION));
+        .warn(anyString(), eq(REMOTE_PLUGIN_NAME), eq("2.0"), eq(DISTRIBUTED_REMOTE_API_VERSION));
   }
 
   @Test(expected = IllegalStateException.class)

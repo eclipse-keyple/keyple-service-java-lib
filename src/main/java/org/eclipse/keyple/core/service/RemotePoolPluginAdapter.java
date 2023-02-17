@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Implementation of a remote {@link PoolPlugin}.
  *
  * @since 2.0.0
@@ -39,7 +38,6 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
   private final RemotePoolPluginSpi remotePoolPluginSpi;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param remotePoolPluginSpi The associated SPI.

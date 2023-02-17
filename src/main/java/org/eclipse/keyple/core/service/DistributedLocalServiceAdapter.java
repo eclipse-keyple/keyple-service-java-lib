@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Implementation of public {@link DistributedLocalService} API.
  *
  * @since 2.0.0
@@ -55,7 +54,6 @@ final class DistributedLocalServiceAdapter
   private boolean isRegistered;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param localServiceSpi The associated SPI.
@@ -167,7 +165,6 @@ final class DistributedLocalServiceAdapter
   }
 
   /**
-   * (package-private)<br>
    * Registers the distributed local service.
    *
    * @since 2.0.0
@@ -177,7 +174,6 @@ final class DistributedLocalServiceAdapter
   }
 
   /**
-   * (package-private)<br>
    * Unregisters the distributed local service and stop all plugins and readers events observations.
    *
    * @since 2.0.0
@@ -197,7 +193,6 @@ final class DistributedLocalServiceAdapter
   }
 
   /**
-   * (private)<br>
    * Check if the distributed local service is registered.
    *
    * @throws IllegalStateException is thrown when the distributed local service is not (or no
@@ -210,10 +205,7 @@ final class DistributedLocalServiceAdapter
     }
   }
 
-  /**
-   * (private)<br>
-   * Inner class used to execute a service on a specific local reader.
-   */
+  /** Inner class used to execute a service on a specific local reader. */
   private final class LocalReaderExecutor {
 
     private final AbstractReaderAdapter reader;
@@ -221,7 +213,6 @@ final class DistributedLocalServiceAdapter
     private final JsonObject output;
 
     /**
-     * (private)<br>
      * Constructor.
      *
      * @param jsonData The JSON service input data.
@@ -238,7 +229,6 @@ final class DistributedLocalServiceAdapter
     }
 
     /**
-     * (private)<br>
      * Retrieves the first register reader having the provided name among all plugins.
      *
      * @param readerName The name of the reader to be found.
@@ -259,7 +249,6 @@ final class DistributedLocalServiceAdapter
     }
 
     /**
-     * (private)<br>
      * The main method.
      *
      * @return A not null JSON string which can eventually contain an exception.
@@ -309,7 +298,6 @@ final class DistributedLocalServiceAdapter
     }
 
     /**
-     * (private)<br>
      * Service {@link ReaderService#TRANSMIT_CARD_REQUEST}.
      *
      * @throws CardBrokenCommunicationException If a card communication error occurs.
@@ -336,7 +324,6 @@ final class DistributedLocalServiceAdapter
     }
 
     /**
-     * (private)<br>
      * Service {@link ReaderService#TRANSMIT_CARD_SELECTION_REQUESTS}.
      *
      * @throws CardBrokenCommunicationException If a card communication error occurs.
@@ -368,10 +355,7 @@ final class DistributedLocalServiceAdapter
       output.addProperty(JsonProperty.RESULT.name(), JsonUtil.toJson(cardSelectionResponses));
     }
 
-    /**
-     * (private)<br>
-     * Service {@link ReaderService#SCHEDULE_CARD_SELECTION_SCENARIO}.
-     */
+    /** Service {@link ReaderService#SCHEDULE_CARD_SELECTION_SCENARIO}. */
     private void scheduleCardSelectionScenario() {
 
       // Extract info from the message
@@ -405,10 +389,7 @@ final class DistributedLocalServiceAdapter
       }
     }
 
-    /**
-     * (private)<br>
-     * Service {@link ReaderService#IS_CARD_PRESENT}.
-     */
+    /** Service {@link ReaderService#IS_CARD_PRESENT}. */
     private void isCardPresent() {
 
       // Execute the service on the reader
@@ -418,10 +399,7 @@ final class DistributedLocalServiceAdapter
       output.addProperty(JsonProperty.RESULT.name(), isCardPresent);
     }
 
-    /**
-     * (private)<br>
-     * Service {@link ReaderService#IS_CONTACTLESS}.
-     */
+    /** Service {@link ReaderService#IS_CONTACTLESS}. */
     private void isContactless() {
 
       // Execute the service on the reader
@@ -431,10 +409,7 @@ final class DistributedLocalServiceAdapter
       output.addProperty(JsonProperty.RESULT.name(), isContactless);
     }
 
-    /**
-     * (private)<br>
-     * Service {@link ReaderService#START_CARD_DETECTION}.
-     */
+    /** Service {@link ReaderService#START_CARD_DETECTION}. */
     private void startCardDetection() {
 
       // Extract info from the message
@@ -447,10 +422,7 @@ final class DistributedLocalServiceAdapter
       ((ObservableCardReader) reader).startCardDetection(detectionMode);
     }
 
-    /**
-     * (private)<br>
-     * Service {@link ReaderService#STOP_CARD_DETECTION}.
-     */
+    /** Service {@link ReaderService#STOP_CARD_DETECTION}. */
     private void stopCardDetection() {
 
       // Execute the service on the reader
@@ -458,10 +430,7 @@ final class DistributedLocalServiceAdapter
       ((ObservableCardReader) reader).stopCardDetection();
     }
 
-    /**
-     * (private)<br>
-     * Service {@link ReaderService#FINALIZE_CARD_PROCESSING}.
-     */
+    /** Service {@link ReaderService#FINALIZE_CARD_PROCESSING}. */
     private void finalizeCardProcessing() {
 
       // Execute the service on the reader
@@ -469,7 +438,6 @@ final class DistributedLocalServiceAdapter
     }
 
     /**
-     * (private)<br>
      * Service {@link ReaderService#RELEASE_CHANNEL}.
      *
      * @throws ReaderBrokenCommunicationException If a reader communication error occurs.
@@ -481,17 +449,13 @@ final class DistributedLocalServiceAdapter
     }
   }
 
-  /**
-   * (private)<br>
-   * Inner class used to execute a service on local plugins.
-   */
+  /** Inner class used to execute a service on local plugins. */
   private final class LocalPluginExecutor {
 
     private final JsonObject input;
     private final JsonObject output;
 
     /**
-     * (private)<br>
      * Constructor.
      *
      * @param jsonData The JSON service input data.
@@ -502,7 +466,6 @@ final class DistributedLocalServiceAdapter
     }
 
     /**
-     * (private)<br>
      * The main method.
      *
      * @return A not null JSON string which can eventually contain an exception.
@@ -542,10 +505,7 @@ final class DistributedLocalServiceAdapter
       return output.toString();
     }
 
-    /**
-     * (private)<br>
-     * Service {@link PluginService#GET_READERS}.
-     */
+    /** Service {@link PluginService#GET_READERS}. */
     private void getReaders() {
 
       // Execute the service on the plugins
@@ -561,7 +521,6 @@ final class DistributedLocalServiceAdapter
     }
 
     /**
-     * (private)<br>
      * Retrieves the pool plugin that contains the provided reader group reference.
      *
      * @param readerGroupReference The target reader group reference.
@@ -579,10 +538,7 @@ final class DistributedLocalServiceAdapter
       return null;
     }
 
-    /**
-     * (private)<br>
-     * Service {@link PluginService#GET_READER_GROUP_REFERENCES}.
-     */
+    /** Service {@link PluginService#GET_READER_GROUP_REFERENCES}. */
     private void getReaderGroupReferences() {
 
       // Execute the service on the plugins
@@ -597,10 +553,7 @@ final class DistributedLocalServiceAdapter
       output.addProperty(JsonProperty.RESULT.name(), JsonUtil.toJson(readerGroupReferences));
     }
 
-    /**
-     * (private)<br>
-     * Service {@link PluginService#ALLOCATE_READER}.
-     */
+    /** Service {@link PluginService#ALLOCATE_READER}. */
     private void allocateReader() {
 
       // Extract info from the message
@@ -621,10 +574,7 @@ final class DistributedLocalServiceAdapter
       output.addProperty(JsonProperty.RESULT.name(), reader.getName());
     }
 
-    /**
-     * (private)<br>
-     * Service {@link PluginService#RELEASE_READER}.
-     */
+    /** Service {@link PluginService#RELEASE_READER}. */
     private void releaseReader() {
 
       // Extract info from the message
@@ -640,10 +590,7 @@ final class DistributedLocalServiceAdapter
       }
     }
 
-    /**
-     * (private)<br>
-     * Service {@link PluginService#START_READER_DETECTION}.
-     */
+    /** Service {@link PluginService#START_READER_DETECTION}. */
     private void startReaderDetection() {
 
       // Start the observation of all observable local plugins.
@@ -659,10 +606,7 @@ final class DistributedLocalServiceAdapter
       }
     }
 
-    /**
-     * (private)<br>
-     * Service {@link PluginService#STOP_READER_DETECTION}.
-     */
+    /** Service {@link PluginService#STOP_READER_DETECTION}. */
     private void stopReaderDetection() {
 
       // Stop the observation of all observable local plugins.

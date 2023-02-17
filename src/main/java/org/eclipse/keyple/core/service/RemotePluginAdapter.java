@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Implementation of a remote {@link Plugin}.
  *
  * @since 2.0.0
@@ -42,7 +41,6 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
   private final RemotePluginSpi remotePluginSpi;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param remotePluginSpi The associated SPI.

@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Wait for start the card detection state implementation.
  *
  * <p>The state during which the reader does not wait for a card to be inserted but for a signal
@@ -35,7 +34,6 @@ final class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapte
       LoggerFactory.getLogger(WaitForStartDetectStateAdapter.class);
 
   /**
-   * (package-private)<br>
    * Creates an instance.
    *
    * @param reader The observable local reader adapter.
@@ -46,7 +44,6 @@ final class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapte
   }
 
   /**
-   * (package-private)<br>
    * Creates an instance.
    *
    * @param reader The observable local reader adapter.

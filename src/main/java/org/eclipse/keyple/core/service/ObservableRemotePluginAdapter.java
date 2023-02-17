@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Implementation of a remote {@link ObservablePlugin}.
  *
  * @since 2.0.0
@@ -47,7 +46,6 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   private final ExecutorService eventNotificationExecutorService;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param observableRemotePluginSpi The associated SPI.
@@ -57,14 +55,16 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     super(observableRemotePluginSpi);
     this.observableRemotePluginSpi = observableRemotePluginSpi;
     this.observableRemotePluginSpi.connect((ObservableRemotePluginApi) this);
-    this.observationManager =
+    observationManager =
         new ObservationManagerAdapter<PluginObserverSpi, PluginObservationExceptionHandlerSpi>(
             getName(), null);
-    this.eventNotificationExecutorService = Executors.newCachedThreadPool();
+    eventNotificationExecutorService =
+        observableRemotePluginSpi.getExecutorService() != null
+            ? observableRemotePluginSpi.getExecutorService()
+            : Executors.newCachedThreadPool();
   }
 
   /**
-   * (package-private)<br>
    * Notifies asynchronously all registered observers with the provided {@link PluginEvent}.
    *
    * <p>This method never throws an exception. Any errors at runtime are notified to the application
@@ -73,7 +73,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    * @param event The plugin event.
    * @since 2.0.0
    */
-  void notifyObservers(final PluginEvent event) {
+  private void notifyObservers(final PluginEvent event) {
 
     if (logger.isDebugEnabled()) {
       logger.debug(
@@ -113,11 +113,10 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    * @since 2.0.0
    */
   @Override
-  final void unregister() {
-    Set<String> unregisteredReaderNames = new HashSet<String>(this.getReaderNames());
+  void unregister() {
+    Set<String> unregisteredReaderNames = new HashSet<String>(getReaderNames());
     notifyObservers(
-        new PluginEventAdapter(
-            this.getName(), unregisteredReaderNames, PluginEvent.Type.UNAVAILABLE));
+        new PluginEventAdapter(getName(), unregisteredReaderNames, PluginEvent.Type.UNAVAILABLE));
     clearObservers();
     super.unregister();
   }
@@ -185,10 +184,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     stopPluginMonitoring();
   }
 
-  /**
-   * (private)<br>
-   * Stops the monitoring of the plugin.
-   */
+  /** Stops the monitoring of the plugin. */
   private void stopPluginMonitoring() {
 
     if (logger.isDebugEnabled()) {
@@ -219,7 +215,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    * @since 2.0.0
    */
   @Override
-  public final int countObservers() {
+  public int countObservers() {
     return observationManager.countObservers();
   }
 
@@ -229,7 +225,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    * @since 2.0.0
    */
   @Override
-  public final void setPluginObservationExceptionHandler(
+  public void setPluginObservationExceptionHandler(
       PluginObservationExceptionHandlerSpi exceptionHandler) {
     checkStatus();
     observationManager.setObservationExceptionHandler(exceptionHandler);

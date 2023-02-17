@@ -17,7 +17,6 @@ import org.calypsonet.terminal.card.CardSelectionResponseApi;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 
 /**
- * (package-private)<br>
  * This POJO contains the data from a card obtained in response to a card selection request.
  *
  * <p>These data are the selection status and the responses, if any, to the additional APDUs sent to
@@ -34,7 +33,6 @@ final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
   private final CardResponseAdapter cardResponse;
 
   /**
-   * (package-private)<br>
    * Builds a card selection response including the selection status and a {@link CardResponseApi}
    * (list of {@link org.calypsonet.terminal.card.ApduResponseApi}).
    *

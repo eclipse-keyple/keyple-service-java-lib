@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Wait for card insertion state implementation.
  *
  * <p>The state during which the insertion of a card is expected.
@@ -38,7 +37,6 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
       LoggerFactory.getLogger(WaitForCardInsertionStateAdapter.class);
 
   /**
-   * (package-private)<br>
    * Creates an instance.
    *
    * @param reader The observable local reader adapter.
@@ -49,7 +47,6 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
   }
 
   /**
-   * (package-private)<br>
    * Creates an instance.
    *
    * @param reader The observable local reader adapter.

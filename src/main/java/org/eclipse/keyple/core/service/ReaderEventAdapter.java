@@ -14,7 +14,6 @@ package org.eclipse.keyple.core.service;
 import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
 
 /**
- * (package-private)<br>
  * Implementation of {@link ReaderEvent}.
  *
  * @since 2.0.0

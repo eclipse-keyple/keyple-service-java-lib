@@ -26,7 +26,6 @@ import org.calypsonet.terminal.reader.selection.spi.CardSelection;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 
 /**
- * (package-private)<br>
  * Contains internal DTOs used for serialization and deserialization processes.
  *
  * @since 2.1.1
@@ -36,7 +35,6 @@ final class InternalDto {
   private InternalDto() {}
 
   /**
-   * (package-private)<br>
    * Local implementation of {@link CardSelection} and {@link CardSelectionSpi}.
    *
    * @since 2.1.1
@@ -46,7 +44,6 @@ final class InternalDto {
     private CardSelectionRequest cardSelectionRequest;
 
     /**
-     * (package-private)<br>
      * Default constructor.
      *
      * @since 2.1.1
@@ -54,7 +51,6 @@ final class InternalDto {
     CardSelectionAdapter() {}
 
     /**
-     * (package-private)<br>
      * Builds a new instance using the provided source object.
      *
      * @param src The source.
@@ -81,7 +77,6 @@ final class InternalDto {
   }
 
   /**
-   * (package-private)<br>
    * Local implementation of {@link CardSelectionRequestSpi}.
    *
    * @since 2.1.1
@@ -92,7 +87,6 @@ final class InternalDto {
     private CardRequest cardRequest;
 
     /**
-     * (package-private)<br>
      * Default constructor.
      *
      * @since 2.1.1
@@ -100,7 +94,6 @@ final class InternalDto {
     CardSelectionRequest() {}
 
     /**
-     * (package-private)<br>
      * Builds a new instance using the provided source object.
      *
      * @param src The source.
@@ -130,7 +123,6 @@ final class InternalDto {
   }
 
   /**
-   * (package-private)<br>
    * Local implementation of {@link CardSelectorSpi}.
    *
    * @since 2.1.1
@@ -145,7 +137,6 @@ final class InternalDto {
     private Set<Integer> successfulSelectionStatusWords;
 
     /**
-     * (package-private)<br>
      * Default constructor.
      *
      * @since 2.1.1
@@ -153,7 +144,6 @@ final class InternalDto {
     CardSelector() {}
 
     /**
-     * (package-private)<br>
      * Builds a new instance using the provided source object.
      *
      * @param src The source.
@@ -206,7 +196,6 @@ final class InternalDto {
   }
 
   /**
-   * (package-private)<br>
    * Local implementation of {@link CardRequestSpi}.
    *
    * @since 2.1.1
@@ -217,7 +206,6 @@ final class InternalDto {
     private boolean stopOnUnsuccessfulStatusWord;
 
     /**
-     * (package-private)<br>
      * Default constructor.
      *
      * @since 2.1.1
@@ -225,7 +213,6 @@ final class InternalDto {
     CardRequest() {}
 
     /**
-     * (package-private)<br>
      * Builds a new instance using the provided source object.
      *
      * @param src The source.
@@ -256,7 +243,6 @@ final class InternalDto {
   }
 
   /**
-   * (package-private)<br>
    * Local implementation of {@link ApduRequestSpi}.
    *
    * @since 2.1.1
@@ -268,7 +254,6 @@ final class InternalDto {
     private String info;
 
     /**
-     * (package-private)<br>
      * Default constructor.
      *
      * @since 2.1.1
@@ -276,7 +261,6 @@ final class InternalDto {
     ApduRequest() {}
 
     /**
-     * (package-private)<br>
      * Builds a new instance using the provided source object.
      *
      * @param src The source.

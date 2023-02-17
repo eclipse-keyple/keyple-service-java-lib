@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Abstract class for all states of a {@link ObservableLocalReaderAdapter}.
  *
  * @since 2.0.0
@@ -28,7 +27,6 @@ abstract class AbstractObservableStateAdapter {
       LoggerFactory.getLogger(AbstractObservableStateAdapter.class);
 
   /**
-   * (package-private)<br>
    * The states that the reader monitoring state machine can have
    *
    * @since 2.0.0
@@ -76,7 +74,6 @@ abstract class AbstractObservableStateAdapter {
   private final ExecutorService executorService;
 
   /**
-   * (package-private)<br>
    * Create a new state with a state identifier and a monitor job
    *
    * @param monitoringState the state identifier
@@ -98,7 +95,6 @@ abstract class AbstractObservableStateAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Create a new state with a state identifier without monitoring job.
    *
    * @param reader observable reader this currentState is attached to
@@ -111,7 +107,6 @@ abstract class AbstractObservableStateAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Get the current state identifier of the state machine
    *
    * @return the current state identifier
@@ -122,7 +117,6 @@ abstract class AbstractObservableStateAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Gets the reader.
    *
    * @return A not null reference.
@@ -133,7 +127,6 @@ abstract class AbstractObservableStateAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Switch state in the parent reader
    *
    * @param stateId the new state
@@ -144,7 +137,6 @@ abstract class AbstractObservableStateAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Invoked when activated, a custom behaviour can be added here.
    *
    * @since 2.0.0
@@ -165,7 +157,6 @@ abstract class AbstractObservableStateAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Invoked when deactivated.
    *
    * @since 2.0.0
@@ -192,7 +183,6 @@ abstract class AbstractObservableStateAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Handle Internal Event.
    *
    * @param event internal event received by reader

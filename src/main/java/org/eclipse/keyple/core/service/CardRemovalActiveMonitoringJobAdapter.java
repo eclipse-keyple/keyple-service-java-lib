@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Ping the card to detect removal thanks to the method {@link
  * ObservableLocalReaderAdapter#isCardPresentPing()}.
  *
@@ -44,7 +43,6 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
   private final long cycleDurationMillis;
 
   /**
-   * (package-private)<br>
    * Create a job monitor job that ping the card with the method isCardPresentPing()
    *
    * @param reader reference to the reader
@@ -58,7 +56,6 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
   }
 
   /**
-   * (package-private)<br>
    * Gets the monitoring process.
    *
    * @return A not null reference.
@@ -122,7 +119,6 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
   }
 
   /**
-   * (package-private)<br>
    * Terminates the monitoring process.
    *
    * @since 2.0.0

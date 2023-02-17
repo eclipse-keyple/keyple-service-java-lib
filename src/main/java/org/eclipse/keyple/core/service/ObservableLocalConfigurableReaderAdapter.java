@@ -15,7 +15,6 @@ import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 
 /**
- * (package-private)<br>
  * Local configurable observable reader adapter.
  *
  * @since 2.0.0
@@ -24,7 +23,6 @@ final class ObservableLocalConfigurableReaderAdapter extends ObservableLocalRead
     implements ConfigurableReader {
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param configurableReaderSpi The configurable reader SPI.

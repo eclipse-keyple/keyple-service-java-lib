@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Management of the physical channel when chaining multiple selection scenarios.
 ### Upgraded
-- "Google Gson library" (com.google.code.gson) to version `2.10.1`.
+- "Keyple Distributed Remote API" to version `2.1.0`
+- "Google Gson Library" (com.google.code.gson) to version `2.10.1`.
 
 ## [2.1.2] - 2023-01-10
 ### Upgraded

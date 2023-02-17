@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Remote reader adapter.
  *
  * @since 2.0.0
@@ -43,7 +42,6 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   private final RemoteReaderSpi remoteReaderSpi;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param remoteReaderSpi The remote reader SPI.
@@ -169,7 +167,6 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * (private)<br>
    * Executes remote reader service for boolean result.
    *
    * @param input The input data.

@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Manages the internal state of an {@link ObservableLocalReaderAdapter} Process InternalEvent
  * against the current state
  *
@@ -56,7 +55,6 @@ final class ObservableReaderStateServiceAdapter {
   private AbstractObservableStateAdapter currentState;
 
   /**
-   * (package-private)<br>
    * Initializes the states according to the interfaces implemented by the provided reader.
    *
    * @param reader The observable local reader adapter.
@@ -148,7 +146,6 @@ final class ObservableReaderStateServiceAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Thread safe method to communicate an internal event to this reader Use this method to inform
    * the reader of external event like a tag discovered or a card inserted
    *
@@ -173,7 +170,6 @@ final class ObservableReaderStateServiceAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Thread safe method to switch the state of this reader should only be invoked by this reader or
    * its state
    *
@@ -205,7 +201,6 @@ final class ObservableReaderStateServiceAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Get reader current state
    *
    * @return reader current state
@@ -216,7 +211,6 @@ final class ObservableReaderStateServiceAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Get the reader current monitoring state
    *
    * @return current monitoring state
@@ -227,7 +221,6 @@ final class ObservableReaderStateServiceAdapter {
   }
 
   /**
-   * (package-private)<br>
    * Shuts down the {@link ExecutorService} of this reader.
    *
    * <p>This method should be invoked when the reader monitoring ends in order to stop any remaining

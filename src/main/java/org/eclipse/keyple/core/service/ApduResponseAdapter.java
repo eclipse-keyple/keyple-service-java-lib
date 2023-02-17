@@ -16,7 +16,6 @@ import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 
 /**
- * (package-private)<br>
  * This POJO contains a set of data related to an ISO-7816 APDU response.
  *
  * @since 2.0.0
@@ -27,7 +26,6 @@ final class ApduResponseAdapter implements ApduResponseApi {
   private final int statusWord;
 
   /**
-   * (package-private)<br>
    * Builds an APDU response from an array of bytes from the card, computes the status word.
    *
    * @param apdu A array of at least 2 bytes.

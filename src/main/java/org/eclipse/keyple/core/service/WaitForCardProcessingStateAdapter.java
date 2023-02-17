@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Wait for card processing state implementation.
  *
  * <p>The state during which the card is being processed by the application.
@@ -40,7 +39,6 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
       LoggerFactory.getLogger(WaitForCardProcessingStateAdapter.class);
 
   /**
-   * (package-private)<br>
    * Creates an instance.
    *
    * @param reader The observable local reader adapter.
@@ -51,7 +49,6 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
   }
 
   /**
-   * (package-private)<br>
    * Creates an instance.
    *
    * @param reader The observable local reader adapter.

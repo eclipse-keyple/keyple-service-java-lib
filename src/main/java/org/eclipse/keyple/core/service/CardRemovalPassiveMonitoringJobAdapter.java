@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private)<br>
  * Detect the card removal thanks to the method {@link
  * WaitForCardRemovalBlockingSpi#waitForCardRemoval()} or {@link
  * WaitForCardRemovalDuringProcessingBlockingSpi#waitForCardRemovalDuringProcessing()} depending of
@@ -51,7 +50,6 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
   private final WaitForCardRemovalDuringProcessingBlockingSpi readerProcessingSpi;
 
   /**
-   * (package-private)<br>
    * Constructor.
    *
    * @param reader reference to the reader
@@ -70,7 +68,6 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
   }
 
   /**
-   * (package-private)<br>
    * Gets the monitoring process.
    *
    * @return A not null reference.
@@ -119,7 +116,6 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
   }
 
   /**
-   * (package-private)<br>
    * Terminates the monitoring process.
    *
    * @since 2.0.0
