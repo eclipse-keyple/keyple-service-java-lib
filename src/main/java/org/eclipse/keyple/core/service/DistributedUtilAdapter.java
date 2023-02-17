@@ -32,7 +32,7 @@ import org.slf4j.Logger;
  */
 final class DistributedUtilAdapter {
 
-  /** Builds on Constructor. */
+  /** Constructor. */
   private DistributedUtilAdapter() {}
 
   /**

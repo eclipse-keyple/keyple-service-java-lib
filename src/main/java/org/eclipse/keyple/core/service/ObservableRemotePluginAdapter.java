@@ -184,7 +184,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     stopPluginMonitoring();
   }
 
-  /** Builds on Stops the monitoring of the plugin. */
+  /** Stops the monitoring of the plugin. */
   private void stopPluginMonitoring() {
 
     if (logger.isDebugEnabled()) {

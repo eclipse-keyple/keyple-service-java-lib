@@ -79,7 +79,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * Builds on Compare versions.
+   * Compare versions.
    *
    * @param providedVersion The provided version string.
    * @param localVersion The local version string.
@@ -115,8 +115,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * Builds on Checks for consistency in the versions of external APIs shared by the plugin and the
-   * service.
+   * Checks for consistency in the versions of external APIs shared by the plugin and the service.
    *
    * <p>Generates warnings into the log.
    *
@@ -140,8 +139,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * Builds on Checks for consistency in the versions of external APIs shared by the remote plugin
-   * and the service.
+   * Checks for consistency in the versions of external APIs shared by the remote plugin and the
+   * service.
    *
    * <p>Generates warnings into the log.
    *
@@ -169,8 +168,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * Builds on Checks for consistency in the versions of external APIs shared by the pool plugin and
-   * the service.
+   * Checks for consistency in the versions of external APIs shared by the pool plugin and the
+   * service.
    *
    * <p>Generates warnings into the log.
    *
@@ -196,8 +195,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * Builds on Checks for consistency in the versions of external APIs shared by the card extension
-   * and the service.
+   * Checks for consistency in the versions of external APIs shared by the card extension and the
+   * service.
    *
    * <p>Generates warnings into the log.
    *
@@ -225,8 +224,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * Builds on Checks for consistency in the versions of external APIs shared by the distributed
-   * local service and the service.
+   * Checks for consistency in the versions of external APIs shared by the distributed local service
+   * and the service.
    *
    * <p>Generates warnings into the log.
    *
@@ -330,7 +329,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * Builds on Creates an instance of local plugin.
+   * Creates an instance of local plugin.
    *
    * @param pluginFactorySpi The plugin factory SPI.
    * @return A not null reference.
@@ -362,7 +361,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * Builds on Creates an instance of local pool plugin.
+   * Creates an instance of local pool plugin.
    *
    * @param poolPluginFactorySpi The pool plugin factory SPI.
    * @return A not null reference.
@@ -385,7 +384,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /**
-   * Builds on Creates an instance of remote plugin.
+   * Creates an instance of remote plugin.
    *
    * @param remotePluginFactorySpi The plugin factory SPI.
    * @return A not null reference.

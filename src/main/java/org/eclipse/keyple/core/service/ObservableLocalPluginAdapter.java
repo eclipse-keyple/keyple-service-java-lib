@@ -138,13 +138,13 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       interrupt();
     }
 
-    /** Builds on Indicate whether the thread is running or not */
+    /** Indicate whether the thread is running or not */
     private boolean isMonitoring() {
       return running;
     }
 
     /**
-     * Builds on Adds a reader to the list of known readers (by the plugin)
+     * Adds a reader to the list of known readers (by the plugin)
      *
      * @param readerName The name of the reader.
      * @throws PluginIOException if an error occurs while searching the reader.
@@ -162,7 +162,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       }
     }
 
-    /** Builds on Removes a reader from the list of known readers (by the plugin) */
+    /** Removes a reader from the list of known readers (by the plugin) */
     private void removeReader(CardReader reader) {
       ((LocalReaderAdapter) reader).unregister();
       getReadersMap().remove(reader.getName());
@@ -174,7 +174,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       }
     }
 
-    /** Builds on Notifies observers of changes in the list of readers */
+    /** Notifies observers of changes in the list of readers */
     private void notifyChanges(PluginEvent.Type type, SortedSet<String> changedReaderNames) {
       /* grouped notification */
       if (logger.isTraceEnabled()) {
@@ -187,8 +187,8 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
     }
 
     /**
-     * Builds on Compares the list of current readers to the list provided by the system and adds or
-     * removes readers accordingly.<br>
+     * Compares the list of current readers to the list provided by the system and adds or removes
+     * readers accordingly.<br>
      * Observers are notified of changes.
      *
      * @param actualNativeReaderNames the list of readers currently known by the system

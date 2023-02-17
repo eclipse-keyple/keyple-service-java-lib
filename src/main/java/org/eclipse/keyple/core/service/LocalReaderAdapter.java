@@ -317,7 +317,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * Builds on Transmits a {@link CardRequestSpi} and returns a {@link CardResponseApi}.
+   * Transmits a {@link CardRequestSpi} and returns a {@link CardResponseApi}.
    *
    * @param cardRequest The card request to transmit.
    * @return A not null reference.
@@ -375,7 +375,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * Builds on Transmits an {@link ApduRequestSpi} and receives the {@link ApduResponseApi}.
+   * Transmits an {@link ApduRequestSpi} and receives the {@link ApduResponseApi}.
    *
    * <p>The time measurement is carried out and logged with the detailed information of the
    * exchanges (TRACE level).
@@ -459,7 +459,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * Builds on Attempts to select the card and executes the optional requests if any.
+   * Attempts to select the card and executes the optional requests if any.
    *
    * @param cardSelectionRequest The {@link CardSelectionRequestSpi} to be processed.
    * @return A not null reference.
@@ -514,7 +514,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * Builds on Select the card according to the {@link CardSelectorSpi}.
+   * Select the card according to the {@link CardSelectorSpi}.
    *
    * <p>The selection status is returned.<br>
    * 3 levels of filtering/selection are applied successively if they are enabled: protocol, power
@@ -575,7 +575,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * Builds on Checks the provided power-on data with the PowerOnDataFilter.
+   * Checks the provided power-on data with the PowerOnDataFilter.
    *
    * <p>Returns true if the power-on data is accepted by the filter.
    *
@@ -610,7 +610,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * Builds on Selects the card with the provided AID and gets the FCI response in return.
+   * Selects the card with the provided AID and gets the FCI response in return.
    *
    * @param cardSelector The card selector.
    * @return A not null {@link ApduResponseApi} containing the FCI.
@@ -642,8 +642,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * Builds on Sends the select application command to the card and returns the requested data
-   * according to AidSelector attributes (ISO7816-4 selection data) into an {@link ApduResponseApi}.
+   * Sends the select application command to the card and returns the requested data according to
+   * AidSelector attributes (ISO7816-4 selection data) into an {@link ApduResponseApi}.
    *
    * @param cardSelector The card selector.
    * @return A not null {@link ApduResponseApi}.
@@ -689,8 +689,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * Builds on Computes the P2 parameter of the ISO7816-4 Select Application APDU command from the
-   * provided FileOccurrence and FileControlInformation.
+   * Computes the P2 parameter of the ISO7816-4 Select Application APDU command from the provided
+   * FileOccurrence and FileControlInformation.
    *
    * @param fileOccurrence The file's position relative to the current file.
    * @param fileControlInformation The file control information output.
@@ -738,7 +738,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     return p2;
   }
 
-  /** Builds on Close the logical channel. */
+  /** Close the logical channel. */
   private void closeLogicalChannel() {
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] closeLogicalChannel => Closing of the logical channel.", this.getName());
@@ -751,7 +751,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * Builds on Determines the current protocol used by the card.
+   * Determines the current protocol used by the card.
    *
    * <p>The Map {@link #protocolAssociations} containing the protocol names (reader and application)
    * is iterated and the reader protocol (key of the Map) is checked with the reader.<br>
@@ -791,7 +791,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     return currentPhysicalProtocolName;
   }
 
-  /** Builds on This POJO contains the card selection status. */
+  /** This POJO contains the card selection status. */
   private static class SelectionStatus {
 
     private final String powerOnData;
@@ -813,7 +813,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     }
   }
 
-  /** Builds on Local implementation of {@link ApduRequestSpi}. */
+  /** Local implementation of {@link ApduRequestSpi}. */
   private static final class ApduRequest implements ApduRequestSpi {
 
     private static final int DEFAULT_SUCCESSFUL_CODE = 0x9000;

@@ -167,7 +167,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * Builds on Executes remote reader service for boolean result.
+   * Executes remote reader service for boolean result.
    *
    * @param input The input data.
    * @return The result as a boolean value.

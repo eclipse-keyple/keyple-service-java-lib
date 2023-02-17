@@ -270,8 +270,8 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   }
 
   /**
-   * Builds on Analyzes the responses received in return of the execution of a card selection
-   * scenario and returns the CardSelectionResult.
+   * Analyzes the responses received in return of the execution of a card selection scenario and
+   * returns the CardSelectionResult.
    *
    * @param cardSelectionResponses The card selection responses.
    * @return A not null reference.
