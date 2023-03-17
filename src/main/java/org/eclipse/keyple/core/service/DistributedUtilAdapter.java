@@ -121,7 +121,8 @@ final class DistributedUtilAdapter {
     if (output.has(JsonProperty.ERROR.name())) {
       BodyError body =
           JsonUtil.getParser()
-              .fromJson(output.get(JsonProperty.ERROR.name()).getAsString(), BodyError.class);
+              .fromJson(
+                  output.getAsJsonObject(JsonProperty.ERROR.name()).toString(), BodyError.class);
       throw body.getException();
     }
     return output;

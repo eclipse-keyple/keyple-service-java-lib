@@ -78,7 +78,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
       localReaders =
           JsonUtil.getParser()
               .fromJson(
-                  output.get(JsonProperty.RESULT.name()).getAsString(),
+                  output.getAsJsonObject(JsonProperty.RESULT.name()).toString(),
                   new TypeToken<HashMap<String, Boolean>>() {}.getType());
 
     } catch (RuntimeException e) {
@@ -154,7 +154,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
       readerEvent =
           JsonUtil.getParser()
               .fromJson(
-                  json.get(JsonProperty.READER_EVENT.name()).getAsString(),
+                  json.getAsJsonObject(JsonProperty.READER_EVENT.name()).toString(),
                   ReaderEventAdapter.class);
     } catch (RuntimeException e) {
       throw new IllegalArgumentException(
