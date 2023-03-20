@@ -311,7 +311,8 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
       pluginEvent =
           JsonUtil.getParser()
               .fromJson(
-                  json.get(JsonProperty.PLUGIN_EVENT.name()).getAsString(), PluginEvent.class);
+                  json.getAsJsonObject(JsonProperty.PLUGIN_EVENT.name()).toString(),
+                  PluginEvent.class);
     } catch (RuntimeException e) {
       throw new IllegalArgumentException(
           String.format("JSON data of the plugin event is malformed : %s", e.getMessage()), e);

@@ -85,7 +85,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
 
       return JsonUtil.getParser()
           .fromJson(
-              output.get(JsonProperty.RESULT.name()).getAsString(),
+              output.getAsJsonArray(JsonProperty.RESULT.name()).toString(),
               new TypeToken<SortedSet<String>>() {}.getType());
 
     } catch (RuntimeException e) {

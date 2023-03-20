@@ -72,9 +72,9 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     input.addProperty(
         JsonProperty.SERVICE.name(), ReaderService.TRANSMIT_CARD_SELECTION_REQUESTS.name());
 
-    input.addProperty(
+    input.add(
         JsonProperty.CARD_SELECTION_REQUESTS.name(),
-        JsonUtil.getParser().toJson(cardSelectionRequests));
+        JsonUtil.getParser().toJsonTree(cardSelectionRequests));
 
     input.addProperty(
         JsonProperty.MULTI_SELECTION_PROCESSING.name(), multiSelectionProcessing.name());
@@ -90,7 +90,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
       return JsonUtil.getParser()
           .fromJson(
-              output.get(JsonProperty.RESULT.name()).getAsString(),
+              output.getAsJsonArray(JsonProperty.RESULT.name()).toString(),
               new TypeToken<ArrayList<CardSelectionResponseAdapter>>() {}.getType());
 
     } catch (RuntimeException e) {
@@ -121,7 +121,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     JsonObject input = new JsonObject();
     input.addProperty(JsonProperty.SERVICE.name(), ReaderService.TRANSMIT_CARD_REQUEST.name());
 
-    input.addProperty(JsonProperty.CARD_REQUEST.name(), JsonUtil.getParser().toJson(cardRequest));
+    input.add(JsonProperty.CARD_REQUEST.name(), JsonUtil.getParser().toJsonTree(cardRequest));
 
     input.addProperty(JsonProperty.CHANNEL_CONTROL.name(), channelControl.name());
 
@@ -134,7 +134,8 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
       return JsonUtil.getParser()
           .fromJson(
-              output.get(JsonProperty.RESULT.name()).getAsString(), CardResponseAdapter.class);
+              output.getAsJsonObject(JsonProperty.RESULT.name()).toString(),
+              CardResponseAdapter.class);
 
     } catch (RuntimeException e) {
       throw e;
