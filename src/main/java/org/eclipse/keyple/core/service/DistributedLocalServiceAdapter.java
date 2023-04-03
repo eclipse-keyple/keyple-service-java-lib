@@ -60,7 +60,7 @@ final class DistributedLocalServiceAdapter
    * @since 2.0.0
    */
   DistributedLocalServiceAdapter(LocalServiceSpi localServiceSpi) {
-    this.name = localServiceSpi.getName();
+    name = localServiceSpi.getName();
     this.localServiceSpi = localServiceSpi;
     localServiceSpi.connect(this);
   }
@@ -136,7 +136,7 @@ final class DistributedLocalServiceAdapter
     }
 
     JsonObject body = new JsonObject();
-    body.add(JsonProperty.PLUGIN_EVENT.name(), JsonUtil.getParser().toJsonTree(pluginEvent));
+    body.add(JsonProperty.PLUGIN_EVENT.getKey(), JsonUtil.getParser().toJsonTree(pluginEvent));
 
     localServiceSpi.onPluginEvent(pluginEvent.getReaderNames().first(), body.toString());
   }
@@ -159,7 +159,7 @@ final class DistributedLocalServiceAdapter
     }
 
     JsonObject body = new JsonObject();
-    body.add(JsonProperty.READER_EVENT.name(), JsonUtil.getParser().toJsonTree(readerEvent));
+    body.add(JsonProperty.READER_EVENT.getKey(), JsonUtil.getParser().toJsonTree(readerEvent));
 
     localServiceSpi.onReaderEvent(readerEvent.getReaderName(), body.toString());
   }
@@ -220,12 +220,12 @@ final class DistributedLocalServiceAdapter
      */
     private LocalReaderExecutor(String jsonData, String readerName) {
 
-      this.reader = getReader(readerName);
+      reader = getReader(readerName);
       if (reader == null) {
         throw new IllegalStateException(String.format(READER_NOT_FOUND_TEMPLATE, readerName));
       }
-      this.input = JsonUtil.getParser().fromJson(jsonData, JsonObject.class);
-      this.output = new JsonObject();
+      input = JsonUtil.getParser().fromJson(jsonData, JsonObject.class);
+      output = new JsonObject();
     }
 
     /**
@@ -255,11 +255,11 @@ final class DistributedLocalServiceAdapter
      */
     private String execute() {
 
-      output.add(JsonProperty.SERVICE.name(), input.get(JsonProperty.SERVICE.name()));
+      output.add(JsonProperty.SERVICE.getKey(), input.get(JsonProperty.SERVICE.getKey()));
       try {
         checkStatus();
         ReaderService service =
-            ReaderService.valueOf(input.get(JsonProperty.SERVICE.name()).getAsString());
+            ReaderService.valueOf(input.get(JsonProperty.SERVICE.getKey()).getAsString());
         switch (service) {
           case TRANSMIT_CARD_REQUEST:
             transmitCardRequest();
@@ -292,7 +292,7 @@ final class DistributedLocalServiceAdapter
             throw new IllegalArgumentException(service.name());
         }
       } catch (Exception e) {
-        output.add(JsonProperty.ERROR.name(), JsonUtil.getParser().toJsonTree(new BodyError(e)));
+        output.add(JsonProperty.ERROR.getKey(), JsonUtil.getParser().toJsonTree(new BodyError(e)));
       }
       return output.toString();
     }
@@ -307,21 +307,23 @@ final class DistributedLocalServiceAdapter
         throws CardBrokenCommunicationException, ReaderBrokenCommunicationException,
             UnexpectedStatusWordException {
 
-      // Extract info from the message
+      // Extract parameters from the message
+      JsonObject params = input.getAsJsonObject(JsonProperty.PARAMETERS.getKey());
+
       ChannelControl channelControl =
-          ChannelControl.valueOf(input.get(JsonProperty.CHANNEL_CONTROL.name()).getAsString());
+          ChannelControl.valueOf(params.get(JsonProperty.CHANNEL_CONTROL.getKey()).getAsString());
 
       CardRequestSpi cardRequest =
           JsonUtil.getParser()
               .fromJson(
-                  input.getAsJsonObject(JsonProperty.CARD_REQUEST.name()).toString(),
+                  params.getAsJsonObject(JsonProperty.CARD_REQUEST.getKey()).toString(),
                   CardRequest.class);
 
       // Execute the service on the reader
       CardResponseApi cardResponse = reader.transmitCardRequest(cardRequest, channelControl);
 
       // Build result
-      output.add(JsonProperty.RESULT.name(), JsonUtil.getParser().toJsonTree(cardResponse));
+      output.add(JsonProperty.RESULT.getKey(), JsonUtil.getParser().toJsonTree(cardResponse));
     }
 
     /**
@@ -333,19 +335,21 @@ final class DistributedLocalServiceAdapter
     private void transmitCardSelectionRequests()
         throws CardBrokenCommunicationException, ReaderBrokenCommunicationException {
 
-      // Extract info from the message
-      List<CardSelectionRequestSpi> cardSelectionRequests =
-          JsonUtil.getParser()
-              .fromJson(
-                  input.getAsJsonArray(JsonProperty.CARD_SELECTION_REQUESTS.name()).toString(),
-                  new TypeToken<ArrayList<CardSelectionRequest>>() {}.getType());
+      // Extract parameters from the message
+      JsonObject params = input.getAsJsonObject(JsonProperty.PARAMETERS.getKey());
 
       MultiSelectionProcessing multiSelectionProcessing =
           MultiSelectionProcessing.valueOf(
-              input.get(JsonProperty.MULTI_SELECTION_PROCESSING.name()).getAsString());
+              params.get(JsonProperty.MULTI_SELECTION_PROCESSING.getKey()).getAsString());
 
       ChannelControl channelControl =
-          ChannelControl.valueOf(input.get(JsonProperty.CHANNEL_CONTROL.name()).getAsString());
+          ChannelControl.valueOf(params.get(JsonProperty.CHANNEL_CONTROL.getKey()).getAsString());
+
+      List<CardSelectionRequestSpi> cardSelectionRequests =
+          JsonUtil.getParser()
+              .fromJson(
+                  params.getAsJsonArray(JsonProperty.CARD_SELECTION_REQUESTS.getKey()).toString(),
+                  new TypeToken<ArrayList<CardSelectionRequest>>() {}.getType());
 
       // Execute the service on the reader
       List<CardSelectionResponseApi> cardSelectionResponses =
@@ -354,28 +358,30 @@ final class DistributedLocalServiceAdapter
 
       // Build result
       output.add(
-          JsonProperty.RESULT.name(), JsonUtil.getParser().toJsonTree(cardSelectionResponses));
+          JsonProperty.RESULT.getKey(), JsonUtil.getParser().toJsonTree(cardSelectionResponses));
     }
 
     /** Service {@link ReaderService#SCHEDULE_CARD_SELECTION_SCENARIO}. */
     private void scheduleCardSelectionScenario() {
 
-      // Extract info from the message
+      // Extract parameters from the message
+      JsonObject params = input.getAsJsonObject(JsonProperty.PARAMETERS.getKey());
+
       CardSelectionScenarioAdapter cardSelectionScenario =
           JsonUtil.getParser()
               .fromJson(
-                  input.get(JsonProperty.CARD_SELECTION_SCENARIO.name()),
+                  params.get(JsonProperty.CARD_SELECTION_SCENARIO.getKey()),
                   CardSelectionScenarioAdapter.class);
 
       ObservableCardReader.NotificationMode notificationMode =
           ObservableCardReader.NotificationMode.valueOf(
-              input.get(JsonProperty.NOTIFICATION_MODE.name()).getAsString());
+              params.get(JsonProperty.NOTIFICATION_MODE.getKey()).getAsString());
 
       ObservableCardReader.DetectionMode detectionMode = null;
-      if (input.has(JsonProperty.POLLING_MODE.name())) {
+      if (params.has(JsonProperty.POLLING_MODE.getKey())) {
         detectionMode =
             ObservableCardReader.DetectionMode.valueOf(
-                input.get(JsonProperty.POLLING_MODE.name()).getAsString());
+                params.get(JsonProperty.POLLING_MODE.getKey()).getAsString());
       }
 
       // Execute the service on the reader
@@ -398,7 +404,7 @@ final class DistributedLocalServiceAdapter
       boolean isCardPresent = reader.isCardPresent();
 
       // Build result
-      output.addProperty(JsonProperty.RESULT.name(), isCardPresent);
+      output.addProperty(JsonProperty.RESULT.getKey(), isCardPresent);
     }
 
     /** Service {@link ReaderService#IS_CONTACTLESS}. */
@@ -408,16 +414,18 @@ final class DistributedLocalServiceAdapter
       boolean isContactless = reader.isContactless();
 
       // Build result
-      output.addProperty(JsonProperty.RESULT.name(), isContactless);
+      output.addProperty(JsonProperty.RESULT.getKey(), isContactless);
     }
 
     /** Service {@link ReaderService#START_CARD_DETECTION}. */
     private void startCardDetection() {
 
-      // Extract info from the message
+      // Extract parameters from the message
+      JsonObject params = input.getAsJsonObject(JsonProperty.PARAMETERS.getKey());
+
       ObservableCardReader.DetectionMode detectionMode =
           ObservableCardReader.DetectionMode.valueOf(
-              input.get(JsonProperty.POLLING_MODE.name()).getAsString());
+              params.get(JsonProperty.POLLING_MODE.getKey()).getAsString());
 
       // Execute the service on the reader
       ((ObservableCardReader) reader).addObserver(DistributedLocalServiceAdapter.this);
@@ -463,8 +471,8 @@ final class DistributedLocalServiceAdapter
      * @param jsonData The JSON service input data.
      */
     private LocalPluginExecutor(String jsonData) {
-      this.input = JsonUtil.getParser().fromJson(jsonData, JsonObject.class);
-      this.output = new JsonObject();
+      input = JsonUtil.getParser().fromJson(jsonData, JsonObject.class);
+      output = new JsonObject();
     }
 
     /**
@@ -474,11 +482,11 @@ final class DistributedLocalServiceAdapter
      */
     private String execute() {
 
-      output.add(JsonProperty.SERVICE.name(), input.get(JsonProperty.SERVICE.name()));
+      output.add(JsonProperty.SERVICE.getKey(), input.get(JsonProperty.SERVICE.getKey()));
       try {
         checkStatus();
         PluginService service =
-            PluginService.valueOf(input.get(JsonProperty.SERVICE.name()).getAsString());
+            PluginService.valueOf(input.get(JsonProperty.SERVICE.getKey()).getAsString());
         switch (service) {
           case GET_READERS:
             getReaders();
@@ -502,7 +510,7 @@ final class DistributedLocalServiceAdapter
             throw new IllegalArgumentException(service.name());
         }
       } catch (Exception e) {
-        output.add(JsonProperty.ERROR.name(), JsonUtil.getParser().toJsonTree(new BodyError(e)));
+        output.add(JsonProperty.ERROR.getKey(), JsonUtil.getParser().toJsonTree(new BodyError(e)));
       }
       return output.toString();
     }
@@ -519,7 +527,7 @@ final class DistributedLocalServiceAdapter
       }
 
       // Build result
-      output.add(JsonProperty.RESULT.name(), JsonUtil.getParser().toJsonTree(readers));
+      output.add(JsonProperty.RESULT.getKey(), JsonUtil.getParser().toJsonTree(readers));
     }
 
     /**
@@ -553,15 +561,17 @@ final class DistributedLocalServiceAdapter
 
       // Build result
       output.add(
-          JsonProperty.RESULT.name(), JsonUtil.getParser().toJsonTree(readerGroupReferences));
+          JsonProperty.RESULT.getKey(), JsonUtil.getParser().toJsonTree(readerGroupReferences));
     }
 
     /** Service {@link PluginService#ALLOCATE_READER}. */
     private void allocateReader() {
 
-      // Extract info from the message
+      // Extract parameters from the message
+      JsonObject params = input.getAsJsonObject(JsonProperty.PARAMETERS.getKey());
+
       String readerGroupReference =
-          input.get(JsonProperty.READER_GROUP_REFERENCE.name()).getAsString();
+          params.get(JsonProperty.READER_GROUP_REFERENCE.getKey()).getAsString();
 
       // Execute the service on the plugins
       PoolPlugin poolPlugin = getPoolPlugin(readerGroupReference);
@@ -574,14 +584,16 @@ final class DistributedLocalServiceAdapter
       CardReader reader = poolPlugin.allocateReader(readerGroupReference);
 
       // Build result
-      output.addProperty(JsonProperty.RESULT.name(), reader.getName());
+      output.addProperty(JsonProperty.RESULT.getKey(), reader.getName());
     }
 
     /** Service {@link PluginService#RELEASE_READER}. */
     private void releaseReader() {
 
-      // Extract info from the message
-      String readerName = input.get(JsonProperty.READER_NAME.name()).getAsString();
+      // Extract parameters from the message
+      JsonObject params = input.getAsJsonObject(JsonProperty.PARAMETERS.getKey());
+
+      String readerName = params.get(JsonProperty.READER_NAME.getKey()).getAsString();
 
       // Execute the service on the plugins
       PoolPlugin poolPlugin;

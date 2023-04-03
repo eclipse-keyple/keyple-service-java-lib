@@ -66,7 +66,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
-    input.addProperty(JsonProperty.SERVICE.name(), PluginService.GET_READERS.name());
+    input.addProperty(JsonProperty.SERVICE.getKey(), PluginService.GET_READERS.name());
 
     // Execute the remote service.
     Map<String, Boolean> localReaders;
@@ -78,7 +78,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
       localReaders =
           JsonUtil.getParser()
               .fromJson(
-                  output.getAsJsonObject(JsonProperty.RESULT.name()).toString(),
+                  output.getAsJsonObject(JsonProperty.RESULT.getKey()).toString(),
                   new TypeToken<HashMap<String, Boolean>>() {}.getType());
 
     } catch (RuntimeException e) {
@@ -154,7 +154,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
       readerEvent =
           JsonUtil.getParser()
               .fromJson(
-                  json.getAsJsonObject(JsonProperty.READER_EVENT.name()).toString(),
+                  json.getAsJsonObject(JsonProperty.READER_EVENT.getKey()).toString(),
                   ReaderEventAdapter.class);
     } catch (RuntimeException e) {
       throw new IllegalArgumentException(
