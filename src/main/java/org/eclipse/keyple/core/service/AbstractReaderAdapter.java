@@ -166,7 +166,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    *     CardSelectionRequestSpi}.
    * @param multiSelectionProcessing The multi selection policy.
    * @param channelControl The channel control policy.
-   * @return An empty list if no response was received.
+   * @return A not empty list containing at most as many responses as there are selection cases.
    * @throws ReaderBrokenCommunicationException if the communication with the reader has failed.
    * @throws CardBrokenCommunicationException if the communication with the card has failed.
    * @throws UnexpectedStatusWordException If status word verification is enabled in the card

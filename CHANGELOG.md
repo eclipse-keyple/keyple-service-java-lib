@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Objects transmitted through the network for "Distributed" solution are now serialized/de-serialized
   as JSON objects, and no more as strings containing JSON objects.
+- All JSON property names are now "lowerCamelCase" formatted.
 
 ## [2.1.3] - 2023-02-17
 ### Fixed

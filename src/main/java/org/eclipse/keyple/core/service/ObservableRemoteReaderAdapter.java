@@ -124,17 +124,18 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
     // Build the input JSON data.
     JsonObject input = new JsonObject();
     input.addProperty(
-        JsonProperty.SERVICE.name(), ReaderService.SCHEDULE_CARD_SELECTION_SCENARIO.name());
+        JsonProperty.SERVICE.getKey(), ReaderService.SCHEDULE_CARD_SELECTION_SCENARIO.name());
 
-    input.add(
-        JsonProperty.CARD_SELECTION_SCENARIO.name(),
+    JsonObject params = new JsonObject();
+    params.add(
+        JsonProperty.CARD_SELECTION_SCENARIO.getKey(),
         JsonUtil.getParser().toJsonTree(cardSelectionScenario));
-
-    input.addProperty(JsonProperty.NOTIFICATION_MODE.name(), notificationMode.name());
-
+    params.addProperty(JsonProperty.NOTIFICATION_MODE.getKey(), notificationMode.name());
     if (detectionMode != null) {
-      input.addProperty(JsonProperty.POLLING_MODE.name(), detectionMode.name());
+      params.addProperty(JsonProperty.POLLING_MODE.getKey(), detectionMode.name());
     }
+
+    input.add(JsonProperty.PARAMETERS.getKey(), params);
 
     // Execute the remote service.
     try {
@@ -234,8 +235,12 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
-    input.addProperty(JsonProperty.SERVICE.name(), ReaderService.START_CARD_DETECTION.name());
-    input.addProperty(JsonProperty.POLLING_MODE.name(), detectionMode.name());
+    input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.START_CARD_DETECTION.name());
+
+    JsonObject params = new JsonObject();
+    params.addProperty(JsonProperty.POLLING_MODE.getKey(), detectionMode.name());
+
+    input.add(JsonProperty.PARAMETERS.getKey(), params);
 
     // Execute the remote service.
     try {
@@ -270,7 +275,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
-    input.addProperty(JsonProperty.SERVICE.name(), ReaderService.STOP_CARD_DETECTION.name());
+    input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.STOP_CARD_DETECTION.name());
 
     // Execute the remote service.
     try {
@@ -301,7 +306,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
-    input.addProperty(JsonProperty.SERVICE.name(), ReaderService.FINALIZE_CARD_PROCESSING.name());
+    input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.FINALIZE_CARD_PROCESSING.name());
 
     // Execute the remote service.
     try {

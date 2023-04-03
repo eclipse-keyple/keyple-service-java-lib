@@ -140,7 +140,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
 
       // Start the observation remotely.
       JsonObject input = new JsonObject();
-      input.addProperty(JsonProperty.SERVICE.name(), PluginService.START_READER_DETECTION.name());
+      input.addProperty(JsonProperty.SERVICE.getKey(), PluginService.START_READER_DETECTION.name());
 
       // Execute the remote service.
       try {
@@ -196,7 +196,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
 
     // Stop the observation remotely.
     JsonObject input = new JsonObject();
-    input.addProperty(JsonProperty.SERVICE.name(), PluginService.STOP_READER_DETECTION.name());
+    input.addProperty(JsonProperty.SERVICE.getKey(), PluginService.STOP_READER_DETECTION.name());
 
     // Execute the remote service.
     try {
@@ -311,7 +311,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
       pluginEvent =
           JsonUtil.getParser()
               .fromJson(
-                  json.getAsJsonObject(JsonProperty.PLUGIN_EVENT.name()).toString(),
+                  json.getAsJsonObject(JsonProperty.PLUGIN_EVENT.getKey()).toString(),
                   PluginEvent.class);
     } catch (RuntimeException e) {
       throw new IllegalArgumentException(

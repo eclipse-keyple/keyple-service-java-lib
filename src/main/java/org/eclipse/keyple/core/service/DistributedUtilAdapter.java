@@ -13,8 +13,11 @@ package org.eclipse.keyple.core.service;
 
 import com.google.gson.JsonObject;
 import java.util.List;
+import org.calypsonet.terminal.card.CardBrokenCommunicationException;
 import org.calypsonet.terminal.card.ChannelControl;
 import org.calypsonet.terminal.card.ProxyReaderApi;
+import org.calypsonet.terminal.card.ReaderBrokenCommunicationException;
+import org.calypsonet.terminal.card.UnexpectedStatusWordException;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.reader.CardReader;
 import org.calypsonet.terminal.reader.ObservableCardReader;
@@ -53,13 +56,13 @@ final class DistributedUtilAdapter {
       throws Exception { // NOSONAR
 
     if (logger.isDebugEnabled()) {
-      logger.debug("Plugin '{}' sends JSON data : {}", pluginName, input);
+      logger.debug("Plugin '{}' sends JSON data: {}", pluginName, input);
     }
 
     String outputJson = remotePluginSpi.executeRemotely(input.toString());
 
     if (logger.isDebugEnabled()) {
-      logger.debug("Plugin '{}' receives JSON data : {}", pluginName, outputJson);
+      logger.debug("Plugin '{}' receives JSON data: {}", pluginName, outputJson);
     }
 
     return getJsonObject(outputJson);
@@ -88,15 +91,14 @@ final class DistributedUtilAdapter {
       throws Exception { // NOSONAR
 
     if (logger.isDebugEnabled()) {
-      logger.debug(
-          "Reader '{}' of plugin '{}' sends JSON data : {}", readerName, pluginName, input);
+      logger.debug("Reader '{}' of plugin '{}' sends JSON data: {}", readerName, pluginName, input);
     }
 
     String outputJson = remoteReaderSpi.executeRemotely(input.toString());
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Reader '{}' of plugin '{}' receives JSON data : {}", readerName, pluginName, outputJson);
+          "Reader '{}' of plugin '{}' receives JSON data: {}", readerName, pluginName, outputJson);
     }
 
     return getJsonObject(outputJson);
@@ -112,18 +114,33 @@ final class DistributedUtilAdapter {
    * @since 2.0.0
    */
   private static JsonObject getJsonObject(String outputJson) throws Exception { // NOSONAR
-
     if (outputJson == null || outputJson.isEmpty()) {
       return null;
     }
-
     JsonObject output = JsonUtil.getParser().fromJson(outputJson, JsonObject.class);
-    if (output.has(JsonProperty.ERROR.name())) {
-      BodyError body =
-          JsonUtil.getParser()
-              .fromJson(
-                  output.getAsJsonObject(JsonProperty.ERROR.name()).toString(), BodyError.class);
-      throw body.getException();
+    if (output.has(JsonProperty.ERROR.getKey())) {
+      JsonObject error = output.getAsJsonObject(JsonProperty.ERROR.getKey());
+      if (error.has(JsonProperty.MESSAGE.getKey())) {
+        // Alternate error messaging specifically transmitted by non-Keyple terminals.
+        String message = error.get(JsonProperty.MESSAGE.getKey()).getAsString();
+        String code = error.get(JsonProperty.CODE.getKey()).getAsString();
+        if ("READER_COMMUNICATION_ERROR".equals(code)) {
+          throw new ReaderBrokenCommunicationException(null, false, message);
+        } else if ("CARD_COMMUNICATION_ERROR".equals(code)) {
+          throw new CardBrokenCommunicationException(null, false, message);
+        } else if ("CARD_COMMAND_ERROR".equals(code)) {
+          throw new UnexpectedStatusWordException(null, false, message);
+        } else {
+          throw new RuntimeException(
+              String.format(
+                  "The distributed message sender received an unknown error: code: %s, message: %s",
+                  code, message));
+        }
+      } else {
+        // Standard error.
+        BodyError body = JsonUtil.getParser().fromJson(error.toString(), BodyError.class);
+        throw body.getException();
+      }
     }
     return output;
   }
@@ -138,7 +155,7 @@ final class DistributedUtilAdapter {
   static void throwRuntimeException(Exception e) {
     throw new RuntimeException( // NOSONAR
         String.format(
-            "The distributed message sender received an unexpected error : %s", e.getMessage()),
+            "The distributed message sender received an unexpected error: %s", e.getMessage()),
         e);
   }
 
@@ -150,46 +167,73 @@ final class DistributedUtilAdapter {
   enum JsonProperty {
 
     /** @since 2.0.0 */
-    CARD_REQUEST,
+    CARD_REQUEST("cardRequest"),
 
     /** @since 2.0.0 */
-    CARD_SELECTION_REQUESTS,
+    CARD_SELECTION_REQUESTS("cardSelectionRequests"),
 
     /** @since 2.0.0 */
-    CARD_SELECTION_SCENARIO,
+    CARD_SELECTION_SCENARIO("cardSelectionScenario"),
 
     /** @since 2.0.0 */
-    CHANNEL_CONTROL,
+    CHANNEL_CONTROL("channelControl"),
 
     /** @since 2.0.0 */
-    ERROR,
+    ERROR("error"),
+
+    /** @since 2.1.4 */
+    CODE("code"),
+
+    /** @since 2.1.4 */
+    MESSAGE("message"),
 
     /** @since 2.0.0 */
-    MULTI_SELECTION_PROCESSING,
+    MULTI_SELECTION_PROCESSING("multiSelectionProcessing"),
 
     /** @since 2.0.0 */
-    NOTIFICATION_MODE,
+    NOTIFICATION_MODE("notificationMode"),
+
+    /** @since 2.1.4 */
+    PARAMETERS("parameters"),
 
     /** @since 2.0.0 */
-    PLUGIN_EVENT,
+    PLUGIN_EVENT("pluginEvent"),
 
     /** @since 2.0.0 */
-    POLLING_MODE,
+    POLLING_MODE("pollingMode"),
 
     /** @since 2.0.0 */
-    READER_EVENT,
+    READER_EVENT("readerEvent"),
 
     /** @since 2.0.0 */
-    READER_GROUP_REFERENCE,
+    READER_GROUP_REFERENCE("readerGroupReference"),
 
     /** @since 2.0.0 */
-    READER_NAME,
+    READER_NAME("readerName"),
 
     /** @since 2.0.0 */
-    RESULT,
+    RESULT("result"),
 
     /** @since 2.0.0 */
-    SERVICE
+    SERVICE("service");
+
+    private final String key;
+
+    /**
+     * @param key The key of the JSON property.
+     * @since 2.1.4
+     */
+    JsonProperty(String key) {
+      this.key = key;
+    }
+
+    /**
+     * @return The key of the JSON property.
+     * @since 2.1.4
+     */
+    String getKey() {
+      return key;
+    }
   }
 
   /**
