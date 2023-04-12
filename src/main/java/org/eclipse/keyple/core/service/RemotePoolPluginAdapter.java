@@ -18,9 +18,12 @@ import com.google.gson.reflect.TypeToken;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.calypsonet.terminal.reader.CardReader;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
+import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePoolPluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.PoolReaderSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;
@@ -147,6 +150,19 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     getReadersMap().put(remoteReaderSpi.getName(), remoteReaderAdapter);
     remoteReaderAdapter.register();
     return remoteReaderAdapter;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.2.0
+   */
+  @Override
+  public SmartCard getSelectedSmartCard(CardReader reader) {
+    Assert.getInstance().notNull(reader, "reader");
+    PoolReaderSpi poolReaderSpi =
+        (PoolReaderSpi) getReaderExtension(KeypleReaderExtension.class, reader.getName());
+    return (SmartCard) poolReaderSpi.getSelectedSmartCard();
   }
 
   /**
