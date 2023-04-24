@@ -23,6 +23,7 @@ import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.calypsonet.terminal.reader.CardReader;
 import org.calypsonet.terminal.reader.CardReaderEvent;
 import org.calypsonet.terminal.reader.ObservableCardReader;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
 import org.eclipse.keyple.core.distributed.local.LocalServiceApi;
@@ -584,7 +585,23 @@ final class DistributedLocalServiceAdapter
       CardReader reader = poolPlugin.allocateReader(readerGroupReference);
 
       // Build result
-      output.addProperty(JsonProperty.RESULT.getKey(), reader.getName());
+      JsonObject result = new JsonObject();
+
+      // Reader name
+      result.addProperty(JsonProperty.READER_NAME.getKey(), reader.getName());
+
+      // Selected smart card
+      SmartCard selectedSmartCard = poolPlugin.getSelectedSmartCard(reader);
+      if (selectedSmartCard != null) {
+        result.addProperty(
+            JsonProperty.SELECTED_SMART_CARD_CLASS_NAME.getKey(),
+            selectedSmartCard.getClass().getName());
+        result.add(
+            JsonProperty.SELECTED_SMART_CARD.getKey(),
+            JsonUtil.getParser().toJsonTree(selectedSmartCard));
+      }
+
+      output.add(JsonProperty.RESULT.getKey(), result);
     }
 
     /** Service {@link PluginService#RELEASE_READER}. */

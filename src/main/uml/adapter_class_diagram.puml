@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 2.2.0 (2023-04-12)
+    Keyple - Adapter of keyple-service-java-lib - 2.2.0 (2023-04-24)
 end title
 
 ' == THEME ==
@@ -306,7 +306,9 @@ package "org.eclipse.keyple.core.service" as service {
     }
     ~class RemoteReaderAdapter extends AbstractReaderAdapter {
         --
-        ~RemoteReaderAdapter (<back:plum>RemoteReaderSpi</back> remoteReaderSpi, String pluginName)
+        ~RemoteReaderAdapter (<back:plum>RemoteReaderSpi</back> remoteReaderSpi, String pluginName, <color:blue><back:yellow>SmartCard</back> selectedSmartCard</color>)
+
+        ~<color:blue>**final** <back:yellow>SmartCard</back> getSelectedSmartCard ()</color>
         -- **AbstractReaderAdapter** --
         ~**final** List<<back:lightGreen>CardSelectionResponseApi</back>> processCardSelectionRequests (
             \tList<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,

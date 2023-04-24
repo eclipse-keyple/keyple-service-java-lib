@@ -21,6 +21,7 @@ import java.util.List;
 import org.calypsonet.terminal.card.*;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
 import org.eclipse.keyple.core.util.Assert;
@@ -40,17 +41,31 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   private static final String OUTPUT = "output";
 
   private final RemoteReaderSpi remoteReaderSpi;
+  private final SmartCard selectedSmartCard;
 
   /**
    * Constructor.
    *
    * @param remoteReaderSpi The remote reader SPI.
    * @param pluginName The name of the plugin.
+   * @param selectedSmartCard The selected smart card in case of a pool plugin (optional).
    * @since 2.0.0
    */
-  RemoteReaderAdapter(RemoteReaderSpi remoteReaderSpi, String pluginName) {
+  RemoteReaderAdapter(
+      RemoteReaderSpi remoteReaderSpi, String pluginName, SmartCard selectedSmartCard) {
     super(remoteReaderSpi.getName(), (KeypleReaderExtension) remoteReaderSpi, pluginName);
     this.remoteReaderSpi = remoteReaderSpi;
+    this.selectedSmartCard = selectedSmartCard;
+  }
+
+  /**
+   * Returns the selected smart card in case of a pool plugin.
+   *
+   * @return Null if there is no selected smart card associated.
+   * @since 2.2.0
+   */
+  final SmartCard getSelectedSmartCard() {
+    return selectedSmartCard;
   }
 
   /**

@@ -110,7 +110,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
       if (!isObservable) {
         RemoteReaderSpi remoteReaderSpi =
             remotePluginSpi.createRemoteReader(remoteReaderName, localReaderName);
-        remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName());
+        remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName(), null);
       }
 
       getReadersMap().put(localReaderName, remoteReaderAdapter);

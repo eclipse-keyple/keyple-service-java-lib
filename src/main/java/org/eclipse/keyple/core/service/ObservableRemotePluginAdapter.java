@@ -254,7 +254,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
       remoteReaderAdapter =
           new ObservableRemoteReaderAdapter((ObservableRemoteReaderSpi) remoteReaderSpi, getName());
     } else {
-      remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName());
+      remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName(), null);
     }
 
     // Register the reader.

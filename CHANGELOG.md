@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- The `PoolPlugin.getSelectedSmartCard` method to retrieve the smart card if it has been automatically selected by the 
+  reader allocation process.
+### Upgraded
+- "Keyple Plugin API" to version `2.1.0`
 
 ## [2.1.4] - 2023-04-04
 ### Changed
