@@ -27,6 +27,7 @@ import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePoolPluginSpi;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.*;
+import org.eclipse.keyple.core.plugin.spi.reader.PoolReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.junit.After;
 import org.junit.Before;
@@ -82,7 +83,7 @@ public class SmartCardServiceAdapterTest {
   private DistributedLocalServiceMock localService;
   private DistributedLocalServiceFactoryMock localServiceFactory;
 
-  interface ReaderMock extends KeypleReaderExtension, ReaderSpi {}
+  interface ReaderMock extends KeypleReaderExtension, PoolReaderSpi {}
 
   interface PluginMock extends KeyplePluginExtension, PluginSpi {}
 
