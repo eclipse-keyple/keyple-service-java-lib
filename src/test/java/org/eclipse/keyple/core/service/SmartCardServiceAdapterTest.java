@@ -27,6 +27,7 @@ import org.eclipse.keyple.core.distributed.remote.spi.RemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePoolPluginSpi;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.*;
+import org.eclipse.keyple.core.plugin.spi.reader.PoolReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.junit.After;
 import org.junit.Before;
@@ -57,7 +58,7 @@ public class SmartCardServiceAdapterTest {
 
   private static final String SERVICE_API_VERSION = "2.0";
   private static final String COMMON_API_VERSION = "2.0";
-  private static final String PLUGIN_API_VERSION = "2.0";
+  private static final String PLUGIN_API_VERSION = "2.1";
   private static final String DISTRIBUTED_REMOTE_API_VERSION = "2.1";
   private static final String DISTRIBUTED_LOCAL_API_VERSION = "2.0";
   private static final String READER_API_VERSION = "1.2";
@@ -82,7 +83,7 @@ public class SmartCardServiceAdapterTest {
   private DistributedLocalServiceMock localService;
   private DistributedLocalServiceFactoryMock localServiceFactory;
 
-  interface ReaderMock extends KeypleReaderExtension, ReaderSpi {}
+  interface ReaderMock extends KeypleReaderExtension, PoolReaderSpi {}
 
   interface PluginMock extends KeyplePluginExtension, PluginSpi {}
 
@@ -299,18 +300,18 @@ public class SmartCardServiceAdapterTest {
 
   @Test
   public void registerPlugin_whenCommonApiVersionDiffers_shouldRegister_and_LogWarn() {
-    when(pluginFactory.getCommonApiVersion()).thenReturn("2.1");
+    when(pluginFactory.getCommonApiVersion()).thenReturn("1.9");
     service.registerPlugin(pluginFactory);
     assertThat(service.getPluginNames().contains(PLUGIN_NAME)).isTrue();
-    verify(logger).warn(anyString(), eq(PLUGIN_NAME), eq("2.1"), eq(COMMON_API_VERSION));
+    verify(logger).warn(anyString(), eq(PLUGIN_NAME), eq("1.9"), eq(COMMON_API_VERSION));
   }
 
   @Test
   public void registerPlugin_whenPluginApiVersionDiffers_shouldRegister_and_LogWarn() {
-    when(pluginFactory.getPluginApiVersion()).thenReturn("2.1");
+    when(pluginFactory.getPluginApiVersion()).thenReturn("1.9");
     service.registerPlugin(pluginFactory);
     assertThat(service.getPluginNames().contains(PLUGIN_NAME)).isTrue();
-    verify(logger).warn(anyString(), eq(PLUGIN_NAME), eq("2.1"), eq(PLUGIN_API_VERSION));
+    verify(logger).warn(anyString(), eq(PLUGIN_NAME), eq("1.9"), eq(PLUGIN_API_VERSION));
   }
 
   @Test(expected = IllegalStateException.class)
@@ -357,18 +358,18 @@ public class SmartCardServiceAdapterTest {
 
   @Test
   public void registerPlugin_Pool_whenCommonApiVersionDiffers_shouldRegister_and_LogWarn() {
-    when(poolPluginFactory.getCommonApiVersion()).thenReturn("2.1");
+    when(poolPluginFactory.getCommonApiVersion()).thenReturn("1.9");
     service.registerPlugin(poolPluginFactory);
     assertThat(service.getPluginNames().contains(POOL_PLUGIN_NAME)).isTrue();
-    verify(logger).warn(anyString(), eq(POOL_PLUGIN_NAME), eq("2.1"), eq(COMMON_API_VERSION));
+    verify(logger).warn(anyString(), eq(POOL_PLUGIN_NAME), eq("1.9"), eq(COMMON_API_VERSION));
   }
 
   @Test
   public void registerPlugin_Pool_whenPluginApiVersionDiffers_shouldRegister_and_LogWarn() {
-    when(poolPluginFactory.getPluginApiVersion()).thenReturn("2.1");
+    when(poolPluginFactory.getPluginApiVersion()).thenReturn("1.9");
     service.registerPlugin(poolPluginFactory);
     assertThat(service.getPluginNames().contains(POOL_PLUGIN_NAME)).isTrue();
-    verify(logger).warn(anyString(), eq(POOL_PLUGIN_NAME), eq("2.1"), eq(PLUGIN_API_VERSION));
+    verify(logger).warn(anyString(), eq(POOL_PLUGIN_NAME), eq("1.9"), eq(PLUGIN_API_VERSION));
   }
 
   @Test(expected = IllegalStateException.class)

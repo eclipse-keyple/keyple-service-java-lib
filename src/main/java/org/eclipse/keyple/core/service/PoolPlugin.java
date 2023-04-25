@@ -13,6 +13,7 @@ package org.eclipse.keyple.core.service;
 
 import java.util.SortedSet;
 import org.calypsonet.terminal.reader.CardReader;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 
 /**
  * Plugin able to handle the access to an undefined number of {@link CardReader}.
@@ -50,6 +51,19 @@ public interface PoolPlugin extends Plugin {
    * @since 2.0.0
    */
   Reader allocateReader(String readerGroupReference);
+
+  /**
+   * Returns the selected {@link SmartCard} from a {@link CardReader}.
+   *
+   * <p>This method is used to retrieve the selected card from a reader that has been allocated with
+   * the {@link #allocateReader(String)} method.
+   *
+   * @param reader The reader from which to get the selected card.
+   * @return null if no smart card is selected by default, the selected smart card otherwise.
+   * @throws IllegalArgumentException If the provided reader is null.
+   * @since 2.2.0
+   */
+  SmartCard getSelectedSmartCard(CardReader reader);
 
   /**
    * Releases a Reader previously allocated with allocateReader.

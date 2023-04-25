@@ -17,25 +17,26 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.util.*;
+import org.calypsonet.terminal.reader.CardReader;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.PoolPluginSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.PoolReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionBlockingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.DontWaitForCardRemovalDuringProcessingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalBlockingSpi;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class LocalPoolPluginAdapterTest {
   private PoolPluginSpiMock poolPluginSpi;
   private ReaderSpiMock readerSpi1;
-  private ReaderSpiMock readerSpi2;
   private ObservableReaderSpiMock observableReader;
-  private SortedSet<String> groupReferences;
+  private SmartCard smartCard;
 
   private static final String POOL_PLUGIN_NAME = "poolPlugin";
   private static final String READER_NAME_1 = "reader1";
@@ -49,21 +50,22 @@ public class LocalPoolPluginAdapterTest {
 
   interface ObservableReaderSpiMock
       extends KeypleReaderExtension,
+          PoolReaderSpi,
           ObservableReaderSpi,
           WaitForCardInsertionBlockingSpi,
           WaitForCardRemovalBlockingSpi,
           DontWaitForCardRemovalDuringProcessingSpi {}
 
-  interface ReaderSpiMock extends KeypleReaderExtension, ReaderSpi {}
+  interface ReaderSpiMock extends KeypleReaderExtension, PoolReaderSpi {}
 
   @Before
   public void setUp() throws Exception {
-    groupReferences = new TreeSet<String>(Arrays.asList(GROUP_1, GROUP_2));
+    SortedSet<String> groupReferences = new TreeSet<String>(Arrays.asList(GROUP_1, GROUP_2));
 
     readerSpi1 = mock(ReaderSpiMock.class);
     when(readerSpi1.getName()).thenReturn(READER_NAME_1);
 
-    readerSpi2 = mock(ReaderSpiMock.class);
+    ReaderSpiMock readerSpi2 = mock(ReaderSpiMock.class);
     when(readerSpi2.getName()).thenReturn(READER_NAME_2);
 
     observableReader = mock(ObservableReaderSpiMock.class);
@@ -74,10 +76,9 @@ public class LocalPoolPluginAdapterTest {
     when(poolPluginSpi.getReaderGroupReferences()).thenReturn(groupReferences);
     when(poolPluginSpi.allocateReader(GROUP_1)).thenReturn(readerSpi1);
     when(poolPluginSpi.allocateReader(GROUP_2)).thenReturn(readerSpi2);
-  }
 
-  @After
-  public void tearDown() throws Exception {}
+    smartCard = mock(SmartCard.class);
+  }
 
   @Test(expected = KeyplePluginException.class)
   public void getReaderGroupReferences_whenGettingReferencesFails_shouldKPE() throws Exception {
@@ -121,9 +122,9 @@ public class LocalPoolPluginAdapterTest {
   public void allocateReader_whenSucceeds_shouldReturnReader() throws Exception {
     LocalPoolPluginAdapter localPluginAdapter = new LocalPoolPluginAdapter(poolPluginSpi);
     localPluginAdapter.register();
-    Reader reader = localPluginAdapter.allocateReader(GROUP_1);
+    CardReader reader = localPluginAdapter.allocateReader(GROUP_1);
     assertThat(reader.getName()).isEqualTo(READER_NAME_1);
-    assertThat(reader).isInstanceOf(Reader.class).isInstanceOf(LocalReaderAdapter.class);
+    assertThat(reader).isInstanceOf(CardReader.class).isInstanceOf(LocalReaderAdapter.class);
     assertThat(localPluginAdapter.getReaderNames()).containsExactly(READER_NAME_1);
     assertThat(localPluginAdapter.getReaders())
         .containsExactlyInAnyOrder(localPluginAdapter.getReader(READER_NAME_1));
@@ -135,9 +136,11 @@ public class LocalPoolPluginAdapterTest {
     when(poolPluginSpi.allocateReader(GROUP_3)).thenReturn(observableReader);
     LocalPoolPluginAdapter localPluginAdapter = new LocalPoolPluginAdapter(poolPluginSpi);
     localPluginAdapter.register();
-    Reader reader = localPluginAdapter.allocateReader(GROUP_3);
+    CardReader reader = localPluginAdapter.allocateReader(GROUP_3);
     assertThat(reader.getName()).isEqualTo(OBSERVABLE_READER_NAME);
-    assertThat(reader).isInstanceOf(Reader.class).isInstanceOf(ObservableLocalReaderAdapter.class);
+    assertThat(reader)
+        .isInstanceOf(CardReader.class)
+        .isInstanceOf(ObservableLocalReaderAdapter.class);
     assertThat(localPluginAdapter.getReaders())
         .containsExactlyInAnyOrder(localPluginAdapter.getReader(OBSERVABLE_READER_NAME));
   }
@@ -146,7 +149,7 @@ public class LocalPoolPluginAdapterTest {
   public void releaseReader_whenNotRegistered_shouldISE() throws Exception {
     LocalPoolPluginAdapter localPluginAdapter = new LocalPoolPluginAdapter(poolPluginSpi);
     localPluginAdapter.register();
-    Reader reader = localPluginAdapter.allocateReader(GROUP_1);
+    CardReader reader = localPluginAdapter.allocateReader(GROUP_1);
     localPluginAdapter.unregister();
     localPluginAdapter.releaseReader(reader);
   }
@@ -155,7 +158,7 @@ public class LocalPoolPluginAdapterTest {
   public void releaseReader_whenSucceeds_shouldRemoveReader() throws Exception {
     LocalPoolPluginAdapter localPluginAdapter = new LocalPoolPluginAdapter(poolPluginSpi);
     localPluginAdapter.register();
-    Reader reader = localPluginAdapter.allocateReader(GROUP_1);
+    CardReader reader = localPluginAdapter.allocateReader(GROUP_1);
     localPluginAdapter.releaseReader(reader);
     assertThat(localPluginAdapter.getReaderNames()).isEmpty();
     assertThat(localPluginAdapter.getReaders()).isEmpty();
@@ -168,7 +171,7 @@ public class LocalPoolPluginAdapterTest {
         .releaseReader(any(ReaderSpi.class));
     LocalPoolPluginAdapter localPluginAdapter = new LocalPoolPluginAdapter(poolPluginSpi);
     localPluginAdapter.register();
-    Reader reader = localPluginAdapter.allocateReader(GROUP_1);
+    CardReader reader = localPluginAdapter.allocateReader(GROUP_1);
     try {
       localPluginAdapter.releaseReader(reader);
       shouldHaveThrown(KeyplePluginException.class);
@@ -177,5 +180,24 @@ public class LocalPoolPluginAdapterTest {
     }
     assertThat(localPluginAdapter.getReaderNames()).isEmpty();
     assertThat(localPluginAdapter.getReaders()).isEmpty();
+  }
+
+  @Test
+  public void getSelectedSmartCard_whenSelectedSmartCardIsNull_shouldReturnNull() throws Exception {
+    when(readerSpi1.getSelectedSmartCard()).thenReturn(null);
+    LocalPoolPluginAdapter plugin = new LocalPoolPluginAdapter(poolPluginSpi);
+    plugin.register();
+    CardReader reader = plugin.allocateReader(GROUP_1);
+    assertThat(plugin.getSelectedSmartCard(reader)).isNull();
+  }
+
+  @Test
+  public void getSelectedSmartCard_whenSelectedSmartCardIsNotNull_shouldReturnSelectedSmartCard()
+      throws Exception {
+    when(readerSpi1.getSelectedSmartCard()).thenReturn(smartCard);
+    LocalPoolPluginAdapter plugin = new LocalPoolPluginAdapter(poolPluginSpi);
+    plugin.register();
+    CardReader reader = plugin.allocateReader(GROUP_1);
+    assertThat(plugin.getSelectedSmartCard(reader)).isSameAs(smartCard);
   }
 }

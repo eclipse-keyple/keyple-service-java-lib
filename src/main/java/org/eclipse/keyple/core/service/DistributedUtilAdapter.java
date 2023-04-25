@@ -211,6 +211,12 @@ final class DistributedUtilAdapter {
     /** @since 2.0.0 */
     READER_NAME("readerName"),
 
+    /** @since 2.2.0 */
+    SELECTED_SMART_CARD("selectedSmartCard"),
+
+    /** @since 2.2.0 */
+    SELECTED_SMART_CARD_CLASS_NAME("selectedSmartCardClassName"),
+
     /** @since 2.0.0 */
     RESULT("result"),
 

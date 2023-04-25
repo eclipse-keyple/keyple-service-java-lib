@@ -18,6 +18,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.calypsonet.terminal.reader.CardReader;
+import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePoolPluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
@@ -125,13 +126,30 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     // Execute the remote service.
     String localReaderName;
     String remoteReaderName;
+    SmartCard selectedSmartCard = null;
     try {
       JsonObject output =
           executePluginServiceRemotely(input, remotePoolPluginSpi, getName(), logger);
 
-      localReaderName = output.get(JsonProperty.RESULT.getKey()).getAsString();
+      output = output.get(JsonProperty.RESULT.getKey()).getAsJsonObject();
+
+      localReaderName = output.get(JsonProperty.READER_NAME.getKey()).getAsString();
       remoteReaderName = localReaderName + REMOTE_READER_NAME_SUFFIX;
 
+      if (output.has(JsonProperty.SELECTED_SMART_CARD.getKey())) {
+        String selectedSmartCardJson =
+            output.getAsJsonObject(JsonProperty.SELECTED_SMART_CARD.getKey()).toString();
+        String selectedSmartCardClassName =
+            output.get(JsonProperty.SELECTED_SMART_CARD_CLASS_NAME.getKey()).getAsString();
+        try {
+          Class<?> classOfSelectedSmartCard = Class.forName(selectedSmartCardClassName);
+          selectedSmartCard =
+              (SmartCard)
+                  JsonUtil.getParser().fromJson(selectedSmartCardJson, classOfSelectedSmartCard);
+        } catch (ClassNotFoundException e) {
+          logger.error("Class not found for name '{}'", selectedSmartCardClassName, e);
+        }
+      }
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
@@ -142,11 +160,24 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     // Build a remote reader and register it.
     RemoteReaderSpi remoteReaderSpi =
         remotePoolPluginSpi.createRemoteReader(remoteReaderName, localReaderName);
-    RemoteReaderAdapter remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName());
+    RemoteReaderAdapter remoteReaderAdapter =
+        new RemoteReaderAdapter(remoteReaderSpi, getName(), selectedSmartCard);
 
     getReadersMap().put(remoteReaderSpi.getName(), remoteReaderAdapter);
     remoteReaderAdapter.register();
     return remoteReaderAdapter;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.2.0
+   */
+  @Override
+  public SmartCard getSelectedSmartCard(CardReader reader) {
+    Assert.getInstance().notNull(reader, "reader");
+    RemoteReaderAdapter remoteReader = (RemoteReaderAdapter) getReader(reader.getName());
+    return remoteReader != null ? remoteReader.getSelectedSmartCard() : null;
   }
 
   /**

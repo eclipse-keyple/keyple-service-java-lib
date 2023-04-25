@@ -50,7 +50,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    */
   ObservableRemoteReaderAdapter(
       ObservableRemoteReaderSpi observableRemoteReaderSpi, String pluginName) {
-    super(observableRemoteReaderSpi, pluginName);
+    super(observableRemoteReaderSpi, pluginName, null);
     this.observableRemoteReaderSpi = observableRemoteReaderSpi;
     this.observationManager =
         new ObservationManagerAdapter<

@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 2.1.3 (2023-02-17)
+    Keyple - Adapter of keyple-service-java-lib - 2.2.0 (2023-04-24)
 end title
 
 ' == THEME ==
@@ -142,6 +142,7 @@ package "org.eclipse.keyple.core.service" as service {
         -- **PoolPlugin** --
         +SortedSet<String> getReaderGroupReferences ()
         +Reader allocateReader (String readerGroupReference)
+        +<color:blue><back:yellow>SmartCard</back> getSelectedSmartCard (<back:yellow>CardReader</back> reader)
         +void releaseReader (<back:yellow>CardReader</back> reader)
     }
     ~class "<<PoolPlugin>>\n**final** RemotePoolPluginAdapter" as RemotePoolPluginAdapter extends AbstractPluginAdapter {
@@ -152,6 +153,7 @@ package "org.eclipse.keyple.core.service" as service {
         -- **PoolPlugin** --
         +SortedSet<String> getReaderGroupReferences ()
         +Reader allocateReader (String readerGroupReference)
+        +<color:blue><back:yellow>SmartCard</back> getSelectedSmartCard (<back:yellow>CardReader</back> reader)
         +void releaseReader (<back:yellow>CardReader</back> reader)
     }
     ' OBSERVATION MANAGER
@@ -304,7 +306,9 @@ package "org.eclipse.keyple.core.service" as service {
     }
     ~class RemoteReaderAdapter extends AbstractReaderAdapter {
         --
-        ~RemoteReaderAdapter (<back:plum>RemoteReaderSpi</back> remoteReaderSpi, String pluginName)
+        ~RemoteReaderAdapter (<back:plum>RemoteReaderSpi</back> remoteReaderSpi, String pluginName, <color:blue><back:yellow>SmartCard</back> selectedSmartCard</color>)
+
+        ~<color:blue>**final** <back:yellow>SmartCard</back> getSelectedSmartCard ()</color>
         -- **AbstractReaderAdapter** --
         ~**final** List<<back:lightGreen>CardSelectionResponseApi</back>> processCardSelectionRequests (
             \tList<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
@@ -687,60 +691,60 @@ ReaderEventAdapter -[hidden]- CardSelectionResponseAdapter
 
 package service #C_GREY1 {}
 
-enum MultiSelectionProcessing <<blue>>
+enum service.MultiSelectionProcessing <<blue>>
 
-class JsonAdapter <<blue>>
-class InternalDto <<blue>>
-class SmartCardServiceAdapter <<blue>>
-abstract class AbstractReaderAdapter <<blue>>
-class LocalReaderAdapter <<blue>>
-class LocalConfigurableReaderAdapter <<blue>>
-class RemoteReaderAdapter <<blue>>
-class ObservableLocalReaderAdapter <<blue>>
-class ObservableLocalConfigurableReaderAdapter <<blue>>
-class ObservableRemoteReaderAdapter <<blue>>
-class CardSelectionScenarioAdapter <<blue>>
-enum InternalEvent <<blue>>
-abstract class AbstractObservableStateAdapter <<blue>>
-enum MonitoringState <<blue>>
-abstract class AbstractMonitoringJobAdapter <<blue>>
-class CardRemovalActiveMonitoringJobAdapter <<blue>>
-class CardInsertionActiveMonitoringJobAdapter <<blue>>
-class CardInsertionPassiveMonitoringJobAdapter <<blue>>
-class CardRemovalPassiveMonitoringJobAdapter <<blue>>
-class WaitForCardInsertionStateAdapter <<blue>>
-class WaitForCardProcessingStateAdapter <<blue>>
-class WaitForCardRemovalStateAdapter <<blue>>
-class WaitForStartDetectStateAdapter <<blue>>
-class ObservableReaderStateServiceAdapter <<blue>>
+class service.JsonAdapter <<blue>>
+class service.InternalDto <<blue>>
+class service.SmartCardServiceAdapter <<blue>>
+abstract class service.AbstractReaderAdapter <<blue>>
+class service.LocalReaderAdapter <<blue>>
+class service.LocalConfigurableReaderAdapter <<blue>>
+class service.RemoteReaderAdapter <<blue>>
+class service.ObservableLocalReaderAdapter <<blue>>
+class service.ObservableLocalConfigurableReaderAdapter <<blue>>
+class service.ObservableRemoteReaderAdapter <<blue>>
+class service.CardSelectionScenarioAdapter <<blue>>
+enum service.InternalEvent <<blue>>
+abstract class service.AbstractObservableStateAdapter <<blue>>
+enum service.MonitoringState <<blue>>
+abstract class service.AbstractMonitoringJobAdapter <<blue>>
+class service.CardRemovalActiveMonitoringJobAdapter <<blue>>
+class service.CardInsertionActiveMonitoringJobAdapter <<blue>>
+class service.CardInsertionPassiveMonitoringJobAdapter <<blue>>
+class service.CardRemovalPassiveMonitoringJobAdapter <<blue>>
+class service.WaitForCardInsertionStateAdapter <<blue>>
+class service.WaitForCardProcessingStateAdapter <<blue>>
+class service.WaitForCardRemovalStateAdapter <<blue>>
+class service.WaitForStartDetectStateAdapter <<blue>>
+class service.ObservableReaderStateServiceAdapter <<blue>>
 
-class ObservationManagerAdapter <<blue>>
+class service.ObservationManagerAdapter <<blue>>
 
-abstract class AbstractPluginAdapter <<blue>>
-class LocalPluginAdapter <<blue>>
-class RemotePluginAdapter <<blue>>
-class LocalPoolPluginAdapter <<blue>>
-class RemotePoolPluginAdapter <<blue>>
-abstract class AbstractObservableLocalPluginAdapter <<blue>>
-class ObservableLocalPluginAdapter <<blue>>
-class AutonomousObservableLocalPluginAdapter <<blue>>
-class ObservableRemotePluginAdapter <<blue>>
+abstract class service.AbstractPluginAdapter <<blue>>
+class service.LocalPluginAdapter <<blue>>
+class service.RemotePluginAdapter <<blue>>
+class service.LocalPoolPluginAdapter <<blue>>
+class service.RemotePoolPluginAdapter <<blue>>
+abstract class service.AbstractObservableLocalPluginAdapter <<blue>>
+class service.ObservableLocalPluginAdapter <<blue>>
+class service.AutonomousObservableLocalPluginAdapter <<blue>>
+class service.ObservableRemotePluginAdapter <<blue>>
 
-class DistributedLocalServiceAdapter <<blue>>
-class DistributedUtilAdapter <<blue>>
-enum JsonProperty <<blue>>
-enum PluginService <<blue>>
-enum ReaderService <<blue>>
+class service.DistributedLocalServiceAdapter <<blue>>
+class service.DistributedUtilAdapter <<blue>>
+enum service.JsonProperty <<blue>>
+enum service.PluginService <<blue>>
+enum service.ReaderService <<blue>>
 
-class CardSelectionManagerAdapter <<blue>>
-class CardSelectionResultAdapter <<blue>>
-class ScheduledCardSelectionsResponseAdapter <<blue>>
+class service.CardSelectionManagerAdapter <<blue>>
+class service.CardSelectionResultAdapter <<blue>>
+class service.ScheduledCardSelectionsResponseAdapter <<blue>>
 
-class CardSelectionResponseAdapter <<blue>>
-class CardResponseAdapter <<blue>>
-class ApduResponseAdapter <<blue>>
+class service.CardSelectionResponseAdapter <<blue>>
+class service.CardResponseAdapter <<blue>>
+class service.ApduResponseAdapter <<blue>>
 
-class PluginEventAdapter <<blue>>
-class ReaderEventAdapter <<blue>>
+class service.PluginEventAdapter <<blue>>
+class service.ReaderEventAdapter <<blue>>
 
 @enduml

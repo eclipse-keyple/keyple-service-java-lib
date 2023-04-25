@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - keyple-service-java-lib - 2.1.+ (29/06/2022)
+    Keyple - keyple-service-java-lib - 2.2.+ (2023-04-24)
 end title
 
 ' == THEME ==
@@ -107,6 +107,8 @@ package "org.eclipse.keyple.core.service" as service {
         +SortedSet<String> getReaderGroupReferences ()
 
         +Reader allocateReader (String readerGroupReference)
+        +<color:blue><back:yellow>SmartCard</back> getSelectedSmartCard (<back:yellow>CardReader</back> reader)
+
         +void releaseReader (<back:yellow>CardReader</back> reader)
     }
     +interface "<<<back:yellow>CardReader</back>>>\n<s>Reader</s>" as Reader {
