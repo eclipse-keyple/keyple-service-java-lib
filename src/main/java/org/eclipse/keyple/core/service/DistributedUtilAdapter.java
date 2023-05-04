@@ -118,7 +118,12 @@ final class DistributedUtilAdapter {
       return null;
     }
     JsonObject output = JsonUtil.getParser().fromJson(outputJson, JsonObject.class);
-    if (output.has(JsonProperty.ERROR.getKey())) {
+    if (output.has(JsonProperty.ERROR.name())) { // Legacy mode
+      BodyError body =
+          JsonUtil.getParser()
+              .fromJson(output.get(JsonProperty.ERROR.name()).getAsString(), BodyError.class);
+      throw body.getException();
+    } else if (output.has(JsonProperty.ERROR.getKey())) {
       JsonObject error = output.getAsJsonObject(JsonProperty.ERROR.getKey());
       if (error.has(JsonProperty.MESSAGE.getKey())) {
         // Alternate error messaging specifically transmitted by non-Keyple terminals.

@@ -42,6 +42,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
   private final RemoteReaderSpi remoteReaderSpi;
   private final SmartCard selectedSmartCard;
+  private Boolean isLegacyMode;
 
   /**
    * Constructor.
@@ -84,18 +85,30 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
-    input.addProperty(
-        JsonProperty.SERVICE.getKey(), ReaderService.TRANSMIT_CARD_SELECTION_REQUESTS.name());
+    if (isLegacyMode == null || isLegacyMode) {
+      input.addProperty(
+          JsonProperty.SERVICE.name(), ReaderService.TRANSMIT_CARD_SELECTION_REQUESTS.name());
+      input.addProperty(
+          JsonProperty.MULTI_SELECTION_PROCESSING.name(), multiSelectionProcessing.name());
+      input.addProperty(JsonProperty.CHANNEL_CONTROL.name(), channelControl.name());
+      input.addProperty(
+          JsonProperty.CARD_SELECTION_REQUESTS.name(),
+          JsonUtil.getParser().toJson(cardSelectionRequests));
+    }
+    if (isLegacyMode == null || !isLegacyMode) {
+      input.addProperty(
+          JsonProperty.SERVICE.getKey(), ReaderService.TRANSMIT_CARD_SELECTION_REQUESTS.name());
 
-    JsonObject params = new JsonObject();
-    params.addProperty(
-        JsonProperty.MULTI_SELECTION_PROCESSING.getKey(), multiSelectionProcessing.name());
-    params.addProperty(JsonProperty.CHANNEL_CONTROL.getKey(), channelControl.name());
-    params.add(
-        JsonProperty.CARD_SELECTION_REQUESTS.getKey(),
-        JsonUtil.getParser().toJsonTree(cardSelectionRequests));
+      JsonObject params = new JsonObject();
+      params.addProperty(
+          JsonProperty.MULTI_SELECTION_PROCESSING.getKey(), multiSelectionProcessing.name());
+      params.addProperty(JsonProperty.CHANNEL_CONTROL.getKey(), channelControl.name());
+      params.add(
+          JsonProperty.CARD_SELECTION_REQUESTS.getKey(),
+          JsonUtil.getParser().toJsonTree(cardSelectionRequests));
 
-    input.add(JsonProperty.PARAMETERS.getKey(), params);
+      input.add(JsonProperty.PARAMETERS.getKey(), params);
+    }
 
     // Execute the remote service.
     try {
@@ -104,11 +117,18 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
       Assert.getInstance().notNull(output, OUTPUT);
 
-      return JsonUtil.getParser()
-          .fromJson(
-              output.getAsJsonArray(JsonProperty.RESULT.getKey()).toString(),
-              new TypeToken<ArrayList<CardSelectionResponseAdapter>>() {}.getType());
-
+      isLegacyMode = output.has(JsonProperty.RESULT.name());
+      if (isLegacyMode) {
+        return JsonUtil.getParser()
+            .fromJson(
+                output.get(JsonProperty.RESULT.name()).getAsString(),
+                new TypeToken<ArrayList<CardSelectionResponseAdapter>>() {}.getType());
+      } else {
+        return JsonUtil.getParser()
+            .fromJson(
+                output.getAsJsonArray(JsonProperty.RESULT.getKey()).toString(),
+                new TypeToken<ArrayList<CardSelectionResponseAdapter>>() {}.getType());
+      }
     } catch (RuntimeException e) {
       throw e;
     } catch (ReaderBrokenCommunicationException e) {
@@ -135,13 +155,20 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
-    input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.TRANSMIT_CARD_REQUEST.name());
+    if (isLegacyMode == null || isLegacyMode) {
+      input.addProperty(JsonProperty.SERVICE.name(), ReaderService.TRANSMIT_CARD_REQUEST.name());
+      input.addProperty(JsonProperty.CARD_REQUEST.name(), JsonUtil.getParser().toJson(cardRequest));
+      input.addProperty(JsonProperty.CHANNEL_CONTROL.name(), channelControl.name());
+    }
+    if (isLegacyMode == null || !isLegacyMode) {
+      input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.TRANSMIT_CARD_REQUEST.name());
 
-    JsonObject params = new JsonObject();
-    params.add(JsonProperty.CARD_REQUEST.getKey(), JsonUtil.getParser().toJsonTree(cardRequest));
-    params.addProperty(JsonProperty.CHANNEL_CONTROL.getKey(), channelControl.name());
+      JsonObject params = new JsonObject();
+      params.add(JsonProperty.CARD_REQUEST.getKey(), JsonUtil.getParser().toJsonTree(cardRequest));
+      params.addProperty(JsonProperty.CHANNEL_CONTROL.getKey(), channelControl.name());
 
-    input.add(JsonProperty.PARAMETERS.getKey(), params);
+      input.add(JsonProperty.PARAMETERS.getKey(), params);
+    }
 
     // Execute the remote service.
     try {
@@ -150,11 +177,17 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
       Assert.getInstance().notNull(output, OUTPUT);
 
-      return JsonUtil.getParser()
-          .fromJson(
-              output.getAsJsonObject(JsonProperty.RESULT.getKey()).toString(),
-              CardResponseAdapter.class);
-
+      isLegacyMode = output.has(JsonProperty.RESULT.name());
+      if (isLegacyMode) {
+        return JsonUtil.getParser()
+            .fromJson(
+                output.get(JsonProperty.RESULT.name()).getAsString(), CardResponseAdapter.class);
+      } else {
+        return JsonUtil.getParser()
+            .fromJson(
+                output.getAsJsonObject(JsonProperty.RESULT.getKey()).toString(),
+                CardResponseAdapter.class);
+      }
     } catch (RuntimeException e) {
       throw e;
     } catch (ReaderBrokenCommunicationException e) {
@@ -179,7 +212,12 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
-    input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.IS_CONTACTLESS.name());
+    if (isLegacyMode == null || isLegacyMode) {
+      input.addProperty(JsonProperty.SERVICE.name(), ReaderService.IS_CONTACTLESS.name());
+    }
+    if (isLegacyMode == null || !isLegacyMode) {
+      input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.IS_CONTACTLESS.name());
+    }
 
     // Execute the remote service.
     return executeReaderBooleanServiceRemotely(input);
@@ -198,8 +236,12 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
       Assert.getInstance().notNull(output, OUTPUT);
 
-      return output.get(JsonProperty.RESULT.getKey()).getAsBoolean();
-
+      isLegacyMode = output.has(JsonProperty.RESULT.name());
+      if (isLegacyMode) {
+        return output.get(JsonProperty.RESULT.name()).getAsBoolean();
+      } else {
+        return output.get(JsonProperty.RESULT.getKey()).getAsBoolean();
+      }
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
@@ -220,7 +262,12 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
-    input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.IS_CARD_PRESENT.name());
+    if (isLegacyMode == null || isLegacyMode) {
+      input.addProperty(JsonProperty.SERVICE.name(), ReaderService.IS_CARD_PRESENT.name());
+    }
+    if (isLegacyMode == null || !isLegacyMode) {
+      input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.IS_CARD_PRESENT.name());
+    }
 
     // Execute the remote service.
     return executeReaderBooleanServiceRemotely(input);
@@ -238,7 +285,12 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
-    input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.RELEASE_CHANNEL.name());
+    if (isLegacyMode == null || isLegacyMode) {
+      input.addProperty(JsonProperty.SERVICE.name(), ReaderService.RELEASE_CHANNEL.name());
+    }
+    if (isLegacyMode == null || !isLegacyMode) {
+      input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.RELEASE_CHANNEL.name());
+    }
 
     // Execute the remote service.
     try {
