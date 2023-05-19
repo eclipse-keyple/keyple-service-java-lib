@@ -20,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.calypsonet.terminal.card.AbstractApduException;
 import org.calypsonet.terminal.card.ApduResponseApi;
 import org.calypsonet.terminal.card.CardApiProperties;
+import org.calypsonet.terminal.card.CardResponseApi;
+import org.calypsonet.terminal.card.CardSelectionResponseApi;
 import org.calypsonet.terminal.reader.CardReader;
 import org.calypsonet.terminal.reader.ReaderApiProperties;
 import org.calypsonet.terminal.reader.selection.CardSelectionManager;
@@ -62,6 +64,12 @@ final class SmartCardServiceAdapter implements SmartCardService {
     // Register additional JSON adapters.
     JsonUtil.registerTypeAdapter(
         AbstractApduException.class, new ApduExceptionJsonSerializerAdapter(), true);
+    JsonUtil.registerTypeAdapter(
+        CardSelectionResponseApi.class,
+        new CardSelectionResponseApiJsonDeserializerAdapter(),
+        false);
+    JsonUtil.registerTypeAdapter(
+        CardResponseApi.class, new CardResponseApiJsonDeserializerAdapter(), false);
     JsonUtil.registerTypeAdapter(ApduResponseApi.class, new ApduResponseApiJsonAdapter(), false);
   }
 

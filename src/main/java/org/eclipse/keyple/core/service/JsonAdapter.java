@@ -57,6 +57,48 @@ final class JsonAdapter {
   }
 
   /**
+   * JSON deserializer of a {@link org.calypsonet.terminal.card.CardSelectionResponseApi}.
+   *
+   * @since 2.2.2
+   */
+  static final class CardSelectionResponseApiJsonDeserializerAdapter
+      implements JsonDeserializer<CardSelectionResponseAdapter> {
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.2.2
+     */
+    @Override
+    public CardSelectionResponseAdapter deserialize(
+        JsonElement json, Type typeOfT, JsonDeserializationContext context)
+        throws JsonParseException {
+      return context.deserialize(json, CardSelectionResponseAdapter.class);
+    }
+  }
+
+  /**
+   * JSON deserializer of a {@link org.calypsonet.terminal.card.CardResponseApi}.
+   *
+   * @since 2.2.2
+   */
+  static final class CardResponseApiJsonDeserializerAdapter
+      implements JsonDeserializer<CardResponseAdapter> {
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.2.2
+     */
+    @Override
+    public CardResponseAdapter deserialize(
+        JsonElement json, Type typeOfT, JsonDeserializationContext context)
+        throws JsonParseException {
+      return context.deserialize(json, CardResponseAdapter.class);
+    }
+  }
+
+  /**
    * JSON serializer/deserializer of a {@link org.calypsonet.terminal.card.ApduResponseApi}.
    *
    * @since 2.0.0

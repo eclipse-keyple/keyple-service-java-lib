@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Upgraded
+- Calypsonet Terminal Reader API `1.2.0` -> `1.3.0`. Adds the possibility to export a locally processed card selection
+  scenario in order to import it and process it remotely by another card selection manager via two new methods of the
+  `CardSelectionManager` API.
 
 ## [2.2.1] - 2023-05-05
 ### Fixed
@@ -56,7 +60,8 @@ version on the client and server side.
 - `ConfigurableReader` in favor of `ConfigurableCardReader` from the "Calypsonet Terminal Reader API".
 - `ReaderEvent` in favor of `CardReaderEvent` from the "Calypsonet Terminal Reader API".
 ### Fixed
-- Auto management of 61XX and 6CXX status words and case 4 commands (Calypsonet Terminal Requirements: `RL-SW-61XX.1`, `RL-SW-6CXX.1`, `RL-SW-ANALYSIS.1` and `RL-SW-CASE4.1`) (issue [#37]).
+- Auto management of 61XX and 6CXX status words and case 4 commands (Calypsonet Terminal Requirements: `RL-SW-61XX.1`, 
+  `RL-SW-6CXX.1`, `RL-SW-ANALYSIS.1` and `RL-SW-CASE4.1`) (issue [#37]).
 - Returned value of `getActiveSmartCard` method when there is no active smart card (issue [#40]).
 - JSON serialization for interfaces in objects trees (issue [#43]).
 - No longer clear the selection requests after processing the card selection.
@@ -73,7 +78,8 @@ version on the client and server side.
 
 ## [2.0.0] - 2021-10-06
 This is the initial release.
-It follows the extraction of Keyple 1.0 components contained in the `eclipse/keyple-java` repository to dedicated repositories.
+It follows the extraction of Keyple 1.0 components contained in the `eclipse/keyple-java` repository to dedicated 
+repositories.
 It also brings many major API changes.
 
 [unreleased]: https://github.com/eclipse/keyple-service-java-lib/compare/2.2.1...HEAD

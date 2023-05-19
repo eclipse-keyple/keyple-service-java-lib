@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 2.2.0 (2023-04-24)
+    Keyple - Adapter of keyple-service-java-lib - 2.2.2 (2023-05-16)
 end title
 
 ' == THEME ==
@@ -142,7 +142,7 @@ package "org.eclipse.keyple.core.service" as service {
         -- **PoolPlugin** --
         +SortedSet<String> getReaderGroupReferences ()
         +Reader allocateReader (String readerGroupReference)
-        +<color:blue><back:yellow>SmartCard</back> getSelectedSmartCard (<back:yellow>CardReader</back> reader)
+        +<back:yellow>SmartCard</back> getSelectedSmartCard (<back:yellow>CardReader</back> reader)
         +void releaseReader (<back:yellow>CardReader</back> reader)
     }
     ~class "<<PoolPlugin>>\n**final** RemotePoolPluginAdapter" as RemotePoolPluginAdapter extends AbstractPluginAdapter {
@@ -153,7 +153,7 @@ package "org.eclipse.keyple.core.service" as service {
         -- **PoolPlugin** --
         +SortedSet<String> getReaderGroupReferences ()
         +Reader allocateReader (String readerGroupReference)
-        +<color:blue><back:yellow>SmartCard</back> getSelectedSmartCard (<back:yellow>CardReader</back> reader)
+        +<back:yellow>SmartCard</back> getSelectedSmartCard (<back:yellow>CardReader</back> reader)
         +void releaseReader (<back:yellow>CardReader</back> reader)
     }
     ' OBSERVATION MANAGER
@@ -306,9 +306,9 @@ package "org.eclipse.keyple.core.service" as service {
     }
     ~class RemoteReaderAdapter extends AbstractReaderAdapter {
         --
-        ~RemoteReaderAdapter (<back:plum>RemoteReaderSpi</back> remoteReaderSpi, String pluginName, <color:blue><back:yellow>SmartCard</back> selectedSmartCard</color>)
+        ~RemoteReaderAdapter (<back:plum>RemoteReaderSpi</back> remoteReaderSpi, String pluginName, <back:yellow>SmartCard</back> selectedSmartCard)
 
-        ~<color:blue>**final** <back:yellow>SmartCard</back> getSelectedSmartCard ()</color>
+        ~**final** <back:yellow>SmartCard</back> getSelectedSmartCard ()
         -- **AbstractReaderAdapter** --
         ~**final** List<<back:lightGreen>CardSelectionResponseApi</back>> processCardSelectionRequests (
             \tList<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
@@ -581,6 +581,8 @@ package "org.eclipse.keyple.core.service" as service {
         +void scheduleCardSelectionScenario (<back:yellow>ObservableCardReader</back> observableCardReader, <back:yellow>DetectionMode</back> detectionMode, <back:yellow>NotificationMode</back> notificationMode)
         +void scheduleCardSelectionScenario (<back:yellow>ObservableCardReader</back> observableCardReader)
         +<back:yellow>CardSelectionResult</back> parseScheduledCardSelectionsResponse (ScheduledCardSelectionsResponseAdapter scheduledCardSelectionsResponse)
+        +<color:blue>String exportProcessedCardSelectionScenario ()
+        +<color:blue><back:yellow>CardSelectionResult</back> importProcessedCardSelectionScenario (String processedCardSelectionScenario)
     }
     ~class "<<<back:yellow>ScheduledCardSelectionsResponse</back>>>\n**final** ScheduledCardSelectionsResponseAdapter" as ScheduledCardSelectionsResponseAdapter {
         --
