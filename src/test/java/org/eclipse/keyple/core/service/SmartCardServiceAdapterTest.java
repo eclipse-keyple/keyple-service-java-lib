@@ -571,21 +571,21 @@ public class SmartCardServiceAdapterTest {
   public void checkCardExtension_whenCommonApiDiffers_shouldLogWarn() {
     when(cardExtension.getCommonApiVersion()).thenReturn("0.9");
     service.checkCardExtension(cardExtension);
-    verify(logger).warn(anyString(), eq("0.9"), eq(COMMON_API_VERSION));
+    verify(logger).warn(anyString(), anyString(), eq("0.9"), eq(COMMON_API_VERSION));
   }
 
   @Test
   public void checkCardExtension_whenReaderApiDiffers_shouldLogWarn() {
     when(cardExtension.getReaderApiVersion()).thenReturn("0.9");
     service.checkCardExtension(cardExtension);
-    verify(logger).warn(anyString(), eq("0.9"), eq(READER_API_VERSION));
+    verify(logger).warn(anyString(), anyString(), eq("0.9"), eq(READER_API_VERSION));
   }
 
   @Test
   public void checkCardExtension_whenCardApiDiffers_shouldLogWarn() {
     when(cardExtension.getCardApiVersion()).thenReturn("0.9");
     service.checkCardExtension(cardExtension);
-    verify(logger).warn(anyString(), eq("0.9"), eq(CARD_API_VERSION));
+    verify(logger).warn(anyString(), anyString(), eq("0.9"), eq(CARD_API_VERSION));
   }
 
   // Register distributed local service

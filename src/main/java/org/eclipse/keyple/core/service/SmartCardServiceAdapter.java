@@ -213,19 +213,22 @@ final class SmartCardServiceAdapter implements SmartCardService {
   private void checkCardExtensionVersion(KeypleCardExtension cardExtension) {
     if (compareVersions(cardExtension.getCommonApiVersion(), CommonApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Common API used by the provided card extension ({}) mismatches the version used by the service ({}).",
+          "The version of Common API used by the provided card extension ({}:{}) mismatches the version used by the service ({}).",
+          cardExtension.getClass().getSimpleName(),
           cardExtension.getCommonApiVersion(),
           CommonApiProperties.VERSION);
     }
     if (compareVersions(cardExtension.getCardApiVersion(), CardApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Card API used by the provided card extension ({}) mismatches the version used by the service ({}).",
+          "The version of Card API used by the provided card extension ({}:{}) mismatches the version used by the service ({}).",
+          cardExtension.getClass().getSimpleName(),
           cardExtension.getCardApiVersion(),
           CardApiProperties.VERSION);
     }
     if (compareVersions(cardExtension.getReaderApiVersion(), ReaderApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Service API used by the provided card extension ({}) mismatches the version used by the service ({}).",
+          "The version of Service API used by the provided card extension ({}:{}) mismatches the version used by the service ({}).",
+          cardExtension.getClass().getSimpleName(),
           cardExtension.getReaderApiVersion(),
           ReaderApiProperties.VERSION);
     }
