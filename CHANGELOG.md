@@ -5,10 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [2.3.0] - 2023-05-22
 ### Upgraded
-- Calypsonet Terminal Reader API `1.2.0` -> `1.3.0`. Adds the possibility to export a locally processed card selection
-  scenario in order to import it and process it remotely by another card selection manager via two new methods of the
-  `CardSelectionManager` API.
+- Calypsonet Terminal Reader API `1.2.0` -> `1.3.0`.
+  Introduced a new capability to export a locally processed card selection scenario to be imported and analyzed remotely
+  by another card selection manager.
+  For this purpose, the following two methods have been added to the `CardSelectionManager` interface:
+  - `exportProcessedCardSelectionScenario`
+  - `importProcessedCardSelectionScenario`
 
 ## [2.2.1] - 2023-05-05
 ### Fixed
@@ -82,7 +87,8 @@ It follows the extraction of Keyple 1.0 components contained in the `eclipse/key
 repositories.
 It also brings many major API changes.
 
-[unreleased]: https://github.com/eclipse/keyple-service-java-lib/compare/2.2.1...HEAD
+[unreleased]: https://github.com/eclipse/keyple-service-java-lib/compare/2.3.0...HEAD
+[2.3.0]: https://github.com/eclipse/keyple-service-java-lib/compare/2.2.1...2.3.0
 [2.2.1]: https://github.com/eclipse/keyple-service-java-lib/compare/2.2.0...2.2.1
 [2.2.0]: https://github.com/eclipse/keyple-service-java-lib/compare/2.1.4...2.2.0
 [2.1.4]: https://github.com/eclipse/keyple-service-java-lib/compare/2.1.3...2.1.4
