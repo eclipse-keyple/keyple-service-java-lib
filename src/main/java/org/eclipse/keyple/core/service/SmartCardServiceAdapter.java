@@ -20,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.calypsonet.terminal.card.AbstractApduException;
 import org.calypsonet.terminal.card.ApduResponseApi;
 import org.calypsonet.terminal.card.CardApiProperties;
+import org.calypsonet.terminal.card.CardResponseApi;
+import org.calypsonet.terminal.card.CardSelectionResponseApi;
 import org.calypsonet.terminal.reader.CardReader;
 import org.calypsonet.terminal.reader.ReaderApiProperties;
 import org.calypsonet.terminal.reader.selection.CardSelectionManager;
@@ -62,6 +64,12 @@ final class SmartCardServiceAdapter implements SmartCardService {
     // Register additional JSON adapters.
     JsonUtil.registerTypeAdapter(
         AbstractApduException.class, new ApduExceptionJsonSerializerAdapter(), true);
+    JsonUtil.registerTypeAdapter(
+        CardSelectionResponseApi.class,
+        new CardSelectionResponseApiJsonDeserializerAdapter(),
+        false);
+    JsonUtil.registerTypeAdapter(
+        CardResponseApi.class, new CardResponseApiJsonDeserializerAdapter(), false);
     JsonUtil.registerTypeAdapter(ApduResponseApi.class, new ApduResponseApiJsonAdapter(), false);
   }
 
@@ -205,19 +213,22 @@ final class SmartCardServiceAdapter implements SmartCardService {
   private void checkCardExtensionVersion(KeypleCardExtension cardExtension) {
     if (compareVersions(cardExtension.getCommonApiVersion(), CommonApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Common API used by the provided card extension ({}) mismatches the version used by the service ({}).",
+          "The version of Common API used by the provided card extension ({}:{}) mismatches the version used by the service ({}).",
+          cardExtension.getClass().getSimpleName(),
           cardExtension.getCommonApiVersion(),
           CommonApiProperties.VERSION);
     }
     if (compareVersions(cardExtension.getCardApiVersion(), CardApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Card API used by the provided card extension ({}) mismatches the version used by the service ({}).",
+          "The version of Card API used by the provided card extension ({}:{}) mismatches the version used by the service ({}).",
+          cardExtension.getClass().getSimpleName(),
           cardExtension.getCardApiVersion(),
           CardApiProperties.VERSION);
     }
     if (compareVersions(cardExtension.getReaderApiVersion(), ReaderApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Service API used by the provided card extension ({}) mismatches the version used by the service ({}).",
+          "The version of Service API used by the provided card extension ({}:{}) mismatches the version used by the service ({}).",
+          cardExtension.getClass().getSimpleName(),
           cardExtension.getReaderApiVersion(),
           ReaderApiProperties.VERSION);
     }

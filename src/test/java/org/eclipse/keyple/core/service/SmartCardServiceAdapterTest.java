@@ -61,7 +61,7 @@ public class SmartCardServiceAdapterTest {
   private static final String PLUGIN_API_VERSION = "2.1";
   private static final String DISTRIBUTED_REMOTE_API_VERSION = "2.1";
   private static final String DISTRIBUTED_LOCAL_API_VERSION = "2.0";
-  private static final String READER_API_VERSION = "1.2";
+  private static final String READER_API_VERSION = "1.3";
   private static final String CARD_API_VERSION = "1.0";
 
   private PluginMock plugin;
@@ -422,10 +422,10 @@ public class SmartCardServiceAdapterTest {
 
   @Test
   public void registerPlugin_Remote_whenCommonApiVersionDiffers_shouldRegister_and_LogWarn() {
-    when(remotePluginFactory.getCommonApiVersion()).thenReturn("2.1");
+    when(remotePluginFactory.getCommonApiVersion()).thenReturn("0.9");
     service.registerPlugin(remotePluginFactory);
     assertThat(service.getPluginNames().contains(REMOTE_PLUGIN_NAME)).isTrue();
-    verify(logger).warn(anyString(), eq(REMOTE_PLUGIN_NAME), eq("2.1"), eq(COMMON_API_VERSION));
+    verify(logger).warn(anyString(), eq(REMOTE_PLUGIN_NAME), eq("0.9"), eq(COMMON_API_VERSION));
   }
 
   @Test
@@ -569,23 +569,23 @@ public class SmartCardServiceAdapterTest {
 
   @Test
   public void checkCardExtension_whenCommonApiDiffers_shouldLogWarn() {
-    when(cardExtension.getCommonApiVersion()).thenReturn("2.1");
+    when(cardExtension.getCommonApiVersion()).thenReturn("0.9");
     service.checkCardExtension(cardExtension);
-    verify(logger).warn(anyString(), eq("2.1"), eq(COMMON_API_VERSION));
+    verify(logger).warn(anyString(), anyString(), eq("0.9"), eq(COMMON_API_VERSION));
   }
 
   @Test
   public void checkCardExtension_whenReaderApiDiffers_shouldLogWarn() {
-    when(cardExtension.getReaderApiVersion()).thenReturn("2.1");
+    when(cardExtension.getReaderApiVersion()).thenReturn("0.9");
     service.checkCardExtension(cardExtension);
-    verify(logger).warn(anyString(), eq("2.1"), eq(READER_API_VERSION));
+    verify(logger).warn(anyString(), anyString(), eq("0.9"), eq(READER_API_VERSION));
   }
 
   @Test
   public void checkCardExtension_whenCardApiDiffers_shouldLogWarn() {
-    when(cardExtension.getCardApiVersion()).thenReturn("2.1");
+    when(cardExtension.getCardApiVersion()).thenReturn("0.9");
     service.checkCardExtension(cardExtension);
-    verify(logger).warn(anyString(), eq("2.1"), eq(CARD_API_VERSION));
+    verify(logger).warn(anyString(), anyString(), eq("0.9"), eq(CARD_API_VERSION));
   }
 
   // Register distributed local service
@@ -613,20 +613,20 @@ public class SmartCardServiceAdapterTest {
   @Test
   public void
       registerDistributedLocalService_whenCommonApiVersionDiffers_shouldRegister_and_LogWarn() {
-    when(localServiceFactory.getCommonApiVersion()).thenReturn("2.1");
+    when(localServiceFactory.getCommonApiVersion()).thenReturn("0.9");
     service.registerDistributedLocalService(localServiceFactory);
     assertThat(service.isDistributedLocalServiceRegistered(LOCAL_SERVICE_NAME)).isTrue();
-    verify(logger).warn(anyString(), eq(LOCAL_SERVICE_NAME), eq("2.1"), eq(COMMON_API_VERSION));
+    verify(logger).warn(anyString(), eq(LOCAL_SERVICE_NAME), eq("0.9"), eq(COMMON_API_VERSION));
   }
 
   @Test
   public void
       registerDistributedLocalService_whenDistributedLocalApiVersionDiffers_shouldRegister_and_LogWarn() {
-    when(localServiceFactory.getDistributedLocalApiVersion()).thenReturn("2.1");
+    when(localServiceFactory.getDistributedLocalApiVersion()).thenReturn("0.9");
     service.registerDistributedLocalService(localServiceFactory);
     assertThat(service.isDistributedLocalServiceRegistered(LOCAL_SERVICE_NAME)).isTrue();
     verify(logger)
-        .warn(anyString(), eq(LOCAL_SERVICE_NAME), eq("2.1"), eq(DISTRIBUTED_LOCAL_API_VERSION));
+        .warn(anyString(), eq(LOCAL_SERVICE_NAME), eq("0.9"), eq(DISTRIBUTED_LOCAL_API_VERSION));
   }
 
   @Test(expected = IllegalStateException.class)

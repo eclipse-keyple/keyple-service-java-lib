@@ -15,6 +15,7 @@ import static org.eclipse.keyple.core.service.InternalDto.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +55,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
 
   private final List<CardSelectionSpi> cardSelections;
   private final List<CardSelectionRequestSpi> cardSelectionRequests;
+  private List<CardSelectionResponseApi> cardSelectionResponses;
   private MultiSelectionProcessing multiSelectionProcessing;
   private ChannelControl channelControl = ChannelControl.KEEP_OPEN;
 
@@ -270,6 +272,44 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @since 2.3.0
+   */
+  @Override
+  public String exportProcessedCardSelectionScenario() {
+    if (cardSelectionResponses == null) {
+      throw new IllegalStateException(
+          "The card selection scenario has not yet been processed or has failed");
+    }
+    return JsonUtil.toJson(cardSelectionResponses);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.3.0
+   */
+  @Override
+  public CardSelectionResult importProcessedCardSelectionScenario(
+      String processedCardSelectionScenario) {
+    List<CardSelectionResponseApi> cardSelectionResponses;
+    try {
+      cardSelectionResponses =
+          JsonUtil.getParser()
+              .fromJson(
+                  processedCardSelectionScenario,
+                  new TypeToken<ArrayList<CardSelectionResponseApi>>() {}.getType());
+    } catch (JsonSyntaxException e) {
+      throw new IllegalArgumentException("Input string is invalid: " + e.getMessage(), e);
+    }
+    if (cardSelectionResponses == null) {
+      throw new IllegalArgumentException("Input string is null or empty");
+    }
+    return processCardSelectionResponses(cardSelectionResponses);
+  }
+
+  /**
    * Analyzes the responses received in return of the execution of a card selection scenario and
    * returns the CardSelectionResult.
    *
@@ -280,13 +320,12 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   private CardSelectionResult processCardSelectionResponses(
       List<CardSelectionResponseApi> cardSelectionResponses) {
 
-    Assert.getInstance().notEmpty(cardSelectionResponses, "cardSelectionResponses");
+    Assert.getInstance()
+        .isInRange(
+            cardSelectionResponses.size(), 1, cardSelections.size(), "cardSelectionResponses");
 
     CardSelectionResultAdapter cardSelectionsResult = new CardSelectionResultAdapter();
-
     int index = 0;
-
-    /* Check card responses */
     for (CardSelectionResponseApi cardSelectionResponse : cardSelectionResponses) {
       if (cardSelectionResponse.hasMatched()) {
         // invoke the parse method defined by the card extension to retrieve the smart card
@@ -296,11 +335,17 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
         } catch (ParseException e) {
           throw new InvalidCardResponseException(
               "Error occurred while parsing the card response: " + e.getMessage(), e);
+        } catch (UnsupportedOperationException e) {
+          logger.warn(
+              "Unable to parse card selection responses due to missing card extensions in the runtime environment");
+          cardSelectionsResult = new CardSelectionResultAdapter(); // Empty result
+          break;
         }
         cardSelectionsResult.addSmartCard(index, smartCard);
       }
       index++;
     }
+    this.cardSelectionResponses = cardSelectionResponses;
     return cardSelectionsResult;
   }
 }
