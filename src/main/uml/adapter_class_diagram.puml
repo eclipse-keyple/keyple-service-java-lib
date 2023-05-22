@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 2.2.2 (2023-05-16)
+    Keyple - Adapter of keyple-service-java-lib - 2.3.0 (2023-05-16)
 end title
 
 ' == THEME ==

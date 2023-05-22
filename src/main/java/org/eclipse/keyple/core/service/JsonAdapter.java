@@ -59,7 +59,7 @@ final class JsonAdapter {
   /**
    * JSON deserializer of a {@link org.calypsonet.terminal.card.CardSelectionResponseApi}.
    *
-   * @since 2.2.2
+   * @since 2.3.0
    */
   static final class CardSelectionResponseApiJsonDeserializerAdapter
       implements JsonDeserializer<CardSelectionResponseAdapter> {
@@ -67,7 +67,7 @@ final class JsonAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.2.2
+     * @since 2.3.0
      */
     @Override
     public CardSelectionResponseAdapter deserialize(
@@ -80,7 +80,7 @@ final class JsonAdapter {
   /**
    * JSON deserializer of a {@link org.calypsonet.terminal.card.CardResponseApi}.
    *
-   * @since 2.2.2
+   * @since 2.3.0
    */
   static final class CardResponseApiJsonDeserializerAdapter
       implements JsonDeserializer<CardResponseAdapter> {
@@ -88,7 +88,7 @@ final class JsonAdapter {
     /**
      * {@inheritDoc}
      *
-     * @since 2.2.2
+     * @since 2.3.0
      */
     @Override
     public CardResponseAdapter deserialize(

@@ -274,7 +274,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   /**
    * {@inheritDoc}
    *
-   * @since 2.2.2
+   * @since 2.3.0
    */
   @Override
   public String exportProcessedCardSelectionScenario() {
@@ -288,7 +288,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   /**
    * {@inheritDoc}
    *
-   * @since 2.2.2
+   * @since 2.3.0
    */
   @Override
   public CardSelectionResult importProcessedCardSelectionScenario(
