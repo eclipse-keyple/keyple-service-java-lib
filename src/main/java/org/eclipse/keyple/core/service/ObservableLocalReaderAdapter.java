@@ -193,6 +193,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
               getPluginName(),
               getName(),
               new ReaderCommunicationException(READER_MONITORING_ERROR, e));
+      return false;
     } catch (CardIOException e) {
       if (logger.isTraceEnabled()) {
         logger.trace(

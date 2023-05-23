@@ -94,22 +94,26 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
               } else {
                 readerProcessingSpi.waitForCardRemovalDuringProcessing();
               }
-              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
-              break;
             } catch (ReaderIOException e) {
               // just warn as it can be a disconnection of the reader.
               logger.warn(
-                  "[{}] waitForCardAbsentNative => Error while processing card removal event",
-                  getReader().getName());
-              break;
+                  "[{}] waitForCardAbsentNative => Error while processing card removal event: {}",
+                  getReader().getName(),
+                  e.getMessage());
             } catch (TaskCanceledException e) {
-              break;
+              logger.warn(
+                  "[{}] waitForCardAbsentNative => task canceled: {}",
+                  getReader().getName(),
+                  e.getMessage());
             }
+            break;
           }
         } catch (RuntimeException e) {
           getReader()
               .getObservationExceptionHandler()
               .onReaderObservationError(getReader().getPluginName(), getReader().getName(), e);
+        } finally {
+          monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
         }
       }
     };

@@ -88,8 +88,7 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
               if (logger.isDebugEnabled()) {
                 logger.debug("[{}] the card stopped responding", getReader().getName());
               }
-              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
-              return;
+              break;
             }
             retries++;
 
@@ -113,6 +112,8 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
           getReader()
               .getObservationExceptionHandler()
               .onReaderObservationError(getReader().getPluginName(), getReader().getName(), e);
+        } finally {
+          monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
         }
       }
     };

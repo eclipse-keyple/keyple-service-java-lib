@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fixes an issue with exception handling in the `WAIT_FOR_CARD_REMOVAL` state of the observable reader state machine 
+that blocked the state machine in the same state.
 
 ## [2.3.0] - 2023-05-22
 ### Upgraded
