@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixes an issue with exception handling in the `WAIT_FOR_CARD_REMOVAL` state of the observable reader state machine 
 that blocked the state machine in the same state.
+- Fixes a performance issue introduced in version `2.1.3` related to the closing of the physical channel when processing 
+a new card selection scenario with the same card (issue [#58]).
 
 ## [2.3.0] - 2023-05-22
 ### Upgraded
@@ -102,6 +104,7 @@ It also brings many major API changes.
 [2.0.1]: https://github.com/eclipse/keyple-service-java-lib/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/eclipse/keyple-service-java-lib/releases/tag/2.0.0
 
+[#58]: https://github.com/eclipse/keyple-service-java-lib/issues/58
 [#43]: https://github.com/eclipse/keyple-service-java-lib/issues/43
 [#40]: https://github.com/eclipse/keyple-service-java-lib/issues/40
 [#38]: https://github.com/eclipse/keyple-service-java-lib/issues/38

@@ -162,23 +162,18 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     checkStatus();
 
-    /* close silently the physical channel if it is already open */
-    if (readerSpi.isPhysicalChannelOpen()) {
-      try {
-        readerSpi.closePhysicalChannel();
-      } catch (ReaderIOException e) {
-      }
-    }
     /* Open the physical channel, determine the current protocol */
-    try {
-      readerSpi.openPhysicalChannel();
-      computeCurrentProtocol();
-    } catch (ReaderIOException e) {
-      throw new ReaderBrokenCommunicationException(
-          null, false, "Reader communication failure while opening physical channel", e);
-    } catch (CardIOException e) {
-      throw new CardBrokenCommunicationException(
-          null, false, "Card communication failure while opening physical channel", e);
+    if (!readerSpi.isPhysicalChannelOpen()) {
+      try {
+        readerSpi.openPhysicalChannel();
+        computeCurrentProtocol();
+      } catch (ReaderIOException e) {
+        throw new ReaderBrokenCommunicationException(
+            null, false, "Reader communication failure while opening physical channel", e);
+      } catch (CardIOException e) {
+        throw new CardBrokenCommunicationException(
+            null, false, "Card communication failure while opening physical channel", e);
+      }
     }
 
     List<CardSelectionResponseApi> cardSelectionResponses =
