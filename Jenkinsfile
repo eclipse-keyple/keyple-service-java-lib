@@ -48,7 +48,7 @@ pipeline {
       when { expression { deployRelease } }
       steps { container('java-builder') {
         configFileProvider([configFile(fileId: 'gradle.properties', targetLocation: '/home/jenkins/agent/gradle.properties')]) {
-          sh './gradlew clean release --info --stacktrace'
+          sh './gradlew clean build test release --info --stacktrace'
         }
         junit testResults: 'build/test-results/test/*.xml', allowEmptyResults: true
       } }
