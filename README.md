@@ -1,5 +1,5 @@
-![GitHub](https://img.shields.io/github/license/eclipse/keyple-service-java-lib)
-![Jenkins](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fkeyple%2Fjob%2FKeyple%2Fjob%2Fkeyple-service-java-lib%2Fjob%2Fmain%2F)
+[![License](https://img.shields.io/badge/License-EPL_2.0-red.svg)](https://opensource.org/licenses/EPL-2.0)
+[![Jenkins](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fkeyple%2Fjob%2FKeyple%2Fjob%2Fkeyple-service-java-lib%2Fjob%2Fmain%2F)](https://ci.eclipse.org/keyple/job/Keyple/job/keyple-service-java-lib/job/main/)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=eclipse_keyple-service-java-lib&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=eclipse_keyple-service-java-lib)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=eclipse_keyple-service-java-lib&metric=bugs)](https://sonarcloud.io/summary/new_code?id=eclipse_keyple-service-java-lib)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=eclipse_keyple-service-java-lib&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=eclipse_keyple-service-java-lib)
