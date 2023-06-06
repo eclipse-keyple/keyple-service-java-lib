@@ -35,7 +35,7 @@ pipeline {
         junit testResults: 'build/test-results/test/*.xml', allowEmptyResults: true
       } }
     }
-    stage('Publish Snapshot') {
+    stage('Build and Publish Snapshot') {
       when { expression { deploySnapshot } }
       steps { container('java-builder') {
         configFileProvider([configFile(fileId: 'gradle.properties', targetLocation: '/home/jenkins/agent/gradle.properties')]) {
@@ -44,7 +44,7 @@ pipeline {
         junit testResults: 'build/test-results/test/*.xml', allowEmptyResults: true
       } }
     }
-    stage('Publish Release') {
+    stage('Build and Publish Release') {
       when { expression { deployRelease } }
       steps { container('java-builder') {
         configFileProvider([configFile(fileId: 'gradle.properties', targetLocation: '/home/jenkins/agent/gradle.properties')]) {
