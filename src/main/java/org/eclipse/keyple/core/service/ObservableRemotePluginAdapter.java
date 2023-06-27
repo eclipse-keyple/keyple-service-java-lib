@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.distributed.remote.ObservableRemotePluginApi;
 import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemoteReaderSpi;
@@ -27,6 +26,7 @@ import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.reader.CardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,6 +140,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
 
       // Start the observation remotely.
       JsonObject input = new JsonObject();
+      input.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), CORE_API_LEVEL);
       input.addProperty(JsonProperty.SERVICE.getKey(), PluginService.START_READER_DETECTION.name());
 
       // Execute the remote service.
@@ -196,6 +197,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
 
     // Stop the observation remotely.
     JsonObject input = new JsonObject();
+    input.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), CORE_API_LEVEL);
     input.addProperty(JsonProperty.SERVICE.getKey(), PluginService.STOP_READER_DETECTION.name());
 
     // Execute the remote service.
@@ -236,8 +238,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
    *
    * @since 2.0.0
    */
-  @Override
-  public void addRemoteReader(RemoteReaderSpi remoteReaderSpi) {
+  public void addRemoteReader(RemoteReaderSpi remoteReaderSpi, int clientCoreApiLevel) {
 
     checkStatus();
     if (logger.isDebugEnabled()) {
@@ -252,9 +253,11 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     RemoteReaderAdapter remoteReaderAdapter;
     if (remoteReaderSpi instanceof ObservableRemoteReaderSpi) {
       remoteReaderAdapter =
-          new ObservableRemoteReaderAdapter((ObservableRemoteReaderSpi) remoteReaderSpi, getName());
+          new ObservableRemoteReaderAdapter(
+              (ObservableRemoteReaderSpi) remoteReaderSpi, getName(), clientCoreApiLevel);
     } else {
-      remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName(), null);
+      remoteReaderAdapter =
+          new RemoteReaderAdapter(remoteReaderSpi, getName(), null, clientCoreApiLevel);
     }
 
     // Register the reader.

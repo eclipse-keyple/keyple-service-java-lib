@@ -12,10 +12,11 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.List;
-import org.calypsonet.terminal.card.ChannelControl;
-import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.card.ChannelControl;
+import org.eclipse.keypop.card.spi.CardSelectionRequestSpi;
+import org.eclipse.keypop.reader.selection.CardSelector;
 
 /**
  * This POJO contains a selection scenario composed of one or more card selection requests and
@@ -35,6 +36,7 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
  */
 final class CardSelectionScenarioAdapter {
 
+  private final List<CardSelector<?>> cardSelectors;
   private final List<CardSelectionRequestSpi> cardSelectionRequests;
   private final MultiSelectionProcessing multiSelectionProcessing;
   private final ChannelControl channelControl;
@@ -47,6 +49,7 @@ final class CardSelectionScenarioAdapter {
    * with the cards expected in the application to optimize the processing time of the selection
    * process. The first selection case in the list will be processed first.
    *
+   * @param cardSelectors A list of card selectors.
    * @param cardSelectionRequests A list of card selection requests.
    * @param multiSelectionProcessing The multi selection processing policy.
    * @param channelControl The channel control policy.
@@ -55,6 +58,7 @@ final class CardSelectionScenarioAdapter {
    * @since 2.0.0
    */
   CardSelectionScenarioAdapter(
+      List<CardSelector<?>> cardSelectors,
       List<CardSelectionRequestSpi> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl) {
@@ -64,9 +68,20 @@ final class CardSelectionScenarioAdapter {
         .notNull(multiSelectionProcessing, "multiSelectionProcessing")
         .notNull(channelControl, "channelControl");
 
+    this.cardSelectors = cardSelectors;
     this.cardSelectionRequests = cardSelectionRequests;
     this.multiSelectionProcessing = multiSelectionProcessing;
     this.channelControl = channelControl;
+  }
+
+  /**
+   * Gets the card selectors list.
+   *
+   * @return A not null reference
+   * @since 3.0.0
+   */
+  List<CardSelector<?>> getCardSelectors() {
+    return cardSelectors;
   }
 
   /**

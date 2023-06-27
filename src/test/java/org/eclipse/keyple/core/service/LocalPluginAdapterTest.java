@@ -25,6 +25,8 @@ import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterBlockingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterBlockingSpi;
+import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.ObservableCardReader;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -85,9 +87,9 @@ public class LocalPluginAdapterTest {
         .containsExactlyInAnyOrder(
             localPluginAdapter.getReader(READER_NAME_1),
             localPluginAdapter.getReader(READER_NAME_2));
-    assertThat(localPluginAdapter.getReader(READER_NAME_1)).isInstanceOf(Reader.class);
+    assertThat(localPluginAdapter.getReader(READER_NAME_1)).isInstanceOf(CardReader.class);
     assertThat(localPluginAdapter.getReader(READER_NAME_1)).isInstanceOf(LocalReaderAdapter.class);
-    assertThat(localPluginAdapter.getReader(READER_NAME_2)).isInstanceOf(Reader.class);
+    assertThat(localPluginAdapter.getReader(READER_NAME_2)).isInstanceOf(CardReader.class);
     assertThat(localPluginAdapter.getReader(READER_NAME_2)).isInstanceOf(LocalReaderAdapter.class);
     assertThat(localPluginAdapter.getReader(READER_NAME_2))
         .isNotEqualTo(localPluginAdapter.getReader(READER_NAME_1));
@@ -106,7 +108,7 @@ public class LocalPluginAdapterTest {
         .containsExactlyInAnyOrder(OBSERVABLE_READER_NAME);
     assertThat(localPluginAdapter.getReaders()).hasSize(1);
     assertThat(localPluginAdapter.getReader(OBSERVABLE_READER_NAME))
-        .isInstanceOf(ObservableReader.class);
+        .isInstanceOf(ObservableCardReader.class);
     assertThat(localPluginAdapter.getReader(OBSERVABLE_READER_NAME))
         .isInstanceOf(ObservableLocalReaderAdapter.class);
   }

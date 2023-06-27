@@ -12,13 +12,6 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.*;
-import org.calypsonet.terminal.card.CardBrokenCommunicationException;
-import org.calypsonet.terminal.card.CardSelectionResponseApi;
-import org.calypsonet.terminal.card.ReaderBrokenCommunicationException;
-import org.calypsonet.terminal.reader.CardReaderEvent;
-import org.calypsonet.terminal.reader.ReaderCommunicationException;
-import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
-import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.plugin.*;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterAsynchronousSpi;
@@ -26,17 +19,25 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.Wait
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterAsynchronousSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalAutonomousSpi;
 import org.eclipse.keyple.core.util.Assert;
+import org.eclipse.keypop.card.CardBrokenCommunicationException;
+import org.eclipse.keypop.card.CardSelectionResponseApi;
+import org.eclipse.keypop.card.ReaderBrokenCommunicationException;
+import org.eclipse.keypop.reader.CardReaderEvent;
+import org.eclipse.keypop.reader.ObservableCardReader;
+import org.eclipse.keypop.reader.ReaderCommunicationException;
+import org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi;
+import org.eclipse.keypop.reader.spi.CardReaderObserverSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation for {@link ObservableReader}, {@link WaitForCardInsertionAutonomousReaderApi} and
- * {@link WaitForCardRemovalAutonomousReaderApi}.
+ * Implementation for {@link ObservableCardReader}, {@link WaitForCardInsertionAutonomousReaderApi}
+ * and {@link WaitForCardRemovalAutonomousReaderApi}.
  *
  * @since 2.0.0
  */
 class ObservableLocalReaderAdapter extends LocalReaderAdapter
-    implements ObservableReader,
+    implements ObservableCardReader,
         CardInsertionWaiterAsynchronousApi,
         CardRemovalWaiterAsynchronousApi,
         WaitForCardInsertionAutonomousReaderApi,
@@ -44,11 +45,11 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   private static final Logger logger = LoggerFactory.getLogger(ObservableLocalReaderAdapter.class);
 
+  private static final String READER_MONITORING_ERROR =
+      "An error occurred while monitoring the reader.";
   private static final byte[] APDU_PING_CARD_PRESENCE = {
     (byte) 0x00, (byte) 0xC0, (byte) 0x00, (byte) 0x00, (byte) 0x00
   };
-  public static final String READER_MONITORING_ERROR =
-      "An error occurred while monitoring the reader.";
 
   private final ObservableReaderSpi observableReaderSpi;
   private final ObservableReaderStateServiceAdapter stateService;
@@ -212,7 +213,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   /**
    * This method is invoked by the card insertion monitoring process when a card is inserted.
    *
-   * <p>It will return a {@link ReaderEvent} or null:
+   * <p>It will return a {@link CardReaderEvent} or null:
    *
    * <ul>
    *   <li>CARD_INSERTED: if no card selection scenario was defined.
@@ -226,13 +227,13 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * matched the selection.
    *
    * <p>The selection data and the responses to the optional requests that may be present in the
-   * card selection scenario are embedded into the {@link ReaderEvent} as a list of {@link
+   * card selection scenario are embedded into the {@link CardReaderEvent} as a list of {@link
    * CardSelectionResponseApi}.
    *
    * @return Null if the card has been rejected by the card selection scenario.
    * @since 2.0.0
    */
-  final ReaderEvent processCardInserted() {
+  final CardReaderEvent processCardInserted() {
 
     // RL-DET-INSNOTIF.1
     if (logger.isTraceEnabled()) {
@@ -253,6 +254,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
     try {
       List<CardSelectionResponseApi> cardSelectionResponses =
           transmitCardSelectionRequests(
+              cardSelectionScenario.getCardSelectors(),
               cardSelectionScenario.getCardSelectionRequests(),
               cardSelectionScenario.getMultiSelectionProcessing(),
               cardSelectionScenario.getChannelControl());
@@ -368,7 +370,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * Notifies all registered observers with the provided {@link ReaderEvent}.
+   * Notifies all registered observers with the provided {@link CardReaderEvent}.
    *
    * <p>This method never throws an exception. Any errors at runtime are notified to the application
    * using the exception handler.
@@ -376,7 +378,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @param event The reader event.
    * @since 2.0.0
    */
-  final void notifyObservers(final ReaderEvent event) {
+  final void notifyObservers(final CardReaderEvent event) {
 
     if (logger.isDebugEnabled()) {
       logger.debug(
@@ -397,7 +399,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @param observer The observer to notify.
    * @param event The event.
    */
-  private void notifyObserver(CardReaderObserverSpi observer, ReaderEvent event) {
+  private void notifyObserver(CardReaderObserverSpi observer, CardReaderEvent event) {
     try {
       observer.onReaderEvent(event);
     } catch (Exception e) {
@@ -425,16 +427,12 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    *
    * @param cardSelectionScenario The card selection scenario.
    * @param notificationMode The notification policy.
-   * @param detectionMode The polling policy (optional).
    * @since 2.0.0
    */
   final void scheduleCardSelectionScenario(
-      CardSelectionScenarioAdapter cardSelectionScenario,
-      NotificationMode notificationMode,
-      DetectionMode detectionMode) {
+      CardSelectionScenarioAdapter cardSelectionScenario, NotificationMode notificationMode) {
     this.cardSelectionScenario = cardSelectionScenario;
     this.notificationMode = notificationMode;
-    this.detectionMode = detectionMode;
   }
 
   /**

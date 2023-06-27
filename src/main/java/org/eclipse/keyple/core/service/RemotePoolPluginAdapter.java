@@ -17,13 +17,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import org.calypsonet.terminal.reader.CardReader;
-import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.distributed.remote.spi.RemotePoolPluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
+import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.selection.spi.SmartCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,21 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
   RemotePoolPluginAdapter(RemotePoolPluginSpi remotePoolPluginSpi) {
     super(remotePoolPluginSpi.getName(), (KeyplePluginExtension) remotePoolPluginSpi);
     this.remotePoolPluginSpi = remotePoolPluginSpi;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 3.0.0
+   */
+  @Override
+  void register() throws PluginIOException {
+    super.register();
+    int distributedApiLevel = remotePoolPluginSpi.exchangeApiLevel(CORE_API_LEVEL);
+    logger.info(
+        "Core API level: {}, Distributed API level (Remote Pool Plugin): {}",
+        CORE_API_LEVEL,
+        distributedApiLevel);
   }
 
   /**
@@ -76,6 +92,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
+    input.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), CORE_API_LEVEL);
     input.addProperty(
         JsonProperty.SERVICE.getKey(), PluginService.GET_READER_GROUP_REFERENCES.name());
 
@@ -103,7 +120,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
    * @since 2.0.0
    */
   @Override
-  public Reader allocateReader(String readerGroupReference) {
+  public CardReader allocateReader(String readerGroupReference) {
 
     checkStatus();
     if (logger.isDebugEnabled()) {
@@ -116,6 +133,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
+    input.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), CORE_API_LEVEL);
     input.addProperty(JsonProperty.SERVICE.getKey(), PluginService.ALLOCATE_READER.name());
 
     JsonObject params = new JsonObject();
@@ -161,7 +179,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     RemoteReaderSpi remoteReaderSpi =
         remotePoolPluginSpi.createRemoteReader(remoteReaderName, localReaderName);
     RemoteReaderAdapter remoteReaderAdapter =
-        new RemoteReaderAdapter(remoteReaderSpi, getName(), selectedSmartCard);
+        new RemoteReaderAdapter(remoteReaderSpi, getName(), selectedSmartCard, CORE_API_LEVEL);
 
     getReadersMap().put(remoteReaderSpi.getName(), remoteReaderAdapter);
     remoteReaderAdapter.register();
@@ -199,6 +217,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
+    input.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), CORE_API_LEVEL);
     input.addProperty(JsonProperty.SERVICE.getKey(), PluginService.RELEASE_READER.name());
 
     JsonObject params = new JsonObject();

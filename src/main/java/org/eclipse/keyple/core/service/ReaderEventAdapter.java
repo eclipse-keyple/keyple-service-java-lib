@@ -11,14 +11,15 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
+import org.eclipse.keypop.reader.CardReaderEvent;
+import org.eclipse.keypop.reader.selection.ScheduledCardSelectionsResponse;
 
 /**
- * Implementation of {@link ReaderEvent}.
+ * Implementation of {@link CardReaderEvent}.
  *
  * @since 2.0.0
  */
-final class ReaderEventAdapter implements ReaderEvent {
+final class ReaderEventAdapter implements CardReaderEvent {
 
   private final String pluginName;
   private final String readerName;
@@ -27,7 +28,7 @@ final class ReaderEventAdapter implements ReaderEvent {
   private final Type type;
 
   /**
-   * ReaderEvent constructor for simple insertion notification mode
+   * CardReaderEvent constructor for simple insertion notification mode
    *
    * @param pluginName The name of the current plugin (should be not null).
    * @param readerName The name of the current reader (should be not null).
@@ -36,7 +37,7 @@ final class ReaderEventAdapter implements ReaderEvent {
    *     selection scenario (can be null).
    * @since 2.0.0
    */
-  public ReaderEventAdapter(
+  ReaderEventAdapter(
       String pluginName,
       String readerName,
       Type type,
@@ -47,21 +48,41 @@ final class ReaderEventAdapter implements ReaderEvent {
     this.scheduledCardSelectionsResponse = scheduledCardSelectionsResponse;
   }
 
-  @Override
-  public String getPluginName() {
+  /**
+   * Returns the plugin name.
+   *
+   * @return A not empty String.
+   * @since 2.0.0
+   */
+  String getPluginName() {
     return pluginName;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0.0
+   */
   @Override
   public String getReaderName() {
     return readerName;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0.0
+   */
   @Override
   public Type getType() {
     return type;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @since 2.0.0
+   */
   @Override
   public ScheduledCardSelectionsResponse getScheduledCardSelectionsResponse() {
     return scheduledCardSelectionsResponse;

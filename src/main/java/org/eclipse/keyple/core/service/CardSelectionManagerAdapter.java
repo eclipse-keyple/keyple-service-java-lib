@@ -19,27 +19,22 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.List;
-import org.calypsonet.terminal.card.*;
-import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
-import org.calypsonet.terminal.card.spi.CardSelectionSpi;
-import org.calypsonet.terminal.card.spi.ParseException;
-import org.calypsonet.terminal.reader.CardCommunicationException;
-import org.calypsonet.terminal.reader.CardReader;
-import org.calypsonet.terminal.reader.ObservableCardReader;
-import org.calypsonet.terminal.reader.ReaderCommunicationException;
-import org.calypsonet.terminal.reader.selection.CardSelectionManager;
-import org.calypsonet.terminal.reader.selection.CardSelectionResult;
-import org.calypsonet.terminal.reader.selection.InvalidCardResponseException;
-import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
-import org.calypsonet.terminal.reader.selection.spi.CardSelection;
-import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.card.*;
+import org.eclipse.keypop.card.spi.CardSelectionExtensionSpi;
+import org.eclipse.keypop.card.spi.CardSelectionRequestSpi;
+import org.eclipse.keypop.reader.CardCommunicationException;
+import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.ObservableCardReader;
+import org.eclipse.keypop.reader.ReaderCommunicationException;
+import org.eclipse.keypop.reader.selection.*;
+import org.eclipse.keypop.reader.selection.spi.CardSelectionExtension;
+import org.eclipse.keypop.reader.selection.spi.SmartCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * (package-private) <br>
  * Implementation of the {@link CardSelectionManager}.
  *
  * @since 2.0.0
@@ -49,18 +44,20 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   private static final Logger logger = LoggerFactory.getLogger(CardSelectionManagerAdapter.class);
   private static final String MULTI_SELECTION_PROCESSING = "multiSelectionProcessing";
   private static final String CHANNEL_CONTROL = "channelControl";
+  private static final String CARD_SELECTORS_TYPES = "cardSelectorsTypes";
+  private static final String CARD_SELECTORS = "cardSelectors";
   private static final String CARD_SELECTIONS_TYPES = "cardSelectionsTypes";
   private static final String CARD_SELECTIONS = "cardSelections";
   private static final String DEFAULT_CARD_SELECTIONS = "defaultCardSelections";
 
-  private final List<CardSelectionSpi> cardSelections;
+  private final List<CardSelector<?>> cardSelectors;
+  private final List<CardSelectionExtensionSpi> cardSelections;
   private final List<CardSelectionRequestSpi> cardSelectionRequests;
   private List<CardSelectionResponseApi> cardSelectionResponses;
   private MultiSelectionProcessing multiSelectionProcessing;
   private ChannelControl channelControl = ChannelControl.KEEP_OPEN;
 
   /**
-   * (package-private) <br>
    * Creates an instance of the service with which the selection stops as soon as a card matches a
    * selection case.
    *
@@ -68,7 +65,8 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
    */
   CardSelectionManagerAdapter() {
     multiSelectionProcessing = MultiSelectionProcessing.FIRST_MATCH;
-    cardSelections = new ArrayList<CardSelectionSpi>();
+    cardSelectors = new ArrayList<CardSelector<?>>();
+    cardSelections = new ArrayList<CardSelectionExtensionSpi>();
     cardSelectionRequests = new ArrayList<CardSelectionRequestSpi>();
   }
 
@@ -88,13 +86,23 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
    * @since 2.0.0
    */
   @Override
-  public int prepareSelection(CardSelection cardSelection) {
+  public int prepareSelection(
+      CardSelector<?> cardSelector, CardSelectionExtension cardSelectionExtension) {
 
-    Assert.getInstance().notNull(cardSelection, "cardSelection");
+    Assert.getInstance()
+        .notNull(cardSelector, "cardSelector")
+        .notNull(cardSelectionExtension, "cardSelectionExtension");
+
+    if (!(cardSelectionExtension instanceof CardSelectionExtensionSpi)) {
+      throw new IllegalArgumentException(
+          "The provided 'cardSelectionExtension' must be an instance of 'CardSelectionExtensionSpi'");
+    }
 
     /* keep the selection request */
-    cardSelections.add((CardSelectionSpi) cardSelection);
-    cardSelectionRequests.add(((CardSelectionSpi) cardSelection).getCardSelectionRequest());
+    cardSelectors.add(cardSelector);
+    cardSelections.add((CardSelectionExtensionSpi) cardSelectionExtension);
+    cardSelectionRequests.add(
+        ((CardSelectionExtensionSpi) cardSelectionExtension).getCardSelectionRequest());
     /* return the selection index (starting at 0) */
     return cardSelections.size() - 1;
   }
@@ -123,9 +131,17 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
     jsonObject.addProperty(MULTI_SELECTION_PROCESSING, multiSelectionProcessing.name());
     jsonObject.addProperty(CHANNEL_CONTROL, channelControl.name());
 
+    // Original card selectors
+    List<String> cardSelectorsTypes = new ArrayList<String>(cardSelectors.size());
+    for (CardSelector<?> cardSelector : cardSelectors) {
+      cardSelectorsTypes.add(cardSelector.getClass().getName());
+    }
+    jsonObject.add(CARD_SELECTORS_TYPES, JsonUtil.getParser().toJsonTree(cardSelectorsTypes));
+    jsonObject.add(CARD_SELECTORS, JsonUtil.getParser().toJsonTree(cardSelectors));
+
     // Original card selections
     List<String> cardSelectionsTypes = new ArrayList<String>(cardSelections.size());
-    for (CardSelectionSpi cardSelection : cardSelections) {
+    for (CardSelectionExtensionSpi cardSelection : cardSelections) {
       cardSelectionsTypes.add(cardSelection.getClass().getName());
     }
     jsonObject.add(CARD_SELECTIONS_TYPES, JsonUtil.getParser().toJsonTree(cardSelectionsTypes));
@@ -134,7 +150,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
     // Default card selections
     List<CardSelectionAdapter> defaultCardSelections =
         new ArrayList<CardSelectionAdapter>(cardSelections.size());
-    for (CardSelectionSpi cardSelection : cardSelections) {
+    for (CardSelectionExtensionSpi cardSelection : cardSelections) {
       defaultCardSelections.add(new CardSelectionAdapter(cardSelection));
     }
     jsonObject.add(DEFAULT_CARD_SELECTIONS, JsonUtil.getParser().toJsonTree(defaultCardSelections));
@@ -157,6 +173,14 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
         MultiSelectionProcessing.valueOf(jsonObject.get(MULTI_SELECTION_PROCESSING).getAsString());
     channelControl = ChannelControl.valueOf(jsonObject.get(CHANNEL_CONTROL).getAsString());
 
+    // Card selectors
+    List<String> cardSelectorsTypes =
+        JsonUtil.getParser()
+            .fromJson(
+                jsonObject.get(CARD_SELECTORS_TYPES).getAsJsonArray(),
+                new TypeToken<ArrayList<String>>() {}.getType());
+    JsonArray cardSelectorsJsonArray = jsonObject.get(CARD_SELECTORS).getAsJsonArray();
+
     // Card selections
     List<String> cardSelectionsTypes =
         JsonUtil.getParser()
@@ -167,18 +191,29 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
     JsonArray defaultCardSelectionsJsonArray =
         jsonObject.get(DEFAULT_CARD_SELECTIONS).getAsJsonArray();
 
-    // Clear the current list of card selections
+    // Clear the current list of card selectors and selections
+    cardSelectors.clear();
     cardSelections.clear();
     cardSelectionRequests.clear();
 
     int index = 0;
-    for (int i = 0; i < cardSelectionsTypes.size(); i++) {
-      CardSelection cardSelection;
+    for (int i = 0; i < cardSelectorsTypes.size(); i++) {
+      CardSelector<?> cardSelector;
+      try {
+        Class<?> classOfCardSelector = Class.forName(cardSelectorsTypes.get(i));
+        cardSelector =
+            (CardSelector<?>)
+                JsonUtil.getParser().fromJson(cardSelectorsJsonArray.get(i), classOfCardSelector);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalArgumentException(
+            "Original CardSelector type " + cardSelectorsTypes.get(i) + " not found.", e);
+      }
+      CardSelectionExtension cardSelection;
       try {
         Class<?> classOfCardSelection = Class.forName(cardSelectionsTypes.get(i));
         // Original card selection
         cardSelection =
-            (CardSelection)
+            (CardSelectionExtension)
                 JsonUtil.getParser().fromJson(cardSelectionsJsonArray.get(i), classOfCardSelection);
       } catch (ClassNotFoundException e) {
         // Default card selection
@@ -191,7 +226,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
                 .fromJson(defaultCardSelectionsJsonArray.get(i), CardSelectionAdapter.class);
       }
       // Prepare selection
-      index = prepareSelection(cardSelection);
+      index = prepareSelection(cardSelector, cardSelection);
     }
     return index;
   }
@@ -213,7 +248,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
       cardSelectionResponses =
           ((AbstractReaderAdapter) reader)
               .transmitCardSelectionRequests(
-                  cardSelectionRequests, multiSelectionProcessing, channelControl);
+                  cardSelectors, cardSelectionRequests, multiSelectionProcessing, channelControl);
     } catch (ReaderBrokenCommunicationException e) {
       throw new ReaderCommunicationException(e.getMessage(), e);
     } catch (CardBrokenCommunicationException e) {
@@ -232,23 +267,21 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
   @Override
   public void scheduleCardSelectionScenario(
       ObservableCardReader observableCardReader,
-      ObservableCardReader.DetectionMode detectionMode,
       ObservableCardReader.NotificationMode notificationMode) {
 
     Assert.getInstance()
         .notNull(observableCardReader, "observableCardReader")
-        .notNull(detectionMode, "detectionMode")
         .notNull(notificationMode, "notificationMode");
 
     CardSelectionScenarioAdapter cardSelectionScenario =
         new CardSelectionScenarioAdapter(
-            cardSelectionRequests, multiSelectionProcessing, channelControl);
+            cardSelectors, cardSelectionRequests, multiSelectionProcessing, channelControl);
     if (observableCardReader instanceof ObservableLocalReaderAdapter) {
       ((ObservableLocalReaderAdapter) observableCardReader)
-          .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, detectionMode);
+          .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode);
     } else if (observableCardReader instanceof ObservableRemoteReaderAdapter) {
       ((ObservableRemoteReaderAdapter) observableCardReader)
-          .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, detectionMode);
+          .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode);
     } else {
       throw new IllegalArgumentException("Not a Keyple reader implementation.");
     }

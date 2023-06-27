@@ -15,13 +15,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
+import org.eclipse.keypop.reader.CardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ abstract class AbstractPluginAdapter implements Plugin {
   private final String pluginName;
   private final KeyplePluginExtension pluginExtension;
   private boolean isRegistered;
-  private final Map<String, Reader> readers;
+  private final Map<String, CardReader> readers;
 
   /**
    * Constructor.
@@ -49,7 +49,7 @@ abstract class AbstractPluginAdapter implements Plugin {
   AbstractPluginAdapter(String pluginName, KeyplePluginExtension pluginExtension) {
     this.pluginName = pluginName;
     this.pluginExtension = pluginExtension;
-    this.readers = new ConcurrentHashMap<String, Reader>();
+    this.readers = new ConcurrentHashMap<String, CardReader>();
   }
 
   /**
@@ -158,7 +158,7 @@ abstract class AbstractPluginAdapter implements Plugin {
    *
    * @since 2.0.0
    */
-  final Map<String, Reader> getReadersMap() {
+  final Map<String, CardReader> getReadersMap() {
     return readers;
   }
 
@@ -179,9 +179,9 @@ abstract class AbstractPluginAdapter implements Plugin {
    * @since 2.0.0
    */
   @Override
-  public final Set<Reader> getReaders() {
+  public final Set<CardReader> getReaders() {
     checkStatus();
-    return new HashSet<Reader>(readers.values());
+    return new HashSet<CardReader>(readers.values());
   }
 
   /**
@@ -190,7 +190,7 @@ abstract class AbstractPluginAdapter implements Plugin {
    * @since 2.0.0
    */
   @Override
-  public final Reader getReader(String name) {
+  public final CardReader getReader(String name) {
     checkStatus();
     return readers.get(name);
   }

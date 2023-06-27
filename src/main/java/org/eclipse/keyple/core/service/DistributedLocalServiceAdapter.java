@@ -14,23 +14,25 @@ package org.eclipse.keyple.core.service;
 import static org.eclipse.keyple.core.service.DistributedUtilAdapter.*;
 import static org.eclipse.keyple.core.service.InternalDto.*;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.*;
-import org.calypsonet.terminal.card.*;
-import org.calypsonet.terminal.card.spi.CardRequestSpi;
-import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
-import org.calypsonet.terminal.reader.CardReader;
-import org.calypsonet.terminal.reader.CardReaderEvent;
-import org.calypsonet.terminal.reader.ObservableCardReader;
-import org.calypsonet.terminal.reader.selection.spi.SmartCard;
-import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
 import org.eclipse.keyple.core.distributed.local.LocalServiceApi;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 import org.eclipse.keyple.core.util.json.BodyError;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.card.*;
+import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.card.spi.CardSelectionRequestSpi;
+import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.CardReaderEvent;
+import org.eclipse.keypop.reader.ObservableCardReader;
+import org.eclipse.keypop.reader.selection.CardSelector;
+import org.eclipse.keypop.reader.selection.spi.SmartCard;
+import org.eclipse.keypop.reader.spi.CardReaderObserverSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,6 +139,7 @@ final class DistributedLocalServiceAdapter
     }
 
     JsonObject body = new JsonObject();
+    body.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), CORE_API_LEVEL);
     body.add(JsonProperty.PLUGIN_EVENT.getKey(), JsonUtil.getParser().toJsonTree(pluginEvent));
 
     localServiceSpi.onPluginEvent(pluginEvent.getReaderNames().first(), body.toString());
@@ -160,6 +163,7 @@ final class DistributedLocalServiceAdapter
     }
 
     JsonObject body = new JsonObject();
+    body.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), CORE_API_LEVEL);
     body.add(JsonProperty.READER_EVENT.getKey(), JsonUtil.getParser().toJsonTree(readerEvent));
 
     localServiceSpi.onReaderEvent(readerEvent.getReaderName(), body.toString());
@@ -171,6 +175,11 @@ final class DistributedLocalServiceAdapter
    * @since 2.0.0
    */
   void register() {
+    int distributedApiLevel = localServiceSpi.exchangeApiLevel(CORE_API_LEVEL);
+    logger.info(
+        "Core API level: {}, Distributed API level (Local Service): {}",
+        CORE_API_LEVEL,
+        distributedApiLevel);
     isRegistered = true;
   }
 
@@ -212,6 +221,7 @@ final class DistributedLocalServiceAdapter
     private final AbstractReaderAdapter reader;
     private final JsonObject input;
     private final JsonObject output;
+    private final int inputCoreApiLevel;
 
     /**
      * Constructor.
@@ -227,6 +237,11 @@ final class DistributedLocalServiceAdapter
       }
       input = JsonUtil.getParser().fromJson(jsonData, JsonObject.class);
       output = new JsonObject();
+      if (input.has(JsonProperty.CORE_API_LEVEL.getKey())) {
+        inputCoreApiLevel = input.get(JsonProperty.CORE_API_LEVEL.getKey()).getAsInt();
+      } else {
+        inputCoreApiLevel = 1;
+      }
     }
 
     /**
@@ -256,6 +271,7 @@ final class DistributedLocalServiceAdapter
      */
     private String execute() {
 
+      output.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), inputCoreApiLevel);
       output.add(JsonProperty.SERVICE.getKey(), input.get(JsonProperty.SERVICE.getKey()));
       try {
         checkStatus();
@@ -346,6 +362,32 @@ final class DistributedLocalServiceAdapter
       ChannelControl channelControl =
           ChannelControl.valueOf(params.get(JsonProperty.CHANNEL_CONTROL.getKey()).getAsString());
 
+      // Card selectors
+      List<String> cardSelectorsTypes =
+          JsonUtil.getParser()
+              .fromJson(
+                  params.get(JsonProperty.CARD_SELECTORS_TYPES.getKey()).getAsJsonArray(),
+                  new TypeToken<ArrayList<String>>() {}.getType());
+
+      JsonArray cardSelectorsJsonArray =
+          params.get(JsonProperty.CARD_SELECTORS.getKey()).getAsJsonArray();
+
+      List<CardSelector<?>> cardSelectors =
+          new ArrayList<CardSelector<?>>(cardSelectorsTypes.size());
+      for (int i = 0; i < cardSelectorsTypes.size(); i++) {
+        CardSelector<?> cardSelector;
+        try {
+          Class<?> classOfCardSelector = Class.forName(cardSelectorsTypes.get(i));
+          cardSelector =
+              (CardSelector<?>)
+                  JsonUtil.getParser().fromJson(cardSelectorsJsonArray.get(i), classOfCardSelector);
+        } catch (ClassNotFoundException e) {
+          throw new IllegalArgumentException(
+              "Original CardSelector type " + cardSelectorsTypes.get(i) + " not found.", e);
+        }
+        cardSelectors.add(cardSelector);
+      }
+
       List<CardSelectionRequestSpi> cardSelectionRequests =
           JsonUtil.getParser()
               .fromJson(
@@ -355,7 +397,7 @@ final class DistributedLocalServiceAdapter
       // Execute the service on the reader
       List<CardSelectionResponseApi> cardSelectionResponses =
           reader.transmitCardSelectionRequests(
-              cardSelectionRequests, multiSelectionProcessing, channelControl);
+              cardSelectors, cardSelectionRequests, multiSelectionProcessing, channelControl);
 
       // Build result
       output.add(
@@ -378,20 +420,13 @@ final class DistributedLocalServiceAdapter
           ObservableCardReader.NotificationMode.valueOf(
               params.get(JsonProperty.NOTIFICATION_MODE.getKey()).getAsString());
 
-      ObservableCardReader.DetectionMode detectionMode = null;
-      if (params.has(JsonProperty.POLLING_MODE.getKey())) {
-        detectionMode =
-            ObservableCardReader.DetectionMode.valueOf(
-                params.get(JsonProperty.POLLING_MODE.getKey()).getAsString());
-      }
-
       // Execute the service on the reader
       if (reader instanceof ObservableLocalReaderAdapter) {
         ((ObservableLocalReaderAdapter) reader)
-            .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, detectionMode);
+            .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode);
       } else if (reader instanceof ObservableRemoteReaderAdapter) {
         ((ObservableRemoteReaderAdapter) reader)
-            .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode, detectionMode);
+            .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode);
       } else {
         throw new IllegalStateException(
             String.format("Reader '%s' is not observable", reader.getName()));
@@ -465,6 +500,7 @@ final class DistributedLocalServiceAdapter
 
     private final JsonObject input;
     private final JsonObject output;
+    private final int inputCoreApiLevel;
 
     /**
      * Constructor.
@@ -474,6 +510,11 @@ final class DistributedLocalServiceAdapter
     private LocalPluginExecutor(String jsonData) {
       input = JsonUtil.getParser().fromJson(jsonData, JsonObject.class);
       output = new JsonObject();
+      if (input.has(JsonProperty.CORE_API_LEVEL.getKey())) {
+        inputCoreApiLevel = input.get(JsonProperty.CORE_API_LEVEL.getKey()).getAsInt();
+      } else {
+        inputCoreApiLevel = 1;
+      }
     }
 
     /**
@@ -483,6 +524,7 @@ final class DistributedLocalServiceAdapter
      */
     private String execute() {
 
+      output.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), inputCoreApiLevel);
       output.add(JsonProperty.SERVICE.getKey(), input.get(JsonProperty.SERVICE.getKey()));
       try {
         checkStatus();

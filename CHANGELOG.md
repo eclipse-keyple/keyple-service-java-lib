@@ -5,6 +5,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+:warning: Major version! Following the migration of the "Calypsonet Terminal" APIs to the
+[Eclipse Keypop project](https://keypop.org), this library now implements Keypop interfaces.
+### Added
+- Added the method `ReaderApiFactory getReaderApiFactory()` to the `SmartCardService` interface to get an implementation
+  of the `ReaderApiFactory` Keypop interface.
+- Added a property indicating the Core JSON API level in exchanged JSON data (current value: `"coreApiLevel": 2`).
+- Added project status badges on `README.md` file.
+### Changed
+- Distributed JSON API `1.0` -> `2.0` (compatibility with previous versions remains assured for the time being)
+- Method signatures:
+    - Interface `Plugin`: `Set<Reader> getReaders()` -> `Set<CardReader> getReaders()`
+    - Interface `Plugin`: `Reader getReader(String readerName)` -> `CardReader getReader(String readerName)`
+    - Interface `PoolPlugin`: `Reader allocateReader(String readerGroupReference)`
+      -> `CardReader allocateReader(String readerGroupReference)`
+### Removed
+- Deprecated interfaces:
+    - `Reader` (replaced by `CardReader` in all methods signatures)
+    - `ObservableReader` (replaced by `ObservableCardReader`)
+    - `ConfigurableReader` (replaced by `ConfigurableCardReader`)
+    - `ReaderEvent` (replaced by `CardReaderEvent`)
+- Method `SmartCardService.createCardSelectionManager()` (now provided by the `ReaderApiFactory` Keypop interface)
+### Fixed
+- CI: code coverage report when releasing.
+### Upgraded
+- Calypsonet Terminal Reader API `1.3.0` -> Keypop Reader API `2.0.0`
+- Calypsonet Terminal Card API `1.0.0` -> Keypop Card API `2.0.0`
+- Keyple Distributed Local API `2.0.0` -> `2.1.0`
+- Keyple Distributed Remote API `2.1.0` -> `3.0.0`
 
 ## [2.3.2] - 2023-11-13
 ### Fixed

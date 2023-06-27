@@ -22,10 +22,10 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> The type of the observers ({@link
  *     org.eclipse.keyple.core.service.spi.PluginObserverSpi} or {@link
- *     org.calypsonet.terminal.reader.spi.CardReaderObserverSpi}).
+ *     org.eclipse.keypop.reader.spi.CardReaderObserverSpi}).
  * @param <S> The type of the exception handler to use during the observation process ({@link
  *     org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi} or {@link
- *     org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi}).
+ *     org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi}).
  * @since 2.0.0
  */
 final class ObservationManagerAdapter<T, S> {

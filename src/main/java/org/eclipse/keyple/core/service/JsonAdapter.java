@@ -19,7 +19,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
-import org.calypsonet.terminal.card.AbstractApduException;
+import org.eclipse.keypop.card.AbstractApduException;
 
 /**
  * Contains all JSON adapters used for serialization and deserialization processes.<br>
@@ -57,7 +57,7 @@ final class JsonAdapter {
   }
 
   /**
-   * JSON deserializer of a {@link org.calypsonet.terminal.card.CardSelectionResponseApi}.
+   * JSON deserializer of a {@link org.eclipse.keypop.card.CardSelectionResponseApi}.
    *
    * @since 2.3.0
    */
@@ -78,7 +78,7 @@ final class JsonAdapter {
   }
 
   /**
-   * JSON deserializer of a {@link org.calypsonet.terminal.card.CardResponseApi}.
+   * JSON deserializer of a {@link org.eclipse.keypop.card.CardResponseApi}.
    *
    * @since 2.3.0
    */
@@ -99,7 +99,7 @@ final class JsonAdapter {
   }
 
   /**
-   * JSON serializer/deserializer of a {@link org.calypsonet.terminal.card.ApduResponseApi}.
+   * JSON serializer/deserializer of a {@link org.eclipse.keypop.card.ApduResponseApi}.
    *
    * @since 2.0.0
    */

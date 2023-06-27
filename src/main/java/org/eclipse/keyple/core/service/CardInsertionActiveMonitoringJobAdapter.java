@@ -12,7 +12,7 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.calypsonet.terminal.reader.CardReader;
+import org.eclipse.keypop.reader.CardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  *
  * <p>All runtime exceptions that may occur during the monitoring process are caught and notified at
  * the application level through the {@link
- * org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi} mechanism.
+ * org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi} mechanism.
  *
  * @since 2.0.0
  */
@@ -33,7 +33,7 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
 
   private final long sleepDurationMillis;
   private final boolean monitorInsertion;
-  private final Reader reader;
+  private final CardReader reader;
   private final AtomicBoolean loop = new AtomicBoolean();
 
   /**

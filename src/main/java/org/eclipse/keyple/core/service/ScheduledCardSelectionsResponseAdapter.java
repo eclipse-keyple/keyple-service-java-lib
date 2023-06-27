@@ -12,8 +12,8 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.List;
-import org.calypsonet.terminal.card.CardSelectionResponseApi;
-import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
+import org.eclipse.keypop.card.CardSelectionResponseApi;
+import org.eclipse.keypop.reader.selection.ScheduledCardSelectionsResponse;
 
 /**
  * POJO containing the card selection responses received during the card selection process.

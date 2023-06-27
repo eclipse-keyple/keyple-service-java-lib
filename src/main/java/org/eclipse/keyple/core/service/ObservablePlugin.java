@@ -11,9 +11,9 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.service.spi.PluginObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
+import org.eclipse.keypop.reader.CardReader;
 
 /**
  * Plugin able to observe the connection/disconnection of {@link CardReader}.

@@ -76,7 +76,7 @@ public class AutonomousObservableLocalPluginAdapterTest {
     assertThat(event.getReaderNames()).contains(READER_NAME_1);
     assertThat(event.getPluginName()).isEqualTo(PLUGIN_NAME);
 
-    assertThat(plugin.getReaderNames().size()).isEqualTo(1);
+    assertThat(plugin.getReaderNames()).hasSize(1);
     assertThat(plugin.getReaderNames()).contains(READER_NAME_1);
   }
 
@@ -99,7 +99,7 @@ public class AutonomousObservableLocalPluginAdapterTest {
     assertThat(event.getReaderNames()).contains(READER_NAME_1);
     assertThat(event.getPluginName()).isEqualTo(PLUGIN_NAME);
 
-    assertThat(plugin.getReaderNames().size()).isEqualTo(0);
+    assertThat(plugin.getReaderNames()).isEmpty();
   }
 
   /*

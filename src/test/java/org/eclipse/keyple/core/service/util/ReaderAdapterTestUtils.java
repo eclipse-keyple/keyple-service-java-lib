@@ -18,10 +18,6 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.calypsonet.terminal.card.ApduResponseApi;
-import org.calypsonet.terminal.card.CardResponseApi;
-import org.calypsonet.terminal.card.CardSelectionResponseApi;
-import org.calypsonet.terminal.card.spi.CardSelectorSpi;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
@@ -31,6 +27,9 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterAsynchronousSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterAsynchronousSpi;
 import org.eclipse.keyple.core.util.HexUtil;
+import org.eclipse.keypop.card.ApduResponseApi;
+import org.eclipse.keypop.card.CardResponseApi;
+import org.eclipse.keypop.card.CardSelectionResponseApi;
 import org.mockito.Mockito;
 
 public class ReaderAdapterTestUtils {
@@ -57,8 +56,6 @@ public class ReaderAdapterTestUtils {
           ControllableReaderSpiMock {}
 
   public interface ReaderSpiMock extends KeypleReaderExtension, ReaderSpi, ConfigurableReaderSpi {}
-
-  public interface CardSelectorMock extends CardSelectorSpi {}
 
   public static ReaderSpiMock getReaderSpi() throws ReaderIOException, CardIOException {
     ReaderSpiMock readerSpi = mock(ReaderSpiMock.class);
@@ -92,16 +89,6 @@ public class ReaderAdapterTestUtils {
     when(readerSpi.isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
     when(readerSpi.isCurrentProtocol(CARD_PROTOCOL)).thenReturn(true);
     return readerSpi;
-  }
-
-  public static CardSelectorMock getCardSelectorSpi() {
-    CardSelectorMock cardSelector = mock(CardSelectorMock.class);
-    when(cardSelector.getFileOccurrence()).thenReturn(CardSelectorSpi.FileOccurrence.FIRST);
-    when(cardSelector.getFileControlInformation())
-        .thenReturn(CardSelectorSpi.FileControlInformation.FCI);
-    when(cardSelector.getSuccessfulSelectionStatusWords())
-        .thenReturn(Collections.singleton(0x9000));
-    return cardSelector;
   }
 
   public static CardSelectionResponseApi getMatchingResponse() {

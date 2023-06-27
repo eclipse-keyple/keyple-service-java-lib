@@ -17,11 +17,11 @@ import static org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils.READER
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import org.calypsonet.terminal.reader.CardReaderEvent;
-import org.calypsonet.terminal.reader.ObservableCardReader;
-import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.util.ControllableReaderSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
+import org.eclipse.keypop.reader.CardReaderEvent;
+import org.eclipse.keypop.reader.ObservableCardReader;
+import org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.slf4j.Logger;
 
 public class ObservableLocalReaderSuite {
@@ -62,7 +62,7 @@ public class ObservableLocalReaderSuite {
   public void removeLastObserver_shoul_StopDetection() {
     addFirstObserver_should_startDetection();
     reader.removeObserver(observer);
-    assertThat(reader.countObservers()).isEqualTo(0);
+    assertThat(reader.countObservers()).isZero();
 
     // state is not changed
     assertThat(reader.getCurrentMonitoringState())
@@ -72,7 +72,7 @@ public class ObservableLocalReaderSuite {
   public void clearObservers_shouldRemove_allObservers() {
     addFirstObserver_should_startDetection();
     reader.clearObservers();
-    assertThat(reader.countObservers()).isEqualTo(0);
+    assertThat(reader.countObservers()).isZero();
   }
 
   public void insertCard_onWaitForCard_shouldNotify_CardInsertedEvent() {

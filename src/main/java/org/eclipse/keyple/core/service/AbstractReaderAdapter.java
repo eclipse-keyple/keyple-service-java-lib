@@ -12,11 +12,13 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.List;
-import org.calypsonet.terminal.card.*;
-import org.calypsonet.terminal.card.spi.CardRequestSpi;
-import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.util.Assert;
+import org.eclipse.keypop.card.*;
+import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.card.spi.CardSelectionRequestSpi;
+import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.selection.CardSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +27,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0.0
  */
-abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
+abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractReaderAdapter.class);
 
@@ -52,7 +54,6 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
   }
 
   /**
-   * (package-private) <br>
    * Gets the plugin name.
    *
    * @return A not empty String.
@@ -73,6 +74,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * At the end of the treatment of each case, the channel is left open or is closed according to
    * the channel control policy.
    *
+   * @param cardSelectors A list of {@link CardSelector}.
    * @param cardSelectionRequests A list of selection cases composed of one or more {@link
    *     CardSelectionRequestSpi}.
    * @param multiSelectionProcessing The multi selection policy.
@@ -83,6 +85,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * @since 2.0.0
    */
   final List<CardSelectionResponseApi> transmitCardSelectionRequests(
+      List<CardSelector<?>> cardSelectors,
       List<CardSelectionRequestSpi> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
@@ -106,7 +109,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
     try {
       cardSelectionResponses =
           processCardSelectionRequests(
-              cardSelectionRequests, multiSelectionProcessing, channelControl);
+              cardSelectors, cardSelectionRequests, multiSelectionProcessing, channelControl);
     } catch (UnexpectedStatusWordException e) {
       throw new CardBrokenCommunicationException(
           e.getCardResponse(), false, "An unexpected status word was received.", e);
@@ -162,6 +165,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
   /**
    * Abstract method performing the actual card selection process.
    *
+   * @param cardSelectors A list of {@link CardSelector}.
    * @param cardSelectionRequests A list of selection cases composed of one or more {@link
    *     CardSelectionRequestSpi}.
    * @param multiSelectionProcessing The multi selection policy.
@@ -174,6 +178,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * @since 2.0.0
    */
   abstract List<CardSelectionResponseApi> processCardSelectionRequests(
+      List<CardSelector<?>> cardSelectors,
       List<CardSelectionRequestSpi> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
@@ -223,7 +228,7 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    * @since 2.0.0
    */
   @Override
-  public CardResponseApi transmitCardRequest(
+  public final CardResponseApi transmitCardRequest(
       CardRequestSpi cardRequest, ChannelControl channelControl)
       throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
           UnexpectedStatusWordException {
