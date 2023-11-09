@@ -13,33 +13,29 @@ package org.eclipse.keyple.core.service.util;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
-import org.eclipse.keyple.core.plugin.CardIOException;
-import org.eclipse.keyple.core.plugin.ReaderIOException;
-import org.eclipse.keyple.core.plugin.WaitForCardInsertionAutonomousReaderApi;
-import org.eclipse.keyple.core.plugin.WaitForCardRemovalAutonomousReaderApi;
+import org.eclipse.keyple.core.plugin.CardInsertionWaiterAsynchronousApi;
+import org.eclipse.keyple.core.plugin.CardRemovalWaiterAsynchronousApi;
 import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionAutonomousSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.DontWaitForCardRemovalDuringProcessingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalAutonomousSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterAsynchronousSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterAsynchronousSpi;
 
-public class ObservableReaderAutonomousSpiMock
+public class ObservableReaderAsynchronousSpiMock
     implements KeypleReaderExtension,
         ConfigurableReaderSpi,
         ObservableReaderSpi,
-        WaitForCardInsertionAutonomousSpi,
-        WaitForCardRemovalAutonomousSpi,
-        DontWaitForCardRemovalDuringProcessingSpi,
+        CardInsertionWaiterAsynchronousSpi,
+        CardRemovalWaiterAsynchronousSpi,
         ControllableReaderSpiMock {
 
-  WaitForCardInsertionAutonomousReaderApi waitForCardInsertionAutonomousReaderApi;
-  WaitForCardRemovalAutonomousReaderApi waitForCardRemovalAutonomousReaderApi;
+  CardInsertionWaiterAsynchronousApi cardInsertionWaiterAsynchronousApi;
+  CardRemovalWaiterAsynchronousApi cardRemovalWaiterAsynchronousApi;
   boolean detectionStarted;
   boolean physicalChannelOpen;
   AtomicBoolean cardPresent;
   String name;
 
-  public ObservableReaderAutonomousSpiMock(String name) {
+  public ObservableReaderAsynchronousSpiMock(String name) {
     this.detectionStarted = false;
     this.name = name;
     this.physicalChannelOpen = false;
@@ -78,12 +74,12 @@ public class ObservableReaderAutonomousSpiMock
   }
 
   @Override
-  public void openPhysicalChannel() throws ReaderIOException, CardIOException {
+  public void openPhysicalChannel() {
     physicalChannelOpen = true;
   }
 
   @Override
-  public void closePhysicalChannel() throws ReaderIOException {
+  public void closePhysicalChannel() {
     physicalChannelOpen = false;
   }
 
@@ -93,7 +89,7 @@ public class ObservableReaderAutonomousSpiMock
   }
 
   @Override
-  public boolean checkCardPresence() throws ReaderIOException {
+  public boolean checkCardPresence() {
     return cardPresent.get();
   }
 
@@ -103,7 +99,7 @@ public class ObservableReaderAutonomousSpiMock
   }
 
   @Override
-  public byte[] transmitApdu(byte[] apduIn) throws ReaderIOException, CardIOException {
+  public byte[] transmitApdu(byte[] apduIn) {
     return new byte[0];
   }
 
@@ -116,22 +112,21 @@ public class ObservableReaderAutonomousSpiMock
   public void onUnregister() {}
 
   @Override
-  public void connect(
-      WaitForCardInsertionAutonomousReaderApi waitForCardInsertionAutonomousReaderApi) {
-    this.waitForCardInsertionAutonomousReaderApi = waitForCardInsertionAutonomousReaderApi;
+  public void setCallback(CardInsertionWaiterAsynchronousApi callback) {
+    this.cardInsertionWaiterAsynchronousApi = callback;
   }
 
   @Override
-  public void connect(WaitForCardRemovalAutonomousReaderApi waitForCardRemovalAutonomousReaderApi) {
-    this.waitForCardRemovalAutonomousReaderApi = waitForCardRemovalAutonomousReaderApi;
+  public void setCallback(CardRemovalWaiterAsynchronousApi callback) {
+    this.cardRemovalWaiterAsynchronousApi = callback;
   }
 
   public void setCardPresent(boolean cardPresent) {
     this.cardPresent.set(cardPresent);
     if (cardPresent) {
-      waitForCardInsertionAutonomousReaderApi.onCardInserted();
+      cardInsertionWaiterAsynchronousApi.onCardInserted();
     } else {
-      waitForCardRemovalAutonomousReaderApi.onCardRemoved();
+      cardRemovalWaiterAsynchronousApi.onCardRemoved();
     }
   }
 }

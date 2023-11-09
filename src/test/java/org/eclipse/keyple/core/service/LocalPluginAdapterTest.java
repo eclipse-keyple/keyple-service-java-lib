@@ -23,9 +23,8 @@ import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.PluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionBlockingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.DontWaitForCardRemovalDuringProcessingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalBlockingSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterBlockingSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterBlockingSpi;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,9 +41,8 @@ public class LocalPluginAdapterTest {
   interface ObservableReaderSpiMock
       extends KeypleReaderExtension,
           ObservableReaderSpi,
-          WaitForCardInsertionBlockingSpi,
-          WaitForCardRemovalBlockingSpi,
-          DontWaitForCardRemovalDuringProcessingSpi {}
+          CardInsertionWaiterBlockingSpi,
+          CardRemovalWaiterBlockingSpi {}
 
   @Before
   public void setUp() throws Exception {

@@ -28,7 +28,7 @@ import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.calypsonet.terminal.reader.CardReaderEvent;
 import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
-import org.eclipse.keyple.core.service.util.ObservableReaderAutonomousSpiMock;
+import org.eclipse.keyple.core.service.util.ObservableReaderAsynchronousSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class ObservableLocalReaderSelectionScenarioTest {
       LoggerFactory.getLogger(ObservableLocalReaderSelectionScenarioTest.class);
 
   ObservableLocalReaderAdapter readerSpy;
-  ObservableReaderAutonomousSpiMock readerSpi;
+  ObservableReaderAsynchronousSpiMock readerSpi;
   ReaderObserverSpiMock observer;
   CardReaderObservationExceptionHandlerSpi handler;
   ObservableLocalReaderSuite testSuite;
@@ -51,12 +51,10 @@ public class ObservableLocalReaderSelectionScenarioTest {
   CardSelectionResponseApi cardSelectionResponseApi;
   CardResponseApi cardResponseApi;
   ReaderEvent event;
-  /*
-   *  With ObservableReaderAutonomousSpi
-   */
+
   @Before
   public void seTup() {
-    readerSpi = Mockito.spy(new ObservableReaderAutonomousSpiMock(READER_NAME));
+    readerSpi = Mockito.spy(new ObservableReaderAsynchronousSpiMock(READER_NAME));
     handler = Mockito.spy(CardReaderObservationExceptionHandlerSpi.class);
     readerSpy = spy(new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME));
     observer = new ReaderObserverSpiMock(null);

@@ -38,14 +38,8 @@ public class ObservableLocalReaderNonBlockingAdapterTest {
   CardReaderObservationExceptionHandlerSpi handler;
   ObservableLocalReaderSuite testSuite;
 
-  /*
-  *  With
-       WaitForCardInsertionNonBlockingSpi,
-       WaitForCardRemovalNonBlockingSpi,
-       DontWaitForCardRemovalDuringProcessingSpi,
-  */
   @Before
-  public void seTup() {
+  public void setup() {
     readerSpi = new ObservableReaderNonBlockingSpiMock(READER_NAME);
     handler = mock(CardReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);

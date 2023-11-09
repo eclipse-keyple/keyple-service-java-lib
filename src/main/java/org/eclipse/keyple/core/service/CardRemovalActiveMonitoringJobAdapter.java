@@ -40,19 +40,19 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
       LoggerFactory.getLogger(CardRemovalActiveMonitoringJobAdapter.class);
 
   private final AtomicBoolean loop = new AtomicBoolean();
-  private final long cycleDurationMillis;
+  private final long sleepDurationMillis;
 
   /**
    * Create a job monitor job that ping the card with the method isCardPresentPing()
    *
    * @param reader reference to the reader
-   * @param cycleDurationMillis delay between between each APDU sending
+   * @param sleepDurationMillis delay between between each APDU sending
    * @since 2.0.0
    */
   public CardRemovalActiveMonitoringJobAdapter(
-      ObservableLocalReaderAdapter reader, long cycleDurationMillis) {
+      ObservableLocalReaderAdapter reader, long sleepDurationMillis) {
     super(reader);
-    this.cycleDurationMillis = cycleDurationMillis;
+    this.sleepDurationMillis = sleepDurationMillis;
   }
 
   /**
@@ -97,7 +97,7 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
             }
             try {
               // wait a bit
-              Thread.sleep(cycleDurationMillis);
+              Thread.sleep(sleepDurationMillis);
             } catch (InterruptedException ignored) {
               // Restore interrupted state...
               Thread.currentThread().interrupt();

@@ -362,8 +362,6 @@ public class LocalReaderAdapterTest {
     assertThat(localReaderAdapter.isLogicalChannelOpen()).isFalse();
   }
 
-  // todo: selectByAid with AutonomousSelectionReaderSpi
-
   /*
    * Transmit card request
    */

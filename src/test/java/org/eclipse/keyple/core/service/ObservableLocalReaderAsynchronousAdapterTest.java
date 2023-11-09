@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 import org.calypsonet.terminal.card.*;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
-import org.eclipse.keyple.core.service.util.ObservableReaderAutonomousSpiMock;
+import org.eclipse.keyple.core.service.util.ObservableReaderAsynchronousSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
 import org.junit.After;
 import org.junit.Before;
@@ -29,12 +29,12 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ObservableLocalReaderAutonomousAdapterTest {
+public class ObservableLocalReaderAsynchronousAdapterTest {
   private static final Logger logger =
-      LoggerFactory.getLogger(ObservableLocalReaderAutonomousAdapterTest.class);
+      LoggerFactory.getLogger(ObservableLocalReaderAsynchronousAdapterTest.class);
 
   ObservableLocalReaderAdapter reader;
-  ObservableReaderAutonomousSpiMock readerSpi;
+  ObservableReaderAsynchronousSpiMock readerSpi;
   ReaderObserverSpiMock observer;
   CardReaderObservationExceptionHandlerSpi handler;
   ObservableLocalReaderSuite testSuite;
@@ -44,13 +44,11 @@ public class ObservableLocalReaderAutonomousAdapterTest {
   CardSelectionResponseApi cardSelectionResponseApi;
   CardResponseApi cardResponseApi;
   ReaderEvent event;
-  /*
-   *  With ObservableReaderAutonomousSpi
-   */
+
   @Before
   public void seTup() {
     notificationExecutorService = Executors.newSingleThreadExecutor();
-    readerSpi = Mockito.spy(new ObservableReaderAutonomousSpiMock(READER_NAME));
+    readerSpi = Mockito.spy(new ObservableReaderAsynchronousSpiMock(READER_NAME));
     handler = Mockito.spy(CardReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
     observer = new ReaderObserverSpiMock(null);

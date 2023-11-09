@@ -41,7 +41,12 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
   AutonomousObservableLocalPluginAdapter(
       AutonomousObservablePluginSpi autonomousObservablePluginSpi) {
     super(autonomousObservablePluginSpi);
-    autonomousObservablePluginSpi.connect(this);
+    try {
+      autonomousObservablePluginSpi.setCallback(this);
+    } catch (Throwable e) {
+      logger.trace("Method 'setCallback' unavailable in legacy plugin: {}", e.getMessage());
+      autonomousObservablePluginSpi.connect(this);
+    }
   }
 
   /**

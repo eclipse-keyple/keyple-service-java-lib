@@ -15,14 +15,8 @@ import java.util.EnumMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionAutonomousSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionBlockingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionNonBlockingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.DontWaitForCardRemovalDuringProcessingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.WaitForCardRemovalDuringProcessingBlockingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalAutonomousSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalBlockingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalNonBlockingSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.*;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +63,7 @@ final class ObservableReaderStateServiceAdapter {
             AbstractObservableStateAdapter.MonitoringState.class);
     this.executorService = Executors.newSingleThreadExecutor();
 
-    // initialize states for each cases:
+    // initialize states for each case:
 
     // wait for start
     this.states.put(
@@ -77,18 +71,26 @@ final class ObservableReaderStateServiceAdapter {
         new WaitForStartDetectStateAdapter(this.reader));
 
     // insertion
-    if (readerSpi instanceof WaitForCardInsertionAutonomousSpi) {
+    if (readerSpi instanceof CardInsertionWaiterAsynchronousSpi
+        || readerSpi instanceof WaitForCardInsertionAutonomousSpi) {
       this.states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION,
           new WaitForCardInsertionStateAdapter(this.reader));
-    } else if (readerSpi instanceof WaitForCardInsertionNonBlockingSpi) {
+    } else if (readerSpi instanceof CardInsertionWaiterNonBlockingSpi
+        || readerSpi instanceof WaitForCardInsertionNonBlockingSpi) {
+      int sleepDurationMillis =
+          readerSpi instanceof CardInsertionWaiterNonBlockingSpi
+              ? ((CardInsertionWaiterNonBlockingSpi) readerSpi)
+                  .getCardInsertionMonitoringSleepDuration()
+              : 200;
       CardInsertionActiveMonitoringJobAdapter cardInsertionActiveMonitoringJobAdapter =
-          new CardInsertionActiveMonitoringJobAdapter(reader, 200, true);
+          new CardInsertionActiveMonitoringJobAdapter(reader, sleepDurationMillis, true);
       this.states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION,
           new WaitForCardInsertionStateAdapter(
               this.reader, cardInsertionActiveMonitoringJobAdapter, this.executorService));
-    } else if (readerSpi instanceof WaitForCardInsertionBlockingSpi) {
+    } else if (readerSpi instanceof CardInsertionWaiterBlockingSpi
+        || readerSpi instanceof WaitForCardInsertionBlockingSpi) {
       final CardInsertionPassiveMonitoringJobAdapter cardInsertionPassiveMonitoringJobAdapter =
           new CardInsertionPassiveMonitoringJobAdapter(reader);
       states.put(
@@ -101,36 +103,32 @@ final class ObservableReaderStateServiceAdapter {
     }
 
     // processing
-    if (readerSpi instanceof WaitForCardRemovalDuringProcessingBlockingSpi) {
-      final CardRemovalPassiveMonitoringJobAdapter cardRemovalPassiveMonitoringJobAdapter =
-          new CardRemovalPassiveMonitoringJobAdapter(reader);
-      this.states.put(
-          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING,
-          new WaitForCardProcessingStateAdapter(
-              this.reader, cardRemovalPassiveMonitoringJobAdapter, this.executorService));
-    } else if (readerSpi instanceof DontWaitForCardRemovalDuringProcessingSpi) {
-      this.states.put(
-          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING,
-          new WaitForCardProcessingStateAdapter(this.reader));
-    } else {
-      throw new IllegalStateException(
-          "Reader should implement implement a Wait/DontWait ForCardRemovalDuringProcessing interface.");
-    }
+    this.states.put(
+        AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING,
+        new WaitForCardProcessingStateAdapter(this.reader));
 
     // removal
-    if (readerSpi instanceof WaitForCardRemovalAutonomousSpi) {
+    if (readerSpi instanceof CardRemovalWaiterAsynchronousSpi
+        || readerSpi instanceof WaitForCardRemovalAutonomousSpi) {
       this.states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_REMOVAL,
           new WaitForCardRemovalStateAdapter(this.reader));
 
-    } else if (readerSpi instanceof WaitForCardRemovalNonBlockingSpi) {
+    } else if (readerSpi instanceof CardRemovalWaiterNonBlockingSpi
+        || readerSpi instanceof WaitForCardRemovalNonBlockingSpi) {
+      int sleepDurationMillis =
+          readerSpi instanceof CardRemovalWaiterNonBlockingSpi
+              ? ((CardRemovalWaiterNonBlockingSpi) readerSpi)
+                  .getCardRemovalMonitoringSleepDuration()
+              : 200;
       CardRemovalActiveMonitoringJobAdapter cardRemovalActiveMonitoringJobAdapter =
-          new CardRemovalActiveMonitoringJobAdapter(this.reader, 200);
+          new CardRemovalActiveMonitoringJobAdapter(this.reader, sleepDurationMillis);
       this.states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_REMOVAL,
           new WaitForCardRemovalStateAdapter(
               this.reader, cardRemovalActiveMonitoringJobAdapter, this.executorService));
-    } else if (readerSpi instanceof WaitForCardRemovalBlockingSpi) {
+    } else if (readerSpi instanceof CardRemovalWaiterBlockingSpi
+        || readerSpi instanceof WaitForCardRemovalBlockingSpi) {
       final CardRemovalPassiveMonitoringJobAdapter cardRemovalPassiveMonitoringJobAdapter =
           new CardRemovalPassiveMonitoringJobAdapter(reader);
       states.put(
