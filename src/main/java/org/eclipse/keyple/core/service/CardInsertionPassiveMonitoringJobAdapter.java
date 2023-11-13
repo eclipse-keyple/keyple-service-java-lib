@@ -13,17 +13,20 @@ package org.eclipse.keyple.core.service;
 
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.TaskCanceledException;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterBlockingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionBlockingSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Detect the card insertion thanks to the method {@link
- * WaitForCardInsertionBlockingSpi#waitForCardPresent()}.
+ * CardInsertionWaiterBlockingSpi#waitForCardInsertion()} or {@link
+ * WaitForCardInsertionBlockingSpi#waitForCardInsertion()}.
  *
  * <p>This method is invoked in another thread.
  *
- * <p>The job waits indefinitely for the waitForCardPresent method to return unless the {@link
+ * <p>The job waits indefinitely for the waitForCardInsertion method to return unless the {@link
  * #stop()} method is invoked. In this case, the job is aborted.
  *
  * <p>When a card is present, an internal CARD_INSERTED event is fired.
@@ -38,7 +41,7 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
   private static final Logger logger =
       LoggerFactory.getLogger(CardInsertionPassiveMonitoringJobAdapter.class);
 
-  private final WaitForCardInsertionBlockingSpi readerSpi;
+  private final ObservableReaderSpi readerSpi;
 
   /**
    * Constructor.
@@ -48,7 +51,7 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
    */
   CardInsertionPassiveMonitoringJobAdapter(ObservableLocalReaderAdapter reader) {
     super(reader);
-    this.readerSpi = (WaitForCardInsertionBlockingSpi) reader.getObservableReaderSpi();
+    readerSpi = reader.getObservableReaderSpi();
   }
 
   /**
@@ -72,21 +75,22 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
       @Override
       public void run() {
         try {
-          while (!Thread.currentThread().isInterrupted()) {
-            try {
-              readerSpi.waitForCardInsertion();
-              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
-              break;
-            } catch (ReaderIOException e) {
-              // just warn as it can be a disconnection of the reader.
-              logger.warn(
-                  "[{}] waitForCardPresent => Error while processing card insertion event",
-                  getReader().getName());
-              break;
-            } catch (TaskCanceledException e) {
-              break;
-            }
+          if (readerSpi instanceof CardInsertionWaiterBlockingSpi) {
+            ((CardInsertionWaiterBlockingSpi) readerSpi).waitForCardInsertion();
+          } else if (readerSpi instanceof WaitForCardInsertionBlockingSpi) {
+            ((WaitForCardInsertionBlockingSpi) readerSpi).waitForCardInsertion();
           }
+          monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
+        } catch (ReaderIOException e) {
+          // just warn as it can be a disconnection of the reader.
+          logger.warn(
+              "[{}] waitForCardPresent => Error while processing card insertion event",
+              getReader().getName());
+        } catch (TaskCanceledException e) {
+          logger.warn(
+              "[{}] waitForCardPresent => task canceled: {}",
+              getReader().getName(),
+              e.getMessage());
         } catch (RuntimeException e) {
           getReader()
               .getObservationExceptionHandler()
@@ -106,6 +110,10 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
     if (logger.isTraceEnabled()) {
       logger.trace("[{}] stopWaitForCard on reader", getReader().getName());
     }
-    readerSpi.stopWaitForCardInsertion();
+    if (readerSpi instanceof CardInsertionWaiterBlockingSpi) {
+      ((CardInsertionWaiterBlockingSpi) readerSpi).stopWaitForCardInsertion();
+    } else if (readerSpi instanceof WaitForCardInsertionBlockingSpi) {
+      ((WaitForCardInsertionBlockingSpi) readerSpi).stopWaitForCardInsertion();
+    }
   }
 }

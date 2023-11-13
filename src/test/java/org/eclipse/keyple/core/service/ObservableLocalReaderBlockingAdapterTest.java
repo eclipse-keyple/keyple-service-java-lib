@@ -38,14 +38,8 @@ public class ObservableLocalReaderBlockingAdapterTest {
   long waitInsertion = 1000;
   long waitRemoval = 1000;
 
-  /*
-   *  With
-   * WaitForCardInsertionBlockingSpi,
-   * WaitForCardRemovalBlockingSpi,
-   * WaitForCardRemovalDuringProcessingBlockingSpi
-   */
   @Before
-  public void seTup() {
+  public void setUp() {
     readerSpi = new ObservableReaderBlockingSpiMock(READER_NAME, waitInsertion, waitRemoval);
     handler = mock(CardReaderObservationExceptionHandlerSpi.class);
     reader = new ObservableLocalReaderAdapter(readerSpi, PLUGIN_NAME);
@@ -87,11 +81,5 @@ public class ObservableLocalReaderBlockingAdapterTest {
   @Test
   public void removeCard_afterFinalize_shouldNotify_CardRemoved() {
     testSuite.removeCard_afterFinalize_shouldNotify_CardRemoved();
-  }
-
-  @Test
-  public void removeCard_beforeFinalize_shouldNotify_CardRemoved() {
-    // todo flaky?, depends on what values are given for waitInsertion and waitRemoval
-    testSuite.removeCard_beforeFinalize_shouldNotify_CardRemoved();
   }
 }

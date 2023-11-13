@@ -33,7 +33,7 @@ dependencies {
     implementation("org.calypsonet.terminal:calypsonet-terminal-reader-java-api:1.3.0")
     implementation("org.calypsonet.terminal:calypsonet-terminal-card-java-api:1.0.0")
     implementation("org.eclipse.keyple:keyple-common-java-api:2.0.0")
-    implementation("org.eclipse.keyple:keyple-plugin-java-api:2.1.0")
+    implementation("org.eclipse.keyple:keyple-plugin-java-api:2.2.0-SNAPSHOT") {isChanging=true}
     implementation("org.eclipse.keyple:keyple-distributed-remote-java-api:2.1.0")
     implementation("org.eclipse.keyple:keyple-distributed-local-java-api:2.0.0")
     implementation("org.eclipse.keyple:keyple-util-java-lib:2.3.0")

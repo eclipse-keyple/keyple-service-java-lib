@@ -19,12 +19,11 @@ import org.calypsonet.terminal.reader.CardReaderEvent;
 import org.calypsonet.terminal.reader.ReaderCommunicationException;
 import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
-import org.eclipse.keyple.core.plugin.CardIOException;
-import org.eclipse.keyple.core.plugin.ReaderIOException;
-import org.eclipse.keyple.core.plugin.WaitForCardInsertionAutonomousReaderApi;
-import org.eclipse.keyple.core.plugin.WaitForCardRemovalAutonomousReaderApi;
+import org.eclipse.keyple.core.plugin.*;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterAsynchronousSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionAutonomousSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterAsynchronousSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalAutonomousSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.slf4j.Logger;
@@ -38,6 +37,8 @@ import org.slf4j.LoggerFactory;
  */
 class ObservableLocalReaderAdapter extends LocalReaderAdapter
     implements ObservableReader,
+        CardInsertionWaiterAsynchronousApi,
+        CardRemovalWaiterAsynchronousApi,
         WaitForCardInsertionAutonomousReaderApi,
         WaitForCardRemovalAutonomousReaderApi {
 
@@ -120,10 +121,14 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
     this.observationManager =
         new ObservationManagerAdapter<
             CardReaderObserverSpi, CardReaderObservationExceptionHandlerSpi>(pluginName, getName());
-    if (observableReaderSpi instanceof WaitForCardInsertionAutonomousSpi) {
+    if (observableReaderSpi instanceof CardInsertionWaiterAsynchronousSpi) {
+      ((CardInsertionWaiterAsynchronousSpi) observableReaderSpi).setCallback(this);
+    } else if (observableReaderSpi instanceof WaitForCardInsertionAutonomousSpi) {
       ((WaitForCardInsertionAutonomousSpi) observableReaderSpi).connect(this);
     }
-    if (observableReaderSpi instanceof WaitForCardRemovalAutonomousSpi) {
+    if (observableReaderSpi instanceof CardRemovalWaiterAsynchronousSpi) {
+      ((CardRemovalWaiterAsynchronousSpi) observableReaderSpi).setCallback(this);
+    } else if (observableReaderSpi instanceof WaitForCardRemovalAutonomousSpi) {
       ((WaitForCardRemovalAutonomousSpi) observableReaderSpi).connect(this);
     }
   }

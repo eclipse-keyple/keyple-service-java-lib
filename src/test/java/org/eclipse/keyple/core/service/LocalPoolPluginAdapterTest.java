@@ -26,9 +26,8 @@ import org.eclipse.keyple.core.plugin.spi.PoolPluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.PoolReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionBlockingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.DontWaitForCardRemovalDuringProcessingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalBlockingSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterBlockingSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterBlockingSpi;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,9 +51,8 @@ public class LocalPoolPluginAdapterTest {
       extends KeypleReaderExtension,
           PoolReaderSpi,
           ObservableReaderSpi,
-          WaitForCardInsertionBlockingSpi,
-          WaitForCardRemovalBlockingSpi,
-          DontWaitForCardRemovalDuringProcessingSpi {}
+          CardInsertionWaiterBlockingSpi,
+          CardRemovalWaiterBlockingSpi {}
 
   interface ReaderSpiMock extends KeypleReaderExtension, PoolReaderSpi {}
 

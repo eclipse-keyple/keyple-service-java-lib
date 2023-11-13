@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * <p>It is based on sending a neutral APDU command as long as the card is responding, an internal
  * CARD_REMOVED event is fired when the card is no longer responding.
  *
- * <p>By default a delay of 200 ms is inserted between each APDU sending .
+ * <p>By default a delay of 100 ms is inserted between each APDU sending .
  *
  * <p>All runtime exceptions that may occur during the monitoring process are caught and notified at
  * the application level through the appropriate exception handler.
@@ -40,19 +40,19 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
       LoggerFactory.getLogger(CardRemovalActiveMonitoringJobAdapter.class);
 
   private final AtomicBoolean loop = new AtomicBoolean();
-  private final long cycleDurationMillis;
+  private final long sleepDurationMillis;
 
   /**
    * Create a job monitor job that ping the card with the method isCardPresentPing()
    *
    * @param reader reference to the reader
-   * @param cycleDurationMillis delay between between each APDU sending
+   * @param sleepDurationMillis delay between between each APDU sending
    * @since 2.0.0
    */
   public CardRemovalActiveMonitoringJobAdapter(
-      ObservableLocalReaderAdapter reader, long cycleDurationMillis) {
+      ObservableLocalReaderAdapter reader, long sleepDurationMillis) {
     super(reader);
-    this.cycleDurationMillis = cycleDurationMillis;
+    this.sleepDurationMillis = sleepDurationMillis;
   }
 
   /**
@@ -97,7 +97,7 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
             }
             try {
               // wait a bit
-              Thread.sleep(cycleDurationMillis);
+              Thread.sleep(sleepDurationMillis);
             } catch (InterruptedException ignored) {
               // Restore interrupted state...
               Thread.currentThread().interrupt();

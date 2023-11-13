@@ -17,17 +17,15 @@ import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionNonBlockingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.DontWaitForCardRemovalDuringProcessingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalNonBlockingSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterNonBlockingSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterNonBlockingSpi;
 
 public class ObservableReaderNonBlockingSpiMock
     implements KeypleReaderExtension,
         ConfigurableReaderSpi,
         ObservableReaderSpi,
-        WaitForCardInsertionNonBlockingSpi,
-        WaitForCardRemovalNonBlockingSpi,
-        DontWaitForCardRemovalDuringProcessingSpi,
+        CardInsertionWaiterNonBlockingSpi,
+        CardRemovalWaiterNonBlockingSpi,
         ControllableReaderSpiMock {
 
   boolean detectionStarted;
@@ -118,5 +116,15 @@ public class ObservableReaderNonBlockingSpiMock
   @Override
   public void setCardPresent(boolean cardPresent) {
     this.cardPresent.set(cardPresent);
+  }
+
+  @Override
+  public int getCardInsertionMonitoringSleepDuration() {
+    return 10;
+  }
+
+  @Override
+  public int getCardRemovalMonitoringSleepDuration() {
+    return 10;
   }
 }

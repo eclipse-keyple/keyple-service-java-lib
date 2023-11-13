@@ -18,20 +18,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
-import org.eclipse.keyple.core.plugin.TaskCanceledException;
 import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionBlockingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.WaitForCardRemovalDuringProcessingBlockingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalBlockingSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterBlockingSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterBlockingSpi;
 
 public class ObservableReaderBlockingSpiMock
     implements KeypleReaderExtension,
         ConfigurableReaderSpi,
         ObservableReaderSpi,
-        WaitForCardInsertionBlockingSpi,
-        WaitForCardRemovalBlockingSpi,
-        WaitForCardRemovalDuringProcessingBlockingSpi,
+        CardInsertionWaiterBlockingSpi,
+        CardRemovalWaiterBlockingSpi,
         ControllableReaderSpiMock {
 
   boolean detectionStarted;
@@ -91,12 +88,12 @@ public class ObservableReaderBlockingSpiMock
   }
 
   @Override
-  public void openPhysicalChannel() throws ReaderIOException, CardIOException {
+  public void openPhysicalChannel() {
     physicalChannelOpen = true;
   }
 
   @Override
-  public void closePhysicalChannel() throws ReaderIOException {
+  public void closePhysicalChannel() {
     physicalChannelOpen = false;
   }
 
@@ -106,7 +103,7 @@ public class ObservableReaderBlockingSpiMock
   }
 
   @Override
-  public boolean checkCardPresence() throws ReaderIOException {
+  public boolean checkCardPresence() {
     return cardPresent.get();
   }
 
@@ -116,7 +113,7 @@ public class ObservableReaderBlockingSpiMock
   }
 
   @Override
-  public byte[] transmitApdu(byte[] apduIn) throws ReaderIOException, CardIOException {
+  public byte[] transmitApdu(byte[] apduIn) throws CardIOException {
     if (cardPresent.get()) {
       return new byte[0];
     } else {
@@ -136,10 +133,9 @@ public class ObservableReaderBlockingSpiMock
    * Wait for a one time card insertion
    *
    * @throws ReaderIOException
-   * @throws TaskCanceledException
    */
   @Override
-  public void waitForCardInsertion() throws ReaderIOException, TaskCanceledException {
+  public void waitForCardInsertion() throws ReaderIOException {
     try {
       // card is detected after a timeout
       sleep(waitInsertion);
@@ -158,7 +154,7 @@ public class ObservableReaderBlockingSpiMock
   }
 
   @Override
-  public void waitForCardRemoval() throws ReaderIOException, TaskCanceledException {
+  public void waitForCardRemoval() throws ReaderIOException {
     try {
       sleep(waitRemoval);
       // card removal is detected after a timeout
@@ -173,15 +169,5 @@ public class ObservableReaderBlockingSpiMock
   @Override
   public void stopWaitForCardRemoval() {
     Thread.currentThread().interrupt();
-  }
-
-  @Override
-  public void waitForCardRemovalDuringProcessing() throws ReaderIOException, TaskCanceledException {
-    waitForCardRemoval();
-  }
-
-  @Override
-  public void stopWaitForCardRemovalDuringProcessing() {
-    stopWaitForCardRemoval();
   }
 }

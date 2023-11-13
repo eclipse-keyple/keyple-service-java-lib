@@ -28,9 +28,8 @@ import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionAutonomousSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.DontWaitForCardRemovalDuringProcessingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalAutonomousSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterAsynchronousSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterAsynchronousSpi;
 import org.eclipse.keyple.core.util.HexUtil;
 import org.mockito.Mockito;
 
@@ -53,9 +52,8 @@ public class ReaderAdapterTestUtils {
       extends KeypleReaderExtension,
           ConfigurableReaderSpi,
           ObservableReaderSpi,
-          WaitForCardInsertionAutonomousSpi,
-          WaitForCardRemovalAutonomousSpi,
-          DontWaitForCardRemovalDuringProcessingSpi,
+          CardInsertionWaiterAsynchronousSpi,
+          CardRemovalWaiterAsynchronousSpi,
           ControllableReaderSpiMock {}
 
   public interface ReaderSpiMock extends KeypleReaderExtension, ReaderSpi, ConfigurableReaderSpi {}

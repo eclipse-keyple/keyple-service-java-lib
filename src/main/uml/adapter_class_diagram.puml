@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 2.3.0 (2023-05-16)
+    Keyple - Adapter of keyple-service-java-lib - 2.3.2 (2023-11-09)
 end title
 
 ' == THEME ==
@@ -344,7 +344,7 @@ package "org.eclipse.keyple.core.service" as service {
         ~<back:lightGreen>ChannelControl</back> getChannelControl ()
         ~List<<back:lightGreen>CardSelectionRequestSpi</back>> getCardSelectionRequests ()
     }
-    ~class "<<ObservableReader>>\n<<<back:pink>WaitForCardInsertionAutonomousReaderApi</back>>>\n<<<back:pink>WaitForCardRemovalAutonomousReaderApi</back>>>\nObservableLocalReaderAdapter" as ObservableLocalReaderAdapter extends LocalReaderAdapter {
+    ~class "<<ObservableReader>>\n<<<back:pink><color:blue>CardInsertionWaiterAsynchronousApi</back>>>\n<<<back:pink><color:blue>CardRemovalWaiterAsynchronousApi</back>>>\n<<<back:pink>WaitForCardInsertionAutonomousReaderApi</back>>>\n<<<back:pink>WaitForCardRemovalAutonomousReaderApi</back>>>\nObservableLocalReaderAdapter" as ObservableLocalReaderAdapter extends LocalReaderAdapter {
         --
         ~ObservableLocalReaderAdapter (<back:pink>ObservableReaderSpi</back> observableReaderSpi, String pluginName)
 

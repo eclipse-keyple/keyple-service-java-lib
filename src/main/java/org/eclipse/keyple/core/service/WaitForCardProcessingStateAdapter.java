@@ -11,7 +11,6 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import java.util.concurrent.ExecutorService;
 import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +22,6 @@ import org.slf4j.LoggerFactory;
  *
  * <ul>
  *   <li>Upon CARD_PROCESSED event, the machine changes state for WAIT_FOR_CARD_REMOVAL or
- *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableCardReader.DetectionMode}
- *       setting.
- *   <li>Upon CARD_REMOVED event, the machine changes state for WAIT_FOR_CARD_INSERTION or
  *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableCardReader.DetectionMode}
  *       setting.
  *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_CARD_DETECTION.
@@ -45,22 +41,7 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
    * @since 2.0.0
    */
   WaitForCardProcessingStateAdapter(ObservableLocalReaderAdapter reader) {
-    this(reader, null, null);
-  }
-
-  /**
-   * Creates an instance.
-   *
-   * @param reader The observable local reader adapter.
-   * @param monitoringJob The monitoring job.
-   * @param executorService The executor service to use.
-   * @since 2.0.0
-   */
-  WaitForCardProcessingStateAdapter(
-      ObservableLocalReaderAdapter reader,
-      AbstractMonitoringJobAdapter monitoringJob,
-      ExecutorService executorService) {
-    super(MonitoringState.WAIT_FOR_CARD_PROCESSING, reader, monitoringJob, executorService);
+    super(MonitoringState.WAIT_FOR_CARD_PROCESSING, reader, null, null);
   }
 
   /**
