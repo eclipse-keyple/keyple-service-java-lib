@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * <p>It is based on sending a neutral APDU command as long as the card is responding, an internal
  * CARD_REMOVED event is fired when the card is no longer responding.
  *
- * <p>By default a delay of 200 ms is inserted between each APDU sending .
+ * <p>By default a delay of 100 ms is inserted between each APDU sending .
  *
  * <p>All runtime exceptions that may occur during the monitoring process are caught and notified at
  * the application level through the appropriate exception handler.

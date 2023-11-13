@@ -82,7 +82,7 @@ final class ObservableReaderStateServiceAdapter {
           readerSpi instanceof CardInsertionWaiterNonBlockingSpi
               ? ((CardInsertionWaiterNonBlockingSpi) readerSpi)
                   .getCardInsertionMonitoringSleepDuration()
-              : 200;
+              : 100;
       CardInsertionActiveMonitoringJobAdapter cardInsertionActiveMonitoringJobAdapter =
           new CardInsertionActiveMonitoringJobAdapter(reader, sleepDurationMillis, true);
       this.states.put(
@@ -120,7 +120,7 @@ final class ObservableReaderStateServiceAdapter {
           readerSpi instanceof CardRemovalWaiterNonBlockingSpi
               ? ((CardRemovalWaiterNonBlockingSpi) readerSpi)
                   .getCardRemovalMonitoringSleepDuration()
-              : 200;
+              : 100;
       CardRemovalActiveMonitoringJobAdapter cardRemovalActiveMonitoringJobAdapter =
           new CardRemovalActiveMonitoringJobAdapter(this.reader, sleepDurationMillis);
       this.states.put(

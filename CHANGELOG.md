@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI: code coverage report when releasing.
 ### Added
 - Added project status badges on `README.md` file.
+### Changed
+- Reduced monitoring cycle for non-blocking insertion/removal interfaces (100 instead of 200 ms).
 ### Upgraded
 - Keyple Plugin API `2.1.0` -> `2.2.0` (remains compliant with plugins using the version `2.1.0`)
 
