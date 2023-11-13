@@ -5,14 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [2.3.2] - 2023-11-13
 ### Fixed
 - CI: code coverage report when releasing.
 ### Added
 - Added project status badges on `README.md` file.
 ### Changed
-- Reduced monitoring cycle for non-blocking insertion/removal interfaces (100 instead of 200 ms).
+- Reduced monitoring cycle for observable readers implementing non-blocking insertion/removal states 
+(100 ms instead of 200 ms).
 ### Upgraded
 - Keyple Plugin API `2.1.0` -> `2.2.0` (remains compliant with plugins using the version `2.1.0`)
+- Keyple Util Library `2.3.0` -> `2.3.1` (code source not impacted)
 
 ## [2.3.1] - 2023-05-30
 ### Fixed
@@ -102,7 +106,8 @@ It follows the extraction of Keyple 1.0 components contained in the `eclipse/key
 repositories.
 It also brings many major API changes.
 
-[unreleased]: https://github.com/eclipse/keyple-service-java-lib/compare/2.3.1...HEAD
+[unreleased]: https://github.com/eclipse/keyple-service-java-lib/compare/2.3.2...HEAD
+[2.3.2]: https://github.com/eclipse/keyple-service-java-lib/compare/2.3.1...2.3.2
 [2.3.1]: https://github.com/eclipse/keyple-service-java-lib/compare/2.3.0...2.3.1
 [2.3.0]: https://github.com/eclipse/keyple-service-java-lib/compare/2.2.1...2.3.0
 [2.2.1]: https://github.com/eclipse/keyple-service-java-lib/compare/2.2.0...2.2.1
