@@ -340,9 +340,9 @@ final class DistributedUtilAdapter {
     /**
      * Refers to {@link
      * ObservableLocalReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
-     * ObservableCardReader.NotificationMode, ObservableCardReader.DetectionMode)} and {@link
+     * ObservableCardReader.NotificationMode)} and {@link
      * ObservableRemoteReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
-     * ObservableCardReader.NotificationMode, ObservableCardReader.DetectionMode)}
+     * ObservableCardReader.NotificationMode)}
      *
      * @since 2.0.0
      */

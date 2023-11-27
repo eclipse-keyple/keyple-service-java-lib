@@ -53,6 +53,7 @@ public class ObservableLocalReaderSelectionScenarioTest {
   CardSelectionResponseApi cardSelectionResponseApi;
   CardResponseApi cardResponseApi;
   CardReaderEvent event;
+
   @Before
   public void seTup() {
     readerSpi = Mockito.spy(new ObservableReaderAsynchronousSpiMock(READER_NAME));

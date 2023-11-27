@@ -46,6 +46,7 @@ public class ObservableLocalReaderAsynchronousAdapterTest {
   CardSelectionResponseApi cardSelectionResponseApi;
   CardResponseApi cardResponseApi;
   CardReaderEvent event;
+
   @Before
   public void seTup() {
     notificationExecutorService = Executors.newSingleThreadExecutor();
