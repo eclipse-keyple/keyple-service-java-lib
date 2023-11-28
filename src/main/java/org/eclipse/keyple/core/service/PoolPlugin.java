@@ -12,8 +12,8 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.SortedSet;
-import org.calypsonet.terminal.reader.CardReader;
-import org.calypsonet.terminal.reader.selection.spi.SmartCard;
+import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.selection.spi.SmartCard;
 
 /**
  * Plugin able to handle the access to an undefined number of {@link CardReader}.
@@ -50,7 +50,7 @@ public interface PoolPlugin extends Plugin {
    * @throws KeyplePluginException If the allocation failed due to lack of available reader.
    * @since 2.0.0
    */
-  Reader allocateReader(String readerGroupReference);
+  CardReader allocateReader(String readerGroupReference);
 
   /**
    * Returns the selected {@link SmartCard} from a {@link CardReader}.

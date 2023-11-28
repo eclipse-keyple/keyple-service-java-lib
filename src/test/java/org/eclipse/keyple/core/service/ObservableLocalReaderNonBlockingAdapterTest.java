@@ -18,9 +18,9 @@ import static org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils.READER
 import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.TimeUnit;
-import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.util.ObservableReaderNonBlockingSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
+import org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

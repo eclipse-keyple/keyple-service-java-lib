@@ -12,7 +12,8 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.concurrent.ExecutorService;
-import org.calypsonet.terminal.reader.ObservableCardReader;
+import org.eclipse.keypop.reader.CardReaderEvent;
+import org.eclipse.keypop.reader.ObservableCardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +82,7 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
     switch (event) {
       case CARD_INSERTED:
         // process default selection if any, return an event, can be null
-        ReaderEvent cardEvent = this.getReader().processCardInserted();
+        CardReaderEvent cardEvent = this.getReader().processCardInserted();
         if (cardEvent != null) {
           // switch internal state
           switchState(MonitoringState.WAIT_FOR_CARD_PROCESSING);

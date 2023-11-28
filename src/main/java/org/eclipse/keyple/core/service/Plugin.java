@@ -12,9 +12,9 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.Set;
-import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
+import org.eclipse.keypop.reader.CardReader;
 
 /**
  * Manager for one or more {@link CardReader} from the same family.
@@ -77,7 +77,7 @@ public interface Plugin {
    * @throws IllegalStateException if the plugin is no longer registered.
    * @since 2.0.0
    */
-  Set<Reader> getReaders();
+  Set<CardReader> getReaders();
 
   /**
    * Gets the {@link CardReader} whose name is provided.
@@ -87,5 +87,5 @@ public interface Plugin {
    * @throws IllegalStateException if the plugin is no longer registered.
    * @since 2.0.0
    */
-  Reader getReader(String name);
+  CardReader getReader(String name);
 }

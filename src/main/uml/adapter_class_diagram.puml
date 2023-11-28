@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 2.3.2 (2023-11-09)
+    Keyple - Adapter of keyple-service-java-lib - 3.0.0 (2023-10-16)
 end title
 
 ' == THEME ==
@@ -55,8 +55,8 @@ legend top
     __Colors legend__ :
     * __External public API references__ :
     ** <back:cyan>**keyple-common-java-api**</back>
-    ** <back:yellow>**calypsonet-terminal-reader-java-api**</back>
-    ** <back:lightGreen>**calypsonet-terminal-card-java-api**</back>
+    ** <back:yellow>**keypop-reader-java-api**</back>
+    ** <back:lightGreen>**keypop-card-java-api**</back>
     ** <back:gold>**com.google.code.gson**</back>
     * __External private API references__ :
     ** <back:pink>**keyple-plugin-java-api**</back>
@@ -65,7 +65,8 @@ legend top
 end legend
 
 package "org.eclipse.keyple.core.service" as service {
-    +class "**final** SmartCardServiceProvider" as SmartCardServiceProvider {
+    +class "**final** SmartCardServiceProvider" as SmartCardServiceProvider <<green>> {
+        __
         ...
     }
     ' ADAPTERS
@@ -78,6 +79,27 @@ package "org.eclipse.keyple.core.service" as service {
         ...
     }
     ~class "**final** InternalDto" as InternalDto {
+        __
+        ...
+    }
+    ~class "<color:blue>**final** InternalLegacyDto" as InternalLegacyDto {
+        __
+        ...
+    }
+    ~interface "<color:blue>InternalCardSelector" as InternalCardSelector {
+        +<color:blue>String getLogicalProtocolName ()
+        +<color:blue>String getPowerOnDataRegex ()
+    }
+    ~interface "<color:blue>InternalIsoCardSelector" as InternalIsoCardSelector extends InternalCardSelector {
+        +<color:blue>byte[] getAid ()
+        +<color:blue><back:yellow>CommonIsoCardSelector.FileOccurrence</back> getFileOccurrence ()
+        +<color:blue><back:yellow>CommonIsoCardSelector.FileControlInformation</back> getFileControlInformation ()
+    }
+    ~class "<<<back:yellow>BasicCardSelector</back>>>\n**final** BasicCardSelectorAdapter" as BasicCardSelectorAdapter implements InternalCardSelector {
+        __
+        ...
+    }
+    ~class "<<<back:yellow>IsoCardSelector</back>>>\n**final** IsoCardSelectorAdapter" as IsoCardSelectorAdapter implements InternalIsoCardSelector {
         __
         ...
     }
@@ -96,7 +118,7 @@ package "org.eclipse.keyple.core.service" as service {
         +DistributedLocalService registerDistributedLocalService (<back:cyan>KeypleDistributedLocalServiceExtensionFactory</back> distributedLocalServiceFactory)
         +void unregisterDistributedLocalService (String distributedLocalServiceName)
         +DistributedLocalService getDistributedLocalService (String distributedLocalServiceName)
-        +<back:yellow>CardSelectionManager</back> createCardSelectionManager ()
+        +<color:blue><back:yellow>ReaderApiFactory</back> getReaderApiFactory ()
     }
     ' PLUGIN
     ~abstract class "<<Plugin>>\nAbstractPluginAdapter" as AbstractPluginAdapter {
@@ -105,7 +127,7 @@ package "org.eclipse.keyple.core.service" as service {
         ~AbstractPluginAdapter (String pluginName, <back:cyan>KeyplePluginExtension</back> pluginExtension)
 
         ~**final** LocalReaderAdapter buildLocalReaderAdapter (ReaderSpi readerSpi)
-        ~**final** Map<String, Reader> getReadersMap ()
+        ~**final** Map<String, <Back:Yellow>CardReader</Back>> getReadersMap ()
         ~**final** void checkStatus ()
         ~void register ()
         ~void unregister ()
@@ -114,8 +136,8 @@ package "org.eclipse.keyple.core.service" as service {
         +**final** <T extends <back:cyan>KeyplePluginExtension</back>> T getExtension (Class<T> pluginExtensionClass)
         +**final** <T extends <back:cyan>KeypleReaderExtension</back>> T getReaderExtension (Class<T> readerExtensionClass, String readerName)
         +**final** Set<String> getReaderNames ()
-        +**final** Set<Reader> getReaders ()
-        +**final** Reader getReader (String readerName)
+        +**final** Set<<Back:Yellow>CardReader</Back>> getReaders ()
+        +**final** <Back:Yellow>CardReader</Back> getReader (String readerName)
     }
     ~class LocalPluginAdapter extends AbstractPluginAdapter {
         --
@@ -141,20 +163,21 @@ package "org.eclipse.keyple.core.service" as service {
         ~void unregister ()
         -- **PoolPlugin** --
         +SortedSet<String> getReaderGroupReferences ()
-        +Reader allocateReader (String readerGroupReference)
-        +<back:yellow>SmartCard</back> getSelectedSmartCard (<back:yellow>CardReader</back> reader)
-        +void releaseReader (<back:yellow>CardReader</back> reader)
+        +<Back:Yellow>CardReader</Back> allocateReader (String readerGroupReference)
+        +<back:yellow>SmartCard</back> getSelectedSmartCard (<back:yellow>CardReader</back> <back:yellow>cardReader</back>)
+        +void releaseReader (<back:yellow>CardReader</back> <back:yellow>cardReader</back>)
     }
     ~class "<<PoolPlugin>>\n**final** RemotePoolPluginAdapter" as RemotePoolPluginAdapter extends AbstractPluginAdapter {
         --
         ~RemotePoolPluginAdapter (<back:plum>RemotePoolPluginSpi</back> remotePoolPluginSpi)
         -- **AbstractPluginAdapter** --
+        ~<color:blue>void register ()
         ~void unregister ()
         -- **PoolPlugin** --
         +SortedSet<String> getReaderGroupReferences ()
-        +Reader allocateReader (String readerGroupReference)
-        +<back:yellow>SmartCard</back> getSelectedSmartCard (<back:yellow>CardReader</back> reader)
-        +void releaseReader (<back:yellow>CardReader</back> reader)
+        +<Back:Yellow>CardReader</Back> allocateReader (String readerGroupReference)
+        +<back:yellow>SmartCard</back> getSelectedSmartCard (<back:yellow>CardReader</back> <back:yellow>cardReader</back>)
+        +void releaseReader (<back:yellow>CardReader</back> <back:yellow>cardReader</back>)
     }
     ' OBSERVATION MANAGER
     ~class "**final** ObservationManagerAdapter\n\n**T** : PluginObserverSpi\nor <back:yellow>CardReaderObserverSpi</back>\n\n**S** : PluginObservationExceptionHandlerSpi\nor <back:yellow>CardReaderObservationExceptionHandlerSpi</back>" as ObservationManagerAdapter<T, S> {
@@ -216,7 +239,7 @@ package "org.eclipse.keyple.core.service" as service {
         +void clearObservers ()
         +int countObservers ()
         -- **ObservableRemotePluginApi** --
-        +void addRemoteReader (<back:plum>RemoteReaderSpi</back> remoteReaderSpi)
+        +void addRemoteReader (<back:plum>RemoteReaderSpi</back> remoteReaderSpi, <color:blue>int clientCoreApiLevel</color>)
         +boolean removeRemoteReader (remoteReaderName)
         +void onPluginEvent (String jsonData)
     }
@@ -233,7 +256,7 @@ package "org.eclipse.keyple.core.service" as service {
         -- **PluginObserverSpi** --
         +void onPluginEvent (PluginEvent pluginEvent)
         -- **CardReaderObserverSpi** --
-        +void onReaderEvent (ReaderEvent readerEvent)
+        +void onReaderEvent (<Back:Yellow>CardReaderEvent</Back> cardReaderEvent)
         -- **LocalServiceApi** --
         +void setPoolPluginNames (String... poolPluginNames)
         +String executeLocally (String jsonData, String readerName)
@@ -249,31 +272,36 @@ package "org.eclipse.keyple.core.service" as service {
         ~{static} void throwRuntimeException (Exception e)
     }
     ~enum JsonProperty {
+        __
         ...
     }
     ~enum PluginService {
+        __
         ...
     }
     ~enum ReaderService {
+        __
         ...
     }
     ' READERS
-    ~abstract class "<<Reader>>\n<<<back:lightGreen>ProxyReaderApi</back>>>\nAbstractReaderAdapter" as AbstractReaderAdapter {
+    ~abstract class "<<<Back:Yellow>CardReader</Back>>>\n<<<back:lightGreen>ProxyReaderApi</back>>>\nAbstractReaderAdapter" as AbstractReaderAdapter {
         --
         ~AbstractReaderAdapter (String readerName, <back:cyan>KeypleReaderExtension</back> readerExtension, String pluginName)
 
         ~**final** String getPluginName ()
-        ~**final** List<<back:lightGreen>CardSelectionResponseApi</back>> transmitCardSelectionRequests (List<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
-            \tMultiSelectionProcessing multiSelectionProcessing, <back:lightGreen>ChannelControl</back> channelControl)
+        ~<color:blue>**final** List<<back:lightGreen>CardSelectionResponseApi</back>> transmitCardSelectionRequests (
+            \tList<<back:yellow>CardSelector</back><?>> cardSelectors, List<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
+            <color:blue>\tMultiSelectionProcessing multiSelectionProcessing, <back:lightGreen>ChannelControl</back> channelControl)
 
         ~**final** void checkStatus ()
         ~**final** void register ()
         ~void unregister ()
 
-        ~{abstract} **abstract** List<<back:lightGreen>CardSelectionResponseApi</back>> processCardSelectionRequests (List<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
-            \tMultiSelectionProcessing multiSelectionProcessing, <back:lightGreen>ChannelControl</back> channelControl)
+        ~<color:blue>{abstract} **abstract** List<<back:lightGreen>CardSelectionResponseApi</back>> processCardSelectionRequests (
+            \tList<<back:yellow>CardSelector</back><?>> cardSelectors, List<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
+            <color:blue>\tMultiSelectionProcessing multiSelectionProcessing, <back:lightGreen>ChannelControl</back> channelControl)
         ~{abstract} **abstract** <back:lightGreen>CardResponseApi</back> processCardRequest (<back:lightGreen>CardRequestSpi</back> cardRequest, <back:lightGreen>ChannelControl</back> channelControl)
-        -- **Reader** --
+        -- **CardReader** --
         +**final** String getName ()
         +**final** <T extends <back:cyan>KeypleReaderExtension</back>> T getExtension (Class<T> readerExtensionClass)
         -- **ProxyReaderApi** --
@@ -291,14 +319,15 @@ package "org.eclipse.keyple.core.service" as service {
         ~**final** String getCurrentPhysicalProtocolName ()
         -- **AbstractReaderAdapter** --
         ~void unregister ()
-        ~**final** List<<back:lightGreen>CardSelectionResponseApi</back>> processCardSelectionRequests (
-            \tList<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
-            \tMultiSelectionProcessing multiSelectionProcessing,
-            \t<back:lightGreen>ChannelControl</back> channelControl)
+        ~<color:blue>**final** List<<back:lightGreen>CardSelectionResponseApi</back>> processCardSelectionRequests (
+            <color:blue>\tList<<back:yellow>CardSelector</back><?>> cardSelectors,
+            <color:blue>\tList<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
+            <color:blue>\tMultiSelectionProcessing multiSelectionProcessing,
+            <color:blue>\t<back:lightGreen>ChannelControl</back> channelControl)
         ~**final** <back:lightGreen>CardResponseApi</back> processCardRequest (
             \t<back:lightGreen>CardRequestSpi</back> cardRequest,
             \t<back:lightGreen>ChannelControl</back> channelControl)
-        -- **Reader** --
+        -- **CardReader** --
         +**final** boolean isContactless ()
         +boolean isCardPresent ()
         -- **ProxyReaderApi** --
@@ -306,29 +335,32 @@ package "org.eclipse.keyple.core.service" as service {
     }
     ~class RemoteReaderAdapter extends AbstractReaderAdapter {
         --
-        ~RemoteReaderAdapter (<back:plum>RemoteReaderSpi</back> remoteReaderSpi, String pluginName, <back:yellow>SmartCard</back> selectedSmartCard)
+        ~RemoteReaderAdapter (<back:plum>RemoteReaderSpi</back> remoteReaderSpi, String pluginName,
+            \t<back:yellow>SmartCard</back> selectedSmartCard, <color:blue>int clientCoreApiLevel</color>)
 
         ~**final** <back:yellow>SmartCard</back> getSelectedSmartCard ()
+        ~<color:blue>**final** int getClientCoreApiLevel ()
         -- **AbstractReaderAdapter** --
-        ~**final** List<<back:lightGreen>CardSelectionResponseApi</back>> processCardSelectionRequests (
-            \tList<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
-            \tMultiSelectionProcessing multiSelectionProcessing,
-            \t<back:lightGreen>ChannelControl</back> channelControl)
+        ~<color:blue>**final** List<<back:lightGreen>CardSelectionResponseApi</back>> processCardSelectionRequests (
+            <color:blue>\tList<<back:yellow>CardSelector</back><?>> cardSelectors,
+            <color:blue>\tList<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
+            <color:blue>\tMultiSelectionProcessing multiSelectionProcessing,
+            <color:blue>\t<back:lightGreen>ChannelControl</back> channelControl)
         ~**final** <back:lightGreen>CardResponseApi</back> processCardRequest (
             \t<back:lightGreen>CardRequestSpi</back> cardRequest,
             \t<back:lightGreen>ChannelControl</back> channelControl)
-        -- **Reader** --
+        -- **CardReader** --
         +**final** boolean isContactless ()
         +**final** boolean isCardPresent ()
         -- **ProxyReaderApi** --
         +**final** void releaseChannel ()
     }
-    ~class "<<ConfigurableReader>>\n**final** LocalConfigurableReaderAdapter" as LocalConfigurableReaderAdapter extends LocalReaderAdapter {
+    ~class "<<<Back:Yellow>ConfigurableCardReader</Back>>>\n**final** LocalConfigurableReaderAdapter" as LocalConfigurableReaderAdapter extends LocalReaderAdapter {
         --
         ~LocalConfigurableReaderAdapter (
             \t<back:pink>ConfigurableReaderSpi</back> configurableReaderSpi,
             \tString pluginName)
-        -- **ConfigurableReader** --
+        -- **ConfigurableCardReader** --
         +void activateProtocol (String physicalProtocolName, String logicalProtocolName)
         +void deactivateProtocol (String physicalProtocolName)
         +String getCurrentProtocol ()
@@ -336,15 +368,17 @@ package "org.eclipse.keyple.core.service" as service {
     ~class "**final** CardSelectionScenarioAdapter" as CardSelectionScenarioAdapter {
         --
         ~CardSelectionScenarioAdapter (
+            \tList<<back:yellow>CardSelector</back><?>> cardSelectors,
             \tList<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
             \tMultiSelectionProcessing multiSelectionProcessing,
             \t<back:lightGreen>ChannelControl</back> channelControl)
 
+        ~List<<back:yellow>CardSelector</back><?>> getCardSelectors()
+        ~List<<back:lightGreen>CardSelectionRequestSpi</back>> getCardSelectionRequests ()
         ~MultiSelectionProcessing getMultiSelectionProcessing ()
         ~<back:lightGreen>ChannelControl</back> getChannelControl ()
-        ~List<<back:lightGreen>CardSelectionRequestSpi</back>> getCardSelectionRequests ()
     }
-    ~class "<<ObservableReader>>\n<<<back:pink><color:blue>CardInsertionWaiterAsynchronousApi</back>>>\n<<<back:pink><color:blue>CardRemovalWaiterAsynchronousApi</back>>>\n<<<back:pink>WaitForCardInsertionAutonomousReaderApi</back>>>\n<<<back:pink>WaitForCardRemovalAutonomousReaderApi</back>>>\nObservableLocalReaderAdapter" as ObservableLocalReaderAdapter extends LocalReaderAdapter {
+    ~class "<<<Back:Yellow>ObservableCardReader</Back>>>\n<<<back:pink><color:blue>CardInsertionWaiterAsynchronousApi</back>>>\n<<<back:pink><color:blue>CardRemovalWaiterAsynchronousApi</back>>>\n<<<back:pink>WaitForCardInsertionAutonomousReaderApi</back>>>\n<<<back:pink>WaitForCardRemovalAutonomousReaderApi</back>>>\nObservableLocalReaderAdapter" as ObservableLocalReaderAdapter extends LocalReaderAdapter {
         --
         ~ObservableLocalReaderAdapter (<back:pink>ObservableReaderSpi</back> observableReaderSpi, String pluginName)
 
@@ -354,18 +388,18 @@ package "org.eclipse.keyple.core.service" as service {
         ~**final** MonitoringState getCurrentMonitoringState ()
         ~**final** boolean isCardPresentPing ()
 
-        ~**final** ReaderEvent processCardInserted ()
+        ~**final** <Back:Yellow>CardReaderEvent</Back> processCardInserted ()
         ~**final** void processCardRemoved ()
         ~**final** void switchState (MonitoringState stateId)
-        ~**final** void notifyObservers (ReaderEvent event)
+        ~**final** void notifyObservers (<Back:Yellow>CardReaderEvent</Back> event)
 
         ~**final** void scheduleCardSelectionScenario (
-            \tCardSelectionScenarioAdapter cardSelectionScenario, <back:yellow>DetectionMode</back> detectionMode, <back:yellow>NotificationMode</back> notificationMode)
+            \tCardSelectionScenarioAdapter cardSelectionScenario, <back:yellow>NotificationMode</back> notificationMode)
         -- **AbstractReaderAdapter** --
         ~**final** void unregister ()
-        -- **Reader** --
+        -- **CardReader** --
         +**final** boolean isCardPresent ()
-        -- **ObservableReader** --
+        -- **ObservableCardReader** --
         +**final** void setReaderObservationExceptionHandler (<back:yellow>CardReaderObservationExceptionHandlerSpi</back> exceptionHandler)
         +**final** void addObserver (<back:yellow>CardReaderObserverSpi</back> observer)
         +**final** void removeObserver (<back:yellow>CardReaderObserverSpi</back> observer)
@@ -387,27 +421,27 @@ package "org.eclipse.keyple.core.service" as service {
         STOP_DETECT
         TIME_OUT
     }
-    ~class "<<ConfigurableReader>>\n**final** ObservableLocalConfigurableReaderAdapter" as ObservableLocalConfigurableReaderAdapter extends ObservableLocalReaderAdapter {
+    ~class "<<<Back:Yellow>ConfigurableCardReader</Back>>>\n**final** ObservableLocalConfigurableReaderAdapter" as ObservableLocalConfigurableReaderAdapter extends ObservableLocalReaderAdapter {
         --
         ~ObservableLocalConfigurableReaderAdapter (
             \t<back:pink>ConfigurableReaderSpi</back> configurableReaderSpi,
             \tString pluginName)
-        -- **ConfigurableReader** --
+        -- **ConfigurableCardReader** --
         +void activateProtocol (String physicalProtocolName, String logicalProtocolName)
         +void deactivateProtocol (String physicalProtocolName)
         +String getCurrentProtocol ()
 }
-    ~class "<<ObservableReader>>\n**final** ObservableRemoteReaderAdapter" as ObservableRemoteReaderAdapter extends RemoteReaderAdapter {
+    ~class "<<<Back:Yellow>ObservableCardReader</Back>>>\n**final** ObservableRemoteReaderAdapter" as ObservableRemoteReaderAdapter extends RemoteReaderAdapter {
         --
-        ~ObservableRemoteReaderAdapter (<back:plum>ObservableRemoteReaderSpi</back> remoteReaderSpi, String pluginName)
+        ~ObservableRemoteReaderAdapter (<back:plum>ObservableRemoteReaderSpi</back> remoteReaderSpi, String pluginName, <color:blue>int clientCoreApiLevel</color>)
 
-        ~void notifyObservers (ReaderEvent event)
+        ~void notifyObservers (<Back:Yellow>CardReaderEvent</Back> event)
 
         ~void scheduleCardSelectionScenario (CardSelectionScenarioAdapter cardSelectionScenario,
-            \t<back:yellow>DetectionMode</back> detectionMode, <back:yellow>NotificationMode</back> notificationMode)
+            \t<back:yellow>NotificationMode</back> notificationMode)
         -- **AbstractReaderAdapter** --
         ~void unregister ()
-        -- **ObservableReader** --
+        -- **ObservableCardReader** --
         +void setReaderObservationExceptionHandler (<back:yellow>CardReaderObservationExceptionHandlerSpi</back> exceptionHandler)
         +void addObserver (<back:yellow>CardReaderObserverSpi</back> observer)
         +void removeObserver (<back:yellow>CardReaderObserverSpi</back> observer)
@@ -428,16 +462,16 @@ package "org.eclipse.keyple.core.service" as service {
         +SortedSet<String> getReaderNames ()
         +PluginEvent.Type getType ()
     }
-    ~class "<<ReaderEvent>>\n**final** ReaderEventAdapter" as ReaderEventAdapter {
+    ~class "<<<Back:Yellow>CardReaderEvent</Back>>>\n**final** ReaderEventAdapter" as ReaderEventAdapter {
         --
         ~ReaderEventAdapter (String pluginName, String readerName, <back:yellow>CardReaderEvent.Type</back> type,
             \t<back:yellow>ScheduledCardSelectionsResponse</back> scheduledCardSelectionsResponse)
+
+        ~String getPluginName ()
         -- **CardReaderEvent** --
         +String getReaderName ()
         +<back:yellow>CardReaderEvent.Type</back> getType ()
         +<back:yellow>ScheduledCardSelectionsResponse</back> getScheduledCardSelectionsResponse ()
-        -- **ReaderEvent** --
-        +String getPluginName ()
     }
 
     ' AUTOMATE
@@ -573,16 +607,15 @@ package "org.eclipse.keyple.core.service" as service {
         ~CardSelectionManagerAdapter (MultiSelectionProcessing multiSelectionProcessing)
         -- **CardSelectionManager** --
         +void setMultipleSelectionMode ()
-        +int prepareSelection (<back:yellow>CardSelection</back> cardSelection)
+        +<color:blue>int prepareSelection (<back:yellow>CardSelector</back><?> cardSelector, <back:yellow>CardSelectionExtension</back> cardSelectionExtension)
         +void prepareReleaseChannel ()
-        +String exportCardSelectionScenario (<back:yellow>DetectionMode</back> detectionMode, <back:yellow>NotificationMode</back> notificationMode)
+        +String exportCardSelectionScenario ()
         +int importCardSelectionScenario (String cardSelectionScenario)
         +<back:yellow>CardSelectionResult</back> processCardSelectionScenario (<back:yellow>CardReader</back> reader)
-        +void scheduleCardSelectionScenario (<back:yellow>ObservableCardReader</back> observableCardReader, <back:yellow>DetectionMode</back> detectionMode, <back:yellow>NotificationMode</back> notificationMode)
-        +void scheduleCardSelectionScenario (<back:yellow>ObservableCardReader</back> observableCardReader)
+        +void scheduleCardSelectionScenario (<back:yellow>ObservableCardReader</back> observableCardReader, <back:yellow>NotificationMode</back> notificationMode)
         +<back:yellow>CardSelectionResult</back> parseScheduledCardSelectionsResponse (ScheduledCardSelectionsResponseAdapter scheduledCardSelectionsResponse)
-        +<color:blue>String exportProcessedCardSelectionScenario ()
-        +<color:blue><back:yellow>CardSelectionResult</back> importProcessedCardSelectionScenario (String processedCardSelectionScenario)
+        +String exportProcessedCardSelectionScenario ()
+        +<back:yellow>CardSelectionResult</back> importProcessedCardSelectionScenario (String processedCardSelectionScenario)
     }
     ~class "<<<back:yellow>ScheduledCardSelectionsResponse</back>>>\n**final** ScheduledCardSelectionsResponseAdapter" as ScheduledCardSelectionsResponseAdapter {
         --
@@ -595,13 +628,11 @@ package "org.eclipse.keyple.core.service" as service {
         --
         ~CardSelectionResultAdapter ()
 
-        ~void addSmartCard (int selectionIndex, <back:yellow>SmartCard</back> smartCard, boolean isSelected)
+        ~void addSmartCard (int selectionIndex, <back:yellow>SmartCard</back> smartCard)
         -- **CardSelectionResult** --
-        +int getActiveSelectionIndex ()
-        +boolean hasSelectionMatched (int selectionIndex)
         +Map<Integer, <back:yellow>SmartCard</back>> getSmartCards ()
-        +<back:yellow>SmartCard</back> getSmartCard (int selectionIndex)
         +<back:yellow>SmartCard</back> getActiveSmartCard ()
+        +int getActiveSelectionIndex ()
     }
 
     ' RESPONSE
@@ -697,6 +728,11 @@ enum service.MultiSelectionProcessing <<blue>>
 
 class service.JsonAdapter <<blue>>
 class service.InternalDto <<blue>>
+class service.InternalLegacyDto <<blue>>
+interface service.InternalCardSelector <<blue>>
+interface service.InternalIsoCardSelector <<blue>>
+class service.BasicCardSelectorAdapter <<blue>>
+class service.IsoCardSelectorAdapter <<blue>>
 class service.SmartCardServiceAdapter <<blue>>
 abstract class service.AbstractReaderAdapter <<blue>>
 class service.LocalReaderAdapter <<blue>>

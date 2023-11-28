@@ -13,19 +13,19 @@ package org.eclipse.keyple.core.service;
 
 import com.google.gson.JsonObject;
 import java.util.List;
-import org.calypsonet.terminal.card.CardBrokenCommunicationException;
-import org.calypsonet.terminal.card.ChannelControl;
-import org.calypsonet.terminal.card.ProxyReaderApi;
-import org.calypsonet.terminal.card.ReaderBrokenCommunicationException;
-import org.calypsonet.terminal.card.UnexpectedStatusWordException;
-import org.calypsonet.terminal.card.spi.CardRequestSpi;
-import org.calypsonet.terminal.reader.CardReader;
-import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.eclipse.keyple.core.distributed.remote.spi.AbstractRemotePluginSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 import org.eclipse.keyple.core.util.json.BodyError;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.card.CardBrokenCommunicationException;
+import org.eclipse.keypop.card.ChannelControl;
+import org.eclipse.keypop.card.ProxyReaderApi;
+import org.eclipse.keypop.card.ReaderBrokenCommunicationException;
+import org.eclipse.keypop.card.UnexpectedStatusWordException;
+import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.ObservableCardReader;
 import org.slf4j.Logger;
 
 /**
@@ -34,6 +34,13 @@ import org.slf4j.Logger;
  * @since 2.0.0
  */
 final class DistributedUtilAdapter {
+
+  /**
+   * The API level of the Core layer: {@value}
+   *
+   * @since 3.0.0
+   */
+  static final int CORE_API_LEVEL = 2;
 
   /** Constructor. */
   private DistributedUtilAdapter() {}
@@ -171,8 +178,17 @@ final class DistributedUtilAdapter {
    */
   enum JsonProperty {
 
+    /** @since 3.0.0 */
+    CORE_API_LEVEL("coreApiLevel"),
+
     /** @since 2.0.0 */
     CARD_REQUEST("cardRequest"),
+
+    /** @since 3.0.0 */
+    CARD_SELECTORS_TYPES("cardSelectorsTypes"),
+
+    /** @since 3.0.0 */
+    CARD_SELECTORS("cardSelectors"),
 
     /** @since 2.0.0 */
     CARD_SELECTION_REQUESTS("cardSelectionRequests"),
@@ -314,7 +330,7 @@ final class DistributedUtilAdapter {
     TRANSMIT_CARD_REQUEST,
 
     /**
-     * Refers to {@link AbstractReaderAdapter#transmitCardSelectionRequests(List,
+     * Refers to {@link AbstractReaderAdapter#transmitCardSelectionRequests(List,List,
      * MultiSelectionProcessing, ChannelControl)}
      *
      * @since 2.0.0
@@ -324,9 +340,9 @@ final class DistributedUtilAdapter {
     /**
      * Refers to {@link
      * ObservableLocalReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
-     * ObservableCardReader.NotificationMode, ObservableCardReader.DetectionMode)} and {@link
+     * ObservableCardReader.NotificationMode)} and {@link
      * ObservableRemoteReaderAdapter#scheduleCardSelectionScenario(CardSelectionScenarioAdapter,
-     * ObservableCardReader.NotificationMode, ObservableCardReader.DetectionMode)}
+     * ObservableCardReader.NotificationMode)}
      *
      * @since 2.0.0
      */

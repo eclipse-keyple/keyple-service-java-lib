@@ -13,11 +13,11 @@ package org.eclipse.keyple.core.service;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.plugin.AutonomousObservablePluginApi;
 import org.eclipse.keyple.core.plugin.spi.AutonomousObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.util.Assert;
+import org.eclipse.keypop.reader.CardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

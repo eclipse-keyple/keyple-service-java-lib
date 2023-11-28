@@ -12,8 +12,8 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.Arrays;
-import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
  * This POJO contains a set of data related to an ISO-7816 APDU response.

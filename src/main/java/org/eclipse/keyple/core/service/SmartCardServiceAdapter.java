@@ -17,14 +17,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import org.calypsonet.terminal.card.AbstractApduException;
-import org.calypsonet.terminal.card.ApduResponseApi;
-import org.calypsonet.terminal.card.CardApiProperties;
-import org.calypsonet.terminal.card.CardResponseApi;
-import org.calypsonet.terminal.card.CardSelectionResponseApi;
-import org.calypsonet.terminal.reader.CardReader;
-import org.calypsonet.terminal.reader.ReaderApiProperties;
-import org.calypsonet.terminal.reader.selection.CardSelectionManager;
 import org.eclipse.keyple.core.common.CommonApiProperties;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory;
@@ -39,6 +31,14 @@ import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.*;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.card.AbstractApduException;
+import org.eclipse.keypop.card.ApduResponseApi;
+import org.eclipse.keypop.card.CardApiProperties;
+import org.eclipse.keypop.card.CardResponseApi;
+import org.eclipse.keypop.card.CardSelectionResponseApi;
+import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.ReaderApiFactory;
+import org.eclipse.keypop.reader.ReaderApiProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -227,7 +227,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     }
     if (compareVersions(cardExtension.getReaderApiVersion(), ReaderApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Service API used by the provided card extension ({}:{}) mismatches the version used by the service ({}).",
+          "The version of Reader API used by the provided card extension ({}:{}) mismatches the version used by the service ({}).",
           cardExtension.getClass().getSimpleName(),
           cardExtension.getReaderApiVersion(),
           ReaderApiProperties.VERSION);
@@ -289,7 +289,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
         "Registering a new distributed local service to the service : {}",
         distributedLocalServiceName);
     Assert.getInstance().notEmpty(distributedLocalServiceName, "distributedLocalServiceName");
-    if (isDistributedLocalServiceRegistered(distributedLocalServiceName)) {
+    if (distributedLocalServices.containsKey(distributedLocalServiceName)) {
       throw new IllegalStateException(
           String.format(
               "Service '%s' has already been registered to the service.",
@@ -597,16 +597,6 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @since 2.0.0
    */
   @Override
-  public boolean isDistributedLocalServiceRegistered(String distributedLocalServiceName) {
-    return distributedLocalServices.containsKey(distributedLocalServiceName);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0.0
-   */
-  @Override
   public DistributedLocalService getDistributedLocalService(String distributedLocalServiceName) {
     return distributedLocalServices.get(distributedLocalServiceName);
   }
@@ -614,10 +604,10 @@ final class SmartCardServiceAdapter implements SmartCardService {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0.0
+   * @since 3.0.0
    */
   @Override
-  public CardSelectionManager createCardSelectionManager() {
-    return new CardSelectionManagerAdapter();
+  public ReaderApiFactory getReaderApiFactory() {
+    return new ReaderApiFactoryAdapter();
   }
 }

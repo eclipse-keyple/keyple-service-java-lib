@@ -22,7 +22,9 @@ public class CardSelectionManagerAdapterTest {
   public void setUp() {
     manager =
         (CardSelectionManagerAdapter)
-            SmartCardServiceProvider.getService().createCardSelectionManager();
+            SmartCardServiceProvider.getService()
+                .getReaderApiFactory()
+                .createCardSelectionManager();
   }
 
   @Test(expected = IllegalStateException.class)

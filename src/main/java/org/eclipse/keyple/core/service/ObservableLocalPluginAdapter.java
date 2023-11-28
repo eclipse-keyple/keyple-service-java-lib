@@ -14,12 +14,12 @@ package org.eclipse.keyple.core.service;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.ConcurrentSkipListSet;
-import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.plugin.spi.ObservablePluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.service.spi.PluginObserverSpi;
 import org.eclipse.keyple.core.util.Assert;
+import org.eclipse.keypop.reader.CardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -200,8 +200,8 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
        * parse the current readers list, notify for disappeared readers, update
        * readers list
        */
-      final Set<Reader> readers = getReaders();
-      for (Reader reader : readers) {
+      final Set<CardReader> readers = getReaders();
+      for (CardReader reader : readers) {
         if (!actualNativeReaderNames.contains(reader.getName())) {
           changedReaderNames.add(reader.getName());
         }

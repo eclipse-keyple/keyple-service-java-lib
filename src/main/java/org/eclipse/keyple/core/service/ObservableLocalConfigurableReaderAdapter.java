@@ -13,6 +13,7 @@ package org.eclipse.keyple.core.service;
 
 import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
+import org.eclipse.keypop.reader.ConfigurableCardReader;
 
 /**
  * Local configurable observable reader adapter.
@@ -20,7 +21,7 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
  * @since 2.0.0
  */
 final class ObservableLocalConfigurableReaderAdapter extends ObservableLocalReaderAdapter
-    implements ConfigurableReader {
+    implements ConfigurableCardReader {
 
   /**
    * Constructor.

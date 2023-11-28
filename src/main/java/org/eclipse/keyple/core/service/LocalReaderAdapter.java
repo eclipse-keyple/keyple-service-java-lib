@@ -11,19 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.calypsonet.terminal.card.*;
-import org.calypsonet.terminal.card.spi.ApduRequestSpi;
-import org.calypsonet.terminal.card.spi.CardRequestSpi;
-import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
-import org.calypsonet.terminal.card.spi.CardSelectorSpi;
-import org.calypsonet.terminal.reader.ReaderCommunicationException;
-import org.calypsonet.terminal.reader.ReaderProtocolNotSupportedException;
+import java.util.*;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
@@ -34,6 +22,14 @@ import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.card.*;
+import org.eclipse.keypop.card.spi.ApduRequestSpi;
+import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.card.spi.CardSelectionRequestSpi;
+import org.eclipse.keypop.reader.ReaderCommunicationException;
+import org.eclipse.keypop.reader.ReaderProtocolNotSupportedException;
+import org.eclipse.keypop.reader.selection.CardSelector;
+import org.eclipse.keypop.reader.selection.CommonIsoCardSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +83,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @return A not null reference.
    * @since 2.0.0
    */
-  public ReaderSpi getReaderSpi() {
+  final ReaderSpi getReaderSpi() {
     return readerSpi;
   }
 
@@ -154,6 +150,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    */
   @Override
   final List<CardSelectionResponseApi> processCardSelectionRequests(
+      List<CardSelector<?>> cardSelectors,
       List<CardSelectionRequestSpi> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
@@ -179,11 +176,13 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     List<CardSelectionResponseApi> cardSelectionResponses =
         new ArrayList<CardSelectionResponseApi>();
 
+    Iterator<CardSelector<?>> cardSelectorIterator = cardSelectors.iterator();
+
     /* loop over all CardRequest provided in the list */
     for (CardSelectionRequestSpi cardSelectionRequest : cardSelectionRequests) {
       /* process the CardRequest and append the CardResponse list */
       CardSelectionResponseApi cardSelectionResponse =
-          processCardSelectionRequest(cardSelectionRequest);
+          processCardSelectionRequest(cardSelectorIterator.next(), cardSelectionRequest);
       cardSelectionResponses.add(cardSelectionResponse);
       if (multiSelectionProcessing == MultiSelectionProcessing.PROCESS_ALL) {
         /* multi CardRequest case: just close the logical channel and go on with the next selection. */
@@ -464,14 +463,14 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *     request and the card returned an unexpected code.
    */
   private CardSelectionResponseApi processCardSelectionRequest(
-      CardSelectionRequestSpi cardSelectionRequest)
+      CardSelector<?> cardSelector, CardSelectionRequestSpi cardSelectionRequest)
       throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
           UnexpectedStatusWordException {
 
     isLogicalChannelOpen = false;
     SelectionStatus selectionStatus;
     try {
-      selectionStatus = processSelection(cardSelectionRequest.getCardSelector());
+      selectionStatus = processSelection(cardSelector, cardSelectionRequest);
     } catch (ReaderIOException e) {
       throw new ReaderBrokenCommunicationException(
           new CardResponseAdapter(new ArrayList<ApduResponseAdapter>(), false),
@@ -509,7 +508,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * Select the card according to the {@link CardSelectorSpi}.
+   * Select the card according to the {@link CardSelector}.
    *
    * <p>The selection status is returned.<br>
    * 3 levels of filtering/selection are applied successively if they are enabled: protocol, power
@@ -519,12 +518,14 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * <p>Conversely, the selection is considered successful if none of the filters have rejected the
    * card, even if none of the filters are active.
    *
-   * @param cardSelector A not null {@link CardSelectorSpi}.
+   * @param cardSelector A not null {@link CardSelector}.
+   * @param cardSelectionRequest A not null {@link CardSelectionRequestSpi}.
    * @return A not null {@link SelectionStatus}.
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
    */
-  private SelectionStatus processSelection(CardSelectorSpi cardSelector)
+  private SelectionStatus processSelection(
+      CardSelector<?> cardSelector, CardSelectionRequestSpi cardSelectionRequest)
       throws CardIOException, ReaderIOException {
 
     // RL-CLA-CHAAUTO.1
@@ -532,24 +533,26 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     ApduResponseAdapter fciResponse;
     boolean hasMatched = true;
 
-    if (cardSelector.getCardProtocol() != null && useDefaultProtocol) {
+    String logicalProtocolName = ((InternalCardSelector) cardSelector).getLogicalProtocolName();
+    if (logicalProtocolName != null && useDefaultProtocol) {
       throw new IllegalStateException(
-          "Protocol " + cardSelector.getCardProtocol() + " not associated to a reader protocol.");
+          "Protocol "
+              + ((InternalCardSelector) cardSelector).getLogicalProtocolName()
+              + " not associated to a reader protocol.");
     }
-
     // check protocol if enabled
-    if (cardSelector.getCardProtocol() == null
-        || cardSelector.getCardProtocol().equals(currentLogicalProtocolName)) {
+    if (logicalProtocolName == null || logicalProtocolName.equals(currentLogicalProtocolName)) {
       // protocol check succeeded, check power-on data if enabled
       // RL-ATR-FILTER
       // RL-SEL-USAGE.1
       powerOnData = readerSpi.getPowerOnData();
-      if (checkPowerOnData(powerOnData, cardSelector)) {
+      if (checkPowerOnData(powerOnData, (InternalCardSelector) cardSelector)) {
         // no power-on data filter or power-on data check succeeded, select by AID if enabled.
-        if (cardSelector.getAid() != null) {
-          fciResponse = selectByAid(cardSelector);
+        if (cardSelector instanceof InternalIsoCardSelector
+            && ((InternalIsoCardSelector) cardSelector).getAid() != null) {
+          fciResponse = selectByAid((InternalIsoCardSelector) cardSelector);
           hasMatched =
-              cardSelector
+              cardSelectionRequest
                   .getSuccessfulSelectionStatusWords()
                   .contains(fciResponse.getStatusWord());
         } else {
@@ -579,9 +582,9 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @return True or false.
    * @throws IllegalStateException if no power-on data is available and the PowerOnDataFilter is
    *     set.
-   * @see #processSelection(CardSelectorSpi)
+   * @see #processSelection(CardSelector, CardSelectionRequestSpi)
    */
-  private boolean checkPowerOnData(String powerOnData, CardSelectorSpi cardSelector) {
+  private boolean checkPowerOnData(String powerOnData, InternalCardSelector cardSelector) {
 
     if (logger.isDebugEnabled()) {
       logger.debug("[{}] openLogicalChannel => PowerOnData = {}", this.getName(), powerOnData);
@@ -609,9 +612,9 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *
    * @param cardSelector The card selector.
    * @return A not null {@link ApduResponseApi} containing the FCI.
-   * @see #processSelection(CardSelectorSpi)
+   * @see #processSelection(CardSelector, CardSelectionRequestSpi)
    */
-  private ApduResponseAdapter selectByAid(CardSelectorSpi cardSelector)
+  private ApduResponseAdapter selectByAid(InternalIsoCardSelector cardSelector)
       throws CardIOException, ReaderIOException {
 
     ApduResponseAdapter fciResponse;
@@ -645,7 +648,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
    */
-  private ApduResponseAdapter processExplicitAidSelection(CardSelectorSpi cardSelector)
+  private ApduResponseAdapter processExplicitAidSelection(InternalIsoCardSelector cardSelector)
       throws CardIOException, ReaderIOException {
 
     final byte[] aid = cardSelector.getAid();
@@ -692,8 +695,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @throws IllegalStateException If one of the provided argument is unexpected.
    */
   private byte computeSelectApplicationP2(
-      CardSelectorSpi.FileOccurrence fileOccurrence,
-      CardSelectorSpi.FileControlInformation fileControlInformation) {
+      CommonIsoCardSelector.FileOccurrence fileOccurrence,
+      CommonIsoCardSelector.FileControlInformation fileControlInformation) {
 
     byte p2;
     switch (fileOccurrence) {

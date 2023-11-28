@@ -18,12 +18,13 @@ import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.calypsonet.terminal.card.*;
-import org.calypsonet.terminal.card.spi.CardRequestSpi;
-import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
-import org.calypsonet.terminal.reader.ReaderCommunicationException;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
+import org.eclipse.keypop.card.*;
+import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.card.spi.CardSelectionRequestSpi;
+import org.eclipse.keypop.reader.ReaderCommunicationException;
+import org.eclipse.keypop.reader.selection.CardSelector;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -91,6 +92,7 @@ public class AbstractReaderAdapterTest {
 
     @Override
     List<CardSelectionResponseApi> processCardSelectionRequests(
+        List<CardSelector<?>> cardSelectors,
         List<CardSelectionRequestSpi> cardSelectionRequests,
         MultiSelectionProcessing multiSelectionProcessing,
         ChannelControl channelControl)

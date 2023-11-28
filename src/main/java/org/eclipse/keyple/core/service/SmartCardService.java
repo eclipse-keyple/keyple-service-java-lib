@@ -12,11 +12,11 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.Set;
-import org.calypsonet.terminal.reader.CardReader;
-import org.calypsonet.terminal.reader.selection.CardSelectionManager;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory;
 import org.eclipse.keyple.core.common.KeyplePluginExtensionFactory;
+import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.ReaderApiFactory;
 
 /**
  * Keyple main service.
@@ -118,15 +118,6 @@ public interface SmartCardService {
   void unregisterDistributedLocalService(String distributedLocalServiceName);
 
   /**
-   * Checks whether a distributed local service is already registered to the service or not.
-   *
-   * @param distributedLocalServiceName The name of the distributed local service to be checked.
-   * @return True if the distributed local service is registered.
-   * @since 2.0.0
-   */
-  boolean isDistributedLocalServiceRegistered(String distributedLocalServiceName);
-
-  /**
    * Returns the distributed local service having the provided name.
    *
    * @param distributedLocalServiceName The name of the distributed local service.
@@ -136,10 +127,10 @@ public interface SmartCardService {
   DistributedLocalService getDistributedLocalService(String distributedLocalServiceName);
 
   /**
-   * Create a new instance of a {@link CardSelectionManager} in order to perform a card selection.
+   * Returns the factory to create the Reader API objects.
    *
    * @return A not null reference.
-   * @since 2.0.0
+   * @since 3.0.0
    */
-  CardSelectionManager createCardSelectionManager();
+  ReaderApiFactory getReaderApiFactory();
 }

@@ -17,7 +17,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.HashMap;
 import java.util.Map;
-import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.distributed.remote.RemotePluginApi;
 import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemoteReaderSpi;
@@ -26,6 +25,9 @@ import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.CardReaderEvent;
+import org.eclipse.keypop.reader.ObservableCardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,8 +66,15 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
 
     super.register();
 
+    int distributedApiLevel = remotePluginSpi.exchangeApiLevel(CORE_API_LEVEL);
+    logger.info(
+        "Core API level: {}, Distributed API level (Remote Plugin): {}",
+        CORE_API_LEVEL,
+        distributedApiLevel);
+
     // Build the input JSON data.
     JsonObject input = new JsonObject();
+    input.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), CORE_API_LEVEL);
     input.addProperty(JsonProperty.SERVICE.getKey(), PluginService.GET_READERS.name());
 
     // Execute the remote service.
@@ -101,7 +110,8 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
           ObservableRemoteReaderSpi observableRemoteReaderSpi =
               remotePluginSpi.createObservableRemoteReader(remoteReaderName, localReaderName);
           remoteReaderAdapter =
-              new ObservableRemoteReaderAdapter(observableRemoteReaderSpi, getName());
+              new ObservableRemoteReaderAdapter(
+                  observableRemoteReaderSpi, getName(), CORE_API_LEVEL);
         } catch (IllegalStateException e) {
           logger.warn(e.getMessage());
           isObservable = false;
@@ -110,7 +120,8 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
       if (!isObservable) {
         RemoteReaderSpi remoteReaderSpi =
             remotePluginSpi.createRemoteReader(remoteReaderName, localReaderName);
-        remoteReaderAdapter = new RemoteReaderAdapter(remoteReaderSpi, getName(), null);
+        remoteReaderAdapter =
+            new RemoteReaderAdapter(remoteReaderSpi, getName(), null, CORE_API_LEVEL);
       }
 
       getReadersMap().put(localReaderName, remoteReaderAdapter);
@@ -148,7 +159,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
     Assert.getInstance().notEmpty(jsonData, "jsonData");
 
     // Extract the event.
-    ReaderEvent readerEvent;
+    CardReaderEvent readerEvent;
     try {
       JsonObject json = JsonUtil.getParser().fromJson(jsonData, JsonObject.class);
       readerEvent =
@@ -163,7 +174,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
 
     // Get the target reader.
     CardReader reader = getReader(readerEvent.getReaderName());
-    if (!(reader instanceof ObservableReader)) {
+    if (!(reader instanceof ObservableCardReader)) {
       throw new IllegalArgumentException(
           String.format(
               "Reader '%s' does not exists or is not observable : %s",

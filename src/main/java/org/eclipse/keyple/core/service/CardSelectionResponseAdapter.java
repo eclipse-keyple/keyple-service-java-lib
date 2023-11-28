@@ -11,10 +11,10 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import org.calypsonet.terminal.card.ApduResponseApi;
-import org.calypsonet.terminal.card.CardResponseApi;
-import org.calypsonet.terminal.card.CardSelectionResponseApi;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.card.ApduResponseApi;
+import org.eclipse.keypop.card.CardResponseApi;
+import org.eclipse.keypop.card.CardSelectionResponseApi;
 
 /**
  * This POJO contains the data from a card obtained in response to a card selection request.
@@ -22,7 +22,7 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
  * <p>These data are the selection status and the responses, if any, to the additional APDUs sent to
  * the card ({@link CardResponseApi}).
  *
- * @see org.calypsonet.terminal.card.spi.CardSelectionRequestSpi
+ * @see org.eclipse.keypop.card.spi.CardSelectionRequestSpi
  * @since 2.0.0
  */
 final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
@@ -34,7 +34,7 @@ final class CardSelectionResponseAdapter implements CardSelectionResponseApi {
 
   /**
    * Builds a card selection response including the selection status and a {@link CardResponseApi}
-   * (list of {@link org.calypsonet.terminal.card.ApduResponseApi}).
+   * (list of {@link org.eclipse.keypop.card.ApduResponseApi}).
    *
    * @param powerOnData The card power-on data, null if the power-on data is not available.
    * @param selectApplicationResponse The response to the Select Application command, null if no

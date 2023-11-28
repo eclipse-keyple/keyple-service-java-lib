@@ -12,8 +12,6 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.SortedSet;
-import org.calypsonet.terminal.reader.CardReader;
-import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
@@ -21,6 +19,8 @@ import org.eclipse.keyple.core.plugin.spi.PoolPluginSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.PoolReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi;
 import org.eclipse.keyple.core.util.Assert;
+import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.selection.spi.SmartCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +88,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
    * @since 2.0.0
    */
   @Override
-  public Reader allocateReader(String readerGroupReference) {
+  public CardReader allocateReader(String readerGroupReference) {
 
     checkStatus();
     if (logger.isDebugEnabled()) {

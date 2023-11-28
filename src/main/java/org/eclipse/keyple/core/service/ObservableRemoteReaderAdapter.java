@@ -17,12 +17,13 @@ import com.google.gson.JsonObject;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.calypsonet.terminal.reader.CardReaderEvent;
-import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
-import org.calypsonet.terminal.reader.spi.CardReaderObserverSpi;
 import org.eclipse.keyple.core.distributed.remote.spi.ObservableRemoteReaderSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.reader.CardReaderEvent;
+import org.eclipse.keypop.reader.ObservableCardReader;
+import org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi;
+import org.eclipse.keypop.reader.spi.CardReaderObserverSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,8 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0.0
  */
-final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements ObservableReader {
+final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
+    implements ObservableCardReader {
 
   private static final Logger logger = LoggerFactory.getLogger(ObservableRemoteReaderAdapter.class);
 
@@ -46,11 +48,14 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    *
    * @param observableRemoteReaderSpi The remote reader SPI.
    * @param pluginName The name of the plugin.
+   * @param clientCoreApiLevel The JSON API level of the associated client Core layer.
    * @since 2.0.0
    */
   ObservableRemoteReaderAdapter(
-      ObservableRemoteReaderSpi observableRemoteReaderSpi, String pluginName) {
-    super(observableRemoteReaderSpi, pluginName, null);
+      ObservableRemoteReaderSpi observableRemoteReaderSpi,
+      String pluginName,
+      int clientCoreApiLevel) {
+    super(observableRemoteReaderSpi, pluginName, null, clientCoreApiLevel);
     this.observableRemoteReaderSpi = observableRemoteReaderSpi;
     this.observationManager =
         new ObservationManagerAdapter<
@@ -59,12 +64,12 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
   }
 
   /**
-   * Notifies asynchronously all registered observers with the provided {@link ReaderEvent}.
+   * Notifies asynchronously all registered observers with the provided {@link CardReaderEvent}.
    *
    * @param event The reader event.
    * @since 2.0.0
    */
-  void notifyObservers(final ReaderEvent event) {
+  void notifyObservers(final CardReaderEvent event) {
 
     if (logger.isDebugEnabled()) {
       logger.debug(
@@ -111,18 +116,16 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
    *
    * @param cardSelectionScenario The card selection scenario.
    * @param notificationMode The notification policy.
-   * @param detectionMode The polling policy (optional).
    * @since 2.0.0
    */
   void scheduleCardSelectionScenario(
-      CardSelectionScenarioAdapter cardSelectionScenario,
-      NotificationMode notificationMode,
-      DetectionMode detectionMode) {
+      CardSelectionScenarioAdapter cardSelectionScenario, NotificationMode notificationMode) {
 
     checkStatus();
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
+    input.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), getClientCoreApiLevel());
     input.addProperty(
         JsonProperty.SERVICE.getKey(), ReaderService.SCHEDULE_CARD_SELECTION_SCENARIO.name());
 
@@ -131,9 +134,6 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
         JsonProperty.CARD_SELECTION_SCENARIO.getKey(),
         JsonUtil.getParser().toJsonTree(cardSelectionScenario));
     params.addProperty(JsonProperty.NOTIFICATION_MODE.getKey(), notificationMode.name());
-    if (detectionMode != null) {
-      params.addProperty(JsonProperty.POLLING_MODE.getKey(), detectionMode.name());
-    }
 
     input.add(JsonProperty.PARAMETERS.getKey(), params);
 
@@ -235,6 +235,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
+    input.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), getClientCoreApiLevel());
     input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.START_CARD_DETECTION.name());
 
     JsonObject params = new JsonObject();
@@ -275,6 +276,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
+    input.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), getClientCoreApiLevel());
     input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.STOP_CARD_DETECTION.name());
 
     // Execute the remote service.
@@ -306,6 +308,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter implements
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
+    input.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), getClientCoreApiLevel());
     input.addProperty(JsonProperty.SERVICE.getKey(), ReaderService.FINALIZE_CARD_PROCESSING.name());
 
     // Execute the remote service.

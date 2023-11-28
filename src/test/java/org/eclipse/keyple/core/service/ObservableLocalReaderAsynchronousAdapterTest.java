@@ -17,11 +17,13 @@ import static org.mockito.Mockito.*;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.calypsonet.terminal.card.*;
-import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
-import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.util.ObservableReaderAsynchronousSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
+import org.eclipse.keypop.card.CardResponseApi;
+import org.eclipse.keypop.card.CardSelectionResponseApi;
+import org.eclipse.keypop.card.spi.CardSelectionRequestSpi;
+import org.eclipse.keypop.reader.CardReaderEvent;
+import org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +45,7 @@ public class ObservableLocalReaderAsynchronousAdapterTest {
   CardSelectionRequestSpi cardSelectionRequestSpi;
   CardSelectionResponseApi cardSelectionResponseApi;
   CardResponseApi cardResponseApi;
-  ReaderEvent event;
+  CardReaderEvent event;
 
   @Before
   public void seTup() {

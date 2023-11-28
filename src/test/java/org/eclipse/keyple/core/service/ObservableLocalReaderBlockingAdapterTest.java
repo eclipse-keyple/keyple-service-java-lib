@@ -15,9 +15,9 @@ import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN
 import static org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils.READER_NAME;
 import static org.mockito.Mockito.mock;
 
-import org.calypsonet.terminal.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.keyple.core.service.util.ObservableReaderBlockingSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
+import org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
