@@ -30,12 +30,12 @@ repositories {
     maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots")
 }
 dependencies {
-    implementation("org.eclipse.keypop:keypop-reader-java-api:2.0.0-SNAPSHOT") {isChanging=true}
-    implementation("org.eclipse.keypop:keypop-card-java-api:2.0.0-SNAPSHOT") {isChanging=true}
+    implementation("org.eclipse.keypop:keypop-reader-java-api:2.0.0")
+    implementation("org.eclipse.keypop:keypop-card-java-api:2.0.0")
     implementation("org.eclipse.keyple:keyple-common-java-api:2.0.0")
     implementation("org.eclipse.keyple:keyple-plugin-java-api:2.2.0")
-    implementation("org.eclipse.keyple:keyple-distributed-remote-java-api:3.0.0-SNAPSHOT") {isChanging=true}
-    implementation("org.eclipse.keyple:keyple-distributed-local-java-api:2.1.0-SNAPSHOT") {isChanging=true}
+    implementation("org.eclipse.keyple:keyple-distributed-remote-java-api:3.0.0")
+    implementation("org.eclipse.keyple:keyple-distributed-local-java-api:2.1.0")
     implementation("org.eclipse.keyple:keyple-util-java-lib:2.3.1")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.slf4j:slf4j-api:1.7.32")

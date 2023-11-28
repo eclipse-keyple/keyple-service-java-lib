@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [3.0.0] - 2023-11-28
 :warning: Major version! Following the migration of the "Calypsonet Terminal" APIs to the
 [Eclipse Keypop project](https://keypop.org), this library now implements Keypop interfaces.
 ### Added
@@ -134,7 +136,8 @@ It follows the extraction of Keyple 1.0 components contained in the `eclipse/key
 repositories.
 It also brings many major API changes.
 
-[unreleased]: https://github.com/eclipse/keyple-service-java-lib/compare/2.3.2...HEAD
+[unreleased]: https://github.com/eclipse/keyple-service-java-lib/compare/3.0.0...HEAD
+[3.0.0]: https://github.com/eclipse/keyple-service-java-lib/compare/2.3.2...3.0.0
 [2.3.2]: https://github.com/eclipse/keyple-service-java-lib/compare/2.3.1...2.3.2
 [2.3.1]: https://github.com/eclipse/keyple-service-java-lib/compare/2.3.0...2.3.1
 [2.3.0]: https://github.com/eclipse/keyple-service-java-lib/compare/2.2.1...2.3.0
