@@ -33,12 +33,12 @@ SPDX-License-Identifier: EPL-2.0
 
 Keypop Reader API
 
-* License: [MIT License](https://opensource.org/licenses/MIT)
+* License: [MIT](https://opensource.org/licenses/MIT)
 * Sources: https://github.com/eclipse-keypop/keypop-reader-java-api
 
 Keypop Card API
 
-* License: [MIT License](https://opensource.org/licenses/MIT)
+* License: [MIT](https://opensource.org/licenses/MIT)
 * Sources: https://github.com/eclipse-keypop/keypop-card-java-api
 
 GSON
