@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Corrects an anomaly in communication between the server and a client using a version of the Distributed JSON API prior
+  to 2.0, when the card selection request sent by the server does not contain an additional card request.
 
 ## [3.0.0] - 2023-11-28
 :warning: Major version! Following the migration of the "Calypsonet Terminal" APIs to the
