@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [3.0.1] - 2023-12-06
 ### Fixed
 - Corrects a server-side anomaly in communication between the server and a client using a version of the 
   Distributed JSON API prior to 2.0, when the card selection request does not contain an additional card request.
@@ -141,7 +143,8 @@ It follows the extraction of Keyple 1.0 components contained in the `eclipse/key
 repositories.
 It also brings many major API changes.
 
-[unreleased]: https://github.com/eclipse/keyple-service-java-lib/compare/3.0.0...HEAD
+[unreleased]: https://github.com/eclipse/keyple-service-java-lib/compare/3.0.1...HEAD
+[3.0.1]: https://github.com/eclipse/keyple-service-java-lib/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/eclipse/keyple-service-java-lib/compare/2.3.2...3.0.0
 [2.3.2]: https://github.com/eclipse/keyple-service-java-lib/compare/2.3.1...2.3.2
 [2.3.1]: https://github.com/eclipse/keyple-service-java-lib/compare/2.3.0...2.3.1
