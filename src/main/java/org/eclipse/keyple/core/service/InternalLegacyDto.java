@@ -46,7 +46,10 @@ final class InternalLegacyDto {
   static LegacyCardSelectionRequest mapToLegacyCardSelectionRequest(
       CardSelector<?> cardSelector, CardSelectionRequestSpi cardSelectionRequestSpi) {
     LegacyCardSelectionRequest result = new LegacyCardSelectionRequest();
-    result.cardRequest = mapToLegacyCardRequest(cardSelectionRequestSpi.getCardRequest());
+    result.cardRequest =
+        cardSelectionRequestSpi.getCardRequest() != null
+            ? mapToLegacyCardRequest(cardSelectionRequestSpi.getCardRequest())
+            : null;
     result.cardSelector = mapToLegacyCardSelector(cardSelector, cardSelectionRequestSpi);
     return result;
   }
