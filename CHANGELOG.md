@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Corrects a server-side anomaly in communication between the server and a client using a version of the 
   Distributed JSON API prior to 2.0, when the card selection request does not contain an additional card request.
+- `CARD_REMOVED` events are no longer notified when the card selection scenario notification mode is set to `MATCH_ONLY` 
+  and a non-matching card has been inserted then removed.
 
 ## [3.0.0] - 2023-11-28
 :warning: Major version! Following the migration of the "Calypsonet Terminal" APIs to the

@@ -60,6 +60,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   private CardSelectionScenarioAdapter cardSelectionScenario;
   private NotificationMode notificationMode;
   private DetectionMode detectionMode;
+  private boolean isCardRemovedEventNotificationEnabled;
 
   /**
    * The events that drive the card's observation state machine.
@@ -240,6 +241,8 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
       logger.trace("[{}] process the inserted card", getName());
     }
 
+    isCardRemovedEventNotificationEnabled = true;
+
     if (cardSelectionScenario == null) {
       if (logger.isTraceEnabled()) {
         logger.trace("[{}] no card selection scenario defined, notify CARD_INSERTED", getName());
@@ -275,6 +278,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
                   + " do not thrown any event because of MATCHED_ONLY flag",
               getName());
         }
+        isCardRemovedEventNotificationEnabled = false;
         return null;
       }
 
@@ -354,9 +358,11 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   final void processCardRemoved() {
     // RL-DET-REMNOTIF.1
     closeLogicalAndPhysicalChannelsSilently();
-    notifyObservers(
-        new ReaderEventAdapter(
-            getPluginName(), getName(), CardReaderEvent.Type.CARD_REMOVED, null));
+    if (isCardRemovedEventNotificationEnabled) {
+      notifyObservers(
+          new ReaderEventAdapter(
+              getPluginName(), getName(), CardReaderEvent.Type.CARD_REMOVED, null));
+    }
   }
 
   /**
