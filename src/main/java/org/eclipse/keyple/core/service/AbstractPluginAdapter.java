@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.PatternSyntaxException;
 import org.eclipse.keyple.core.common.KeyplePluginExtension;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.PluginIOException;
@@ -193,5 +194,24 @@ abstract class AbstractPluginAdapter implements Plugin {
   public final CardReader getReader(String name) {
     checkStatus();
     return readers.get(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 3.1.0
+   */
+  @Override
+  public final CardReader findReader(String readerNameRegex) {
+    for (CardReader reader : readers.values()) {
+      try {
+        if (reader.getName().matches(readerNameRegex)) {
+          return reader;
+        }
+      } catch (PatternSyntaxException e) {
+        throw new IllegalArgumentException("readerNameRegex is invalid: " + e.getMessage(), e);
+      }
+    }
+    return null;
   }
 }

@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.PatternSyntaxException;
 import org.eclipse.keyple.core.common.CommonApiProperties;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory;
@@ -505,6 +506,27 @@ final class SmartCardServiceAdapter implements SmartCardService {
       for (CardReader reader : plugin.getReaders()) {
         if (reader.getName().equals(readerName)) {
           return reader;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 3.1.0
+   */
+  @Override
+  public CardReader findReader(String readerNameRegex) {
+    for (Plugin plugin : plugins.values()) {
+      for (CardReader reader : plugin.getReaders()) {
+        try {
+          if (reader.getName().matches(readerNameRegex)) {
+            return reader;
+          }
+        } catch (PatternSyntaxException e) {
+          throw new IllegalArgumentException("readerNameRegex is invalid: " + e.getMessage(), e);
         }
       }
     }

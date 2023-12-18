@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - keyple-service-java-lib - 3.0.+ (2023-06-26)
+    Keyple - keyple-service-java-lib - 3.1.+ (2023-12-18)
 end title
 
 ' == THEME ==
@@ -71,6 +71,7 @@ package "org.eclipse.keyple.core.service" as service {
         +Plugin getPlugin (String pluginName)
         +Plugin getPlugin (<back:yellow>CardReader</back> reader)
         +<back:yellow>CardReader</back> getReader (String readerName)
+        +<color:blue><back:yellow>CardReader</back> findReader (String readerNameRegex)
 
         +void checkCardExtension (<back:cyan>KeypleCardExtension</back> cardExtension)
 
@@ -78,7 +79,7 @@ package "org.eclipse.keyple.core.service" as service {
         +void unregisterDistributedLocalService (String distributedLocalServiceName)
         +DistributedLocalService getDistributedLocalService (String distributedLocalServiceName)
 
-        +<color:blue><back:yellow>ReaderApiFactory</back> getReaderApiFactory ()
+        +<back:yellow>ReaderApiFactory</back> getReaderApiFactory ()
     }
     +interface Plugin {
         +String getName ()
@@ -86,8 +87,9 @@ package "org.eclipse.keyple.core.service" as service {
         +<T extends <back:cyan>KeypleReaderExtension</back>> T getReaderExtension (Class<T> readerExtensionClass, String readerName)
 
         +Set<String> getReaderNames ()
-        +Set<<color:blue>CardReader</color>> getReaders ()
-        +<color:blue>CardReader</color> getReader (String readerName)
+        +Set<<back:yellow>CardReader</back>> getReaders ()
+        +<back:yellow>CardReader</back> getReader (String readerName)
+        +<color:blue><back:yellow>CardReader</back> findReader (String readerNameRegex)
     }
     +interface DistributedLocalService {
         +String getName ()
@@ -104,7 +106,7 @@ package "org.eclipse.keyple.core.service" as service {
     +interface PoolPlugin extends Plugin {
         +SortedSet<String> getReaderGroupReferences ()
 
-        +<color:blue>CardReader</color> allocateReader (String readerGroupReference)
+        +<back:yellow>CardReader</back> allocateReader (String readerGroupReference)
         +<back:yellow>SmartCard</back> getSelectedSmartCard (<back:yellow>CardReader</back> reader)
 
         +void releaseReader (<back:yellow>CardReader</back> reader)

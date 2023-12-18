@@ -88,4 +88,14 @@ public interface Plugin {
    * @since 2.0.0
    */
   CardReader getReader(String name);
+
+  /**
+   * Returns the first reader whose name matches the provided regular expression.
+   *
+   * @param readerNameRegex The name of the card reader as a regular expression string.
+   * @return Null if the reader is not found or no longer registered.
+   * @throws IllegalArgumentException If the provided regex is invalid.
+   * @since 3.1.0
+   */
+  CardReader findReader(String readerNameRegex);
 }

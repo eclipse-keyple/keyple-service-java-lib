@@ -125,6 +125,62 @@ public class LocalPluginAdapterTest {
     localPluginAdapter.getReader(READER_NAME_1);
   }
 
+  @Test
+  public void findReader_whenReaderNameRegexMatches_returnsExistingReader() throws Exception {
+
+    String readerNameRegex = ".*1";
+
+    Set<ReaderSpi> readerSpis = new HashSet<ReaderSpi>();
+    readerSpis.add(readerSpi1);
+    readerSpis.add(readerSpi2);
+    when(pluginSpi.searchAvailableReaders()).thenReturn(readerSpis);
+    LocalPluginAdapter localPluginAdapter = new LocalPluginAdapter(pluginSpi);
+    localPluginAdapter.register();
+
+    // Act
+    CardReader foundedReader = localPluginAdapter.findReader(readerNameRegex);
+
+    // Assert
+    assertThat(foundedReader).isNotNull();
+    assertThat(foundedReader.getName()).isEqualTo(READER_NAME_1);
+  }
+
+  @Test
+  public void findReader_whenNoReaderNameMatches_returnsNull() throws Exception {
+
+    String readerNameRegex = ".*3";
+
+    Set<ReaderSpi> readerSpis = new HashSet<ReaderSpi>();
+    readerSpis.add(readerSpi1);
+    readerSpis.add(readerSpi2);
+    when(pluginSpi.searchAvailableReaders()).thenReturn(readerSpis);
+    LocalPluginAdapter localPluginAdapter = new LocalPluginAdapter(pluginSpi);
+    localPluginAdapter.register();
+
+    // Act
+    CardReader foundedReader = localPluginAdapter.findReader(readerNameRegex);
+
+    // Assert
+    assertThat(foundedReader).isNull();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void findReader_whenReaderNameRegexIsNotAValidPattern_throwsIllegalArgumentsException()
+      throws Exception {
+
+    String invalidReaderNameRegex = "[";
+
+    Set<ReaderSpi> readerSpis = new HashSet<ReaderSpi>();
+    readerSpis.add(readerSpi1);
+    readerSpis.add(readerSpi2);
+    when(pluginSpi.searchAvailableReaders()).thenReturn(readerSpis);
+    LocalPluginAdapter localPluginAdapter = new LocalPluginAdapter(pluginSpi);
+    localPluginAdapter.register();
+
+    // Act
+    CardReader foundedReader = localPluginAdapter.findReader(invalidReaderNameRegex);
+  }
+
   @Test(expected = IllegalStateException.class)
   public void getReaderNames_whenNotRegistered_shouldISE() {
     LocalPluginAdapter localPluginAdapter = new LocalPluginAdapter(pluginSpi);
