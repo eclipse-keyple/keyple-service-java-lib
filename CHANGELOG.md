@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - The `findReader` methods has been added to `SmartCardService` and `Plugin` interfaces to make it easier to search for
-  readers using a regular expression.
+  readers using a regular expression (issue [#47]).
 
 ## [3.0.1] - 2023-12-06
 ### Fixed
@@ -163,6 +163,7 @@ It also brings many major API changes.
 [2.0.0]: https://github.com/eclipse/keyple-service-java-lib/releases/tag/2.0.0
 
 [#58]: https://github.com/eclipse/keyple-service-java-lib/issues/58
+[#47]: https://github.com/eclipse/keyple-service-java-lib/issues/47
 [#43]: https://github.com/eclipse/keyple-service-java-lib/issues/43
 [#40]: https://github.com/eclipse/keyple-service-java-lib/issues/40
 [#38]: https://github.com/eclipse/keyple-service-java-lib/issues/38
