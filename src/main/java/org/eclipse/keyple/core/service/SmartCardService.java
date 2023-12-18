@@ -88,6 +88,16 @@ public interface SmartCardService {
   CardReader getReader(String readerName);
 
   /**
+   * Returns the first reader whose name matches the provided regular expression.
+   *
+   * @param readerNameRegex The name of the card reader as a regular expression string.
+   * @return Null if the reader is not found or no longer registered.
+   * @throws IllegalArgumentException If the provided regex is invalid.
+   * @since 3.1.0
+   */
+  CardReader findReader(String readerNameRegex);
+
+  /**
    * Verifies the compatibility with the service of the provided card extension.
    *
    * <p>The verification is based on the comparison of the respective API versions.

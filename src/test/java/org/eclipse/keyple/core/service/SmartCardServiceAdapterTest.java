@@ -552,6 +552,59 @@ public class SmartCardServiceAdapterTest {
   }
 
   @Test
+  public void findReader_whenReaderNameRegexMatches_returnsExistingReader() throws Exception {
+
+    String readerNameRegex = "testReader.*";
+    String readerName = "testReader123";
+
+    when(reader.getName()).thenReturn(readerName);
+    when(plugin.searchAvailableReaders())
+        .thenReturn(new HashSet<ReaderSpi>(Collections.singletonList(reader)));
+
+    service.registerPlugin(pluginFactory);
+
+    // Act
+    CardReader foundedReader = service.findReader(readerNameRegex);
+
+    // Assert
+    assertThat(foundedReader).isNotNull();
+    assertThat(foundedReader.getName()).isEqualTo(readerName);
+  }
+
+  @Test
+  public void findReader_whenNoReaderNameMatches_returnsNull() throws Exception {
+
+    String readerNameRegex = "testReader.*";
+    String readerName = "differentReader123";
+
+    when(reader.getName()).thenReturn(readerName);
+    when(plugin.searchAvailableReaders())
+        .thenReturn(new HashSet<ReaderSpi>(Collections.singletonList(reader)));
+
+    service.registerPlugin(pluginFactory);
+
+    // Act
+    CardReader foundedReader = service.findReader(readerNameRegex);
+
+    // Assert
+    assertThat(foundedReader).isNull();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void findReader_whenReaderNameRegexIsNotAValidPattern_throwsIllegalArgumentsException()
+      throws Exception {
+
+    String invalidReaderNameRegex = "[";
+
+    when(plugin.searchAvailableReaders())
+        .thenReturn(new HashSet<ReaderSpi>(Collections.singletonList(reader)));
+
+    service.registerPlugin(pluginFactory);
+
+    service.findReader(invalidReaderNameRegex);
+  }
+
+  @Test
   public void getPlugins_whenNoPluginRegistered_shouldReturnEmptyList() {
     assertThat(service.getPlugins()).isEmpty();
   }
