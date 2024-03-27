@@ -16,6 +16,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.*;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.CardPresenceMonitorBlockingSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.WaitForCardRemovalDuringProcessingBlockingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,9 +105,19 @@ final class ObservableReaderStateServiceAdapter {
     }
 
     // processing
-    this.states.put(
-        AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING,
-        new WaitForCardProcessingStateAdapter(this.reader));
+    if (readerSpi instanceof CardPresenceMonitorBlockingSpi
+        || readerSpi instanceof WaitForCardRemovalDuringProcessingBlockingSpi) {
+      final CardRemovalPassiveMonitoringJobAdapter cardRemovalPassiveMonitoringJobAdapter =
+          new CardRemovalPassiveMonitoringJobAdapter(reader);
+      this.states.put(
+          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING,
+          new WaitForCardProcessingStateAdapter(
+              this.reader, cardRemovalPassiveMonitoringJobAdapter, this.executorService));
+    } else {
+      this.states.put(
+          AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING,
+          new WaitForCardProcessingStateAdapter(this.reader));
+    }
 
     // removal
     if (readerSpi instanceof CardRemovalWaiterAsynchronousSpi
