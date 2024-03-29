@@ -11,6 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import java.util.concurrent.ExecutorService;
 import org.eclipse.keypop.reader.ObservableCardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,22 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
    * @since 2.0.0
    */
   WaitForCardProcessingStateAdapter(ObservableLocalReaderAdapter reader) {
-    super(MonitoringState.WAIT_FOR_CARD_PROCESSING, reader, null, null);
+    this(reader, null, null);
+  }
+
+  /**
+   * Creates an instance.
+   *
+   * @param reader The observable local reader adapter.
+   * @param monitoringJob The monitoring job.
+   * @param executorService The executor service to use.
+   * @since 2.0.0
+   */
+  WaitForCardProcessingStateAdapter(
+      ObservableLocalReaderAdapter reader,
+      AbstractMonitoringJobAdapter monitoringJob,
+      ExecutorService executorService) {
+    super(MonitoringState.WAIT_FOR_CARD_PROCESSING, reader, monitoringJob, executorService);
   }
 
   /**

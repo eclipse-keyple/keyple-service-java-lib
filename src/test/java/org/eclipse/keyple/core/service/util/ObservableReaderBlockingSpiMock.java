@@ -18,9 +18,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.keyple.core.common.KeypleReaderExtension;
 import org.eclipse.keyple.core.plugin.CardIOException;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
+import org.eclipse.keyple.core.plugin.TaskCanceledException;
 import org.eclipse.keyple.core.plugin.spi.reader.ConfigurableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterBlockingSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.CardPresenceMonitorBlockingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterBlockingSpi;
 
 public class ObservableReaderBlockingSpiMock
@@ -29,6 +31,7 @@ public class ObservableReaderBlockingSpiMock
         ObservableReaderSpi,
         CardInsertionWaiterBlockingSpi,
         CardRemovalWaiterBlockingSpi,
+        CardPresenceMonitorBlockingSpi,
         ControllableReaderSpiMock {
 
   boolean detectionStarted;
@@ -169,5 +172,16 @@ public class ObservableReaderBlockingSpiMock
   @Override
   public void stopWaitForCardRemoval() {
     Thread.currentThread().interrupt();
+  }
+
+  @Override
+  public void monitorCardPresenceDuringProcessing()
+      throws ReaderIOException, TaskCanceledException {
+    waitForCardRemoval();
+  }
+
+  @Override
+  public void stopCardPresenceMonitoringDuringProcessing() {
+    stopWaitForCardRemoval();
   }
 }

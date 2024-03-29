@@ -14,6 +14,8 @@ package org.eclipse.keyple.core.service;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.TaskCanceledException;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.CardPresenceMonitorBlockingSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.WaitForCardRemovalDuringProcessingBlockingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterBlockingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalBlockingSpi;
 import org.slf4j.Logger;
@@ -22,7 +24,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Detect the card removal thanks to the method {@link
  * CardRemovalWaiterBlockingSpi#waitForCardRemoval()} or {@link
- * WaitForCardRemovalBlockingSpi#waitForCardRemoval()} depending on the provided SPI.
+ * WaitForCardRemovalBlockingSpi#waitForCardRemoval()} or {@link
+ * CardPresenceMonitorBlockingSpi#monitorCardPresenceDuringProcessing()} or {@link
+ * WaitForCardRemovalDuringProcessingBlockingSpi#waitForCardRemovalDuringProcessing()} depending on
+ * the provided SPI.
  *
  * <p>This method is invoked in another thread
  *
@@ -83,6 +88,11 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
             ((CardRemovalWaiterBlockingSpi) readerSpi).waitForCardRemoval();
           } else if (readerSpi instanceof WaitForCardRemovalBlockingSpi) {
             ((WaitForCardRemovalBlockingSpi) readerSpi).waitForCardRemoval();
+          } else if (readerSpi instanceof CardPresenceMonitorBlockingSpi) {
+            ((CardPresenceMonitorBlockingSpi) readerSpi).monitorCardPresenceDuringProcessing();
+          } else if (readerSpi instanceof WaitForCardRemovalDuringProcessingBlockingSpi) {
+            ((WaitForCardRemovalDuringProcessingBlockingSpi) readerSpi)
+                .waitForCardRemovalDuringProcessing();
           }
         } catch (ReaderIOException e) {
           // just warn as it can be a disconnection of the reader.
@@ -117,6 +127,11 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
       ((CardRemovalWaiterBlockingSpi) readerSpi).stopWaitForCardRemoval();
     } else if (readerSpi instanceof WaitForCardRemovalBlockingSpi) {
       ((WaitForCardRemovalBlockingSpi) readerSpi).stopWaitForCardRemoval();
+    } else if (readerSpi instanceof CardPresenceMonitorBlockingSpi) {
+      ((CardPresenceMonitorBlockingSpi) readerSpi).stopCardPresenceMonitoringDuringProcessing();
+    } else if (readerSpi instanceof WaitForCardRemovalDuringProcessingBlockingSpi) {
+      ((WaitForCardRemovalDuringProcessingBlockingSpi) readerSpi)
+          .stopWaitForCardRemovalDuringProcessing();
     }
   }
 }

@@ -1,4 +1,4 @@
-url: https://github.com/eclipse/keyple-service-java-lib
+url: https://github.com/eclipse-keyple/keyple-service-java-lib
 organization:
   name: Eclipse Keyple
   url: https://keyple.org/
@@ -10,9 +10,9 @@ developers:
   - name: Keyple Contributors
     email: keyple-dev@eclipse.org
 scm:
-  connection: scm:git:git://github.com/eclipse/keyple-service-java-lib.git
-  developerConnection: scm:git:https://github.com/eclipse/keyple-service-java-lib.git
-  url: https://github.com/eclipse/keyple-service-java-lib
+  connection: scm:git:git://github.com/eclipse-keyple/keyple-service-java-lib.git
+  developerConnection: scm:git:https://github.com/eclipse-keyple/keyple-service-java-lib.git
+  url: https://github.com/eclipse-keyple/keyple-service-java-lib
 ciManagement:
   system: Jenkins
   url: https://ci.eclipse.org/keyple/job/Keyple/job/keyple-service-java-lib/
