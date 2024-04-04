@@ -40,12 +40,12 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.slf4j:slf4j-api:1.7.32")
     testImplementation("org.slf4j:slf4j-simple:1.7.32")
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(platform("org.junit:junit-bom:5.9.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.vintage:junit-vintage-engine")
     testImplementation("org.assertj:assertj-core:3.23.1")
-    testImplementation("org.mockito:mockito-core:3.3.3")
-    testImplementation("org.powermock:powermock-api-mockito2:2.0.9")
-    testImplementation("org.powermock:powermock-module-junit4:2.0.9")
-    testImplementation("org.awaitility:awaitility:4.0.3")
+    testImplementation("org.mockito:mockito-core:4.8.0")
+    testImplementation("org.awaitility:awaitility:4.1.0")
 }
 
 val javaSourceLevel: String by project

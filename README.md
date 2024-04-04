@@ -25,4 +25,4 @@ Examples of implementation are available in the following repository: [github.co
 
 ## About the source code
 
-The code is built with **Gradle** and is compliant with **Java 1.6** in order to address a wide range of applications.
+The code is built with **Gradle** and is compliant with **Java 1.8** in order to address a wide range of applications.
