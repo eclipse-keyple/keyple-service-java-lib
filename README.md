@@ -17,7 +17,7 @@ The full documentation, including the **user guide**, **download information** a
 
 ## API documentation
 
-API documentation & class diagram is available online: [eclipse.github.io/keyple-service-java-lib](https://eclipse.github.io/keyple-service-java-lib)
+API documentation & class diagram is available online: [eclipse-keyple.github.io/keyple-service-java-lib](https://eclipse-keyple.github.io/keyple-service-java-lib)
 
 ## Examples
 

@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 plugins {
     java
-    id("com.diffplug.spotless") version "5.10.2"
+    id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "3.1"
     jacoco
 }

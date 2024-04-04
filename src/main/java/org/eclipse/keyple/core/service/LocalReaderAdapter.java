@@ -154,7 +154,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       List<CardSelectionRequestSpi> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
-      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+      throws ReaderBrokenCommunicationException,
+          CardBrokenCommunicationException,
           UnexpectedStatusWordException {
 
     checkStatus();
@@ -211,7 +212,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   @Override
   final CardResponseApi processCardRequest(
       CardRequestSpi cardRequest, ChannelControl channelControl)
-      throws CardBrokenCommunicationException, ReaderBrokenCommunicationException,
+      throws CardBrokenCommunicationException,
+          ReaderBrokenCommunicationException,
           UnexpectedStatusWordException {
 
     checkStatus();
@@ -321,7 +323,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *     request and the card returned an unexpected code.
    */
   private CardResponseAdapter processCardRequest(CardRequestSpi cardRequest)
-      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+      throws ReaderBrokenCommunicationException,
+          CardBrokenCommunicationException,
           UnexpectedStatusWordException {
 
     List<ApduResponseAdapter> apduResponses = new ArrayList<ApduResponseAdapter>();
@@ -464,7 +467,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    */
   private CardSelectionResponseApi processCardSelectionRequest(
       CardSelector<?> cardSelector, CardSelectionRequestSpi cardSelectionRequest)
-      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+      throws ReaderBrokenCommunicationException,
+          CardBrokenCommunicationException,
           UnexpectedStatusWordException {
 
     isLogicalChannelOpen = false;
@@ -784,7 +788,9 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     }
   }
 
-  /** @return null or the name of the physical protocol used for the last card communication. */
+  /**
+   * @return null or the name of the physical protocol used for the last card communication.
+   */
   final String getCurrentPhysicalProtocolName() {
     return currentPhysicalProtocolName;
   }

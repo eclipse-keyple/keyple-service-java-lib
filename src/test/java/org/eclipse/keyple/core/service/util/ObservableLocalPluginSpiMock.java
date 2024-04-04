@@ -44,6 +44,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
     this.pluginError = pluginError;
     this.stubReaders = new ConcurrentHashMap<String, ReaderSpi>();
   }
+
   /**
    * {@inheritDoc}
    *
@@ -53,6 +54,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
   public int getMonitoringCycleDuration() {
     return monitoringCycleDuration;
   }
+
   /**
    * {@inheritDoc}
    *
@@ -65,6 +67,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
     }
     return new HashSet<String>(stubReaders.keySet());
   }
+
   /**
    * {@inheritDoc}
    *
@@ -77,6 +80,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
     }
     return stubReaders.get(readerName);
   }
+
   /**
    * {@inheritDoc}
    *
@@ -86,6 +90,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
   public String getName() {
     return name;
   }
+
   /**
    * {@inheritDoc}
    *
@@ -95,6 +100,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
   public Set<ReaderSpi> searchAvailableReaders() throws PluginIOException {
     return new HashSet(stubReaders.values());
   }
+
   /**
    * {@inheritDoc}
    *
@@ -104,6 +110,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
   public void onUnregister() {
     // NO-OP
   }
+
   /**
    * {@inheritDoc}
    *
@@ -116,6 +123,7 @@ public class ObservableLocalPluginSpiMock implements KeyplePluginExtension, Obse
       stubReaders.put(readerName, readerSpi);
     }
   }
+
   /**
    * {@inheritDoc}
    *
