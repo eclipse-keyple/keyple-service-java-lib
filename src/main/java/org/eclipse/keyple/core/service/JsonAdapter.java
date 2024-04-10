@@ -18,8 +18,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import org.eclipse.keypop.card.AbstractApduException;
+import org.eclipse.keypop.card.CardResponseApi;
 
 /**
  * Contains all JSON adapters used for serialization and deserialization processes.<br>
@@ -29,15 +32,15 @@ import org.eclipse.keypop.card.AbstractApduException;
  */
 final class JsonAdapter {
 
+  private JsonAdapter() {}
+
   /**
-   * Serializer of a {@link AbstractApduException}.
-   *
-   * <p>Only the field "message" is serialized during the process.
+   * Serializer/De-serializer of a {@link AbstractApduException}.
    *
    * @since 2.0.0
    */
-  static final class ApduExceptionJsonSerializerAdapter
-      implements JsonSerializer<AbstractApduException> {
+  static final class ApduExceptionJsonAdapter
+      implements JsonSerializer<AbstractApduException>, JsonDeserializer<AbstractApduException> {
 
     /**
      * {@inheritDoc}
@@ -49,10 +52,57 @@ final class JsonAdapter {
         AbstractApduException exception,
         Type type,
         JsonSerializationContext jsonSerializationContext) {
+
       JsonObject json = new JsonObject();
       json.addProperty("detailMessage", exception.getMessage());
-      json.add("cardResponse", jsonSerializationContext.serialize(exception.getCardResponse()));
+      json.addProperty("isCardResponseComplete", exception.isCardResponseComplete());
+      json.add("cardResponseApi", jsonSerializationContext.serialize(exception.getCardResponse()));
       return json;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 3.2.1
+     */
+    @Override
+    public AbstractApduException deserialize(
+        JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
+        throws JsonParseException {
+
+      JsonObject jsonObject = (JsonObject) jsonElement;
+
+      String message = jsonObject.get("detailMessage").getAsString();
+      boolean isCardResponseComplete = jsonObject.get("isCardResponseComplete").getAsBoolean();
+      CardResponseApi cardResponseApi =
+          jsonDeserializationContext.deserialize(
+              jsonObject.get("cardResponseApi").getAsJsonObject(), CardResponseApi.class);
+
+      Class<? extends AbstractApduException> exceptionClass;
+      try {
+        exceptionClass = (Class<? extends AbstractApduException>) Class.forName(type.getTypeName());
+      } catch (ClassNotFoundException e) {
+        throw new JsonParseException(
+            String.format(
+                "Exception [%s] not founded in runtime environment. Original message: %s",
+                type, message));
+      }
+
+      try {
+        Constructor<? extends AbstractApduException> constructor =
+            exceptionClass.getConstructor(CardResponseApi.class, boolean.class, String.class);
+
+        return constructor.newInstance(cardResponseApi, isCardResponseComplete, message);
+
+      } catch (NoSuchMethodException e) {
+        throw new JsonParseException(
+            String.format(
+                "No valid constructor found for exception [%s] with message [%s]", type, message));
+      } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+        throw new JsonParseException(
+            String.format(
+                "Error while trying to build exception [%s] with message [%s]", type, message));
+      }
     }
   }
 

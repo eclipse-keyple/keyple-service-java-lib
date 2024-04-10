@@ -31,7 +31,7 @@ repositories {
 }
 dependencies {
     implementation("org.eclipse.keypop:keypop-reader-java-api:2.0.0")
-    implementation("org.eclipse.keypop:keypop-card-java-api:2.0.0")
+    implementation("org.eclipse.keypop:keypop-card-java-api:2.0.1-SNAPSHOT") {isChanging=true}
     implementation("org.eclipse.keyple:keyple-common-java-api:2.0.0")
     implementation("org.eclipse.keyple:keyple-plugin-java-api:2.3.0")
     implementation("org.eclipse.keyple:keyple-distributed-remote-java-api:3.0.0")
