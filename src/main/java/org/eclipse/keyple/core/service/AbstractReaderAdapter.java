@@ -243,22 +243,22 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
 
     CardResponseApi cardResponse = null;
 
-    if (logger.isDebugEnabled()) {
+    if (logger.isTraceEnabled()) {
       long timeStamp = System.nanoTime();
       long elapsed10ms = (timeStamp - before) / 100000;
       this.before = timeStamp;
-      logger.debug(
+      logger.trace(
           "[{}] transmit => {}, elapsed {} ms.", this.getName(), cardRequest, elapsed10ms / 10.0);
     }
 
     try {
       cardResponse = processCardRequest(cardRequest, channelControl);
     } finally {
-      if (logger.isDebugEnabled()) {
+      if (logger.isTraceEnabled()) {
         long timeStamp = System.nanoTime();
         long elapsed10ms = (timeStamp - before) / 100000;
         this.before = timeStamp;
-        logger.debug(
+        logger.trace(
             "[{}] receive => {}, elapsed {} ms.", this.getName(), cardResponse, elapsed10ms / 10.0);
       }
     }
