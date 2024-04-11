@@ -95,11 +95,11 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
 
     List<CardSelectionResponseApi> cardSelectionResponses = null;
 
-    if (logger.isDebugEnabled()) {
+    if (logger.isTraceEnabled()) {
       long timeStamp = System.nanoTime();
       long elapsed10ms = (timeStamp - before) / 100000;
       this.before = timeStamp;
-      logger.debug(
+      logger.trace(
           "[{}] transmit => {}, elapsed {} ms.",
           this.getName(),
           cardSelectionRequests,
@@ -114,11 +114,11 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
       throw new CardBrokenCommunicationException(
           e.getCardResponse(), false, "An unexpected status word was received.", e);
     } finally {
-      if (logger.isDebugEnabled()) {
+      if (logger.isTraceEnabled()) {
         long timeStamp = System.nanoTime();
         long elapsed10ms = (timeStamp - before) / 100000;
         this.before = timeStamp;
-        logger.debug(
+        logger.trace(
             "[{}] received => {}, elapsed {} ms.",
             this.getName(),
             cardSelectionResponses,

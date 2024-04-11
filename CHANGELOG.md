@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Java source and target levels `1.6` -> `1.8`
+- Logging level for transmission of `CardRequest` and `CardResponse` changed from "debug" to "trace".
 ### Upgraded
 - Gradle `6.8.3` -> `7.6.4`
 
