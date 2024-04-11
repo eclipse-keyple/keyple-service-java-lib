@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Java source and target levels `1.6` -> `1.8`
+- Logging level for transmission of `CardRequest` and `CardResponse` changed from "debug" to "trace".
+### Upgraded
+- Gradle `6.8.3` -> `7.6.4`
 
 ## [3.2.0] - 2024-03-29
 ### Upgraded

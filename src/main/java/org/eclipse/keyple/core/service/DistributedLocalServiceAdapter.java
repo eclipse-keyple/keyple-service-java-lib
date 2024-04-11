@@ -321,7 +321,8 @@ final class DistributedLocalServiceAdapter
      * @throws ReaderBrokenCommunicationException If a reader communication error occurs.
      */
     private void transmitCardRequest()
-        throws CardBrokenCommunicationException, ReaderBrokenCommunicationException,
+        throws CardBrokenCommunicationException,
+            ReaderBrokenCommunicationException,
             UnexpectedStatusWordException {
 
       // Extract parameters from the message

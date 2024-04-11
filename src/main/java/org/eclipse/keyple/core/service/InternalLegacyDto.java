@@ -98,7 +98,9 @@ final class InternalLegacyDto {
     return result;
   }
 
-  /** @since 2.1.1 */
+  /**
+   * @since 2.1.1
+   */
   static final class LegacyCardSelectionRequest {
     LegacyCardSelector cardSelector;
     LegacyCardRequest cardRequest;
@@ -109,7 +111,9 @@ final class InternalLegacyDto {
     }
   }
 
-  /** @since 2.1.1 */
+  /**
+   * @since 2.1.1
+   */
   static final class LegacyCardSelector {
     String cardProtocol;
     String powerOnDataRegex;
@@ -124,7 +128,9 @@ final class InternalLegacyDto {
     }
   }
 
-  /** @since 2.1.1 */
+  /**
+   * @since 2.1.1
+   */
   static final class LegacyCardRequest {
     List<LegacyApduRequest> apduRequests;
     boolean stopOnUnsuccessfulStatusWord;
@@ -135,7 +141,9 @@ final class InternalLegacyDto {
     }
   }
 
-  /** @since 2.1.1 */
+  /**
+   * @since 2.1.1
+   */
   static class LegacyApduRequest {
     byte[] apdu;
     Set<Integer> successfulStatusWords;
