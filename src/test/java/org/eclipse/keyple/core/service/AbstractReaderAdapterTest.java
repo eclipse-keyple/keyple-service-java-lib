@@ -67,14 +67,16 @@ public class AbstractReaderAdapterTest {
 
   @Test(expected = IllegalStateException.class)
   public void transmitCardRequest_whenReaderIsNotRegistered_shouldISE()
-      throws UnexpectedStatusWordException, ReaderBrokenCommunicationException,
+      throws UnexpectedStatusWordException,
+          ReaderBrokenCommunicationException,
           CardBrokenCommunicationException {
     readerAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.KEEP_OPEN);
   }
 
   @Test
   public void transmitCardRequest_shouldInvoke_processCardRequest()
-      throws UnexpectedStatusWordException, ReaderBrokenCommunicationException,
+      throws UnexpectedStatusWordException,
+          ReaderBrokenCommunicationException,
           CardBrokenCommunicationException {
     readerAdapter = Mockito.spy(readerAdapter);
     readerAdapter.register();
@@ -94,14 +96,16 @@ public class AbstractReaderAdapterTest {
         List<CardSelectionRequestSpi> cardSelectionRequests,
         MultiSelectionProcessing multiSelectionProcessing,
         ChannelControl channelControl)
-        throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+        throws ReaderBrokenCommunicationException,
+            CardBrokenCommunicationException,
             UnexpectedStatusWordException {
       return new ArrayList<CardSelectionResponseApi>();
     }
 
     @Override
     CardResponseApi processCardRequest(CardRequestSpi cardRequest, ChannelControl channelControl)
-        throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+        throws ReaderBrokenCommunicationException,
+            CardBrokenCommunicationException,
             UnexpectedStatusWordException {
       return Mockito.mock(CardResponseApi.class);
     }
