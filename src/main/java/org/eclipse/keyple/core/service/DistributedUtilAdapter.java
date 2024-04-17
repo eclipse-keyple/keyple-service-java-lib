@@ -171,61 +171,99 @@ final class DistributedUtilAdapter {
    */
   enum JsonProperty {
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     CARD_REQUEST("cardRequest"),
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     CARD_SELECTION_REQUESTS("cardSelectionRequests"),
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     CARD_SELECTION_SCENARIO("cardSelectionScenario"),
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     CHANNEL_CONTROL("channelControl"),
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     ERROR("error"),
 
-    /** @since 2.1.4 */
+    /**
+     * @since 2.1.4
+     */
     CODE("code"),
 
-    /** @since 2.1.4 */
+    /**
+     * @since 2.1.4
+     */
     MESSAGE("message"),
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     MULTI_SELECTION_PROCESSING("multiSelectionProcessing"),
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     NOTIFICATION_MODE("notificationMode"),
 
-    /** @since 2.1.4 */
+    /**
+     * @since 2.1.4
+     */
     PARAMETERS("parameters"),
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     PLUGIN_EVENT("pluginEvent"),
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     POLLING_MODE("pollingMode"),
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     READER_EVENT("readerEvent"),
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     READER_GROUP_REFERENCE("readerGroupReference"),
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     READER_NAME("readerName"),
 
-    /** @since 2.2.0 */
+    /**
+     * @since 2.2.0
+     */
     SELECTED_SMART_CARD("selectedSmartCard"),
 
-    /** @since 2.2.0 */
+    /**
+     * @since 2.2.0
+     */
     SELECTED_SMART_CARD_CLASS_NAME("selectedSmartCardClassName"),
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     RESULT("result"),
 
-    /** @since 2.0.0 */
+    /**
+     * @since 2.0.0
+     */
     SERVICE("service");
 
     private final String key;

@@ -177,7 +177,8 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
       List<CardSelectionRequestSpi> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
-      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+      throws ReaderBrokenCommunicationException,
+          CardBrokenCommunicationException,
           UnexpectedStatusWordException;
 
   /**
@@ -194,7 +195,8 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
    */
   abstract CardResponseApi processCardRequest(
       CardRequestSpi cardRequest, ChannelControl channelControl)
-      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+      throws ReaderBrokenCommunicationException,
+          CardBrokenCommunicationException,
           UnexpectedStatusWordException;
 
   /**
@@ -225,7 +227,8 @@ abstract class AbstractReaderAdapter implements Reader, ProxyReaderApi {
   @Override
   public CardResponseApi transmitCardRequest(
       CardRequestSpi cardRequest, ChannelControl channelControl)
-      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException,
+      throws ReaderBrokenCommunicationException,
+          CardBrokenCommunicationException,
           UnexpectedStatusWordException {
     checkStatus();
 
