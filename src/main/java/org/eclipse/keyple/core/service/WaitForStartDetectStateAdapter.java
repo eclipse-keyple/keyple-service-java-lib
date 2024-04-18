@@ -79,7 +79,6 @@ final class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapte
       case START_DETECT:
         switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
         break;
-
       default:
         logger.warn(
             "[{}] Ignore =>  Event {} received in currentState {}",

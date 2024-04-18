@@ -167,13 +167,11 @@ final class ObservableReaderStateServiceAdapter {
       case CARD_INSERTED:
       case CARD_REMOVED:
       case CARD_PROCESSED:
+      case STOP_DETECT: // Manage during the switchState() method call
       case TIME_OUT:
         break;
       case START_DETECT:
         readerSpi.onStartDetection();
-        break;
-      case STOP_DETECT:
-        readerSpi.onStopDetection();
         break;
     }
     this.currentState.onEvent(event);
@@ -205,6 +203,12 @@ final class ObservableReaderStateServiceAdapter {
 
     // switch currentState
     currentState = this.states.get(stateId);
+
+    // As soon as the state machine returns to the WAIT_FOR_START_DETECTION state,
+    // we deactivate card detection in the plugin.
+    if (stateId == AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_START_DETECTION) {
+      readerSpi.onStopDetection();
+    }
 
     // onActivate the new current state
     currentState.onActivate();

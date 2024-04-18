@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fixes a weakness related to observable reader observation in `SINGLESHOT` detection mode.
+  The `onStopDetection()` method of the `ObservableReaderSpi` interface is now called whenever the state machine 
+  switches to the `WAIT_FOR_START_DETECTION` state.
 
 ## [3.2.1] - 2024-04-12
 ### Fixed
