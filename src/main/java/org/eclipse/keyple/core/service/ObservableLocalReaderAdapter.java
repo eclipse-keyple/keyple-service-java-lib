@@ -197,7 +197,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
               new ReaderCommunicationException(READER_MONITORING_ERROR, e));
       return false;
     } catch (CardIOException e) {
-      logger.warn("Error while ping card: {}", e.getMessage());
       return false;
     }
     return true;
@@ -230,14 +229,14 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
     // RL-DET-INSNOTIF.1
     if (logger.isTraceEnabled()) {
-      logger.trace("Processes inserted card");
+      logger.trace("Process inserted card");
     }
 
     isCardRemovedEventNotificationEnabled = true;
 
     if (cardSelectionScenario == null) {
       if (logger.isTraceEnabled()) {
-        logger.trace("No card selection scenario defined. Notifies [CARD_INSERTED] event");
+        logger.trace("No card selection scenario defined. Notify [CARD_INSERTED] event");
       }
       /* no default request is defined, just notify the card insertion */
       return new ReaderEventAdapter(

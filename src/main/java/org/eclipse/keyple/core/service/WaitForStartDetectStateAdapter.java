@@ -67,9 +67,9 @@ final class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapte
   void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "Monitor of reader [{}] receives internal event [{}] in current state [{}]",
-          getReader().getName(),
+          "Internal event [{}] received for reader [{}] in current state [{}]",
           event,
+          getReader().getName(),
           getMonitoringState());
     }
     /*

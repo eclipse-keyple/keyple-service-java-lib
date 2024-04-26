@@ -187,7 +187,7 @@ final class ObservableReaderStateServiceAdapter {
     if (currentState != null) {
       if (logger.isTraceEnabled()) {
         logger.trace(
-            "Monitor of reader [{}] switches state from {} to {}",
+            "Switch state of reader [{}] from {} to {}",
             this.reader.getName(),
             this.currentState.getMonitoringState(),
             stateId);
@@ -195,7 +195,7 @@ final class ObservableReaderStateServiceAdapter {
       currentState.onDeactivate();
     } else {
       if (logger.isTraceEnabled()) {
-        logger.trace("Monitor of reader [{}] switches state to {}", this.reader.getName(), stateId);
+        logger.trace("Switch state of reader [{}] to {}", this.reader.getName(), stateId);
       }
     }
 

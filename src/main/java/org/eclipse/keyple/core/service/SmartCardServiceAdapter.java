@@ -295,7 +295,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @throws IllegalStateException if the plugin is already registered.
    */
   private void checkPluginRegistration(String pluginName) {
-    logger.info("Registers plugin [{}]", pluginName);
+    logger.info("Register plugin [{}]", pluginName);
     Assert.getInstance().notEmpty(pluginName, "pluginName");
     if (plugins.containsKey(pluginName)) {
       throw new IllegalStateException(
@@ -310,7 +310,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @throws IllegalStateException if the distributed local service is already registered.
    */
   private void checkDistributedLocalServiceRegistration(String distributedLocalServiceName) {
-    logger.info("Registers distributed local service [{}]", distributedLocalServiceName);
+    logger.info("Register distributed local service [{}]", distributedLocalServiceName);
     Assert.getInstance().notEmpty(distributedLocalServiceName, "distributedLocalServiceName");
     if (distributedLocalServices.containsKey(distributedLocalServiceName)) {
       throw new IllegalStateException(
@@ -454,7 +454,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public void unregisterPlugin(String pluginName) {
-    logger.info("Unregisters plugin [{}]", pluginName);
+    logger.info("Unregister plugin [{}]", pluginName);
     synchronized (pluginMonitor) {
       Plugin plugin = plugins.get(pluginName);
       if (plugin != null) {
@@ -620,7 +620,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public void unregisterDistributedLocalService(String distributedLocalServiceName) {
-    logger.info("Unregisters distributed local service [{}]", distributedLocalServiceName);
+    logger.info("Unregister distributed local service [{}]", distributedLocalServiceName);
     synchronized (distributedLocalServiceMonitor) {
       DistributedLocalService localService =
           distributedLocalServices.remove(distributedLocalServiceName);
