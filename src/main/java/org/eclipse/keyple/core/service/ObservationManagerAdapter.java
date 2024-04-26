@@ -47,11 +47,11 @@ final class ObservationManagerAdapter<T, S> {
    */
   ObservationManagerAdapter(String pluginName, String readerName) {
     if (readerName == null) {
-      this.ownerComponent = String.format("Plugin '%s'", pluginName);
+      this.ownerComponent = String.format("Plugin [%s]", pluginName);
     } else {
-      this.ownerComponent = String.format("Reader '%s' of plugin '%s'", readerName, pluginName);
+      this.ownerComponent = String.format("Reader [%s]", readerName);
     }
-    this.observers = new LinkedHashSet<T>(1);
+    this.observers = new LinkedHashSet<>(1);
     this.monitor = new Object();
   }
 
@@ -64,15 +64,13 @@ final class ObservationManagerAdapter<T, S> {
    * @since 2.0.0
    */
   void addObserver(T observer) {
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "{} is adding the observer '{}'.",
-          ownerComponent,
-          observer != null ? observer.getClass().getSimpleName() : null);
-    }
+    logger.info(
+        "{} adds observer [{}]",
+        ownerComponent,
+        observer != null ? observer.getClass().getSimpleName() : null);
     Assert.getInstance().notNull(observer, "observer");
     if (exceptionHandler == null) {
-      throw new IllegalStateException("No exception handler defined.");
+      throw new IllegalStateException("No exception handler defined");
     }
     synchronized (monitor) {
       observers.add(observer);
@@ -87,12 +85,10 @@ final class ObservationManagerAdapter<T, S> {
    * @since 2.0.0
    */
   void removeObserver(T observer) {
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "{} is removing the observer '{}'.",
-          ownerComponent,
-          observer != null ? observer.getClass().getSimpleName() : null);
-    }
+    logger.info(
+        "{} removes observer [{}]",
+        ownerComponent,
+        observer != null ? observer.getClass().getSimpleName() : null);
     synchronized (monitor) {
       observers.remove(observer);
     }
@@ -104,9 +100,7 @@ final class ObservationManagerAdapter<T, S> {
    * @since 2.0.0
    */
   void clearObservers() {
-    if (logger.isDebugEnabled()) {
-      logger.debug("{} is removing all observers.", ownerComponent);
-    }
+    logger.info("{} removes all observers", ownerComponent);
     synchronized (monitor) {
       observers.clear();
     }
@@ -142,7 +136,7 @@ final class ObservationManagerAdapter<T, S> {
    */
   Set<T> getObservers() {
     synchronized (monitor) {
-      return new LinkedHashSet<T>(observers);
+      return new LinkedHashSet<>(observers);
     }
   }
 

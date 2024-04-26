@@ -13,8 +13,6 @@ package org.eclipse.keyple.core.service;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Abstract class for all states of a {@link ObservableLocalReaderAdapter}.
@@ -22,9 +20,6 @@ import org.slf4j.LoggerFactory;
  * @since 2.0.0
  */
 abstract class AbstractObservableStateAdapter {
-
-  private static final Logger logger =
-      LoggerFactory.getLogger(AbstractObservableStateAdapter.class);
 
   /**
    * The states that the reader monitoring state machine can have
@@ -95,18 +90,6 @@ abstract class AbstractObservableStateAdapter {
   }
 
   /**
-   * Create a new state with a state identifier without monitoring job.
-   *
-   * @param reader observable reader this currentState is attached to
-   * @param monitoringState name of the currentState
-   * @since 2.0.0
-   */
-  AbstractObservableStateAdapter(
-      MonitoringState monitoringState, ObservableLocalReaderAdapter reader) {
-    this(monitoringState, reader, null, null);
-  }
-
-  /**
    * Get the current state identifier of the state machine
    *
    * @return the current state identifier
@@ -143,10 +126,6 @@ abstract class AbstractObservableStateAdapter {
    * @throws IllegalStateException if a job is defined with a null executor service.
    */
   final void onActivate() {
-    if (logger.isTraceEnabled()) {
-      logger.trace("[{}] onActivate => {}", this.reader.getName(), this.getMonitoringState());
-    }
-
     // launch the monitoringJob is necessary
     if (monitoringJob != null) {
       if (executorService == null) {
@@ -157,28 +136,14 @@ abstract class AbstractObservableStateAdapter {
   }
 
   /**
-   * Invoked when deactivated.
+   * Invoked when deactivated. Cancel the monitoringJob is necessary.
    *
    * @since 2.0.0
    */
   final void onDeactivate() {
-
-    if (logger.isTraceEnabled()) {
-      logger.trace("[{}] onDeactivate => {}", this.reader.getName(), this.getMonitoringState());
-    }
-
-    // cancel the monitoringJob is necessary
     if (monitoringEvent != null && !monitoringEvent.isDone()) {
       monitoringJob.stop();
-
-      boolean canceled = monitoringEvent.cancel(false);
-      if (logger.isTraceEnabled()) {
-        logger.trace(
-            "[{}] onDeactivate => cancel monitoring job {} by thread interruption {}",
-            reader.getName(),
-            monitoringJob.getClass().getSimpleName(),
-            canceled);
-      }
+      monitoringEvent.cancel(false);
     }
   }
 

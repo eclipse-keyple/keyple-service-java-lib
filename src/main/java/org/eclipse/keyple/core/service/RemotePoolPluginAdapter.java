@@ -60,7 +60,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     super.register();
     int distributedApiLevel = remotePoolPluginSpi.exchangeApiLevel(CORE_API_LEVEL);
     logger.info(
-        "Core API level: {}, Distributed API level (Remote Pool Plugin): {}",
+        "Distributed Core API level: {}, Distributed API level (Remote Pool Plugin): {}",
         CORE_API_LEVEL,
         distributedApiLevel);
   }
@@ -75,7 +75,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     try {
       remotePoolPluginSpi.onUnregister();
     } catch (Exception e) {
-      logger.error("Error during the unregistration of the extension of plugin '{}'", getName(), e);
+      logger.error("Error unregistering plugin extension [{}]: {}", getName(), e.getMessage(), e);
     }
     super.unregister();
   }
@@ -110,7 +110,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
       throw e;
     } catch (Exception e) {
       throwRuntimeException(e);
-      return new TreeSet<String>();
+      return new TreeSet<>();
     }
   }
 
@@ -125,7 +125,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Pool plugin '{}' allocates a reader of the group reference '{}'.",
+          "Pool plugin [{}] allocates reader of group reference [{}]",
           getName(),
           readerGroupReference);
     }
@@ -165,7 +165,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
               (SmartCard)
                   JsonUtil.getParser().fromJson(selectedSmartCardJson, classOfSelectedSmartCard);
         } catch (ClassNotFoundException e) {
-          logger.error("Class not found for name '{}'", selectedSmartCardClassName, e);
+          logger.error("Class not found: {}", selectedSmartCardClassName, e);
         }
       }
     } catch (RuntimeException e) {
@@ -209,7 +209,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Pool plugin '{}' releases the reader '{}'.",
+          "Pool plugin [{}] releases reader [{}]",
           getName(),
           reader != null ? reader.getName() : null);
     }

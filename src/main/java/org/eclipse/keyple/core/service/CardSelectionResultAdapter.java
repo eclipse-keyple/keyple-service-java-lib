@@ -24,7 +24,7 @@ import org.eclipse.keypop.reader.selection.spi.SmartCard;
 final class CardSelectionResultAdapter implements CardSelectionResult {
 
   private int activeSelectionIndex = -1;
-  private final Map<Integer, SmartCard> smartCardMap = new HashMap<Integer, SmartCard>();
+  private final Map<Integer, SmartCard> smartCardMap = new HashMap<>();
 
   /**
    * Constructor

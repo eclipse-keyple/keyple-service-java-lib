@@ -46,7 +46,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   private static final Logger logger = LoggerFactory.getLogger(ObservableLocalReaderAdapter.class);
 
   private static final String READER_MONITORING_ERROR =
-      "An error occurred while monitoring the reader.";
+      "An error occurred while monitoring the reader";
   private static final byte[] APDU_PING_CARD_PRESENCE = {
     (byte) 0x00, (byte) 0xC0, (byte) 0x00, (byte) 0x00, (byte) 0x00
   };
@@ -120,9 +120,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
     super(observableReaderSpi, pluginName);
     this.observableReaderSpi = observableReaderSpi;
     this.stateService = new ObservableReaderStateServiceAdapter(this);
-    this.observationManager =
-        new ObservationManagerAdapter<
-            CardReaderObserverSpi, CardReaderObservationExceptionHandlerSpi>(pluginName, getName());
+    this.observationManager = new ObservationManagerAdapter<>(pluginName, getName());
     if (observableReaderSpi instanceof CardInsertionWaiterAsynchronousSpi) {
       ((CardInsertionWaiterAsynchronousSpi) observableReaderSpi).setCallback(this);
     } else if (observableReaderSpi instanceof WaitForCardInsertionAutonomousSpi) {
@@ -189,9 +187,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   final boolean isCardPresentPing() {
     // transmits the APDU and checks for the IO exception.
     try {
-      if (logger.isTraceEnabled()) {
-        logger.trace("[{}] Ping card", getName());
-      }
       observableReaderSpi.transmitApdu(APDU_PING_CARD_PRESENCE);
     } catch (ReaderIOException e) {
       // Notify the reader communication failure with the exception handler.
@@ -202,10 +197,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
               new ReaderCommunicationException(READER_MONITORING_ERROR, e));
       return false;
     } catch (CardIOException e) {
-      if (logger.isTraceEnabled()) {
-        logger.trace(
-            "[{}] Exception occurred in isCardPresentPing. Message: {}", getName(), e.getMessage());
-      }
       return false;
     }
     return true;
@@ -238,14 +229,14 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
     // RL-DET-INSNOTIF.1
     if (logger.isTraceEnabled()) {
-      logger.trace("[{}] process the inserted card", getName());
+      logger.trace("Process inserted card");
     }
 
     isCardRemovedEventNotificationEnabled = true;
 
     if (cardSelectionScenario == null) {
       if (logger.isTraceEnabled()) {
-        logger.trace("[{}] no card selection scenario defined, notify CARD_INSERTED", getName());
+        logger.trace("No card selection scenario defined. Notify [CARD_INSERTED] event");
       }
       /* no default request is defined, just notify the card insertion */
       return new ReaderEventAdapter(
@@ -274,9 +265,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
         /* notify only if a card matched the selection, just ignore if not */
         if (logger.isTraceEnabled()) {
           logger.trace(
-              "[{}] selection hasn't matched"
-                  + " do not thrown any event because of MATCHED_ONLY flag",
-              getName());
+              "Selection hasn't matched. Do not throw any event because of [MATCHED_ONLY] flag");
         }
         isCardRemovedEventNotificationEnabled = false;
         return null;
@@ -284,8 +273,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
       // the card didn't match, notify an CARD_INSERTED event with the received response
       if (logger.isTraceEnabled()) {
-        logger.trace(
-            "[{}] none of {} default selection matched", getName(), cardSelectionResponses.size());
+        logger.trace("None of {} selection cases matched", cardSelectionResponses.size());
       }
       return new ReaderEventAdapter(
           getPluginName(),
@@ -306,9 +294,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
       closeLogicalAndPhysicalChannelsSilently();
       // The card was removed or not read correctly, no exception raising or event notification,
       // just log.
-      logger.debug(
-          "A card error or communication exception occurred while processing the card selection scenario. {}",
-          e.getMessage());
+      logger.warn("Error while processing card selection scenario: {}", e.getMessage());
     }
 
     // Here we close the physical channel in case it was opened for a card excluded by the selection
@@ -338,7 +324,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
     for (CardSelectionResponseApi cardSelectionResponse : cardSelectionResponses) {
       if (cardSelectionResponse != null && cardSelectionResponse.hasMatched()) {
         if (logger.isTraceEnabled()) {
-          logger.trace("[{}] a default selection has matched", getName());
+          logger.trace("A default selection case matched");
         }
         return true;
       }
@@ -388,7 +374,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Reader '{}' notifies the reader event '{}' to {} observer(s).",
+          "Reader [{}] notifies event [{}] to {} observer(s)",
           getName(),
           event.getType().name(),
           countObservers());
@@ -414,8 +400,8 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
             .getObservationExceptionHandler()
             .onReaderObservationError(getPluginName(), getName(), e);
       } catch (Exception e2) {
-        logger.error("Exception during notification", e2);
-        logger.error("Original cause", e);
+        logger.error("Event notification error: {}", e2.getMessage(), e2);
+        logger.error("Original cause: {}", e.getMessage(), e);
       }
     }
   }
@@ -456,7 +442,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
       stopCardDetection();
       stateService.shutdown();
     } catch (Exception e) {
-      logger.error("Error during the stop card detection of reader '{}'", getName(), e);
+      logger.error("Error stopping card detection on reader [{}]", getName(), e);
     }
     notifyObservers(
         new ReaderEventAdapter(getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));
@@ -539,13 +525,8 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   public final void startCardDetection(DetectionMode detectionMode) {
     // RL-DET-REMCTRL.1
     checkStatus();
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "Reader '{}' of plugin '{}' starts the card detection with polling mode '{}'.",
-          getName(),
-          getPluginName(),
-          detectionMode);
-    }
+    logger.info(
+        "Reader [{}] starts card detection with polling mode [{}]", getName(), detectionMode);
     Assert.getInstance().notNull(detectionMode, "detectionMode");
     this.detectionMode = detectionMode;
     stateService.onEvent(InternalEvent.START_DETECT);
@@ -559,10 +540,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   @Override
   public final void stopCardDetection() {
     // RL-DET-REMCTRL.1
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "Reader '{}' of plugin '{}' stops the card detection.", getName(), getPluginName());
-    }
+    logger.info("Reader [{}] stops card detection", getName());
     stateService.onEvent(InternalEvent.STOP_DETECT);
   }
 
@@ -572,12 +550,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0.0
    */
   public final void finalizeCardProcessing() {
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "Reader '{}' of plugin '{}' starts the removal sequence of the card.",
-          getName(),
-          getPluginName());
-    }
+    logger.info("Reader [{}] starts card removal sequence", getName());
     stateService.onEvent(InternalEvent.CARD_PROCESSED);
   }
 

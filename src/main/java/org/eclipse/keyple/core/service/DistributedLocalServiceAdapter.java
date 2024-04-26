@@ -48,7 +48,7 @@ final class DistributedLocalServiceAdapter
       LoggerFactory.getLogger(DistributedLocalServiceAdapter.class);
 
   private static final String READER_NOT_FOUND_TEMPLATE =
-      "There is no local reader registered with the name '%s' or the associated plugin is no longer registered.";
+      "There is no local reader registered with the name [%s] or the associated plugin is no longer registered";
 
   private final String name;
   private final LocalServiceSpi localServiceSpi;
@@ -87,13 +87,12 @@ final class DistributedLocalServiceAdapter
   public String executeLocally(String jsonData, String readerName) {
     if (readerName != null) {
       if (logger.isDebugEnabled()) {
-        logger.debug(
-            "Service '{}' processes data on the reader '{}' : {}", name, readerName, jsonData);
+        logger.debug("Service [{}] processes data on reader [{}]: {}", name, readerName, jsonData);
       }
       return new LocalReaderExecutor(jsonData, readerName).execute();
     } else {
       if (logger.isDebugEnabled()) {
-        logger.debug("Service '{}' processes data on plugins : {}", name, jsonData);
+        logger.debug("Service [{}] processes data on plugins: {}", name, jsonData);
       }
       return new LocalPluginExecutor(jsonData).execute();
     }
@@ -118,7 +117,7 @@ final class DistributedLocalServiceAdapter
   public <T extends KeypleDistributedLocalServiceExtension> T getExtension(
       Class<T> distributedLocalServiceExtensionClass) {
     checkStatus();
-    return (T) localServiceSpi;
+    return distributedLocalServiceExtensionClass.cast(localServiceSpi);
   }
 
   /**
@@ -131,7 +130,7 @@ final class DistributedLocalServiceAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Service '{}' forwards the plugin event '{}' associated to the local reader '{}' of the local plugin '{}'.",
+          "Service [{}] forwards plugin event [{}] associated to local reader [{}] of local plugin [{}]",
           name,
           pluginEvent.getType().name(),
           pluginEvent.getReaderNames().first(),
@@ -155,7 +154,7 @@ final class DistributedLocalServiceAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Service '{}' forwards the reader event '{}' associated to the local reader '{}' of the local plugin '{}'.",
+          "Service [{}] forwards reader event [{}] associated to local reader [{}] of local plugin [{}]",
           name,
           readerEvent.getType().name(),
           readerEvent.getReaderName(),
@@ -177,7 +176,7 @@ final class DistributedLocalServiceAdapter
   void register() {
     int distributedApiLevel = localServiceSpi.exchangeApiLevel(CORE_API_LEVEL);
     logger.info(
-        "Core API level: {}, Distributed API level (Local Service): {}",
+        "Distributed Core API level: {}, Distributed API level (Local Service): {}",
         CORE_API_LEVEL,
         distributedApiLevel);
     isRegistered = true;
@@ -211,7 +210,7 @@ final class DistributedLocalServiceAdapter
   private void checkStatus() {
     if (!isRegistered) {
       throw new IllegalStateException(
-          String.format("Service '%s' is not or no longer registered.", name));
+          String.format("Service [%s] is not or no longer registered", name));
     }
   }
 
@@ -373,8 +372,7 @@ final class DistributedLocalServiceAdapter
       JsonArray cardSelectorsJsonArray =
           params.get(JsonProperty.CARD_SELECTORS.getKey()).getAsJsonArray();
 
-      List<CardSelector<?>> cardSelectors =
-          new ArrayList<CardSelector<?>>(cardSelectorsTypes.size());
+      List<CardSelector<?>> cardSelectors = new ArrayList<>(cardSelectorsTypes.size());
       for (int i = 0; i < cardSelectorsTypes.size(); i++) {
         CardSelector<?> cardSelector;
         try {
@@ -384,7 +382,7 @@ final class DistributedLocalServiceAdapter
                   JsonUtil.getParser().fromJson(cardSelectorsJsonArray.get(i), classOfCardSelector);
         } catch (ClassNotFoundException e) {
           throw new IllegalArgumentException(
-              "Original CardSelector type " + cardSelectorsTypes.get(i) + " not found.", e);
+              "Original CardSelector type " + cardSelectorsTypes.get(i) + " not found", e);
         }
         cardSelectors.add(cardSelector);
       }
@@ -430,7 +428,7 @@ final class DistributedLocalServiceAdapter
             .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode);
       } else {
         throw new IllegalStateException(
-            String.format("Reader '%s' is not observable", reader.getName()));
+            String.format("Reader [%s] is not observable", reader.getName()));
       }
     }
 
@@ -563,7 +561,7 @@ final class DistributedLocalServiceAdapter
     private void getReaders() {
 
       // Execute the service on the plugins
-      Map<String, Boolean> readers = new HashMap<String, Boolean>();
+      Map<String, Boolean> readers = new HashMap<>();
       for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
         for (CardReader reader : plugin.getReaders()) {
           readers.put(reader.getName(), reader instanceof ObservableCardReader);
@@ -596,7 +594,7 @@ final class DistributedLocalServiceAdapter
     private void getReaderGroupReferences() {
 
       // Execute the service on the plugins
-      SortedSet<String> readerGroupReferences = new TreeSet<String>();
+      SortedSet<String> readerGroupReferences = new TreeSet<>();
       for (String poolPluginName : poolPluginNames) {
         PoolPlugin poolPlugin =
             (PoolPlugin) SmartCardServiceProvider.getService().getPlugin(poolPluginName);
@@ -622,7 +620,7 @@ final class DistributedLocalServiceAdapter
       if (poolPlugin == null) {
         throw new IllegalStateException(
             String.format(
-                "There is no local pool plugin registered having the reader group name '%s'.",
+                "There is no local pool plugin registered having the reader group name [%s]",
                 readerGroupReference));
       }
       CardReader reader = poolPlugin.allocateReader(readerGroupReference);
@@ -677,7 +675,7 @@ final class DistributedLocalServiceAdapter
         }
       }
       if (!isObservationStarted) {
-        throw new IllegalStateException("There is no observable local plugin.");
+        throw new IllegalStateException("There is no observable local plugin");
       }
     }
 

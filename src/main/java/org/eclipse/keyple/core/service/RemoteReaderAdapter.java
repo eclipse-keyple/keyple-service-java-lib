@@ -118,7 +118,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
         params.addProperty(JsonProperty.CHANNEL_CONTROL.getKey(), channelControl.name());
 
         // Original card selectors
-        List<String> cardSelectorsTypes = new ArrayList<String>(cardSelectors.size());
+        List<String> cardSelectorsTypes = new ArrayList<>(cardSelectors.size());
         for (CardSelector<?> cardSelector : cardSelectors) {
           cardSelectorsTypes.add(cardSelector.getClass().getName());
         }
@@ -155,8 +155,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Execute the remote service.
     try {
-      JsonObject output =
-          executeReaderServiceRemotely(input, remoteReaderSpi, getName(), getPluginName(), logger);
+      JsonObject output = executeReaderServiceRemotely(input, remoteReaderSpi, getName(), logger);
 
       Assert.getInstance().notNull(output, OUTPUT);
 
@@ -274,8 +273,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Execute the remote service.
     try {
-      JsonObject output =
-          executeReaderServiceRemotely(input, remoteReaderSpi, getName(), getPluginName(), logger);
+      JsonObject output = executeReaderServiceRemotely(input, remoteReaderSpi, getName(), logger);
 
       Assert.getInstance().notNull(output, OUTPUT);
 
@@ -376,8 +374,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
    */
   private boolean executeReaderBooleanServiceRemotely(JsonObject input) {
     try {
-      JsonObject output =
-          executeReaderServiceRemotely(input, remoteReaderSpi, getName(), getPluginName(), logger);
+      JsonObject output = executeReaderServiceRemotely(input, remoteReaderSpi, getName(), logger);
 
       Assert.getInstance().notNull(output, OUTPUT);
 
@@ -473,7 +470,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
 
     // Execute the remote service.
     try {
-      executeReaderServiceRemotely(input, remoteReaderSpi, getName(), getPluginName(), logger);
+      executeReaderServiceRemotely(input, remoteReaderSpi, getName(), logger);
 
     } catch (RuntimeException e) {
       throw e;

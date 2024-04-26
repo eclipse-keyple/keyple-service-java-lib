@@ -63,13 +63,13 @@ final class DistributedUtilAdapter {
       throws Exception { // NOSONAR
 
     if (logger.isDebugEnabled()) {
-      logger.debug("Plugin '{}' sends JSON data: {}", pluginName, input);
+      logger.debug("Plugin [{}] --> jsonData: {}", pluginName, input);
     }
 
     String outputJson = remotePluginSpi.executeRemotely(input.toString());
 
     if (logger.isDebugEnabled()) {
-      logger.debug("Plugin '{}' receives JSON data: {}", pluginName, outputJson);
+      logger.debug("Plugin [{}] <-- jsonData: {}", pluginName, outputJson);
     }
 
     return getJsonObject(outputJson);
@@ -83,29 +83,23 @@ final class DistributedUtilAdapter {
    * @param input The JSON input data to process.
    * @param remoteReaderSpi The SPI in charge of carrying out the treatment.
    * @param readerName The name of the remote reader.
-   * @param pluginName The name of the remote plugin.
    * @param logger The logger to use for logging.
    * @return The JSON output data, or null if returned data are null or empty.
    * @throws Exception The embedded exception if exists.
    * @since 2.0.0
    */
   static JsonObject executeReaderServiceRemotely(
-      JsonObject input,
-      RemoteReaderSpi remoteReaderSpi,
-      String readerName,
-      String pluginName,
-      Logger logger)
+      JsonObject input, RemoteReaderSpi remoteReaderSpi, String readerName, Logger logger)
       throws Exception { // NOSONAR
 
     if (logger.isDebugEnabled()) {
-      logger.debug("Reader '{}' of plugin '{}' sends JSON data: {}", readerName, pluginName, input);
+      logger.debug("Reader [{}] --> jsonData: {}", readerName, input);
     }
 
     String outputJson = remoteReaderSpi.executeRemotely(input.toString());
 
     if (logger.isDebugEnabled()) {
-      logger.debug(
-          "Reader '{}' of plugin '{}' receives JSON data: {}", readerName, pluginName, outputJson);
+      logger.debug("Reader [{}] <-- jsonData: {}", readerName, outputJson);
     }
 
     return getJsonObject(outputJson);

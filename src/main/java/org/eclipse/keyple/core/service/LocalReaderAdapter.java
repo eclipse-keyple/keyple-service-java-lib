@@ -74,7 +74,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   LocalReaderAdapter(ReaderSpi readerSpi, String pluginName) {
     super(readerSpi.getName(), (KeypleReaderExtension) readerSpi, pluginName);
     this.readerSpi = readerSpi;
-    protocolAssociations = new LinkedHashMap<String, String>();
+    protocolAssociations = new LinkedHashMap<>();
   }
 
   /**
@@ -114,10 +114,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       readerSpi.closePhysicalChannel();
     } catch (ReaderIOException e) {
       logger.error(
-          "[{}] Exception occurred in releaseSeChannel. Message: {}",
-          this.getName(),
-          e.getMessage(),
-          e);
+          "Error closing physical channel on reader [{}]: {}", this.getName(), e.getMessage(), e);
     }
   }
 
@@ -133,12 +130,12 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     try {
       readerSpi.closePhysicalChannel();
     } catch (Exception e) {
-      logger.error("Error during the closing physical channel on reader '{}'", getName(), e);
+      logger.error("Error closing physical channel on reader [{}]", getName(), e);
     }
     try {
       readerSpi.onUnregister();
     } catch (Exception e) {
-      logger.error("Error during the unregistration of the extension of reader '{}'", getName(), e);
+      logger.error("Error unregistering reader extension [{}]: {}", getName(), e.getMessage(), e);
     }
     super.unregister();
   }
@@ -174,8 +171,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       }
     }
 
-    List<CardSelectionResponseApi> cardSelectionResponses =
-        new ArrayList<CardSelectionResponseApi>();
+    List<CardSelectionResponseApi> cardSelectionResponses = new ArrayList<>();
 
     Iterator<CardSelector<?>> cardSelectorIterator = cardSelectors.iterator();
 
@@ -255,7 +251,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       return readerSpi.checkCardPresence();
     } catch (ReaderIOException e) {
       throw new ReaderCommunicationException(
-          "An exception occurred while checking the card presence.", e);
+          "An exception occurred while checking the card presence", e);
     }
   }
 
@@ -327,7 +323,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           CardBrokenCommunicationException,
           UnexpectedStatusWordException {
 
-    List<ApduResponseAdapter> apduResponses = new ArrayList<ApduResponseAdapter>();
+    List<ApduResponseAdapter> apduResponses = new ArrayList<>();
 
     /* Proceeds with the APDU requests present in the CardRequest */
     for (ApduRequestSpi apduRequest : cardRequest.getApduRequests()) {
@@ -339,7 +335,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           throw new UnexpectedStatusWordException(
               new CardResponseAdapter(apduResponses, false),
               cardRequest.getApduRequests().size() == apduResponses.size(),
-              "Unexpected status word.");
+              "Unexpected status word");
         }
       } catch (ReaderIOException e) {
         /*
@@ -351,7 +347,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         throw new ReaderBrokenCommunicationException(
             new CardResponseAdapter(apduResponses, false),
             false,
-            "Reader communication failure while transmitting a card request.",
+            "Reader communication failure while transmitting a card request",
             e);
       } catch (CardIOException e) {
         /*
@@ -363,7 +359,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         throw new CardBrokenCommunicationException(
             new CardResponseAdapter(apduResponses, false),
             false,
-            "Card communication failure while transmitting a card request.",
+            "Card communication failure while transmitting a card request",
             e);
       }
     }
@@ -391,7 +387,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       long elapsed10ms = (timeStamp - before) / 100000;
       this.before = timeStamp;
       logger.debug(
-          "[{}] processApduRequest => {}, elapsed {} ms.",
+          "Reader [{}] --> apduRequest: {}, elapsed {} ms",
           this.getName(),
           apduRequest,
           elapsed10ms / 10.0);
@@ -404,7 +400,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       long elapsed10ms = (timeStamp - before) / 100000;
       this.before = timeStamp;
       logger.debug(
-          "[{}] processApduRequest => {}, elapsed {} ms.",
+          "Reader [{}] <-- apduResponse: {}, elapsed {} ms",
           this.getName(),
           apduResponse,
           elapsed10ms / 10.0);
@@ -477,16 +473,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       selectionStatus = processSelection(cardSelector, cardSelectionRequest);
     } catch (ReaderIOException e) {
       throw new ReaderBrokenCommunicationException(
-          new CardResponseAdapter(new ArrayList<ApduResponseAdapter>(), false),
-          false,
-          e.getMessage(),
-          e);
+          new CardResponseAdapter(new ArrayList<>(), false), false, e.getMessage(), e);
     } catch (CardIOException e) {
       throw new CardBrokenCommunicationException(
-          new CardResponseAdapter(new ArrayList<ApduResponseAdapter>(), false),
-          false,
-          e.getMessage(),
-          e);
+          new CardResponseAdapter(new ArrayList<>(), false), false, e.getMessage(), e);
     }
     if (!selectionStatus.hasMatched) {
       // the selection failed, return an empty response having the selection status
@@ -494,7 +484,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           selectionStatus.powerOnData,
           selectionStatus.selectApplicationResponse,
           false,
-          new CardResponseAdapter(new ArrayList<ApduResponseAdapter>(), false));
+          new CardResponseAdapter(new ArrayList<>(), false));
     }
 
     isLogicalChannelOpen = true;
@@ -542,7 +532,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       throw new IllegalStateException(
           "Protocol "
               + ((InternalCardSelector) cardSelector).getLogicalProtocolName()
-              + " not associated to a reader protocol.");
+              + " not associated to a reader protocol");
     }
     // check protocol if enabled
     if (logicalProtocolName == null || logicalProtocolName.equals(currentLogicalProtocolName)) {
@@ -590,18 +580,14 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    */
   private boolean checkPowerOnData(String powerOnData, InternalCardSelector cardSelector) {
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("[{}] openLogicalChannel => PowerOnData = {}", this.getName(), powerOnData);
-    }
     String powerOnDataRegex = cardSelector.getPowerOnDataRegex();
     // check the power-on data
     if (powerOnData != null && powerOnDataRegex != null && !powerOnData.matches(powerOnDataRegex)) {
-      if (logger.isInfoEnabled()) {
-        logger.info(
-            "[{}] openLogicalChannel => Power-on data didn't match. PowerOnData = {}, regex filter = {}",
-            this.getName(),
+      if (logger.isTraceEnabled()) {
+        logger.trace(
+            "Power-on data didn't match (powerOnData: {}, powerOnDataRegex: {})",
             powerOnData,
-            cardSelector.getPowerOnDataRegex());
+            powerOnDataRegex);
       }
       // the power-on data have been rejected
       return false;
@@ -658,9 +644,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     final byte[] aid = cardSelector.getAid();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "[{}] openLogicalChannel => Select Application with AID = {}",
-          this.getName(),
-          HexUtil.toHex(aid));
+          "Reader [{}] selects application with AID [{}]", this.getName(), HexUtil.toHex(aid));
     }
     /*
      * build a get response command the actual length expected by the card in the get response
@@ -743,13 +727,16 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   /** Close the logical channel. */
   private void closeLogicalChannel() {
     if (logger.isTraceEnabled()) {
-      logger.trace("[{}] closeLogicalChannel => Closing of the logical channel.", this.getName());
+      logger.trace("Reader [{}] closes logical channel", this.getName());
     }
     if (readerSpi instanceof AutonomousSelectionReaderSpi) {
       /* AutonomousSelectionReader have an explicit method for closing channels */
       ((AutonomousSelectionReaderSpi) readerSpi).closeLogicalChannel();
     }
     isLogicalChannelOpen = false;
+    if (logger.isTraceEnabled()) {
+      logger.trace("Logical channel closed");
+    }
   }
 
   /**
@@ -774,7 +761,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private void computeCurrentProtocol() {
     currentLogicalProtocolName = null;
     currentPhysicalProtocolName = null;
-    if (protocolAssociations.size() == 0) {
+    if (protocolAssociations.isEmpty()) {
       useDefaultProtocol = true;
     } else {
       useDefaultProtocol = false;
@@ -828,7 +815,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     private ApduRequest(byte[] apdu) {
       this.apdu = apdu;
-      this.successfulStatusWords = new HashSet<Integer>();
+      this.successfulStatusWords = new HashSet<>();
       this.successfulStatusWords.add(DEFAULT_SUCCESSFUL_CODE);
     }
 

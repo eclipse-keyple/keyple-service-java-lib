@@ -50,7 +50,7 @@ final class CardResponseAdapter implements CardResponseApi {
    */
   @Override
   public List<ApduResponseApi> getApduResponses() {
-    return new ArrayList<ApduResponseApi>(apduResponses);
+    return new ArrayList<>(apduResponses);
   }
 
   /**

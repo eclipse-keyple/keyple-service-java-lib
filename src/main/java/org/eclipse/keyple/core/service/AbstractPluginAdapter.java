@@ -50,7 +50,7 @@ abstract class AbstractPluginAdapter implements Plugin {
   AbstractPluginAdapter(String pluginName, KeyplePluginExtension pluginExtension) {
     this.pluginName = pluginName;
     this.pluginExtension = pluginExtension;
-    this.readers = new ConcurrentHashMap<String, CardReader>();
+    this.readers = new ConcurrentHashMap<>();
   }
 
   /**
@@ -86,7 +86,7 @@ abstract class AbstractPluginAdapter implements Plugin {
   final void checkStatus() {
     if (!isRegistered) {
       throw new IllegalStateException(
-          String.format("Plugin '%s' is not or no longer registered.", pluginName));
+          String.format("Plugin [%s] is not or no longer registered", pluginName));
     }
   }
 
@@ -110,7 +110,7 @@ abstract class AbstractPluginAdapter implements Plugin {
       try {
         ((AbstractReaderAdapter) reader).unregister();
       } catch (Exception e) {
-        logger.error("Error during the unregistration of reader '{}'", reader.getName(), e);
+        logger.error("Error unregistering reader [{}]", reader.getName(), e);
       }
     }
     readers.clear();
@@ -135,7 +135,7 @@ abstract class AbstractPluginAdapter implements Plugin {
   @Override
   public final <T extends KeyplePluginExtension> T getExtension(Class<T> pluginExtensionClass) {
     checkStatus();
-    return (T) pluginExtension;
+    return pluginExtensionClass.cast(pluginExtension);
   }
 
   /**
@@ -149,7 +149,7 @@ abstract class AbstractPluginAdapter implements Plugin {
     checkStatus();
     AbstractReaderAdapter reader = (AbstractReaderAdapter) getReader(readerName);
     if (reader == null) {
-      throw new IllegalArgumentException("Reader '" + readerName + "'not found!");
+      throw new IllegalArgumentException("Reader [" + readerName + "] not found");
     }
     return reader.getExtension(readerExtensionClass);
   }
@@ -171,7 +171,7 @@ abstract class AbstractPluginAdapter implements Plugin {
   @Override
   public final Set<String> getReaderNames() {
     checkStatus();
-    return new HashSet<String>(readers.keySet());
+    return new HashSet<>(readers.keySet());
   }
 
   /**
@@ -182,7 +182,7 @@ abstract class AbstractPluginAdapter implements Plugin {
   @Override
   public final Set<CardReader> getReaders() {
     checkStatus();
-    return new HashSet<CardReader>(readers.values());
+    return new HashSet<>(readers.values());
   }
 
   /**

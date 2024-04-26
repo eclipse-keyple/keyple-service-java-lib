@@ -28,7 +28,7 @@ final class ApduResponseAdapter implements ApduResponseApi {
   /**
    * Builds an APDU response from an array of bytes from the card, computes the status word.
    *
-   * @param apdu A array of at least 2 bytes.
+   * @param apdu An array of at least 2 bytes.
    * @since 2.0.0
    */
   ApduResponseAdapter(byte[] apdu) {

@@ -100,7 +100,7 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
       long elapsed10ms = (timeStamp - before) / 100000;
       this.before = timeStamp;
       logger.trace(
-          "[{}] transmit => {}, elapsed {} ms.",
+          "Reader [{}] --> cardSelectionRequests: {}, elapsed {} ms",
           this.getName(),
           cardSelectionRequests,
           elapsed10ms / 10.0);
@@ -112,14 +112,14 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
               cardSelectors, cardSelectionRequests, multiSelectionProcessing, channelControl);
     } catch (UnexpectedStatusWordException e) {
       throw new CardBrokenCommunicationException(
-          e.getCardResponse(), false, "An unexpected status word was received.", e);
+          e.getCardResponse(), false, "An unexpected status word was received", e);
     } finally {
       if (logger.isTraceEnabled()) {
         long timeStamp = System.nanoTime();
         long elapsed10ms = (timeStamp - before) / 100000;
         this.before = timeStamp;
         logger.trace(
-            "[{}] received => {}, elapsed {} ms.",
+            "Reader [{}] <-- cardSelectionResponses: {}, elapsed {} ms",
             this.getName(),
             cardSelectionResponses,
             elapsed10ms / 10.0);
@@ -221,7 +221,7 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
    */
   public final <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionClass) {
     checkStatus();
-    return (T) readerExtension;
+    return readerExtensionClass.cast(readerExtension);
   }
 
   /**
@@ -248,7 +248,10 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
       long elapsed10ms = (timeStamp - before) / 100000;
       this.before = timeStamp;
       logger.trace(
-          "[{}] transmit => {}, elapsed {} ms.", this.getName(), cardRequest, elapsed10ms / 10.0);
+          "Reader [{}] --> cardRequest: {}, elapsed {} ms",
+          this.getName(),
+          cardRequest,
+          elapsed10ms / 10.0);
     }
 
     try {
@@ -259,7 +262,10 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
         long elapsed10ms = (timeStamp - before) / 100000;
         this.before = timeStamp;
         logger.trace(
-            "[{}] receive => {}, elapsed {} ms.", this.getName(), cardResponse, elapsed10ms / 10.0);
+            "Reader [{}] <-- cardResponse: {}, elapsed {} ms",
+            this.getName(),
+            cardResponse,
+            elapsed10ms / 10.0);
       }
     }
 

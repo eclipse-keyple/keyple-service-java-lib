@@ -43,8 +43,10 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
     super(autonomousObservablePluginSpi);
     try {
       autonomousObservablePluginSpi.setCallback(this);
-    } catch (Throwable e) {
-      logger.trace("Method 'setCallback' unavailable in legacy plugin: {}", e.getMessage());
+    } catch (Exception e) {
+      if (logger.isTraceEnabled()) {
+        logger.trace("Method 'setCallback(...)' unavailable for legacy plugin: {}", e.getMessage());
+      }
       autonomousObservablePluginSpi.connect(this);
     }
   }
@@ -57,7 +59,7 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
   @Override
   public void onReaderConnected(Set<ReaderSpi> readers) {
     Assert.getInstance().notEmpty(readers, "readers");
-    Set<String> notifyReaders = new HashSet<String>();
+    Set<String> notifyReaders = new HashSet<>();
 
     for (ReaderSpi readerSpi : readers) {
       // add reader to plugin
@@ -77,25 +79,18 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
   @Override
   public void onReaderDisconnected(Set<String> readerNames) {
     Assert.getInstance().notEmpty(readerNames, "readerNames");
-    Set<String> notifyReaders = new HashSet<String>();
+    Set<String> notifyReaders = new HashSet<>();
 
     for (String readerName : readerNames) {
       CardReader reader = this.getReader(readerName);
       if (reader == null) {
-        logger.warn(
-            "[{}] ObservableLocalPlugin => Impossible to remove reader, reader not found with name : {}",
-            this.getName(),
-            readerName);
+        logger.warn("Plugin [{}] unable to remove unknown reader [{}]", this.getName(), readerName);
       } else {
         // unregister and remove reader
         ((LocalReaderAdapter) reader).unregister();
         getReadersMap().remove(reader.getName());
-        if (logger.isTraceEnabled()) {
-          logger.trace(
-              "[{}] ObservableLocalPlugin => Remove reader '{}' from readers list.",
-              this.getName(),
-              reader.getName());
-        }
+        logger.info(
+            "Plugin [{}] removes reader [{}] from readers list", this.getName(), reader.getName());
         notifyReaders.add(readerName);
       }
     }
@@ -113,11 +108,7 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
     LocalReaderAdapter reader = buildLocalReaderAdapter(readerSpi);
     reader.register();
     getReadersMap().put(reader.getName(), reader);
-    if (logger.isTraceEnabled()) {
-      logger.trace(
-          "[{}] ObservableLocalPlugin => Add reader '{}' to readers list.",
-          this.getName(),
-          readerSpi.getName());
-    }
+    logger.info(
+        "Plugin [{}] adds reader [{}] to readers list", this.getName(), readerSpi.getName());
   }
 }

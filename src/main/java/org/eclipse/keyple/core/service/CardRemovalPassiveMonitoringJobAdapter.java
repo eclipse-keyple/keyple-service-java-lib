@@ -97,14 +97,11 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
         } catch (ReaderIOException e) {
           // just warn as it can be a disconnection of the reader.
           logger.warn(
-              "[{}] waitForCardAbsentNative => Error while processing card removal event: {}",
+              "Monitoring job error while processing card removal event on reader [{}]: {}",
               getReader().getName(),
               e.getMessage());
         } catch (TaskCanceledException e) {
-          logger.warn(
-              "[{}] waitForCardAbsentNative => task canceled: {}",
-              getReader().getName(),
-              e.getMessage());
+          logger.warn("Monitoring job process cancelled: {}", e.getMessage());
         } catch (RuntimeException e) {
           getReader()
               .getObservationExceptionHandler()
@@ -123,6 +120,9 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
    */
   @Override
   void stop() {
+    if (logger.isTraceEnabled()) {
+      logger.trace("Stop monitoring job process");
+    }
     if (readerSpi instanceof CardRemovalWaiterBlockingSpi) {
       ((CardRemovalWaiterBlockingSpi) readerSpi).stopWaitForCardRemoval();
     } else if (readerSpi instanceof WaitForCardRemovalBlockingSpi) {
@@ -132,6 +132,9 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
     } else if (readerSpi instanceof WaitForCardRemovalDuringProcessingBlockingSpi) {
       ((WaitForCardRemovalDuringProcessingBlockingSpi) readerSpi)
           .stopWaitForCardRemovalDuringProcessing();
+    }
+    if (logger.isTraceEnabled()) {
+      logger.trace("Monitoring job process stopped");
     }
   }
 }

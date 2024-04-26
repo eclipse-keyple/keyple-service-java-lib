@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixes a weakness related to observable reader observation in `SINGLESHOT` detection mode.
   The `onStopDetection()` method of the `ObservableReaderSpi` interface is now called whenever the state machine 
   switches to the `WAIT_FOR_START_DETECTION` state.
+### Changed
+- Logging improvement.
 
 ## [3.2.1] - 2024-04-12
 ### Fixed

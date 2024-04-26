@@ -52,13 +52,16 @@ final class SmartCardServiceAdapter implements SmartCardService {
 
   private static final Logger logger = LoggerFactory.getLogger(SmartCardServiceAdapter.class);
 
+  private static final String MSG_VERSION_MISMATCH_DETECTED =
+      "Version mismatch detected: {} [{}] uses '{}' version '{}' (expected '{}'). Compatibility issues may arise";
+
   private static final SmartCardServiceAdapter INSTANCE = new SmartCardServiceAdapter();
 
-  private final Map<String, Plugin> plugins = new ConcurrentHashMap<String, Plugin>();
+  private final Map<String, Plugin> plugins = new ConcurrentHashMap<>();
   private final Object pluginMonitor = new Object();
 
   private final Map<String, DistributedLocalService> distributedLocalServices =
-      new ConcurrentHashMap<String, DistributedLocalService>();
+      new ConcurrentHashMap<>();
   private final Object distributedLocalServiceMonitor = new Object();
 
   static {
@@ -132,15 +135,19 @@ final class SmartCardServiceAdapter implements SmartCardService {
   private void checkPluginVersion(PluginFactorySpi pluginFactorySpi) {
     if (compareVersions(pluginFactorySpi.getCommonApiVersion(), CommonApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Common API used by the provided plugin ({}:{}) mismatches the version used by the service ({}).",
+          MSG_VERSION_MISMATCH_DETECTED,
+          "plugin",
           pluginFactorySpi.getPluginName(),
+          "Common API",
           pluginFactorySpi.getCommonApiVersion(),
           CommonApiProperties.VERSION);
     }
     if (compareVersions(pluginFactorySpi.getPluginApiVersion(), PluginApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Plugin API used by the provided plugin ({}:{}) mismatches the version used by the service ({}).",
+          MSG_VERSION_MISMATCH_DETECTED,
+          "plugin",
           pluginFactorySpi.getPluginName(),
+          "Plugin API",
           pluginFactorySpi.getPluginApiVersion(),
           PluginApiProperties.VERSION);
     }
@@ -158,8 +165,10 @@ final class SmartCardServiceAdapter implements SmartCardService {
     if (compareVersions(remotePluginFactorySpi.getCommonApiVersion(), CommonApiProperties.VERSION)
         != 0) {
       logger.warn(
-          "The version of Common API used by the provided plugin ({}:{}) mismatches the version used by the service ({}).",
+          MSG_VERSION_MISMATCH_DETECTED,
+          "remote plugin",
           remotePluginFactorySpi.getRemotePluginName(),
+          "Common API",
           remotePluginFactorySpi.getCommonApiVersion(),
           CommonApiProperties.VERSION);
     }
@@ -168,8 +177,10 @@ final class SmartCardServiceAdapter implements SmartCardService {
             DistributedRemoteApiProperties.VERSION)
         != 0) {
       logger.warn(
-          "The version of Distributed Remote Plugin API used by the provided plugin ({}:{}) mismatches the version used by the service ({}).",
+          MSG_VERSION_MISMATCH_DETECTED,
+          "remote plugin",
           remotePluginFactorySpi.getRemotePluginName(),
+          "Distributed Remote Plugin API",
           remotePluginFactorySpi.getDistributedRemoteApiVersion(),
           DistributedRemoteApiProperties.VERSION);
     }
@@ -187,16 +198,20 @@ final class SmartCardServiceAdapter implements SmartCardService {
     if (compareVersions(poolPluginFactorySpi.getCommonApiVersion(), CommonApiProperties.VERSION)
         != 0) {
       logger.warn(
-          "The version of Common API used by the provided pool plugin ({}:{}) mismatches the version used by the service ({}).",
+          MSG_VERSION_MISMATCH_DETECTED,
+          "pool plugin",
           poolPluginFactorySpi.getPoolPluginName(),
+          "Common API",
           poolPluginFactorySpi.getCommonApiVersion(),
           CommonApiProperties.VERSION);
     }
     if (compareVersions(poolPluginFactorySpi.getPluginApiVersion(), PluginApiProperties.VERSION)
         != 0) {
       logger.warn(
-          "The version of Plugin API used by the provided pool plugin ({}:{}) mismatches the version used by the service ({}).",
+          MSG_VERSION_MISMATCH_DETECTED,
+          "pool plugin",
           poolPluginFactorySpi.getPoolPluginName(),
+          "Plugin API",
           poolPluginFactorySpi.getPluginApiVersion(),
           PluginApiProperties.VERSION);
     }
@@ -213,22 +228,28 @@ final class SmartCardServiceAdapter implements SmartCardService {
   private void checkCardExtensionVersion(KeypleCardExtension cardExtension) {
     if (compareVersions(cardExtension.getCommonApiVersion(), CommonApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Common API used by the provided card extension ({}:{}) mismatches the version used by the service ({}).",
+          MSG_VERSION_MISMATCH_DETECTED,
+          "card extension",
           cardExtension.getClass().getSimpleName(),
+          "Common API",
           cardExtension.getCommonApiVersion(),
           CommonApiProperties.VERSION);
     }
     if (compareVersions(cardExtension.getCardApiVersion(), CardApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Card API used by the provided card extension ({}:{}) mismatches the version used by the service ({}).",
+          MSG_VERSION_MISMATCH_DETECTED,
+          "card extension",
           cardExtension.getClass().getSimpleName(),
+          "Card API",
           cardExtension.getCardApiVersion(),
           CardApiProperties.VERSION);
     }
     if (compareVersions(cardExtension.getReaderApiVersion(), ReaderApiProperties.VERSION) != 0) {
       logger.warn(
-          "The version of Reader API used by the provided card extension ({}:{}) mismatches the version used by the service ({}).",
+          MSG_VERSION_MISMATCH_DETECTED,
+          "card extension",
           cardExtension.getClass().getSimpleName(),
+          "Reader API",
           cardExtension.getReaderApiVersion(),
           ReaderApiProperties.VERSION);
     }
@@ -246,8 +267,10 @@ final class SmartCardServiceAdapter implements SmartCardService {
     if (compareVersions(localServiceFactorySpi.getCommonApiVersion(), CommonApiProperties.VERSION)
         != 0) {
       logger.warn(
-          "The version of Common API used by the provided distributed local service ({}:{}) mismatches the version used by the service ({}).",
+          MSG_VERSION_MISMATCH_DETECTED,
+          "distributed local service",
           localServiceFactorySpi.getLocalServiceName(),
+          "Common API",
           localServiceFactorySpi.getCommonApiVersion(),
           CommonApiProperties.VERSION);
     }
@@ -256,8 +279,10 @@ final class SmartCardServiceAdapter implements SmartCardService {
             DistributedLocalApiProperties.VERSION)
         != 0) {
       logger.warn(
-          "The version of Distributed Local API used by the provided distributed local service ({}:{}) mismatches the version used by the service ({}).",
+          MSG_VERSION_MISMATCH_DETECTED,
+          "distributed local service",
           localServiceFactorySpi.getLocalServiceName(),
+          "Distributed Local API",
           localServiceFactorySpi.getDistributedLocalApiVersion(),
           DistributedLocalApiProperties.VERSION);
     }
@@ -270,11 +295,11 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @throws IllegalStateException if the plugin is already registered.
    */
   private void checkPluginRegistration(String pluginName) {
-    logger.info("Registering a new Plugin to the service : {}", pluginName);
+    logger.info("Register plugin [{}]", pluginName);
     Assert.getInstance().notEmpty(pluginName, "pluginName");
     if (plugins.containsKey(pluginName)) {
       throw new IllegalStateException(
-          String.format("Plugin '%s' has already been registered to the service.", pluginName));
+          String.format("Plugin [%s] has already been registered to the service", pluginName));
     }
   }
 
@@ -285,14 +310,12 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @throws IllegalStateException if the distributed local service is already registered.
    */
   private void checkDistributedLocalServiceRegistration(String distributedLocalServiceName) {
-    logger.info(
-        "Registering a new distributed local service to the service : {}",
-        distributedLocalServiceName);
+    logger.info("Register distributed local service [{}]", distributedLocalServiceName);
     Assert.getInstance().notEmpty(distributedLocalServiceName, "distributedLocalServiceName");
     if (distributedLocalServices.containsKey(distributedLocalServiceName)) {
       throw new IllegalStateException(
           String.format(
-              "Service '%s' has already been registered to the service.",
+              "Service [%s] has already been registered to the service",
               distributedLocalServiceName));
     }
   }
@@ -320,7 +343,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
           plugin = createRemotePlugin((RemotePluginFactorySpi) pluginFactory);
 
         } else {
-          throw new IllegalArgumentException("The factory doesn't implement the right SPI.");
+          throw new IllegalArgumentException("The factory doesn't implement the right SPI");
         }
 
         plugins.put(plugin.getName(), plugin);
@@ -328,12 +351,11 @@ final class SmartCardServiceAdapter implements SmartCardService {
       }
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException(
-          "The provided plugin factory doesn't implement the plugin API properly.", e);
+          "The provided plugin factory doesn't implement the plugin API properly", e);
 
     } catch (PluginIOException e) {
       throw new KeyplePluginException(
-          String.format(
-              "Unable to register the plugin '%s' : %s", plugin.getName(), e.getMessage()),
+          String.format("Unable to register the plugin [%s]: %s", plugin.getName(), e.getMessage()),
           e);
     }
     return plugin;
@@ -355,7 +377,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     if (!pluginSpi.getName().equals(pluginFactorySpi.getPluginName())) {
       throw new IllegalArgumentException(
           String.format(
-              "Plugin name '%s' mismatches the expected name '%s' provided by the factory",
+              "Plugin name [%s] mismatches the expected name [%s] provided by the factory",
               pluginSpi.getName(), pluginFactorySpi.getPluginName()));
     }
 
@@ -387,7 +409,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     if (!poolPluginSpi.getName().equals(poolPluginFactorySpi.getPoolPluginName())) {
       throw new IllegalArgumentException(
           String.format(
-              "Pool plugin name '%s' mismatches the expected name '%s' provided by the factory",
+              "Pool plugin name [%s] mismatches the expected name [%s] provided by the factory",
               poolPluginSpi.getName(), poolPluginFactorySpi.getPoolPluginName()));
     }
 
@@ -410,7 +432,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     if (!remotePluginSpi.getName().equals(remotePluginFactorySpi.getRemotePluginName())) {
       throw new IllegalArgumentException(
           String.format(
-              "Remote plugin name '%s' mismatches the expected name '%s' provided by the factory",
+              "Remote plugin name [%s] mismatches the expected name [%s] provided by the factory",
               remotePluginSpi.getName(), remotePluginFactorySpi.getRemotePluginName()));
     }
 
@@ -432,7 +454,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public void unregisterPlugin(String pluginName) {
-    logger.info("Unregistering a plugin from the service : {}", pluginName);
+    logger.info("Unregister plugin [{}]", pluginName);
     synchronized (pluginMonitor) {
       Plugin plugin = plugins.get(pluginName);
       if (plugin != null) {
@@ -442,7 +464,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
           plugins.remove(pluginName);
         }
       } else {
-        logger.warn("Plugin '{}' is not registered", pluginName);
+        logger.warn("Plugin [{}] not registered", pluginName);
       }
     }
   }
@@ -454,7 +476,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public Set<String> getPluginNames() {
-    return new HashSet<String>(plugins.keySet());
+    return new HashSet<>(plugins.keySet());
   }
 
   /**
@@ -464,7 +486,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public Set<Plugin> getPlugins() {
-    return new HashSet<Plugin>(plugins.values());
+    return new HashSet<>(plugins.values());
   }
 
   /**
@@ -557,7 +579,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     DistributedLocalServiceAdapter distributedLocalService;
     try {
       if (!(distributedLocalServiceExtensionFactory instanceof LocalServiceFactorySpi)) {
-        throw new IllegalArgumentException("The factory doesn't implement the right SPI.");
+        throw new IllegalArgumentException("The factory doesn't implement the right SPI");
       }
 
       LocalServiceFactorySpi factory =
@@ -574,7 +596,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
         if (!localServiceSpi.getName().equals(localServiceName)) {
           throw new IllegalArgumentException(
               String.format(
-                  "The local service name '%s' mismatches the expected name '%s' provided by the factory",
+                  "The local service name [%s] mismatches the expected name [%s] provided by the factory",
                   localServiceSpi.getName(), localServiceName));
         }
 
@@ -585,7 +607,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
       }
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException(
-          "The provided distributed local service factory doesn't implement the distributed local service API properly.",
+          "The provided distributed local service factory doesn't implement the distributed local service API properly",
           e);
     }
     return distributedLocalService;
@@ -598,16 +620,14 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public void unregisterDistributedLocalService(String distributedLocalServiceName) {
-    logger.info(
-        "Unregistering a distributed local service from the service : {}",
-        distributedLocalServiceName);
+    logger.info("Unregister distributed local service [{}]", distributedLocalServiceName);
     synchronized (distributedLocalServiceMonitor) {
       DistributedLocalService localService =
           distributedLocalServices.remove(distributedLocalServiceName);
       if (localService != null) {
         ((DistributedLocalServiceAdapter) localService).unregister();
       } else {
-        logger.warn("Service '{}' is not registered", distributedLocalServiceName);
+        logger.warn("Distributed local service [{}] not registered", distributedLocalServiceName);
       }
     }
   }

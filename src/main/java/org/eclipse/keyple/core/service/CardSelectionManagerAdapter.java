@@ -65,9 +65,9 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
    */
   CardSelectionManagerAdapter() {
     multiSelectionProcessing = MultiSelectionProcessing.FIRST_MATCH;
-    cardSelectors = new ArrayList<CardSelector<?>>();
-    cardSelections = new ArrayList<CardSelectionExtensionSpi>();
-    cardSelectionRequests = new ArrayList<CardSelectionRequestSpi>();
+    cardSelectors = new ArrayList<>();
+    cardSelections = new ArrayList<>();
+    cardSelectionRequests = new ArrayList<>();
   }
 
   /**
@@ -132,7 +132,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
     jsonObject.addProperty(CHANNEL_CONTROL, channelControl.name());
 
     // Original card selectors
-    List<String> cardSelectorsTypes = new ArrayList<String>(cardSelectors.size());
+    List<String> cardSelectorsTypes = new ArrayList<>(cardSelectors.size());
     for (CardSelector<?> cardSelector : cardSelectors) {
       cardSelectorsTypes.add(cardSelector.getClass().getName());
     }
@@ -140,7 +140,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
     jsonObject.add(CARD_SELECTORS, JsonUtil.getParser().toJsonTree(cardSelectors));
 
     // Original card selections
-    List<String> cardSelectionsTypes = new ArrayList<String>(cardSelections.size());
+    List<String> cardSelectionsTypes = new ArrayList<>(cardSelections.size());
     for (CardSelectionExtensionSpi cardSelection : cardSelections) {
       cardSelectionsTypes.add(cardSelection.getClass().getName());
     }
@@ -148,8 +148,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
     jsonObject.add(CARD_SELECTIONS, JsonUtil.getParser().toJsonTree(cardSelections));
 
     // Default card selections
-    List<CardSelectionAdapter> defaultCardSelections =
-        new ArrayList<CardSelectionAdapter>(cardSelections.size());
+    List<CardSelectionAdapter> defaultCardSelections = new ArrayList<>(cardSelections.size());
     for (CardSelectionExtensionSpi cardSelection : cardSelections) {
       defaultCardSelections.add(new CardSelectionAdapter(cardSelection));
     }
@@ -206,7 +205,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
                 JsonUtil.getParser().fromJson(cardSelectorsJsonArray.get(i), classOfCardSelector);
       } catch (ClassNotFoundException e) {
         throw new IllegalArgumentException(
-            "Original CardSelector type " + cardSelectorsTypes.get(i) + " not found.", e);
+            "Original CardSelector type [" + cardSelectorsTypes.get(i) + "] not found", e);
       }
       CardSelectionExtension cardSelection;
       try {
@@ -218,7 +217,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
       } catch (ClassNotFoundException e) {
         // Default card selection
         logger.warn(
-            "Original CardSelection type '{}' not found. Use default type '{}' for deserialization.",
+            "Original CardSelection type [{}] not found. Use default type [{}] for deserialization",
             cardSelectionsTypes.get(i),
             CardSelectionAdapter.class.getName());
         cardSelection =
@@ -283,7 +282,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
       ((ObservableRemoteReaderAdapter) observableCardReader)
           .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode);
     } else {
-      throw new IllegalArgumentException("Not a Keyple reader implementation.");
+      throw new IllegalArgumentException("Not a Keyple reader implementation");
     }
   }
 
@@ -370,7 +369,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
               "Error occurred while parsing the card response: " + e.getMessage(), e);
         } catch (UnsupportedOperationException e) {
           logger.warn(
-              "Unable to parse card selection responses due to missing card extensions in the runtime environment");
+              "Unable to parse card selection responses due to missing card extensions in runtime environment");
           cardSelectionsResult = new CardSelectionResultAdapter(); // Empty result
           break;
         }

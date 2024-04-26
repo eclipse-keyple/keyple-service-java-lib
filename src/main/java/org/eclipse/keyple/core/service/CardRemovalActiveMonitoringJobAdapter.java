@@ -46,7 +46,7 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
    * Create a job monitor job that ping the card with the method isCardPresentPing()
    *
    * @param reader reference to the reader
-   * @param sleepDurationMillis delay between between each APDU sending
+   * @param sleepDurationMillis delay between each APDU sending
    * @since 2.0.0
    */
   public CardRemovalActiveMonitoringJobAdapter(
@@ -65,7 +65,6 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
   Runnable getMonitoringJob(final AbstractObservableStateAdapter monitoringState) {
 
     return new Runnable() {
-      long retries = 0;
 
       /**
        * Monitoring loop
@@ -78,25 +77,22 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
       @Override
       public void run() {
         try {
-          if (logger.isDebugEnabled()) {
-            logger.debug("[{}] Polling from isCardPresentPing", getReader().getName());
+          if (logger.isTraceEnabled()) {
+            logger.trace(
+                "Start monitoring job polling process using 'isCardPresentPing()' method on reader [{}]",
+                getReader().getName());
           }
           // re-init loop value to true
           loop.set(true);
           while (loop.get()) {
             if (!getReader().isCardPresentPing()) {
-              if (logger.isDebugEnabled()) {
-                logger.debug("[{}] the card stopped responding", getReader().getName());
+              if (logger.isTraceEnabled()) {
+                logger.trace("Card stop responding");
               }
               break;
             }
-            retries++;
-
-            if (logger.isTraceEnabled()) {
-              logger.trace("[{}] Polling retries : {}", getReader().getName(), retries);
-            }
+            // wait a bit
             try {
-              // wait a bit
               Thread.sleep(sleepDurationMillis);
             } catch (InterruptedException ignored) {
               // Restore interrupted state...
@@ -104,9 +100,8 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
               loop.set(false);
             }
           }
-
-          if (logger.isDebugEnabled()) {
-            logger.debug("[{}] Polling loop has been stopped", getReader().getName());
+          if (logger.isTraceEnabled()) {
+            logger.trace("Monitoring job polling process stopped");
           }
         } catch (RuntimeException e) {
           getReader()
@@ -126,9 +121,6 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
    */
   @Override
   void stop() {
-    if (logger.isDebugEnabled()) {
-      logger.debug("[{}] Stop Polling ", getReader().getName());
-    }
     loop.set(false);
   }
 }
