@@ -57,9 +57,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
       int clientCoreApiLevel) {
     super(observableRemoteReaderSpi, pluginName, null, clientCoreApiLevel);
     this.observableRemoteReaderSpi = observableRemoteReaderSpi;
-    this.observationManager =
-        new ObservationManagerAdapter<
-            CardReaderObserverSpi, CardReaderObservationExceptionHandlerSpi>(pluginName, getName());
+    this.observationManager = new ObservationManagerAdapter<>(pluginName, getName());
     this.eventNotificationExecutorService = Executors.newCachedThreadPool();
   }
 
@@ -73,7 +71,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Reader '{}' notifies the reader event '{}' to {} observer(s).",
+          "Reader [{}] notifies event [{}] to {} observer(s)",
           getName(),
           event.getType().name(),
           countObservers());
@@ -94,8 +92,8 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
                       .getObservationExceptionHandler()
                       .onReaderObservationError(getPluginName(), getName(), e);
                 } catch (Exception e2) {
-                  logger.error("Exception during notification", e2);
-                  logger.error("Original cause", e);
+                  logger.error("Event notification error: {}", e2.getMessage(), e2);
+                  logger.error("Original cause: {}", e.getMessage(), e);
                 }
               }
             }
@@ -139,8 +137,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
 
     // Execute the remote service.
     try {
-      executeReaderServiceRemotely(
-          input, observableRemoteReaderSpi, getName(), getPluginName(), logger);
+      executeReaderServiceRemotely(input, observableRemoteReaderSpi, getName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
@@ -163,7 +160,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
     try {
       stopCardDetection();
     } catch (Exception e) {
-      logger.error("Error during the stop card detection of reader '{}'", getName(), e);
+      logger.error("Error stopping card detection on reader [{}]", getName(), e);
     }
     notifyObservers(
         new ReaderEventAdapter(getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));
@@ -224,13 +221,8 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
   public void startCardDetection(DetectionMode detectionMode) {
 
     checkStatus();
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "Reader '{}' of plugin '{}' starts the card detection with polling mode '{}'.",
-          getName(),
-          getPluginName(),
-          detectionMode);
-    }
+    logger.info(
+        "Reader [{}] starts card detection with polling mode [{}]", getName(), detectionMode);
     Assert.getInstance().notNull(detectionMode, "detectionMode");
 
     // Build the input JSON data.
@@ -245,8 +237,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
 
     // Execute the remote service.
     try {
-      executeReaderServiceRemotely(
-          input, observableRemoteReaderSpi, getName(), getPluginName(), logger);
+      executeReaderServiceRemotely(input, observableRemoteReaderSpi, getName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
@@ -266,10 +257,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
   @Override
   public void stopCardDetection() {
 
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "Reader '{}' of plugin '{}' stops the card detection.", getName(), getPluginName());
-    }
+    logger.info("Reader [{}] stops card detection", getName());
 
     // Notify the SPI first.
     observableRemoteReaderSpi.onStopObservation();
@@ -281,8 +269,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
 
     // Execute the remote service.
     try {
-      executeReaderServiceRemotely(
-          input, observableRemoteReaderSpi, getName(), getPluginName(), logger);
+      executeReaderServiceRemotely(input, observableRemoteReaderSpi, getName(), logger);
 
     } catch (RuntimeException e) {
       throw e;
@@ -299,12 +286,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
   @Override
   public void finalizeCardProcessing() {
 
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "Reader '{}' of plugin '{}' starts the removal sequence of the card.",
-          getName(),
-          getPluginName());
-    }
+    logger.info("Reader [{}] starts card removal sequence", getName());
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
@@ -313,8 +295,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
 
     // Execute the remote service.
     try {
-      executeReaderServiceRemotely(
-          input, observableRemoteReaderSpi, getName(), getPluginName(), logger);
+      executeReaderServiceRemotely(input, observableRemoteReaderSpi, getName(), logger);
 
     } catch (RuntimeException e) {
       throw e;

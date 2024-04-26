@@ -48,7 +48,7 @@ final class PluginEventAdapter implements PluginEvent {
    */
   PluginEventAdapter(String pluginName, String readerName, Type type) {
     this.pluginName = pluginName;
-    this.readerNames = new TreeSet<String>(Collections.singleton(readerName));
+    this.readerNames = new TreeSet<>(Collections.singleton(readerName));
     this.type = type;
   }
 
@@ -67,7 +67,7 @@ final class PluginEventAdapter implements PluginEvent {
    */
   PluginEventAdapter(String pluginName, Set<String> readerNames, Type type) {
     this.pluginName = pluginName;
-    this.readerNames = new TreeSet<String>(readerNames);
+    this.readerNames = new TreeSet<>(readerNames);
     this.type = type;
   }
 

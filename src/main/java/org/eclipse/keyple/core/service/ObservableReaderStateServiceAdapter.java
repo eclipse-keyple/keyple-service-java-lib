@@ -60,9 +60,7 @@ final class ObservableReaderStateServiceAdapter {
     this.reader = reader;
     this.readerSpi = reader.getObservableReaderSpi();
 
-    this.states =
-        new EnumMap<AbstractObservableStateAdapter.MonitoringState, AbstractObservableStateAdapter>(
-            AbstractObservableStateAdapter.MonitoringState.class);
+    this.states = new EnumMap<>(AbstractObservableStateAdapter.MonitoringState.class);
     this.executorService = Executors.newSingleThreadExecutor();
 
     // initialize states for each case:
@@ -101,7 +99,7 @@ final class ObservableReaderStateServiceAdapter {
               this.reader, cardInsertionPassiveMonitoringJobAdapter, this.executorService));
     } else {
       throw new IllegalStateException(
-          "Reader should implement implement a WaitForCardInsertion interface.");
+          "Reader should implement implement a WaitForCardInsertion interface");
     }
 
     // processing
@@ -149,7 +147,7 @@ final class ObservableReaderStateServiceAdapter {
               this.reader, cardRemovalPassiveMonitoringJobAdapter, this.executorService));
     } else {
       throw new IllegalStateException(
-          "Reader should implement implement a WaitForCardRemoval interface.");
+          "Reader should implement implement a WaitForCardRemoval interface");
     }
 
     switchState(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_START_DETECTION);
@@ -189,7 +187,7 @@ final class ObservableReaderStateServiceAdapter {
     if (currentState != null) {
       if (logger.isTraceEnabled()) {
         logger.trace(
-            "[{}] Switch currentState from {} to {}",
+            "Monitor of reader [{}] switches state from {} to {}",
             this.reader.getName(),
             this.currentState.getMonitoringState(),
             stateId);
@@ -197,7 +195,7 @@ final class ObservableReaderStateServiceAdapter {
       currentState.onDeactivate();
     } else {
       if (logger.isTraceEnabled()) {
-        logger.trace("[{}] Switch to a new currentState {}", this.reader.getName(), stateId);
+        logger.trace("Monitor of reader [{}] switches state to {}", this.reader.getName(), stateId);
       }
     }
 

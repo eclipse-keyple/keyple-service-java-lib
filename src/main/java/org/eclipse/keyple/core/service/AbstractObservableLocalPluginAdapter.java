@@ -42,9 +42,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    */
   AbstractObservableLocalPluginAdapter(PluginSpi pluginSpi) {
     super(pluginSpi);
-    this.observationManager =
-        new ObservationManagerAdapter<PluginObserverSpi, PluginObservationExceptionHandlerSpi>(
-            getName(), null);
+    this.observationManager = new ObservationManagerAdapter<>(getName(), null);
   }
 
   /**
@@ -71,7 +69,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Plugin '{}' notifies the plugin event '{}' to {} observer(s).",
+          "Plugin [{}] notifies event [{}] to {} observer(s)",
           getName(),
           event.getType().name(),
           countObservers());
@@ -95,8 +93,8 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
       try {
         observationManager.getObservationExceptionHandler().onPluginObservationError(getName(), e);
       } catch (Exception e2) {
-        logger.error("Exception during notification", e2);
-        logger.error("Original cause", e);
+        logger.error("Event notification error: {}", e2.getMessage(), e2);
+        logger.error("Original cause: {}", e.getMessage(), e);
       }
     }
   }
@@ -108,7 +106,7 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    */
   @Override
   final void unregister() {
-    Set<String> unregisteredReaderNames = new HashSet<String>(this.getReaderNames());
+    Set<String> unregisteredReaderNames = new HashSet<>(this.getReaderNames());
     notifyObservers(
         new PluginEventAdapter(
             this.getName(), unregisteredReaderNames, PluginEvent.Type.UNAVAILABLE));

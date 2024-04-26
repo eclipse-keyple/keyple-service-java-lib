@@ -63,7 +63,7 @@ final class InternalDto {
 
     @Override
     public SmartCardSpi parse(CardSelectionResponseApi cardSelectionResponseApi) {
-      throw new UnsupportedOperationException("Method not supported for internal DTO.");
+      throw new UnsupportedOperationException("Method not supported for internal DTO");
     }
 
     @Override
@@ -99,8 +99,7 @@ final class InternalDto {
       if (src.getCardRequest() != null) {
         this.cardRequest = new CardRequest(src.getCardRequest());
       }
-      this.successfulSelectionStatusWords =
-          new HashSet<Integer>(src.getSuccessfulSelectionStatusWords());
+      this.successfulSelectionStatusWords = new HashSet<>(src.getSuccessfulSelectionStatusWords());
     }
 
     @Override
@@ -143,7 +142,7 @@ final class InternalDto {
      * @since 2.1.1
      */
     CardRequest(CardRequestSpi src) {
-      this.apduRequests = new ArrayList<ApduRequest>(src.getApduRequests().size());
+      this.apduRequests = new ArrayList<>(src.getApduRequests().size());
       for (ApduRequestSpi apduRequestSpi : src.getApduRequests()) {
         apduRequests.add(new ApduRequest(apduRequestSpi));
       }
@@ -152,7 +151,7 @@ final class InternalDto {
 
     @Override
     public List<ApduRequestSpi> getApduRequests() {
-      return new ArrayList<ApduRequestSpi>(apduRequests);
+      return new ArrayList<>(apduRequests);
     }
 
     @Override
@@ -192,7 +191,7 @@ final class InternalDto {
      */
     ApduRequest(ApduRequestSpi src) {
       this.apdu = src.getApdu().clone();
-      this.successfulStatusWords = new HashSet<Integer>(src.getSuccessfulStatusWords());
+      this.successfulStatusWords = new HashSet<>(src.getSuccessfulStatusWords());
       this.info = src.getInfo();
     }
 

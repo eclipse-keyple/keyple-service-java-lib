@@ -64,9 +64,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
   public void addObserver(PluginObserverSpi observer) {
     super.addObserver(observer);
     if (countObservers() == 1) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Start monitoring the plugin '{}'.", getName());
-      }
+      logger.info("Start monitoring of plugin [{}]", getName());
       thread = new EventThread(getName());
       thread.setName("PluginEventMonitoringThread");
       thread.setUncaughtExceptionHandler(
@@ -92,11 +90,9 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
     if (getObservationManager().getObservers().contains(observer)) {
       super.removeObserver(observer);
       if (countObservers() == 0) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Stop the plugin monitoring.");
-        }
         if (thread != null) {
           thread.end();
+          logger.info("Plugin monitoring stopped");
         }
       }
     }
@@ -111,10 +107,8 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
   public void clearObservers() {
     super.clearObservers();
     if (thread != null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Stop the plugin monitoring.");
-      }
       thread.end();
+      logger.info("Plugin monitoring stopped");
     }
   }
 
@@ -154,24 +148,17 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       LocalReaderAdapter reader = buildLocalReaderAdapter(readerSpi);
       reader.register();
       getReadersMap().put(reader.getName(), reader);
-      if (logger.isTraceEnabled()) {
-        logger.trace(
-            "[{}][{}] Plugin thread => Add plugged reader to readers list.",
-            pluginName,
-            readerName);
-      }
+      logger.info("Plugin [{}] adds plugged reader [{}] to readers list", pluginName, readerName);
     }
 
     /** Removes a reader from the list of known readers (by the plugin) */
     private void removeReader(CardReader reader) {
       ((LocalReaderAdapter) reader).unregister();
       getReadersMap().remove(reader.getName());
-      if (logger.isTraceEnabled()) {
-        logger.trace(
-            "[{}][{}] Plugin thread => Remove unplugged reader from readers list.",
-            pluginName,
-            reader.getName());
-      }
+      logger.info(
+          "Plugin [{}] removes unplugged reader [{}] from readers list",
+          pluginName,
+          reader.getName());
     }
 
     /** Notifies observers of changes in the list of readers */
@@ -179,7 +166,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       /* grouped notification */
       if (logger.isTraceEnabled()) {
         logger.trace(
-            "Notifying {}(s): {}",
+            "Notify reader {}(s): {}",
             type == PluginEvent.Type.READER_CONNECTED ? "connection" : "disconnection",
             changedReaderNames);
       }
@@ -195,7 +182,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
      * @throws PluginIOException if an error occurs while searching readers.
      */
     private void processChanges(Set<String> actualNativeReaderNames) throws PluginIOException {
-      SortedSet<String> changedReaderNames = new ConcurrentSkipListSet<String>();
+      SortedSet<String> changedReaderNames = new ConcurrentSkipListSet<>();
       /*
        * parse the current readers list, notify for disappeared readers, update
        * readers list
@@ -259,8 +246,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
         }
       } catch (InterruptedException e) {
         logger.info(
-            "[{}] The observation of this plugin is stopped, possibly because there is no more registered observer.",
-            pluginName);
+            "Plugin monitoring stopped, possibly because there is no more registered observer");
         // Restore interrupted state...
         Thread.currentThread().interrupt();
       } catch (PluginIOException e) {
@@ -268,7 +254,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
             .getObservationExceptionHandler()
             .onPluginObservationError(
                 pluginName,
-                new KeyplePluginException("An error occurred while monitoring the readers.", e));
+                new KeyplePluginException("An error occurred while monitoring the readers", e));
       }
     }
   }

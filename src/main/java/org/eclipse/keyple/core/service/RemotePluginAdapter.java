@@ -68,7 +68,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
 
     int distributedApiLevel = remotePluginSpi.exchangeApiLevel(CORE_API_LEVEL);
     logger.info(
-        "Core API level: {}, Distributed API level (Remote Plugin): {}",
+        "Distributed Core API level: {}, Distributed API level (Remote Plugin): {}",
         CORE_API_LEVEL,
         distributedApiLevel);
 
@@ -139,7 +139,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
     try {
       remotePluginSpi.onUnregister();
     } catch (Exception e) {
-      logger.error("Error during the unregistration of the extension of plugin '{}'", getName(), e);
+      logger.error("Error unregistering plugin extension [{}]: {}", getName(), e.getMessage(), e);
     }
     super.unregister();
   }
@@ -154,7 +154,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
 
     checkStatus();
     if (logger.isDebugEnabled()) {
-      logger.debug("Plugin '{}' receives a reader event : {}", getName(), jsonData);
+      logger.debug("Plugin [{}] receives reader event: {}", getName(), jsonData);
     }
     Assert.getInstance().notEmpty(jsonData, "jsonData");
 
@@ -177,7 +177,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
     if (!(reader instanceof ObservableCardReader)) {
       throw new IllegalArgumentException(
           String.format(
-              "Reader '%s' does not exists or is not observable : %s",
+              "Reader [%s] does not exists or is not observable: %s",
               readerEvent.getReaderName(), reader));
     }
 

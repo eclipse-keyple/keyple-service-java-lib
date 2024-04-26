@@ -34,8 +34,7 @@ final class InternalLegacyDto {
 
   static List<LegacyCardSelectionRequest> mapToLegacyCardSelectionRequests(
       List<CardSelector<?>> cardSelectors, List<CardSelectionRequestSpi> cardSelectionRequests) {
-    List<LegacyCardSelectionRequest> result =
-        new ArrayList<LegacyCardSelectionRequest>(cardSelectors.size());
+    List<LegacyCardSelectionRequest> result = new ArrayList<>(cardSelectors.size());
     for (int i = 0; i < cardSelectors.size(); i++) {
       result.add(
           mapToLegacyCardSelectionRequest(cardSelectors.get(i), cardSelectionRequests.get(i)));
@@ -83,7 +82,7 @@ final class InternalLegacyDto {
   }
 
   static List<LegacyApduRequest> mapToLegacyApduRequests(List<ApduRequestSpi> apduRequests) {
-    List<LegacyApduRequest> result = new ArrayList<LegacyApduRequest>(apduRequests.size());
+    List<LegacyApduRequest> result = new ArrayList<>(apduRequests.size());
     for (ApduRequestSpi apduRequestSpi : apduRequests) {
       result.add(mapToLegacyApduRequest(apduRequestSpi));
     }

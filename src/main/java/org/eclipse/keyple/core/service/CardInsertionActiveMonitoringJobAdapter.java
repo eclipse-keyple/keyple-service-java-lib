@@ -61,7 +61,6 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
   @Override
   Runnable getMonitoringJob(final AbstractObservableStateAdapter monitoringState) {
     return new Runnable() {
-      long retries = 0;
 
       /**
        * Monitoring loop
@@ -75,36 +74,33 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
       @Override
       public void run() {
         try {
-          if (logger.isDebugEnabled()) {
-            logger.debug("[{}] Polling from isCardPresent", reader.getName());
+          if (logger.isTraceEnabled()) {
+            logger.trace(
+                "Start monitoring job polling process using 'isCardPresent()' method on reader [{}]",
+                reader.getName());
           }
           // re-init loop value to true
           loop.set(true);
           while (loop.get()) {
             // polls for CARD_INSERTED
             if (monitorInsertion && reader.isCardPresent()) {
-              if (logger.isDebugEnabled()) {
-                logger.debug("[{}] The card is present ", reader.getName());
+              if (logger.isTraceEnabled()) {
+                logger.trace("Card present");
               }
               monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
               return;
             }
             // polls for CARD_REMOVED
             if (!monitorInsertion && !reader.isCardPresent()) {
-              if (logger.isDebugEnabled()) {
-                logger.debug("[{}] The card is not present ", reader.getName());
+              if (logger.isTraceEnabled()) {
+                logger.trace("Card not present");
               }
               loop.set(false);
               monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
               return;
             }
-            retries++;
-
-            if (logger.isTraceEnabled()) {
-              logger.trace("[{}] isCardPresent polling retries : {}", reader.getName(), retries);
-            }
+            // wait a bit
             try {
-              // wait a bit
               Thread.sleep(sleepDurationMillis);
             } catch (InterruptedException ignored) {
               // Restore interrupted state...
@@ -113,7 +109,7 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
             }
           }
           if (logger.isTraceEnabled()) {
-            logger.trace("[{}] Looping has been stopped", reader.getName());
+            logger.trace("Monitoring job polling process stopped");
           }
         } catch (RuntimeException e) {
           ((ObservableLocalReaderAdapter) reader)
@@ -132,9 +128,6 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
    */
   @Override
   void stop() {
-    if (logger.isDebugEnabled()) {
-      logger.debug("[{}] Stop polling ", reader.getName());
-    }
     loop.set(false);
   }
 }

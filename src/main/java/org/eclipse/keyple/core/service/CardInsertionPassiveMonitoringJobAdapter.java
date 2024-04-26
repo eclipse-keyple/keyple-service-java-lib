@@ -75,6 +75,9 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
       @Override
       public void run() {
         try {
+          if (logger.isTraceEnabled()) {
+            logger.trace("Start monitoring job process on reader [{}]", getReader().getName());
+          }
           if (readerSpi instanceof CardInsertionWaiterBlockingSpi) {
             ((CardInsertionWaiterBlockingSpi) readerSpi).waitForCardInsertion();
           } else if (readerSpi instanceof WaitForCardInsertionBlockingSpi) {
@@ -84,13 +87,11 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
         } catch (ReaderIOException e) {
           // just warn as it can be a disconnection of the reader.
           logger.warn(
-              "[{}] waitForCardPresent => Error while processing card insertion event",
-              getReader().getName());
-        } catch (TaskCanceledException e) {
-          logger.warn(
-              "[{}] waitForCardPresent => task canceled: {}",
+              "Monitoring job error while processing card insertion event on reader [{}]: {}",
               getReader().getName(),
               e.getMessage());
+        } catch (TaskCanceledException e) {
+          logger.warn("Monitoring job process cancelled: {}", e.getMessage());
         } catch (RuntimeException e) {
           getReader()
               .getObservationExceptionHandler()
@@ -108,12 +109,15 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
   @Override
   void stop() {
     if (logger.isTraceEnabled()) {
-      logger.trace("[{}] stopWaitForCard on reader", getReader().getName());
+      logger.trace("Stop monitoring job process");
     }
     if (readerSpi instanceof CardInsertionWaiterBlockingSpi) {
       ((CardInsertionWaiterBlockingSpi) readerSpi).stopWaitForCardInsertion();
     } else if (readerSpi instanceof WaitForCardInsertionBlockingSpi) {
       ((WaitForCardInsertionBlockingSpi) readerSpi).stopWaitForCardInsertion();
+    }
+    if (logger.isTraceEnabled()) {
+      logger.trace("Monitoring job process stopped");
     }
   }
 }
