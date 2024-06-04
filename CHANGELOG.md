@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [3.2.2] - 2024-06-04
 ### Fixed
-- Fixes a weakness related to observable reader observation in `SINGLESHOT` detection mode.
+- Fixed exception while deserializing a plugin event (issue [#69]).
+- Fixed a weakness related to observable reader observation in `SINGLESHOT` detection mode.
   The `onStopDetection()` method of the `ObservableReaderSpi` interface is now called whenever the state machine 
   switches to the `WAIT_FOR_START_DETECTION` state.
 ### Changed
@@ -167,7 +170,8 @@ It follows the extraction of Keyple 1.0 components contained in the `eclipse-key
 repositories.
 It also brings many major API changes.
 
-[unreleased]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.2.1...HEAD
+[unreleased]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.2.2...HEAD
+[3.2.2]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.2.1...3.2.2
 [3.2.1]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.2.0...3.2.1
 [3.2.0]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.1.0...3.2.0
 [3.1.0]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.0.1...3.1.0
@@ -186,6 +190,7 @@ It also brings many major API changes.
 [2.0.1]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/eclipse-keyple/keyple-service-java-lib/releases/tag/2.0.0
 
+[#69]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/69
 [#58]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/58
 [#47]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/47
 [#43]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/43
