@@ -40,6 +40,7 @@ import org.eclipse.keypop.card.CardSelectionResponseApi;
 import org.eclipse.keypop.reader.CardReader;
 import org.eclipse.keypop.reader.ReaderApiFactory;
 import org.eclipse.keypop.reader.ReaderApiProperties;
+import org.eclipse.keypop.reader.selection.ScheduledCardSelectionsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +68,10 @@ final class SmartCardServiceAdapter implements SmartCardService {
   static {
     // Register additional JSON adapters.
     JsonUtil.registerTypeAdapter(AbstractApduException.class, new ApduExceptionJsonAdapter(), true);
+    JsonUtil.registerTypeAdapter(
+        ScheduledCardSelectionsResponse.class,
+        new ScheduledCardSelectionsResponseJsonDeserializerAdapter(),
+        false);
     JsonUtil.registerTypeAdapter(
         CardSelectionResponseApi.class,
         new CardSelectionResponseApiJsonDeserializerAdapter(),

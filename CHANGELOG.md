@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.3] - 2024-06-24
+### Fixed
+- Fixed exception while deserializing a reader event (issue [#70]).
+
 ## [3.2.2] - 2024-06-04
 ### Fixed
 - Fixed exception while deserializing a plugin event (issue [#69]).
@@ -170,7 +174,8 @@ It follows the extraction of Keyple 1.0 components contained in the `eclipse-key
 repositories.
 It also brings many major API changes.
 
-[unreleased]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.2.2...HEAD
+[unreleased]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.2.3...HEAD
+[3.2.3]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.2.2...3.2.3
 [3.2.2]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.2.1...3.2.2
 [3.2.1]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.2.0...3.2.1
 [3.2.0]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.1.0...3.2.0
@@ -190,6 +195,7 @@ It also brings many major API changes.
 [2.0.1]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/eclipse-keyple/keyple-service-java-lib/releases/tag/2.0.0
 
+[#70]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/70
 [#69]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/69
 [#58]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/58
 [#47]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/47

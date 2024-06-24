@@ -23,6 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import org.eclipse.keypop.card.AbstractApduException;
 import org.eclipse.keypop.card.CardResponseApi;
+import org.eclipse.keypop.reader.selection.ScheduledCardSelectionsResponse;
 
 /**
  * Contains all JSON adapters used for serialization and deserialization processes.<br>
@@ -103,6 +104,27 @@ final class JsonAdapter {
             String.format(
                 "Error while trying to build exception [%s] with message [%s]", type, message));
       }
+    }
+  }
+
+  /**
+   * JSON deserializer of a {@link ScheduledCardSelectionsResponse}.
+   *
+   * @since 3.2.3
+   */
+  static final class ScheduledCardSelectionsResponseJsonDeserializerAdapter
+      implements JsonDeserializer<ScheduledCardSelectionsResponseAdapter> {
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 3.2.3
+     */
+    @Override
+    public ScheduledCardSelectionsResponseAdapter deserialize(
+        JsonElement json, Type typeOfT, JsonDeserializationContext context)
+        throws JsonParseException {
+      return context.deserialize(json, ScheduledCardSelectionsResponseAdapter.class);
     }
   }
 
