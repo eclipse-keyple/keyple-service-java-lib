@@ -25,6 +25,7 @@ import org.calypsonet.terminal.card.CardSelectionResponseApi;
 import org.calypsonet.terminal.reader.CardReader;
 import org.calypsonet.terminal.reader.ReaderApiProperties;
 import org.calypsonet.terminal.reader.selection.CardSelectionManager;
+import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
 import org.eclipse.keyple.core.common.CommonApiProperties;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtensionFactory;
@@ -64,6 +65,10 @@ final class SmartCardServiceAdapter implements SmartCardService {
     // Register additional JSON adapters.
     JsonUtil.registerTypeAdapter(
         AbstractApduException.class, new ApduExceptionJsonSerializerAdapter(), true);
+    JsonUtil.registerTypeAdapter(
+        ScheduledCardSelectionsResponse.class,
+        new ScheduledCardSelectionsResponseJsonDeserializerAdapter(),
+        false);
     JsonUtil.registerTypeAdapter(
         CardSelectionResponseApi.class,
         new CardSelectionResponseApiJsonDeserializerAdapter(),

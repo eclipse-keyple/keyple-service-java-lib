@@ -20,6 +20,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
 import org.calypsonet.terminal.card.AbstractApduException;
+import org.calypsonet.terminal.reader.selection.ScheduledCardSelectionsResponse;
 
 /**
  * Contains all JSON adapters used for serialization and deserialization processes.<br>
@@ -53,6 +54,27 @@ final class JsonAdapter {
       json.addProperty("detailMessage", exception.getMessage());
       json.add("cardResponse", jsonSerializationContext.serialize(exception.getCardResponse()));
       return json;
+    }
+  }
+
+  /**
+   * JSON deserializer of a {@link ScheduledCardSelectionsResponse}.
+   *
+   * @since 2.3.5
+   */
+  static final class ScheduledCardSelectionsResponseJsonDeserializerAdapter
+      implements JsonDeserializer<ScheduledCardSelectionsResponseAdapter> {
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.3.5
+     */
+    @Override
+    public ScheduledCardSelectionsResponseAdapter deserialize(
+        JsonElement json, Type typeOfT, JsonDeserializationContext context)
+        throws JsonParseException {
+      return context.deserialize(json, ScheduledCardSelectionsResponseAdapter.class);
     }
   }
 
