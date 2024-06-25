@@ -7,6 +7,7 @@
 | 3.1.0 | [API documentation](3.1.0)<br>[API class diagram](3.1.0/api_class_diagram.svg) |
 | 3.0.1 | [API documentation](3.0.1)<br>[API class diagram](3.0.1/api_class_diagram.svg) |
 | 3.0.0 | [API documentation](3.0.0)<br>[API class diagram](3.0.0/api_class_diagram.svg) |
+| 2.3.5 | [API documentation](2.3.5)<br>[API class diagram](2.3.5/api_class_diagram.svg) |
 | 2.3.4 | [API documentation](2.3.4)<br>[API class diagram](2.3.4/api_class_diagram.svg) |
 | 2.3.3 | [API documentation](2.3.3)<br>[API class diagram](2.3.3/api_class_diagram.svg) |
 | 2.3.2 | [API documentation](2.3.2)<br>[API class diagram](2.3.2/api_class_diagram.svg) |
