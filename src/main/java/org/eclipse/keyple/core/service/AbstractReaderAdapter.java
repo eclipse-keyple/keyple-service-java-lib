@@ -37,6 +37,7 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
 
   private boolean isRegistered;
   private long before;
+  private Boolean isContactless;
 
   /**
    * Constructor.
@@ -61,6 +62,22 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
    */
   final String getPluginName() {
     return pluginName;
+  }
+
+  /**
+   * Returns the {@link KeypleReaderExtension} that is reader-specific.
+   *
+   * <p>Note: the provided argument is used at compile time to check the type consistency.
+   *
+   * @param readerExtensionClass The specific class of the reader.
+   * @param <T> The type of the reader extension.
+   * @return A {@link KeypleReaderExtension}.
+   * @throws IllegalStateException If reader is no longer registered.
+   * @since 2.0.0
+   */
+  final <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionClass) {
+    checkStatus();
+    return readerExtensionClass.cast(readerExtension);
   }
 
   /**
@@ -136,9 +153,10 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
    * @since 2.0.0
    */
   final void checkStatus() {
-    if (!isRegistered)
+    if (!isRegistered) {
       throw new IllegalStateException(
           String.format("This reader, %s, is not registered", getName()));
+    }
   }
 
   /**
@@ -205,6 +223,14 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
           UnexpectedStatusWordException;
 
   /**
+   * Checks if the reader is contactless or not.
+   *
+   * @return True if the reader is contactless.
+   * @since 3.2.4
+   */
+  abstract boolean processIsContactless();
+
+  /**
    * {@inheritDoc}
    *
    * @since 2.0.0
@@ -219,9 +245,12 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
    *
    * @since 2.0.0
    */
-  public final <T extends KeypleReaderExtension> T getExtension(Class<T> readerExtensionClass) {
-    checkStatus();
-    return readerExtensionClass.cast(readerExtension);
+  @Override
+  public final boolean isContactless() {
+    if (isContactless == null) {
+      isContactless = processIsContactless();
+    }
+    return isContactless;
   }
 
   /**

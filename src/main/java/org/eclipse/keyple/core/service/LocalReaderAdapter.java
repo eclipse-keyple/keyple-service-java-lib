@@ -230,10 +230,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0.0
+   * @since 3.2.4
    */
   @Override
-  public final boolean isContactless() {
+  final boolean processIsContactless() {
     return readerSpi.isContactless();
   }
 

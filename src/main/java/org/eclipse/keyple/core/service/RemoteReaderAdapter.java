@@ -333,11 +333,10 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0.0
+   * @since 3.2.4
    */
   @Override
-  public final boolean isContactless() {
-    // TODO use cache
+  final boolean processIsContactless() {
     checkStatus();
 
     // Build the input JSON data.
