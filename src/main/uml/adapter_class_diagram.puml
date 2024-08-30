@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 3.1.0 (2023-12-18)
+    Keyple - Adapter of keyple-service-java-lib - 3.2.4 (2024-08-30)
 end title
 
 ' == THEME ==
@@ -114,7 +114,7 @@ package "org.eclipse.keyple.core.service" as service {
         +Plugin getPlugin (String pluginName)
         +Plugin getPlugin (<back:yellow>CardReader</back> reader)
         +<back:yellow>CardReader</back> getReader (String readerName)
-        +<color:blue><back:yellow>CardReader</back> findReader (String readerNameRegex)
+        +<back:yellow>CardReader</back> findReader (String readerNameRegex)
         +void checkCardExtension (<back:cyan>KeypleCardExtension</back> cardExtension)
         +DistributedLocalService registerDistributedLocalService (<back:cyan>KeypleDistributedLocalServiceExtensionFactory</back> distributedLocalServiceFactory)
         +void unregisterDistributedLocalService (String distributedLocalServiceName)
@@ -139,7 +139,7 @@ package "org.eclipse.keyple.core.service" as service {
         +**final** Set<String> getReaderNames ()
         +**final** Set<<Back:Yellow>CardReader</Back>> getReaders ()
         +**final** <Back:Yellow>CardReader</Back> getReader (String readerName)
-        +<color:blue>**final** <back:yellow>CardReader</back> findReader (String readerNameRegex)
+        +**final** <back:yellow>CardReader</back> findReader (String readerNameRegex)
     }
     ~class LocalPluginAdapter extends AbstractPluginAdapter {
         --
@@ -291,6 +291,8 @@ package "org.eclipse.keyple.core.service" as service {
         ~AbstractReaderAdapter (String readerName, <back:cyan>KeypleReaderExtension</back> readerExtension, String pluginName)
 
         ~**final** String getPluginName ()
+        ~**final** <T extends <back:cyan>KeypleReaderExtension</back>> T getExtension (Class<T> readerExtensionClass)
+
         ~**final** List<<back:lightGreen>CardSelectionResponseApi</back>> transmitCardSelectionRequests (
             \tList<<back:yellow>CardSelector</back><?>> cardSelectors, List<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
             \tMultiSelectionProcessing multiSelectionProcessing, <back:lightGreen>ChannelControl</back> channelControl)
@@ -303,9 +305,10 @@ package "org.eclipse.keyple.core.service" as service {
             \tList<<back:yellow>CardSelector</back><?>> cardSelectors, List<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
             \tMultiSelectionProcessing multiSelectionProcessing, <back:lightGreen>ChannelControl</back> channelControl)
         ~{abstract} **abstract** <back:lightGreen>CardResponseApi</back> processCardRequest (<back:lightGreen>CardRequestSpi</back> cardRequest, <back:lightGreen>ChannelControl</back> channelControl)
+        ~<color:blue>{abstract} **abstract** boolean processIsContactless ()
         -- **CardReader** --
         +**final** String getName ()
-        +**final** <T extends <back:cyan>KeypleReaderExtension</back>> T getExtension (Class<T> readerExtensionClass)
+        +<color:blue>**final** boolean isContactless ()
         -- **ProxyReaderApi** --
         +**final** <back:lightGreen>CardResponseApi</back> transmitCardRequest (<back:lightGreen>CardRequestSpi</back> cardRequest, <back:lightGreen>ChannelControl</back> channelControl)
     }
@@ -329,8 +332,9 @@ package "org.eclipse.keyple.core.service" as service {
         ~**final** <back:lightGreen>CardResponseApi</back> processCardRequest (
             \t<back:lightGreen>CardRequestSpi</back> cardRequest,
             \t<back:lightGreen>ChannelControl</back> channelControl)
+        ~<color:blue>**final** boolean processIsContactless ()
         -- **CardReader** --
-        +**final** boolean isContactless ()
+        +<color:red><s>**final** boolean isContactless ()
         +boolean isCardPresent ()
         -- **ProxyReaderApi** --
         +**final** void releaseChannel ()
@@ -351,8 +355,9 @@ package "org.eclipse.keyple.core.service" as service {
         ~**final** <back:lightGreen>CardResponseApi</back> processCardRequest (
             \t<back:lightGreen>CardRequestSpi</back> cardRequest,
             \t<back:lightGreen>ChannelControl</back> channelControl)
+        ~<color:blue>**final** boolean processIsContactless ()
         -- **CardReader** --
-        +**final** boolean isContactless ()
+        +<color:red><s>**final** boolean isContactless ()
         +**final** boolean isCardPresent ()
         -- **ProxyReaderApi** --
         +**final** void releaseChannel ()
