@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Caching of the flag indicating whether the reader is contactless.
 ### Upgraded
+- Keyple Distributed Remote API `3.0.1` -> `3.1.0`
 - Keyple Distributed Local API `2.1.1` -> `2.2.0`
 
 ## [3.2.3] - 2024-06-24
