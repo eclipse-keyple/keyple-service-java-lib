@@ -72,7 +72,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0.0
    */
   LocalReaderAdapter(ReaderSpi readerSpi, String pluginName) {
-    super(readerSpi.getName(), (KeypleReaderExtension) readerSpi, pluginName);
+    super(readerSpi.getName(), (KeypleReaderExtension) readerSpi, pluginName, null);
     this.readerSpi = readerSpi;
     protocolAssociations = new LinkedHashMap<>();
   }

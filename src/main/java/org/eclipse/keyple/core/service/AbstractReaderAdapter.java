@@ -45,13 +45,18 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
    * @param readerName The name of the reader.
    * @param readerExtension The associated reader extension SPI.
    * @param pluginName The name of the plugin.
+   * @param isContactless Is reader contactless? Set null value if unknown.
    * @since 2.0.0
    */
   AbstractReaderAdapter(
-      String readerName, KeypleReaderExtension readerExtension, String pluginName) {
+      String readerName,
+      KeypleReaderExtension readerExtension,
+      String pluginName,
+      Boolean isContactless) {
     this.readerName = readerName;
     this.readerExtension = readerExtension;
     this.pluginName = pluginName;
+    this.isContactless = isContactless;
   }
 
   /**

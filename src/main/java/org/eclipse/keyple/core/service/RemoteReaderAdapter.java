@@ -63,7 +63,11 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
       String pluginName,
       SmartCard selectedSmartCard,
       int clientCoreApiLevel) {
-    super(remoteReaderSpi.getName(), (KeypleReaderExtension) remoteReaderSpi, pluginName);
+    super(
+        remoteReaderSpi.getName(),
+        (KeypleReaderExtension) remoteReaderSpi,
+        pluginName,
+        remoteReaderSpi.isLocalReaderContactless());
     this.remoteReaderSpi = remoteReaderSpi;
     this.selectedSmartCard = selectedSmartCard;
     this.clientCoreApiLevel = clientCoreApiLevel;

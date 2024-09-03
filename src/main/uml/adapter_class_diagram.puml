@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 3.2.4 (2024-08-30)
+    Keyple - Adapter of keyple-service-java-lib - 3.3.0 (2024-09-02)
 end title
 
 ' == THEME ==
@@ -260,6 +260,7 @@ package "org.eclipse.keyple.core.service" as service {
         -- **CardReaderObserverSpi** --
         +void onReaderEvent (<Back:Yellow>CardReaderEvent</Back> cardReaderEvent)
         -- **LocalServiceApi** --
+        +<color:blue>boolean isReaderContactless (String readerName)
         +void setPoolPluginNames (String... poolPluginNames)
         +String executeLocally (String jsonData, String readerName)
     }
@@ -288,7 +289,7 @@ package "org.eclipse.keyple.core.service" as service {
     ' READERS
     ~abstract class "<<<Back:Yellow>CardReader</Back>>>\n<<<back:lightGreen>ProxyReaderApi</back>>>\nAbstractReaderAdapter" as AbstractReaderAdapter {
         --
-        ~AbstractReaderAdapter (String readerName, <back:cyan>KeypleReaderExtension</back> readerExtension, String pluginName)
+        ~AbstractReaderAdapter (String readerName, <back:cyan>KeypleReaderExtension</back> readerExtension, String pluginName, <color:blue>Boolean isContactless</color>)
 
         ~**final** String getPluginName ()
         ~**final** <T extends <back:cyan>KeypleReaderExtension</back>> T getExtension (Class<T> readerExtensionClass)

@@ -89,7 +89,7 @@ public class AbstractReaderAdapterTest {
 
     DefaultAbstractReaderAdapter(
         String readerName, KeypleReaderExtension readerExtension, String pluginName) {
-      super(readerName, readerExtension, pluginName);
+      super(readerName, readerExtension, pluginName, null);
     }
 
     @Override
