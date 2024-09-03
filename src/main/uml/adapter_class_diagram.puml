@@ -306,10 +306,8 @@ package "org.eclipse.keyple.core.service" as service {
             \tList<<back:yellow>CardSelector</back><?>> cardSelectors, List<<back:lightGreen>CardSelectionRequestSpi</back>> cardSelectionRequests,
             \tMultiSelectionProcessing multiSelectionProcessing, <back:lightGreen>ChannelControl</back> channelControl)
         ~{abstract} **abstract** <back:lightGreen>CardResponseApi</back> processCardRequest (<back:lightGreen>CardRequestSpi</back> cardRequest, <back:lightGreen>ChannelControl</back> channelControl)
-        ~<color:blue>{abstract} **abstract** boolean processIsContactless ()
         -- **CardReader** --
         +**final** String getName ()
-        +<color:blue>**final** boolean isContactless ()
         -- **ProxyReaderApi** --
         +**final** <back:lightGreen>CardResponseApi</back> transmitCardRequest (<back:lightGreen>CardRequestSpi</back> cardRequest, <back:lightGreen>ChannelControl</back> channelControl)
     }
@@ -333,9 +331,8 @@ package "org.eclipse.keyple.core.service" as service {
         ~**final** <back:lightGreen>CardResponseApi</back> processCardRequest (
             \t<back:lightGreen>CardRequestSpi</back> cardRequest,
             \t<back:lightGreen>ChannelControl</back> channelControl)
-        ~<color:blue>**final** boolean processIsContactless ()
         -- **CardReader** --
-        +<color:red><s>**final** boolean isContactless ()
+        +**final** boolean isContactless ()
         +boolean isCardPresent ()
         -- **ProxyReaderApi** --
         +**final** void releaseChannel ()
@@ -356,9 +353,8 @@ package "org.eclipse.keyple.core.service" as service {
         ~**final** <back:lightGreen>CardResponseApi</back> processCardRequest (
             \t<back:lightGreen>CardRequestSpi</back> cardRequest,
             \t<back:lightGreen>ChannelControl</back> channelControl)
-        ~<color:blue>**final** boolean processIsContactless ()
         -- **CardReader** --
-        +<color:red><s>**final** boolean isContactless ()
+        +**final** boolean isContactless ()
         +**final** boolean isCardPresent ()
         -- **ProxyReaderApi** --
         +**final** void releaseChannel ()
