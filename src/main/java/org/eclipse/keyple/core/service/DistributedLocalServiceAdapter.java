@@ -71,6 +71,20 @@ final class DistributedLocalServiceAdapter
   /**
    * {@inheritDoc}
    *
+   * @since 3.3.0
+   */
+  @Override
+  public boolean isReaderContactless(String readerName) {
+    CardReader reader = SmartCardServiceProvider.getService().findReader(readerName);
+    if (reader == null) {
+      throw new IllegalStateException(String.format(READER_NOT_FOUND_TEMPLATE, readerName));
+    }
+    return reader.isContactless();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @since 2.0.0
    */
   @Override
@@ -230,7 +244,7 @@ final class DistributedLocalServiceAdapter
      */
     private LocalReaderExecutor(String jsonData, String readerName) {
 
-      reader = getReader(readerName);
+      reader = (AbstractReaderAdapter) SmartCardServiceProvider.getService().findReader(readerName);
       if (reader == null) {
         throw new IllegalStateException(String.format(READER_NOT_FOUND_TEMPLATE, readerName));
       }
@@ -241,26 +255,6 @@ final class DistributedLocalServiceAdapter
       } else {
         inputCoreApiLevel = 1;
       }
-    }
-
-    /**
-     * Retrieves the first register reader having the provided name among all plugins.
-     *
-     * @param readerName The name of the reader to be found.
-     * @return null if no reader is found with this name.
-     */
-    private AbstractReaderAdapter getReader(String readerName) {
-      for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
-        try {
-          CardReader localReader = plugin.getReader(readerName);
-          if (localReader != null) {
-            return (AbstractReaderAdapter) localReader;
-          }
-        } catch (IllegalStateException e) {
-          // The plugin is no longer register, then continue.
-        }
-      }
-      return null;
     }
 
     /**

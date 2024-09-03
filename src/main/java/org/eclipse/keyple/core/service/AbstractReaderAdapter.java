@@ -37,7 +37,6 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
 
   private boolean isRegistered;
   private long before;
-  private Boolean isContactless;
 
   /**
    * Constructor.
@@ -223,14 +222,6 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
           UnexpectedStatusWordException;
 
   /**
-   * Checks if the reader is contactless or not.
-   *
-   * @return True if the reader is contactless.
-   * @since 3.2.4
-   */
-  abstract boolean processIsContactless();
-
-  /**
    * {@inheritDoc}
    *
    * @since 2.0.0
@@ -238,19 +229,6 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
   @Override
   public final String getName() {
     return readerName;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0.0
-   */
-  @Override
-  public final boolean isContactless() {
-    if (isContactless == null) {
-      isContactless = processIsContactless();
-    }
-    return isContactless;
   }
 
   /**

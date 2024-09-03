@@ -47,6 +47,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   private final RemoteReaderSpi remoteReaderSpi;
   private final SmartCard selectedSmartCard;
   private int clientCoreApiLevel;
+  private Boolean isContactless;
 
   /**
    * Constructor.
@@ -67,6 +68,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     this.remoteReaderSpi = remoteReaderSpi;
     this.selectedSmartCard = selectedSmartCard;
     this.clientCoreApiLevel = clientCoreApiLevel;
+    isContactless = remoteReaderSpi.isContactless();
   }
 
   /**
@@ -333,10 +335,17 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   /**
    * {@inheritDoc}
    *
-   * @since 3.2.4
+   * @since 2.0.0
    */
   @Override
-  final boolean processIsContactless() {
+  public final boolean isContactless() {
+    if (isContactless == null) {
+      isContactless = processIsContactless();
+    }
+    return isContactless;
+  }
+
+  private boolean processIsContactless() {
     checkStatus();
 
     // Build the input JSON data.

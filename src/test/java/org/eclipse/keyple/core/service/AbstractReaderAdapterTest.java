@@ -113,12 +113,12 @@ public class AbstractReaderAdapterTest {
     }
 
     @Override
-    boolean processIsContactless() {
-      return false;
-    }
+    public void releaseChannel() throws ReaderCommunicationException {}
 
     @Override
-    public void releaseChannel() throws ReaderCommunicationException {}
+    public boolean isContactless() {
+      return false;
+    }
 
     @Override
     public boolean isCardPresent() {
