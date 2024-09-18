@@ -18,6 +18,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.*;
+import java.util.regex.Pattern;
 import org.eclipse.keyple.core.common.KeypleDistributedLocalServiceExtension;
 import org.eclipse.keyple.core.distributed.local.LocalServiceApi;
 import org.eclipse.keyple.core.distributed.local.spi.LocalServiceSpi;
@@ -75,7 +76,7 @@ final class DistributedLocalServiceAdapter
    */
   @Override
   public boolean isReaderContactless(String readerName) {
-    CardReader reader = SmartCardServiceProvider.getService().findReader(readerName);
+    CardReader reader = SmartCardServiceProvider.getService().findReader(Pattern.quote(readerName));
     if (reader == null) {
       throw new IllegalStateException(String.format(READER_NOT_FOUND_TEMPLATE, readerName));
     }
@@ -244,7 +245,9 @@ final class DistributedLocalServiceAdapter
      */
     private LocalReaderExecutor(String jsonData, String readerName) {
 
-      reader = (AbstractReaderAdapter) SmartCardServiceProvider.getService().findReader(readerName);
+      reader =
+          (AbstractReaderAdapter)
+              SmartCardServiceProvider.getService().findReader(Pattern.quote(readerName));
       if (reader == null) {
         throw new IllegalStateException(String.format(READER_NOT_FOUND_TEMPLATE, readerName));
       }
