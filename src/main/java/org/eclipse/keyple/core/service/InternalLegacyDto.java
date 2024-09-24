@@ -77,7 +77,7 @@ final class InternalLegacyDto {
   static LegacyCardRequest mapToLegacyCardRequest(CardRequestSpi cardRequest) {
     LegacyCardRequest result = new LegacyCardRequest();
     result.apduRequests = mapToLegacyApduRequests(cardRequest.getApduRequests());
-    result.stopOnUnsuccessfulStatusWord = cardRequest.stopOnUnsuccessfulStatusWord();
+    result.isStatusCodesVerificationEnabled = cardRequest.stopOnUnsuccessfulStatusWord();
     return result;
   }
 
@@ -132,7 +132,7 @@ final class InternalLegacyDto {
    */
   static final class LegacyCardRequest {
     List<LegacyApduRequest> apduRequests;
-    boolean stopOnUnsuccessfulStatusWord;
+    boolean isStatusCodesVerificationEnabled;
 
     @Override
     public String toString() {
