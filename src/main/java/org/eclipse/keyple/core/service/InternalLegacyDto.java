@@ -32,22 +32,43 @@ final class InternalLegacyDto {
 
   private InternalLegacyDto() {}
 
-  static List<LegacyCardSelectionRequest> mapToLegacyCardSelectionRequests(
+  static List<LegacyCardSelectionRequestV0> mapToLegacyCardSelectionRequestsV0(
       List<CardSelector<?>> cardSelectors, List<CardSelectionRequestSpi> cardSelectionRequests) {
-    List<LegacyCardSelectionRequest> result = new ArrayList<>(cardSelectors.size());
+    List<LegacyCardSelectionRequestV0> result = new ArrayList<>(cardSelectors.size());
     for (int i = 0; i < cardSelectors.size(); i++) {
       result.add(
-          mapToLegacyCardSelectionRequest(cardSelectors.get(i), cardSelectionRequests.get(i)));
+          mapToLegacyCardSelectionRequestV0(cardSelectors.get(i), cardSelectionRequests.get(i)));
     }
     return result;
   }
 
-  static LegacyCardSelectionRequest mapToLegacyCardSelectionRequest(
+  static List<LegacyCardSelectionRequestV1> mapToLegacyCardSelectionRequestsV1(
+      List<CardSelector<?>> cardSelectors, List<CardSelectionRequestSpi> cardSelectionRequests) {
+    List<LegacyCardSelectionRequestV1> result = new ArrayList<>(cardSelectors.size());
+    for (int i = 0; i < cardSelectors.size(); i++) {
+      result.add(
+          mapToLegacyCardSelectionRequestV1(cardSelectors.get(i), cardSelectionRequests.get(i)));
+    }
+    return result;
+  }
+
+  static LegacyCardSelectionRequestV0 mapToLegacyCardSelectionRequestV0(
       CardSelector<?> cardSelector, CardSelectionRequestSpi cardSelectionRequestSpi) {
-    LegacyCardSelectionRequest result = new LegacyCardSelectionRequest();
+    LegacyCardSelectionRequestV0 result = new LegacyCardSelectionRequestV0();
     result.cardRequest =
         cardSelectionRequestSpi.getCardRequest() != null
-            ? mapToLegacyCardRequest(cardSelectionRequestSpi.getCardRequest())
+            ? mapToLegacyCardRequestV0(cardSelectionRequestSpi.getCardRequest())
+            : null;
+    result.cardSelector = mapToLegacyCardSelector(cardSelector, cardSelectionRequestSpi);
+    return result;
+  }
+
+  static LegacyCardSelectionRequestV1 mapToLegacyCardSelectionRequestV1(
+      CardSelector<?> cardSelector, CardSelectionRequestSpi cardSelectionRequestSpi) {
+    LegacyCardSelectionRequestV1 result = new LegacyCardSelectionRequestV1();
+    result.cardRequest =
+        cardSelectionRequestSpi.getCardRequest() != null
+            ? mapToLegacyCardRequestV1(cardSelectionRequestSpi.getCardRequest())
             : null;
     result.cardSelector = mapToLegacyCardSelector(cardSelector, cardSelectionRequestSpi);
     return result;
@@ -74,8 +95,15 @@ final class InternalLegacyDto {
     return result;
   }
 
-  static LegacyCardRequest mapToLegacyCardRequest(CardRequestSpi cardRequest) {
-    LegacyCardRequest result = new LegacyCardRequest();
+  static LegacyCardRequestV0 mapToLegacyCardRequestV0(CardRequestSpi cardRequest) {
+    LegacyCardRequestV0 result = new LegacyCardRequestV0();
+    result.apduRequests = mapToLegacyApduRequests(cardRequest.getApduRequests());
+    result.isStatusCodesVerificationEnabled = cardRequest.stopOnUnsuccessfulStatusWord();
+    return result;
+  }
+
+  static LegacyCardRequestV1 mapToLegacyCardRequestV1(CardRequestSpi cardRequest) {
+    LegacyCardRequestV1 result = new LegacyCardRequestV1();
     result.apduRequests = mapToLegacyApduRequests(cardRequest.getApduRequests());
     result.stopOnUnsuccessfulStatusWord = cardRequest.stopOnUnsuccessfulStatusWord();
     return result;
@@ -98,11 +126,24 @@ final class InternalLegacyDto {
   }
 
   /**
+   * @since 3.3.1
+   */
+  static final class LegacyCardSelectionRequestV0 {
+    LegacyCardSelector cardSelector;
+    LegacyCardRequestV0 cardRequest;
+
+    @Override
+    public String toString() {
+      return "CARD_SELECTION_REQUEST = " + JsonUtil.toJson(this);
+    }
+  }
+
+  /**
    * @since 2.1.1
    */
-  static final class LegacyCardSelectionRequest {
+  static final class LegacyCardSelectionRequestV1 {
     LegacyCardSelector cardSelector;
-    LegacyCardRequest cardRequest;
+    LegacyCardRequestV1 cardRequest;
 
     @Override
     public String toString() {
@@ -128,9 +169,22 @@ final class InternalLegacyDto {
   }
 
   /**
+   * @since 3.3.1
+   */
+  static final class LegacyCardRequestV0 {
+    List<LegacyApduRequest> apduRequests;
+    boolean isStatusCodesVerificationEnabled;
+
+    @Override
+    public String toString() {
+      return "CARD_REQUEST = " + JsonUtil.toJson(this);
+    }
+  }
+
+  /**
    * @since 2.1.1
    */
-  static final class LegacyCardRequest {
+  static final class LegacyCardRequestV1 {
     List<LegacyApduRequest> apduRequests;
     boolean stopOnUnsuccessfulStatusWord;
 

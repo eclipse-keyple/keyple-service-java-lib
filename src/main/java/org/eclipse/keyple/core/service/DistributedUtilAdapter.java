@@ -120,10 +120,28 @@ final class DistributedUtilAdapter {
     }
     JsonObject output = JsonUtil.getParser().fromJson(outputJson, JsonObject.class);
     if (output.has(JsonProperty.ERROR.name())) { // Legacy mode
-      BodyError body =
-          JsonUtil.getParser()
-              .fromJson(output.get(JsonProperty.ERROR.name()).getAsString(), BodyError.class);
-      throw body.getException();
+      Exception exception = null;
+      try {
+        BodyError body =
+            JsonUtil.getParser()
+                .fromJson(
+                    output.getAsJsonObject(JsonProperty.ERROR.name()).toString(), BodyError.class);
+        exception = body.getException();
+      } catch (Exception ignored) {
+        try {
+          BodyError body =
+              JsonUtil.getParser()
+                  .fromJson(output.get(JsonProperty.ERROR.name()).getAsString(), BodyError.class);
+          exception = body.getException();
+        } catch (Exception ignored2) {
+        }
+      }
+      if (exception != null) {
+        throw exception;
+      } else {
+        throw new RuntimeException(
+            "The distributed message sender received an unknown error: " + outputJson);
+      }
     } else if (output.has(JsonProperty.ERROR.getKey())) {
       JsonObject error = output.getAsJsonObject(JsonProperty.ERROR.getKey());
       if (error.has(JsonProperty.MESSAGE.getKey())) {

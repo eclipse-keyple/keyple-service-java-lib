@@ -181,11 +181,9 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
           throw new IllegalArgumentException(
               MSG_CLIENT_CORE_JSON_API_LEVEL_NOT_SUPPORTED + clientCoreApiLevel);
       }
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (ReaderBrokenCommunicationException e) {
-      throw e;
-    } catch (CardBrokenCommunicationException e) {
+    } catch (RuntimeException
+        | ReaderBrokenCommunicationException
+        | CardBrokenCommunicationException e) {
       throw e;
     } catch (Exception e) {
       throwRuntimeException(e);
@@ -209,7 +207,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     params.add(
         JsonProperty.CARD_SELECTION_REQUESTS.getKey(),
         JsonUtil.getParser()
-            .toJsonTree(mapToLegacyCardSelectionRequests(cardSelectors, cardSelectionRequests)));
+            .toJsonTree(mapToLegacyCardSelectionRequestsV1(cardSelectors, cardSelectionRequests)));
 
     input.add(JsonProperty.PARAMETERS.getKey(), params);
   }
@@ -228,7 +226,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     input.addProperty(
         JsonProperty.CARD_SELECTION_REQUESTS.name(),
         JsonUtil.getParser()
-            .toJson(mapToLegacyCardSelectionRequests(cardSelectors, cardSelectionRequests)));
+            .toJson(mapToLegacyCardSelectionRequestsV0(cardSelectors, cardSelectionRequests)));
   }
 
   /**
@@ -298,11 +296,9 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
           throw new IllegalArgumentException(
               MSG_CLIENT_CORE_JSON_API_LEVEL_NOT_SUPPORTED + clientCoreApiLevel);
       }
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (ReaderBrokenCommunicationException e) {
-      throw e;
-    } catch (CardBrokenCommunicationException e) {
+    } catch (RuntimeException
+        | ReaderBrokenCommunicationException
+        | CardBrokenCommunicationException e) {
       throw e;
     } catch (Exception e) {
       throwRuntimeException(e);
@@ -317,7 +313,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     JsonObject params = new JsonObject();
     params.add(
         JsonProperty.CARD_REQUEST.getKey(),
-        JsonUtil.getParser().toJsonTree(mapToLegacyCardRequest(cardRequest)));
+        JsonUtil.getParser().toJsonTree(mapToLegacyCardRequestV1(cardRequest)));
     params.addProperty(JsonProperty.CHANNEL_CONTROL.getKey(), channelControl.name());
 
     input.add(JsonProperty.PARAMETERS.getKey(), params);
@@ -328,7 +324,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     input.addProperty(JsonProperty.SERVICE.name(), ReaderService.TRANSMIT_CARD_REQUEST.name());
     input.addProperty(
         JsonProperty.CARD_REQUEST.name(),
-        JsonUtil.getParser().toJson(mapToLegacyCardRequest(cardRequest)));
+        JsonUtil.getParser().toJson(mapToLegacyCardRequestV0(cardRequest)));
     input.addProperty(JsonProperty.CHANNEL_CONTROL.name(), channelControl.name());
   }
 
@@ -480,9 +476,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     try {
       executeReaderServiceRemotely(input, remoteReaderSpi, getName(), logger);
 
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (ReaderBrokenCommunicationException e) {
+    } catch (RuntimeException | ReaderBrokenCommunicationException e) {
       throw e;
     } catch (Exception e) {
       throwRuntimeException(e);
