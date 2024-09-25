@@ -181,11 +181,9 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
           throw new IllegalArgumentException(
               MSG_CLIENT_CORE_JSON_API_LEVEL_NOT_SUPPORTED + clientCoreApiLevel);
       }
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (ReaderBrokenCommunicationException e) {
-      throw e;
-    } catch (CardBrokenCommunicationException e) {
+    } catch (RuntimeException
+        | ReaderBrokenCommunicationException
+        | CardBrokenCommunicationException e) {
       throw e;
     } catch (Exception e) {
       throwRuntimeException(e);
@@ -298,11 +296,9 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
           throw new IllegalArgumentException(
               MSG_CLIENT_CORE_JSON_API_LEVEL_NOT_SUPPORTED + clientCoreApiLevel);
       }
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (ReaderBrokenCommunicationException e) {
-      throw e;
-    } catch (CardBrokenCommunicationException e) {
+    } catch (RuntimeException
+        | ReaderBrokenCommunicationException
+        | CardBrokenCommunicationException e) {
       throw e;
     } catch (Exception e) {
       throwRuntimeException(e);
@@ -480,9 +476,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
     try {
       executeReaderServiceRemotely(input, remoteReaderSpi, getName(), logger);
 
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (ReaderBrokenCommunicationException e) {
+    } catch (RuntimeException | ReaderBrokenCommunicationException e) {
       throw e;
     } catch (Exception e) {
       throwRuntimeException(e);
