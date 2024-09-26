@@ -57,7 +57,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private static final int SW2_MASK = 0x00FF;
 
   private final ReaderSpi readerSpi;
-  private final boolean isContactless;
   private long before;
   private boolean isLogicalChannelOpen;
   private boolean useDefaultProtocol;
@@ -75,7 +74,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   LocalReaderAdapter(ReaderSpi readerSpi, String pluginName) {
     super(readerSpi.getName(), (KeypleReaderExtension) readerSpi, pluginName);
     this.readerSpi = readerSpi;
-    isContactless = readerSpi.isContactless();
     protocolAssociations = new LinkedHashMap<>();
   }
 
@@ -236,7 +234,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    */
   @Override
   public final boolean isContactless() {
-    return isContactless;
+    return readerSpi.isContactless();
   }
 
   /**
