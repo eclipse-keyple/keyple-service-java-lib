@@ -68,9 +68,10 @@ do
   done
   # If this is the stable version, write latest-stable entry first
   if [ "$directory" = "$latest_stable" ]; then
-      echo "| latest-stable ($latest_stable) | [API documentation](latest-stable)$diagrams |" >> list_versions.md
+      echo "| **$directory (latest stable)** | [API documentation](latest-stable)$diagrams |" >> list_versions.md
+  else
+      echo "| $directory | [API documentation]($directory)$diagrams |" >> list_versions.md
   fi
-  echo "| $directory | [API documentation]($directory)$diagrams |" >> list_versions.md
 done
 
 echo "Computed all versions:"
