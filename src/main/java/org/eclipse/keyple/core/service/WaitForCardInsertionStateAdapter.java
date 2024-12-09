@@ -12,7 +12,6 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.concurrent.ExecutorService;
-import org.calypsonet.terminal.reader.ObservableCardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,15 +100,6 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
 
       case STOP_DETECT:
         switchState(MonitoringState.WAIT_FOR_START_DETECTION);
-        break;
-
-      case CARD_REMOVED:
-        // the card has been removed during default selection
-        if (getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
-          switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
-        } else {
-          switchState(MonitoringState.WAIT_FOR_START_DETECTION);
-        }
         break;
 
       default:
