@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - Remove unexpected `CARD_REMOVED` event processing in **Wait For Card Insertion** state.
+- Remove unexpected `CARD_REMOVED` event sending when task **Card Removal Passive Monitoring Job** is cancelled.
 
 ## [2.3.5] - 2024-06-24
 ### Fixed

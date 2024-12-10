@@ -83,6 +83,7 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
        */
       @Override
       public void run() {
+        boolean isTaskCanceled = false;
         try {
           if (readerSpi instanceof CardRemovalWaiterBlockingSpi) {
             ((CardRemovalWaiterBlockingSpi) readerSpi).waitForCardRemoval();
@@ -101,6 +102,7 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
               getReader().getName(),
               e.getMessage());
         } catch (TaskCanceledException e) {
+          isTaskCanceled = true;
           logger.warn(
               "[{}] waitForCardAbsentNative => task canceled: {}",
               getReader().getName(),
@@ -110,7 +112,9 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
               .getObservationExceptionHandler()
               .onReaderObservationError(getReader().getPluginName(), getReader().getName(), e);
         } finally {
-          monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
+          if (!isTaskCanceled) {
+            monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
+          }
         }
       }
     };
