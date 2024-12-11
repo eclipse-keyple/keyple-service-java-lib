@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.4] - 2024-12-11
+### Fixed
+- Remove unexpected `CARD_REMOVED` event processing in **Wait For Card Insertion** state.
+- Remove unexpected `CARD_REMOVED` event sending when task **Card Removal Passive Monitoring Job** is cancelled.
+
 ## [3.3.3] - 2024-10-01
 ### Fixed
 - Fixed the issue caused by caching the `isContactless` flag for local readers.
@@ -194,7 +199,8 @@ It follows the extraction of Keyple 1.0 components contained in the `eclipse-key
 repositories.
 It also brings many major API changes.
 
-[unreleased]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.3...HEAD
+[unreleased]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.4...HEAD
+[3.3.4]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.3...3.3.4
 [3.3.3]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.2...3.3.3
 [3.3.2]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.1...3.3.2
 [3.3.1]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.0...3.3.1
