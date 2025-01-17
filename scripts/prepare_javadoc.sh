@@ -18,8 +18,8 @@ git clone https://github.com/eclipse-keyple/$repository_name.git
 
 cd $repository_name
 
-echo "Checkout gh-pages branch..."
-git checkout -f gh-pages
+echo "Checkout doc branch..."
+git checkout -f doc
 
 echo "Delete existing SNAPSHOT directory..."
 rm -rf *-SNAPSHOT
@@ -30,7 +30,6 @@ mkdir $version
 echo "Copy javadoc and uml files..."
 cp -rf ../build/docs/javadoc/* $version/
 cp -rf ../src/main/uml/api_*.svg $version/
-
 # Find the latest stable version (first non-SNAPSHOT)
 latest_stable=$(ls -d [0-9]*/ | grep -v SNAPSHOT | cut -f1 -d'/' | sort -Vr | head -n1)
 
