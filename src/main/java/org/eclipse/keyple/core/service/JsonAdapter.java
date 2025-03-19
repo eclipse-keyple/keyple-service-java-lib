@@ -11,18 +11,21 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import static org.eclipse.keyple.core.service.DistributedUtilAdapter.JsonProperty.*;
+
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.eclipse.keypop.card.AbstractApduException;
 import org.eclipse.keypop.card.CardResponseApi;
+import org.eclipse.keypop.card.ChannelControl;
+import org.eclipse.keypop.card.spi.CardSelectionRequestSpi;
+import org.eclipse.keypop.reader.selection.CardSelector;
 import org.eclipse.keypop.reader.selection.ScheduledCardSelectionsResponse;
 
 /**
@@ -199,6 +202,101 @@ final class JsonAdapter {
         JsonElement json, Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
       return context.deserialize(json, ApduResponseAdapter.class);
+    }
+  }
+
+  /**
+   * JSON serializer/deserializer of a {@link CardSelectionScenarioAdapter}.
+   *
+   * @since 3.3.5
+   */
+  static final class CardSelectionScenarioAdapterJsonAdapter
+      implements JsonSerializer<CardSelectionScenarioAdapter>,
+          JsonDeserializer<CardSelectionScenarioAdapter> {
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 3.3.5
+     */
+    @Override
+    public JsonElement serialize(
+        CardSelectionScenarioAdapter src, Type typeOfSrc, JsonSerializationContext context) {
+
+      JsonObject jsonObject = new JsonObject();
+
+      // Basic fields
+      jsonObject.addProperty(
+          MULTI_SELECTION_PROCESSING.getKey(), src.getMultiSelectionProcessing().name());
+      jsonObject.addProperty(CHANNEL_CONTROL.getKey(), src.getChannelControl().name());
+
+      // Original card selectors
+      List<String> cardSelectorsTypes = new ArrayList<>(src.getCardSelectors().size());
+      for (CardSelector<?> cardSelector : src.getCardSelectors()) {
+        cardSelectorsTypes.add(cardSelector.getClass().getName());
+      }
+      jsonObject.add(CARD_SELECTORS_TYPES.getKey(), context.serialize(cardSelectorsTypes));
+      jsonObject.add(CARD_SELECTORS.getKey(), context.serialize(src.getCardSelectors()));
+
+      // Card selection requests
+      jsonObject.add(
+          CARD_SELECTION_REQUESTS.getKey(), context.serialize(src.getCardSelectionRequests()));
+
+      return jsonObject;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 3.3.5
+     */
+    @Override
+    public CardSelectionScenarioAdapter deserialize(
+        JsonElement jsonElement, Type typeOfT, JsonDeserializationContext context)
+        throws JsonParseException {
+
+      JsonObject jsonObject = (JsonObject) jsonElement;
+
+      // Basic fields
+      MultiSelectionProcessing multiSelectionProcessing =
+          MultiSelectionProcessing.valueOf(
+              jsonObject.get(MULTI_SELECTION_PROCESSING.getKey()).getAsString());
+
+      ChannelControl channelControl =
+          ChannelControl.valueOf(jsonObject.get(CHANNEL_CONTROL.getKey()).getAsString());
+
+      // Card selectors
+      List<String> cardSelectorsTypes =
+          JsonUtil.getParser()
+              .fromJson(
+                  jsonObject.get(CARD_SELECTORS_TYPES.getKey()).getAsJsonArray(),
+                  new TypeToken<ArrayList<String>>() {}.getType());
+
+      JsonArray cardSelectorsJsonArray = jsonObject.get(CARD_SELECTORS.getKey()).getAsJsonArray();
+
+      List<CardSelector<?>> cardSelectors = new ArrayList<>(cardSelectorsTypes.size());
+      for (int i = 0; i < cardSelectorsTypes.size(); i++) {
+        try {
+          Class<?> classOfCardSelector = Class.forName(cardSelectorsTypes.get(i));
+          cardSelectors.add(
+              (CardSelector<?>)
+                  JsonUtil.getParser()
+                      .fromJson(cardSelectorsJsonArray.get(i), classOfCardSelector));
+        } catch (ClassNotFoundException e) {
+          throw new IllegalArgumentException(
+              "Original CardSelector type [" + cardSelectorsTypes.get(i) + "] not found", e);
+        }
+      }
+
+      // Card selection requests
+      List<CardSelectionRequestSpi> cardSelectionRequests =
+          JsonUtil.getParser()
+              .fromJson(
+                  jsonObject.get(CARD_SELECTION_REQUESTS.getKey()).getAsJsonArray(),
+                  new TypeToken<ArrayList<InternalDto.CardSelectionRequest>>() {}.getType());
+
+      return new CardSelectionScenarioAdapter(
+          cardSelectors, cardSelectionRequests, multiSelectionProcessing, channelControl);
     }
   }
 }
