@@ -78,6 +78,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
     JsonUtil.registerTypeAdapter(
         CardResponseApi.class, new CardResponseApiJsonDeserializerAdapter(), false);
     JsonUtil.registerTypeAdapter(ApduResponseApi.class, new ApduResponseApiJsonAdapter(), false);
+    JsonUtil.registerTypeAdapter(
+        CardSelectionScenarioAdapter.class, new CardSelectionScenarioAdapterJsonAdapter(), false);
   }
 
   /** Private constructor. */

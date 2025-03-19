@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fixed the JSON format of data exchanged in the "Reader Server Side" mode of the "Keyple Distributed" solution 
+  (issue [#79]).
 
 ## [3.3.4] - 2024-12-11
 ### Fixed
@@ -225,6 +228,7 @@ It also brings many major API changes.
 [2.0.1]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/eclipse-keyple/keyple-service-java-lib/releases/tag/2.0.0
 
+[#79]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/79
 [#74]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/74
 [#70]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/70
 [#69]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/69
