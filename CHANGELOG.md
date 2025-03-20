@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- Fixed management of physical channel closure in the case of unexpected APDU response status (issue [#78]).
 - Fixed the JSON format of data exchanged in the "Reader Server Side" mode of the "Keyple Distributed" solution 
   (issue [#79]).
 
@@ -229,6 +230,7 @@ It also brings many major API changes.
 [2.0.0]: https://github.com/eclipse-keyple/keyple-service-java-lib/releases/tag/2.0.0
 
 [#79]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/79
+[#78]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/78
 [#74]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/74
 [#70]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/70
 [#69]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/69
