@@ -179,7 +179,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     for (CardSelectionRequestSpi cardSelectionRequest : cardSelectionRequests) {
       /* process the CardRequest and append the CardResponse list */
       CardSelectionResponseApi cardSelectionResponse =
-          processCardSelectionRequest(cardSelectorIterator.next(), cardSelectionRequest);
+          processCardSelectionRequest(
+              cardSelectorIterator.next(), cardSelectionRequest, channelControl);
       cardSelectionResponses.add(cardSelectionResponse);
       if (multiSelectionProcessing == MultiSelectionProcessing.PROCESS_ALL) {
         /* multi CardRequest case: just close the logical channel and go on with the next selection. */
@@ -424,6 +425,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * Attempts to select the card and executes the optional requests if any.
    *
    * @param cardSelectionRequest The {@link CardSelectionRequestSpi} to be processed.
+   * @param channelControl The channel control.
    * @return A not null reference.
    * @throws ReaderBrokenCommunicationException If the communication with the reader has failed.
    * @throws CardBrokenCommunicationException If the communication with the card has failed.
@@ -431,7 +433,9 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *     request and the card returned an unexpected code.
    */
   private CardSelectionResponseApi processCardSelectionRequest(
-      CardSelector<?> cardSelector, CardSelectionRequestSpi cardSelectionRequest)
+      CardSelector<?> cardSelector,
+      CardSelectionRequestSpi cardSelectionRequest,
+      ChannelControl channelControl)
       throws ReaderBrokenCommunicationException,
           CardBrokenCommunicationException,
           UnexpectedStatusWordException {
@@ -454,7 +458,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     if (cardSelectionRequest.getCardRequest() != null) {
       cardResponse =
           (CardResponseAdapter)
-              processCardRequest(cardSelectionRequest.getCardRequest(), ChannelControl.KEEP_OPEN);
+              processCardRequest(cardSelectionRequest.getCardRequest(), channelControl);
     } else {
       cardResponse = null;
     }
