@@ -5,8 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [3.3.5] - 2025-03-21
 ### Fixed
-- Fixed management of physical channel closure in the case of unexpected APDU response status (issue [#78]).
+- Fixed the management of physical channel closure in the case of unexpected APDU response status (issue [#78]).
 - Fixed the JSON format of data exchanged in the "Reader Server Side" mode of the "Keyple Distributed" solution 
   (issue [#79]).
 
@@ -203,7 +205,8 @@ It follows the extraction of Keyple 1.0 components contained in the `eclipse-key
 repositories.
 It also brings many major API changes.
 
-[unreleased]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.4...HEAD
+[unreleased]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.5...HEAD
+[3.3.5]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.4...3.3.5
 [3.3.4]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.3...3.3.4
 [3.3.3]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.2...3.3.3
 [3.3.2]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.1...3.3.2
