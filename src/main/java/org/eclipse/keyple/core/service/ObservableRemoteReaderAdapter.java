@@ -160,7 +160,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
     try {
       stopCardDetection();
     } catch (Exception e) {
-      logger.error("Error stopping card detection on reader [{}]", getName(), e);
+      logger.warn("Error stopping card detection on reader [{}]: {}", getName(), e.getMessage());
     }
     notifyObservers(
         new ReaderEventAdapter(getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));

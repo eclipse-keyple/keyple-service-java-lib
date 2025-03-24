@@ -74,7 +74,7 @@ class LocalPluginAdapter extends AbstractPluginAdapter {
     try {
       pluginSpi.onUnregister();
     } catch (Exception e) {
-      logger.error("Error unregistering plugin extension [{}]: {}", getName(), e.getMessage(), e);
+      logger.warn("Error unregistering plugin extension [{}]: {}", getName(), e.getMessage());
     }
     super.unregister();
   }
