@@ -58,7 +58,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
     try {
       poolPluginSpi.onUnregister();
     } catch (Exception e) {
-      logger.error("Error unregistering plugin extension [{}]: {}", getName(), e.getMessage(), e);
+      logger.warn("Error unregistering plugin extension [{}]: {}", getName(), e.getMessage());
     }
     super.unregister();
   }

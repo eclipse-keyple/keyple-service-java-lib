@@ -130,12 +130,12 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     try {
       readerSpi.closePhysicalChannel();
     } catch (Exception e) {
-      logger.error("Error closing physical channel on reader [{}]", getName(), e);
+      logger.warn("Error closing physical channel on reader [{}]: {}", getName(), e.getMessage());
     }
     try {
       readerSpi.onUnregister();
     } catch (Exception e) {
-      logger.error("Error unregistering reader extension [{}]: {}", getName(), e.getMessage(), e);
+      logger.warn("Error unregistering reader extension [{}]: {}", getName(), e.getMessage());
     }
     super.unregister();
   }
