@@ -63,6 +63,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   private String currentLogicalProtocolName;
   private String currentPhysicalProtocolName;
   private final Map<String, String> protocolAssociations;
+  private final boolean isAutomaticStatusCodeHandlingEnabled;
 
   /**
    * Constructor.
@@ -75,6 +76,9 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     super(readerSpi.getName(), (KeypleReaderExtension) readerSpi, pluginName);
     this.readerSpi = readerSpi;
     protocolAssociations = new LinkedHashMap<>();
+    isAutomaticStatusCodeHandlingEnabled =
+        ((SmartCardServiceAdapter) SmartCardServiceProvider.getService())
+            .isAutomaticStatusCodeHandlingEnabled();
   }
 
   /**
@@ -376,7 +380,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           elapsed10ms / 10.0);
     }
 
-    if (apduResponse.getDataOut().length == 0) {
+    if (apduResponse.getDataOut().length == 0 && isAutomaticStatusCodeHandlingEnabled) {
 
       if ((apduResponse.getStatusWord() & SW1_MASK) == SW_6100) {
         // RL-SW-61XX.1

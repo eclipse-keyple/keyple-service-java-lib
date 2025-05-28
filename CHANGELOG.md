@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Changes the log level from `error` to `warning` when errors occur during unregistration of the plugin/reader and no 
   longer displays the useless stacktrace.
+### Added
+- Added `disableAutomaticStatusCodeHandling()` method to the `SmartCardService` interface allowing disabling of
+  automatic APDU status word handling (0x61xx/0x6Cxx).
 ### Changed
 - Migrated the CI pipeline from Jenkins to GitHub Actions.
 
