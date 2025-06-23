@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Changes the log level from `error` to `warning` when errors occur during unregistration of the plugin/reader and no 
   longer displays the useless stacktrace.
+### Changed
+- Migrated the CI pipeline from Jenkins to GitHub Actions.
 
 ## [3.3.5] - 2025-03-21
 ### Fixed
