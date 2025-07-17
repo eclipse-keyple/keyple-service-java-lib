@@ -91,15 +91,17 @@ final class SmartCardServiceAdapter implements SmartCardService {
   private SmartCardServiceAdapter() {
 
     try (InputStream input =
-        SmartCardServiceAdapter.class.getClassLoader().getResourceAsStream("service.properties")) {
+        SmartCardServiceAdapter.class
+            .getClassLoader()
+            .getResourceAsStream("keyple-service.properties")) {
       if (input != null) {
         Properties props = new Properties();
         props.load(input);
 
         String value = props.getProperty("automaticStatusCodeHandling.enabled");
         if ("false".equalsIgnoreCase(value)) {
-          this.isAutomaticStatusCodeHandlingEnabled = false;
-          logger.debug("Automatic status code handling disabled via service.properties");
+          isAutomaticStatusCodeHandlingEnabled = false;
+          logger.info("Automatic status code handling is disabled");
         }
       }
     } catch (IOException ignored) {

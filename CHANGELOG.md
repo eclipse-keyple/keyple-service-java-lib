@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   longer displays the useless stacktrace.
 ### Added
 - Added support for disabling automatic APDU status word handling (0x61xx/0x6Cxx) via
-  `service.properties` using the `automaticStatusCodeHandling.enabled=false` property.
+  `keyple-service.properties` using the `automaticStatusCodeHandling.enabled=false` property.
   Automatic handling remains enabled by default.
 ### Changed
 - Migrated the CI pipeline from Jenkins to GitHub Actions.
