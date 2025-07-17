@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 3.3.0 (2024-09-02)
+    Keyple - Adapter of keyple-service-java-lib - 3.3.6 (2025-07-17)
 end title
 
 ' == THEME ==
@@ -106,6 +106,8 @@ package "org.eclipse.keyple.core.service" as service {
     ~class "<<SmartCardService>>\n**final** SmartCardServiceAdapter" as SmartCardServiceAdapter {
         --
         ~{static} SmartCardServiceAdapter getInstance ()
+
+        ~void boolean isAutomaticStatusCodeHandlingEnabled()
         -- **SmartCardService** --
         +Plugin registerPlugin (<back:cyan>KeyplePluginExtensionFactory</back> pluginFactory)
         +void unregisterPlugin (String pluginName)
