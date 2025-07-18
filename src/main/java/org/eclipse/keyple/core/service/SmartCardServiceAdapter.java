@@ -13,12 +13,7 @@ package org.eclipse.keyple.core.service;
 
 import static org.eclipse.keyple.core.service.JsonAdapter.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.keyple.core.common.CommonApiProperties;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
@@ -90,22 +85,9 @@ final class SmartCardServiceAdapter implements SmartCardService {
   /** Private constructor. */
   private SmartCardServiceAdapter() {
 
-    try (InputStream input =
-        SmartCardServiceAdapter.class
-            .getClassLoader()
-            .getResourceAsStream("keyple-service.properties")) {
-      if (input != null) {
-        Properties props = new Properties();
-        props.load(input);
-
-        String value = props.getProperty("automaticStatusCodeHandling.enabled");
-        if ("false".equalsIgnoreCase(value)) {
-          isAutomaticStatusCodeHandlingEnabled = false;
-          logger.info("Automatic status code handling is disabled");
-        }
-      }
-    } catch (IOException ignored) {
-      // NOP
+    if ("false".equalsIgnoreCase(System.getProperty("isAutomaticStatusCodeHandlingEnabled"))) {
+      isAutomaticStatusCodeHandlingEnabled = false;
+      logger.warn("Automatic status code handling is disabled");
     }
   }
 
