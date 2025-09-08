@@ -13,9 +13,7 @@ package org.eclipse.keyple.core.service;
 
 import static org.eclipse.keyple.core.service.JsonAdapter.*;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.keyple.core.common.CommonApiProperties;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
@@ -64,6 +62,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
       new ConcurrentHashMap<>();
   private final Object distributedLocalServiceMonitor = new Object();
 
+  private boolean isAutomaticStatusCodeHandlingEnabled = true;
+
   static {
     // Register additional JSON adapters.
     JsonUtil.registerTypeAdapter(AbstractApduException.class, new ApduExceptionJsonAdapter(), true);
@@ -83,7 +83,13 @@ final class SmartCardServiceAdapter implements SmartCardService {
   }
 
   /** Private constructor. */
-  private SmartCardServiceAdapter() {}
+  private SmartCardServiceAdapter() {
+
+    if ("false".equalsIgnoreCase(System.getProperty("isAutomaticStatusCodeHandlingEnabled"))) {
+      isAutomaticStatusCodeHandlingEnabled = false;
+      logger.warn("Automatic status code handling is disabled");
+    }
+  }
 
   /**
    * Gets the single instance of SmartCardServiceAdapter.
@@ -651,5 +657,9 @@ final class SmartCardServiceAdapter implements SmartCardService {
   @Override
   public ReaderApiFactory getReaderApiFactory() {
     return new ReaderApiFactoryAdapter();
+  }
+
+  boolean isAutomaticStatusCodeHandlingEnabled() {
+    return isAutomaticStatusCodeHandlingEnabled;
   }
 }

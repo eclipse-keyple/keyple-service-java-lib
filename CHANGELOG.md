@@ -5,8 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added an internal configuration option for specific integration scenarios.
 ### Fixed
-- Changes the log level from `error` to `warning` when errors occur during unregistration of the plugin/reader and no 
+- Changes the log level from `error` to `warning` when errors occur during unregistration of the plugin/reader and no
   longer displays the useless stacktrace.
 ### Changed
 - Migrated the CI pipeline from Jenkins to GitHub Actions.
