@@ -1,7 +1,7 @@
 | Version | Documents |
 |:---:|---|
-| 3.3.6-SNAPSHOT | [API documentation](3.3.6-SNAPSHOT)<br>[API class diagram](3.3.6-SNAPSHOT/api_class_diagram.svg) |
-| **3.3.5 (latest stable)** | [API documentation](latest-stable)<br>[API class diagram](3.3.5/api_class_diagram.svg) |
+| **3.3.6 (latest stable)** | [API documentation](latest-stable)<br>[API class diagram](3.3.6/api_class_diagram.svg) |
+| 3.3.5 | [API documentation](3.3.5)<br>[API class diagram](3.3.5/api_class_diagram.svg) |
 | 3.3.4 | [API documentation](3.3.4)<br>[API class diagram](3.3.4/api_class_diagram.svg) |
 | 3.3.3 | [API documentation](3.3.3)<br>[API class diagram](3.3.3/api_class_diagram.svg) |
 | 3.3.2 | [API documentation](3.3.2)<br>[API class diagram](3.3.2/api_class_diagram.svg) |
