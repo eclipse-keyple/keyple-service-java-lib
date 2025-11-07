@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - Fixed automatic chaining of APDU responses with 61XX status words to properly accumulate all data segments when the
-  card returns chained responses.
+  card returns chained responses (issue [#86]).
 
 ## [3.3.6] - 2025-10-23
 ### Added
@@ -245,6 +245,7 @@ It also brings many major API changes.
 [2.0.1]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/eclipse-keyple/keyple-service-java-lib/releases/tag/2.0.0
 
+[#86]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/86
 [#79]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/79
 [#78]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/78
 [#74]: https://github.com/eclipse-keyple/keyple-service-java-lib/issues/74
