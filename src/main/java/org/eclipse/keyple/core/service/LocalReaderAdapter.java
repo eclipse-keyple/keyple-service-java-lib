@@ -380,45 +380,109 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           elapsed10ms / 10.0);
     }
 
-    if (apduResponse.getDataOut().length == 0 && isAutomaticStatusCodeHandlingEnabled) {
+    if (isAutomaticStatusCodeHandlingEnabled) {
 
       if ((apduResponse.getStatusWord() & SW1_MASK) == SW_6100) {
         // RL-SW-61XX.1
-        // Build a GetResponse APDU command with the provided "le"
-        byte[] getResponseApdu = {
-          (byte) 0x00,
-          (byte) 0xC0,
-          (byte) 0x00,
-          (byte) 0x00,
-          (byte) (apduResponse.getStatusWord() & SW2_MASK)
-        };
-        // Execute APDU
-        apduResponse =
-            processApduRequest(new ApduRequest(getResponseApdu).setInfo("Internal Get Response"));
+        // Handle chained responses by accumulating data from multiple GET RESPONSE commands
+        List<byte[]> dataChunks = new ArrayList<>();
 
-      } else if ((apduResponse.getStatusWord() & SW1_MASK) == SW_6C00) {
-        // RL-SW-6CXX.1
-        // Update the last command with the provided "le"
-        apduRequest.getApdu()[apduRequest.getApdu().length - 1] =
-            (byte) (apduResponse.getStatusWord() & SW2_MASK);
-        // Replay the last command APDU
-        apduResponse = processApduRequest(apduRequest);
+        // Add initial data if present
+        if (apduResponse.getDataOut().length > 0) {
+          dataChunks.add(apduResponse.getDataOut());
+        }
 
-      } else if (ApduUtil.isCase4(apduRequest.getApdu())
-          && apduRequest.getSuccessfulStatusWords().contains(apduResponse.getStatusWord())) {
-        // RL-SW-ANALYSIS.1
-        // RL-SW-CASE4.1 (SW=6200 not taken into account here)
-        // Build a GetResponse APDU command with the original "le"
-        byte[] getResponseApdu = {
-          (byte) 0x00,
-          (byte) 0xC0,
-          (byte) 0x00,
-          (byte) 0x00,
-          apduRequest.getApdu()[apduRequest.getApdu().length - 1]
-        };
-        // Execute GetResponse APDU
-        apduResponse =
-            processApduRequest(new ApduRequest(getResponseApdu).setInfo("Internal Get Response"));
+        // Keep sending GET RESPONSE until we get a status word other than 61XX
+        while ((apduResponse.getStatusWord() & SW1_MASK) == SW_6100) {
+          // Build a GetResponse APDU command with the length from SW2
+          byte[] getResponseApdu = {
+            (byte) 0x00,
+            (byte) 0xC0,
+            (byte) 0x00,
+            (byte) 0x00,
+            (byte) (apduResponse.getStatusWord() & SW2_MASK)
+          };
+
+          if (logger.isDebugEnabled()) {
+            long timeStamp = System.nanoTime();
+            long elapsed10ms = (timeStamp - before) / 100000;
+            this.before = timeStamp;
+            logger.debug(
+                "Reader [{}] --> GET RESPONSE (chained): {}, elapsed {} ms",
+                this.getName(),
+                HexUtil.toHex(getResponseApdu),
+                elapsed10ms / 10.0);
+          }
+
+          // Execute APDU directly to avoid recursive status handling
+          byte[] responseBytes = readerSpi.transmitApdu(getResponseApdu);
+          apduResponse = new ApduResponseAdapter(responseBytes);
+
+          if (logger.isDebugEnabled()) {
+            long timeStamp = System.nanoTime();
+            long elapsed10ms = (timeStamp - before) / 100000;
+            this.before = timeStamp;
+            logger.debug(
+                "Reader [{}] <-- apduResponse (chained): {}, elapsed {} ms",
+                this.getName(),
+                apduResponse,
+                elapsed10ms / 10.0);
+          }
+
+          // Add data from this response
+          if (apduResponse.getDataOut().length > 0) {
+            dataChunks.add(apduResponse.getDataOut());
+          }
+        }
+
+        // Merge all data chunks into a single response with the final status word
+        if (!dataChunks.isEmpty()) {
+          int totalLength = 0;
+          for (byte[] chunk : dataChunks) {
+            totalLength += chunk.length;
+          }
+
+          byte[] completeApdu = new byte[totalLength + 2]; // +2 for status word
+          int offset = 0;
+          for (byte[] chunk : dataChunks) {
+            System.arraycopy(chunk, 0, completeApdu, offset, chunk.length);
+            offset += chunk.length;
+          }
+
+          // Append final status word
+          completeApdu[totalLength] = (byte) ((apduResponse.getStatusWord() >> 8) & 0xFF);
+          completeApdu[totalLength + 1] = (byte) (apduResponse.getStatusWord() & 0xFF);
+
+          apduResponse = new ApduResponseAdapter(completeApdu);
+        }
+
+      } else if (apduResponse.getDataOut().length == 0) {
+        // Handle 6CXX and Case4 only when there's no data in the response
+
+        if ((apduResponse.getStatusWord() & SW1_MASK) == SW_6C00) {
+          // RL-SW-6CXX.1
+          // Update the last command with the provided "le"
+          apduRequest.getApdu()[apduRequest.getApdu().length - 1] =
+              (byte) (apduResponse.getStatusWord() & SW2_MASK);
+          // Replay the last command APDU
+          apduResponse = processApduRequest(apduRequest);
+
+        } else if (ApduUtil.isCase4(apduRequest.getApdu())
+            && apduRequest.getSuccessfulStatusWords().contains(apduResponse.getStatusWord())) {
+          // RL-SW-ANALYSIS.1
+          // RL-SW-CASE4.1 (SW=6200 not taken into account here)
+          // Build a GetResponse APDU command with the original "le"
+          byte[] getResponseApdu = {
+            (byte) 0x00,
+            (byte) 0xC0,
+            (byte) 0x00,
+            (byte) 0x00,
+            apduRequest.getApdu()[apduRequest.getApdu().length - 1]
+          };
+          // Execute GetResponse APDU
+          apduResponse =
+              processApduRequest(new ApduRequest(getResponseApdu).setInfo("Internal Get Response"));
+        }
       }
     }
 

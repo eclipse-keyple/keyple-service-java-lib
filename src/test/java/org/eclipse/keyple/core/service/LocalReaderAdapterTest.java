@@ -558,4 +558,155 @@ public class LocalReaderAdapterTest {
     localReaderAdapter.register();
     localReaderAdapter.isCardPresent();
   }
+
+  /*
+   * APDU chaining tests (61XX status word handling)
+   */
+
+  @Test
+  public void transmitCardRequest_with61XXResponse_withNoInitialData_shouldChainGetResponse()
+      throws Exception {
+    byte[] requestApdu = HexUtil.toByteArray("00A4040000");
+    // First response: no data, status 6110 (16 bytes available)
+    byte[] firstResponseApdu = HexUtil.toByteArray("6110");
+    // GET RESPONSE command: 00C0000010
+    byte[] getResponseApdu = HexUtil.toByteArray("00C0000010");
+    // GET RESPONSE response: 16 bytes + 9000
+    byte[] getResponseCApdu = HexUtil.toByteArray("112233445566778899AABBCCDDEEFF009000");
+
+    when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
+    when(readerSpi.transmitApdu(requestApdu)).thenReturn(firstResponseApdu);
+    when(readerSpi.transmitApdu(getResponseApdu)).thenReturn(getResponseCApdu);
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    CardResponseApi response =
+        localReaderAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.CLOSE_AFTER);
+
+    // Should return the merged data with final status word
+    assertThat(response.getApduResponses().get(0).getApdu()).isEqualTo(getResponseCApdu);
+    assertThat(response.getApduResponses().get(0).getStatusWord()).isEqualTo(0x9000);
+    assertThat(response.getApduResponses().get(0).getDataOut())
+        .isEqualTo(HexUtil.toByteArray("112233445566778899AABBCCDDEEFF00"));
+  }
+
+  @Test
+  public void transmitCardRequest_with61XXResponse_withInitialData_shouldChainAndAccumulateData()
+      throws Exception {
+    byte[] requestApdu = HexUtil.toByteArray("00A4040000");
+    // First response: 9 bytes of data, status 6108 (8 more bytes available)
+    byte[] firstResponseApdu = HexUtil.toByteArray("AABBCCDDEE112233446108");
+    // GET RESPONSE command: 00C0000008
+    byte[] getResponseApdu = HexUtil.toByteArray("00C0000008");
+    // GET RESPONSE response: 8 bytes + 9000
+    byte[] getResponseCApdu = HexUtil.toByteArray("55667788990011229000");
+
+    when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
+    when(readerSpi.transmitApdu(requestApdu)).thenReturn(firstResponseApdu);
+    when(readerSpi.transmitApdu(getResponseApdu)).thenReturn(getResponseCApdu);
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    CardResponseApi response =
+        localReaderAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.CLOSE_AFTER);
+
+    // Should return all data accumulated: first 9 bytes + second 8 bytes = 17 bytes total
+    byte[] expectedData = HexUtil.toByteArray("AABBCCDDEE112233445566778899001122");
+    byte[] expectedApdu = HexUtil.toByteArray("AABBCCDDEE1122334455667788990011229000");
+
+    assertThat(response.getApduResponses().get(0).getApdu()).isEqualTo(expectedApdu);
+    assertThat(response.getApduResponses().get(0).getStatusWord()).isEqualTo(0x9000);
+    assertThat(response.getApduResponses().get(0).getDataOut()).isEqualTo(expectedData);
+  }
+
+  @Test
+  public void transmitCardRequest_with61XXResponse_multipleChains_shouldAccumulateAllData()
+      throws Exception {
+    byte[] requestApdu = HexUtil.toByteArray("00A4040000");
+    // First response: 4 bytes, status 6104 (4 more bytes)
+    byte[] firstResponseApdu = HexUtil.toByteArray("AABBCCDD6104");
+    // GET RESPONSE: 00C0000004 (will be sent twice with different responses)
+    byte[] getResponseApdu = HexUtil.toByteArray("00C0000004");
+    // Second response: 4 bytes, status 6104 (4 more bytes)
+    byte[] secondResponseApdu = HexUtil.toByteArray("112233446104");
+    // Third response: 4 bytes, status 9000 (done)
+    byte[] thirdResponseApdu = HexUtil.toByteArray("556677889000");
+
+    when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
+    when(readerSpi.transmitApdu(requestApdu)).thenReturn(firstResponseApdu);
+    // Chain multiple responses for the same GET RESPONSE command
+    when(readerSpi.transmitApdu(getResponseApdu))
+        .thenReturn(secondResponseApdu)
+        .thenReturn(thirdResponseApdu);
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    CardResponseApi response =
+        localReaderAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.CLOSE_AFTER);
+
+    // Should accumulate all three chunks: 4 + 4 + 4 = 12 bytes
+    byte[] expectedData = HexUtil.toByteArray("AABBCCDD1122334455667788");
+    byte[] expectedApdu = HexUtil.toByteArray("AABBCCDD11223344556677889000");
+
+    assertThat(response.getApduResponses().get(0).getApdu()).isEqualTo(expectedApdu);
+    assertThat(response.getApduResponses().get(0).getStatusWord()).isEqualTo(0x9000);
+    assertThat(response.getApduResponses().get(0).getDataOut()).isEqualTo(expectedData);
+  }
+
+  @Test
+  public void
+      transmitCardRequest_with61XXResponse_finalStatusNotSuccess_shouldReturnAllDataWithFinalStatus()
+          throws Exception {
+    byte[] requestApdu = HexUtil.toByteArray("00A4040000");
+    // First response: 4 bytes, status 6104
+    byte[] firstResponseApdu = HexUtil.toByteArray("AABBCCDD6104");
+    // GET RESPONSE: 00C0000004
+    byte[] getResponseApdu = HexUtil.toByteArray("00C0000004");
+    // Second response: 4 bytes, status 6283 (file invalidated)
+    byte[] secondResponseApdu = HexUtil.toByteArray("112233446283");
+
+    when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
+    // Allow both 9000 and 6283 as successful
+    when(apduRequestSpi.getSuccessfulStatusWords())
+        .thenReturn(new HashSet<Integer>(Arrays.asList(0x9000, 0x6283)));
+    when(readerSpi.transmitApdu(requestApdu)).thenReturn(firstResponseApdu);
+    when(readerSpi.transmitApdu(getResponseApdu)).thenReturn(secondResponseApdu);
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    CardResponseApi response =
+        localReaderAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.CLOSE_AFTER);
+
+    // Should accumulate data and return final status 6283
+    byte[] expectedData = HexUtil.toByteArray("AABBCCDD11223344");
+    byte[] expectedApdu = HexUtil.toByteArray("AABBCCDD112233446283");
+
+    assertThat(response.getApduResponses().get(0).getApdu()).isEqualTo(expectedApdu);
+    assertThat(response.getApduResponses().get(0).getStatusWord()).isEqualTo(0x6283);
+    assertThat(response.getApduResponses().get(0).getDataOut()).isEqualTo(expectedData);
+  }
+
+  @Test
+  public void transmitCardRequest_with6100Response_withMaxLength_shouldRequestMaxBytes()
+      throws Exception {
+    byte[] requestApdu = HexUtil.toByteArray("00A4040000");
+    // Response: status 6100 (0 bytes in SW2 means 256 bytes available)
+    byte[] firstResponseApdu = HexUtil.toByteArray("6100");
+    // GET RESPONSE should request 0x00 (which means 256)
+    byte[] getResponseApdu = HexUtil.toByteArray("00C0000000");
+    // Return some data with 9000
+    byte[] getResponseCApdu = HexUtil.toByteArray("AABBCCDD9000");
+
+    when(apduRequestSpi.getApdu()).thenReturn(requestApdu);
+    when(readerSpi.transmitApdu(requestApdu)).thenReturn(firstResponseApdu);
+    when(readerSpi.transmitApdu(getResponseApdu)).thenReturn(getResponseCApdu);
+
+    LocalReaderAdapter localReaderAdapter = new LocalReaderAdapter(readerSpi, PLUGIN_NAME);
+    localReaderAdapter.register();
+    CardResponseApi response =
+        localReaderAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.CLOSE_AFTER);
+
+    assertThat(response.getApduResponses().get(0).getApdu()).isEqualTo(getResponseCApdu);
+    assertThat(response.getApduResponses().get(0).getStatusWord()).isEqualTo(0x9000);
+  }
 }
