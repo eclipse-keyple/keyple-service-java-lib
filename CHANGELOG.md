@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
-- Fixed automatic chaining of APDU responses with 61XX status words to properly accumulate all data segments when the
+- Fixed automatic chaining of APDU responses with `61XX` status words to properly accumulate all data segments when the
   card returns chained responses (issue [#86]).
 
 ## [3.3.6] - 2025-10-23
