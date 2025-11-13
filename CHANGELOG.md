@@ -5,9 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [3.3.7] - 2025-11-13
 ### Fixed
 - Fixed automatic chaining of APDU responses with `61XX` status words to properly accumulate all data segments when the
   card returns chained responses (issue [#86]).
+### Upgraded
+- Keyple Common API `2.0.1` -> `2.0.2` (documentation improvements)
 
 ## [3.3.6] - 2025-10-23
 ### Added
@@ -217,7 +221,8 @@ It follows the extraction of Keyple 1.0 components contained in the `eclipse-key
 repositories.
 It also brings many major API changes.
 
-[unreleased]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.6...HEAD
+[unreleased]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.7...HEAD
+[3.3.7]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.6...3.3.7
 [3.3.6]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.5...3.3.6
 [3.3.5]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.4...3.3.5
 [3.3.4]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.3...3.3.4
