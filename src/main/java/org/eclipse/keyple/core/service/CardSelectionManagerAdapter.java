@@ -157,7 +157,18 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
     return jsonObject.toString();
   }
 
-  /**
+    /**
+     * {@inheritDoc}
+     *
+     * @since 3.4.0
+     */
+    @Override
+    public String exportCardSelectionScenario(org.eclipse.keypop.reader.ChannelControl channelControl) {
+        this.channelControl = ChannelControl.valueOf(channelControl.name());
+        return exportCardSelectionScenario();
+    }
+
+    /**
    * {@inheritDoc}
    *
    * @since 2.1.1
@@ -258,7 +269,18 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
     return processCardSelectionResponses(cardSelectionResponses);
   }
 
-  /**
+    /**
+     * {@inheritDoc}
+     *
+     * @since 3.4.0
+     */
+    @Override
+    public CardSelectionResult processCardSelectionScenario(CardReader reader, org.eclipse.keypop.reader.ChannelControl channelControl) {
+        this.channelControl = ChannelControl.valueOf(channelControl.name());
+        return processCardSelectionScenario(reader);
+    }
+
+    /**
    * {@inheritDoc}
    *
    * @since 2.0.0
@@ -286,7 +308,18 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
     }
   }
 
-  /**
+    /**
+     * {@inheritDoc}
+     *
+     * @since 3.4.0
+     */
+    @Override
+    public void scheduleCardSelectionScenario(ObservableCardReader observableCardReader, ObservableCardReader.NotificationMode notificationMode, org.eclipse.keypop.reader.ChannelControl channelControl) {
+        this.channelControl = ChannelControl.valueOf(channelControl.name());
+        scheduleCardSelectionScenario(observableCardReader, notificationMode);
+    }
+
+    /**
    * {@inheritDoc}
    *
    * @since 2.0.0
