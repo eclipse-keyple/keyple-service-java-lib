@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Upgraded
-- Keypop Reader API `2.0.1` -> `2.1.0` (added `ChannelControl` enum)
+- Keypop Reader API `2.0.1` -> `2.1.0` (source code not impacted)
 
 ## [3.3.7] - 2025-11-13
 ### Fixed
