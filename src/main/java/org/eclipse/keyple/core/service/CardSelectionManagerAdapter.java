@@ -250,7 +250,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
                   cardSelectors, cardSelectionRequests, multiSelectionProcessing, channelControl);
     } catch (ReaderBrokenCommunicationException e) {
       throw new ReaderCommunicationException(e.getMessage(), e);
-    } catch (CardBrokenCommunicationException e) {
+    } catch (CardBrokenCommunicationException | UnexpectedResponseTimeException e) {
       throw new CardCommunicationException(e.getMessage(), e);
     }
 

@@ -315,11 +315,15 @@ final class DistributedLocalServiceAdapter
      *
      * @throws CardBrokenCommunicationException If a card communication error occurs.
      * @throws ReaderBrokenCommunicationException If a reader communication error occurs.
+     * @throws UnexpectedStatusWordException If an unexpected status word is received.
+     * @throws UnexpectedResponseTimeException If the response time exceeds the maximum expected
+     *     time.
      */
     private void transmitCardRequest()
         throws CardBrokenCommunicationException,
             ReaderBrokenCommunicationException,
-            UnexpectedStatusWordException {
+            UnexpectedStatusWordException,
+            UnexpectedResponseTimeException {
 
       // Extract parameters from the message
       JsonObject params = input.getAsJsonObject(JsonProperty.PARAMETERS.getKey());
@@ -345,9 +349,13 @@ final class DistributedLocalServiceAdapter
      *
      * @throws CardBrokenCommunicationException If a card communication error occurs.
      * @throws ReaderBrokenCommunicationException If a reader communication error occurs.
+     * @throws UnexpectedResponseTimeException If the response time exceeds the maximum expected
+     *     time.
      */
     private void transmitCardSelectionRequests()
-        throws CardBrokenCommunicationException, ReaderBrokenCommunicationException {
+        throws CardBrokenCommunicationException,
+            ReaderBrokenCommunicationException,
+            UnexpectedResponseTimeException {
 
       // Extract parameters from the message
       JsonObject params = input.getAsJsonObject(JsonProperty.PARAMETERS.getKey());

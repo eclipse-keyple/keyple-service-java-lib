@@ -24,6 +24,7 @@ final class ApduResponseAdapter implements ApduResponseApi {
 
   private final byte[] apdu;
   private final int statusWord;
+  private final Integer responseTime;
 
   /**
    * Builds an APDU response from an array of bytes from the card, computes the status word.
@@ -32,8 +33,21 @@ final class ApduResponseAdapter implements ApduResponseApi {
    * @since 2.0.0
    */
   ApduResponseAdapter(byte[] apdu) {
+    this(apdu, null);
+  }
+
+  /**
+   * Builds an APDU response from an array of bytes from the card, computes the status word.
+   *
+   * @param apdu An array of at least 2 bytes.
+   * @param responseTime The response time in milliseconds (can be null).
+   * @since 3.4.0
+   */
+  ApduResponseAdapter(byte[] apdu, Integer responseTime) {
     this.apdu = apdu;
-    statusWord = ((apdu[apdu.length - 2] & 0x000000FF) << 8) + (apdu[apdu.length - 1] & 0x000000FF);
+    this.statusWord =
+        ((apdu[apdu.length - 2] & 0x000000FF) << 8) + (apdu[apdu.length - 1] & 0x000000FF);
+    this.responseTime = responseTime;
   }
 
   /**
@@ -64,6 +78,16 @@ final class ApduResponseAdapter implements ApduResponseApi {
   @Override
   public int getStatusWord() {
     return statusWord;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 3.4.0
+   */
+  @Override
+  public Integer getResponseTime() {
+    return responseTime;
   }
 
   /**
