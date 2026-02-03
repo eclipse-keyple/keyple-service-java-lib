@@ -22,6 +22,7 @@ import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keypop.card.CardBrokenCommunicationException;
 import org.eclipse.keypop.card.CardSelectionResponseApi;
 import org.eclipse.keypop.card.ReaderBrokenCommunicationException;
+import org.eclipse.keypop.card.UnexpectedResponseTimeException;
 import org.eclipse.keypop.reader.CardReaderEvent;
 import org.eclipse.keypop.reader.ObservableCardReader;
 import org.eclipse.keypop.reader.ReaderCommunicationException;
@@ -289,7 +290,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
               getName(),
               new ReaderCommunicationException(READER_MONITORING_ERROR, e));
 
-    } catch (CardBrokenCommunicationException e) {
+    } catch (CardBrokenCommunicationException | UnexpectedResponseTimeException e) {
       // The last transmission failed, close the logical and physical channels.
       closeLogicalAndPhysicalChannelsSilently();
       // The card was removed or not read correctly, no exception raising or event notification,

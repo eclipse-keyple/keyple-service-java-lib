@@ -157,7 +157,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       ChannelControl channelControl)
       throws ReaderBrokenCommunicationException,
           CardBrokenCommunicationException,
-          UnexpectedStatusWordException {
+          UnexpectedStatusWordException,
+          UnexpectedResponseTimeException {
 
     checkStatus();
 
@@ -215,7 +216,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       CardRequestSpi cardRequest, ChannelControl channelControl)
       throws CardBrokenCommunicationException,
           ReaderBrokenCommunicationException,
-          UnexpectedStatusWordException {
+          UnexpectedStatusWordException,
+          UnexpectedResponseTimeException {
 
     checkStatus();
 
@@ -351,11 +353,14 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @return A not null reference.
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
+   * @throws UnexpectedResponseTimeException if the response time exceeds the maximum expected time.
    */
   private ApduResponseAdapter processApduRequest(ApduRequestSpi apduRequest)
-      throws CardIOException, ReaderIOException {
+      throws CardIOException, ReaderIOException, UnexpectedResponseTimeException {
 
     ApduResponseAdapter apduResponse;
+    long startTimeNano = System.nanoTime();
+
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
       long elapsed10ms = (timeStamp - before) / 100000;
@@ -367,7 +372,9 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           elapsed10ms / 10.0);
     }
 
-    apduResponse = new ApduResponseAdapter(readerSpi.transmitApdu(apduRequest.getApdu()));
+    byte[] responseBytes = readerSpi.transmitApdu(apduRequest.getApdu());
+    int responseTime = (int) ((System.nanoTime() - startTimeNano) / 1_000_000);
+    apduResponse = new ApduResponseAdapter(responseBytes, responseTime);
 
     if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
@@ -415,8 +422,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           }
 
           // Execute APDU directly to avoid recursive status handling
-          byte[] responseBytes = readerSpi.transmitApdu(getResponseApdu);
-          apduResponse = new ApduResponseAdapter(responseBytes);
+          byte[] chainedResponseBytes = readerSpi.transmitApdu(getResponseApdu);
+          apduResponse = new ApduResponseAdapter(chainedResponseBytes);
 
           if (logger.isDebugEnabled()) {
             long timeStamp = System.nanoTime();
@@ -453,7 +460,9 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           completeApdu[totalLength] = (byte) ((apduResponse.getStatusWord() >> 8) & 0xFF);
           completeApdu[totalLength + 1] = (byte) (apduResponse.getStatusWord() & 0xFF);
 
-          apduResponse = new ApduResponseAdapter(completeApdu);
+          // Calculate total response time from the beginning of the initial APDU
+          int totalResponseTime = (int) ((System.nanoTime() - startTimeNano) / 1_000_000);
+          apduResponse = new ApduResponseAdapter(completeApdu, totalResponseTime);
         }
 
       } else if (apduResponse.getDataOut().length == 0) {
@@ -486,6 +495,19 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       }
     }
 
+    // Validate response time against max expected time
+    Integer maxExpectedTime = apduRequest.getMaxExpectedResponseTime();
+    if (maxExpectedTime != null
+        && apduResponse.getResponseTime() != null
+        && apduResponse.getResponseTime() > maxExpectedTime) {
+      throw new UnexpectedResponseTimeException(
+          new CardResponseAdapter(Collections.singletonList(apduResponse), true),
+          true,
+          String.format(
+              "Response time %d ms exceeded maximum expected time %d ms",
+              apduResponse.getResponseTime(), maxExpectedTime));
+    }
+
     return apduResponse;
   }
 
@@ -499,6 +521,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @throws CardBrokenCommunicationException If the communication with the card has failed.
    * @throws UnexpectedStatusWordException If status word verification is enabled in the card
    *     request and the card returned an unexpected code.
+   * @throws UnexpectedResponseTimeException If the response time exceeds the maximum expected time.
    */
   private CardSelectionResponseApi processCardSelectionRequest(
       CardSelector<?> cardSelector,
@@ -506,7 +529,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       ChannelControl channelControl)
       throws ReaderBrokenCommunicationException,
           CardBrokenCommunicationException,
-          UnexpectedStatusWordException {
+          UnexpectedStatusWordException,
+          UnexpectedResponseTimeException {
 
     isLogicalChannelOpen = false;
 
@@ -551,10 +575,13 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @return A not null {@link SelectionStatus}.
    * @throws ReaderBrokenCommunicationException If the communication with the reader has failed.
    * @throws CardBrokenCommunicationException If the communication with the card has failed.
+   * @throws UnexpectedResponseTimeException If the response time exceeds the maximum expected time.
    */
   private SelectionStatus processSelection(
       CardSelector<?> cardSelector, CardSelectionRequestSpi cardSelectionRequest)
-      throws CardBrokenCommunicationException, ReaderBrokenCommunicationException {
+      throws CardBrokenCommunicationException,
+          ReaderBrokenCommunicationException,
+          UnexpectedResponseTimeException {
     try {
       // RL-CLA-CHAAUTO.1
       String powerOnData;
@@ -644,10 +671,13 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *
    * @param cardSelector The card selector.
    * @return A not null {@link ApduResponseApi} containing the FCI.
+   * @throws CardIOException if the communication with the card has failed.
+   * @throws ReaderIOException if the communication with the reader has failed.
+   * @throws UnexpectedResponseTimeException If the response time exceeds the maximum expected time.
    * @see #processSelection(CardSelector, CardSelectionRequestSpi)
    */
   private ApduResponseAdapter selectByAid(InternalIsoCardSelector cardSelector)
-      throws CardIOException, ReaderIOException {
+      throws CardIOException, ReaderIOException, UnexpectedResponseTimeException {
 
     ApduResponseAdapter fciResponse;
 
@@ -679,9 +709,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @return A not null {@link ApduResponseApi}.
    * @throws ReaderIOException if the communication with the reader has failed.
    * @throws CardIOException if the communication with the card has failed.
+   * @throws UnexpectedResponseTimeException If the response time exceeds the maximum expected time.
    */
   private ApduResponseAdapter processExplicitAidSelection(InternalIsoCardSelector cardSelector)
-      throws CardIOException, ReaderIOException {
+      throws CardIOException, ReaderIOException, UnexpectedResponseTimeException {
 
     final byte[] aid = cardSelector.getAid();
     if (logger.isDebugEnabled()) {
@@ -879,6 +910,12 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     @Override
     public String getInfo() {
       return info;
+    }
+
+    @Override
+    public Integer getMaxExpectedResponseTime() {
+      // Internal GET RESPONSE commands have no specific time constraint
+      return null;
     }
 
     @Override

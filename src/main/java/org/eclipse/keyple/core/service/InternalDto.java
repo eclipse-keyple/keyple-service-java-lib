@@ -175,6 +175,7 @@ final class InternalDto {
     private byte[] apdu;
     private Set<Integer> successfulStatusWords;
     private String info;
+    private Integer maxExpectedResponseTime;
 
     /**
      * Default constructor.
@@ -193,6 +194,7 @@ final class InternalDto {
       this.apdu = src.getApdu().clone();
       this.successfulStatusWords = new HashSet<>(src.getSuccessfulStatusWords());
       this.info = src.getInfo();
+      this.maxExpectedResponseTime = src.getMaxExpectedResponseTime();
     }
 
     @Override
@@ -208,6 +210,11 @@ final class InternalDto {
     @Override
     public String getInfo() {
       return info;
+    }
+
+    @Override
+    public Integer getMaxExpectedResponseTime() {
+      return maxExpectedResponseTime;
     }
 
     @Override

@@ -105,7 +105,9 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
       List<CardSelectionRequestSpi> cardSelectionRequests,
       MultiSelectionProcessing multiSelectionProcessing,
       ChannelControl channelControl)
-      throws ReaderBrokenCommunicationException, CardBrokenCommunicationException {
+      throws ReaderBrokenCommunicationException,
+          CardBrokenCommunicationException,
+          UnexpectedResponseTimeException {
 
     checkStatus();
 
@@ -201,7 +203,8 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
       ChannelControl channelControl)
       throws ReaderBrokenCommunicationException,
           CardBrokenCommunicationException,
-          UnexpectedStatusWordException;
+          UnexpectedStatusWordException,
+          UnexpectedResponseTimeException;
 
   /**
    * Abstract method performing the actual transmission of the card request.
@@ -213,13 +216,15 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
    * @throws CardBrokenCommunicationException if the communication with the card has failed.
    * @throws UnexpectedStatusWordException If status word verification is enabled in the card
    *     request and the card returned an unexpected code.
+   * @throws UnexpectedResponseTimeException If the response time exceeds the maximum expected time.
    * @since 2.0.0
    */
   abstract CardResponseApi processCardRequest(
       CardRequestSpi cardRequest, ChannelControl channelControl)
       throws ReaderBrokenCommunicationException,
           CardBrokenCommunicationException,
-          UnexpectedStatusWordException;
+          UnexpectedStatusWordException,
+          UnexpectedResponseTimeException;
 
   /**
    * {@inheritDoc}
@@ -241,7 +246,8 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
       CardRequestSpi cardRequest, ChannelControl channelControl)
       throws ReaderBrokenCommunicationException,
           CardBrokenCommunicationException,
-          UnexpectedStatusWordException {
+          UnexpectedStatusWordException,
+          UnexpectedResponseTimeException {
     checkStatus();
 
     Assert.getInstance()

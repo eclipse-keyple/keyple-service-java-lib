@@ -70,7 +70,8 @@ public class AbstractReaderAdapterTest {
   public void transmitCardRequest_whenReaderIsNotRegistered_shouldISE()
       throws UnexpectedStatusWordException,
           ReaderBrokenCommunicationException,
-          CardBrokenCommunicationException {
+          CardBrokenCommunicationException,
+          UnexpectedResponseTimeException {
     readerAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.KEEP_OPEN);
   }
 
@@ -78,7 +79,8 @@ public class AbstractReaderAdapterTest {
   public void transmitCardRequest_shouldInvoke_processCardRequest()
       throws UnexpectedStatusWordException,
           ReaderBrokenCommunicationException,
-          CardBrokenCommunicationException {
+          CardBrokenCommunicationException,
+          UnexpectedResponseTimeException {
     readerAdapter = Mockito.spy(readerAdapter);
     readerAdapter.register();
     readerAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.KEEP_OPEN);
@@ -100,7 +102,8 @@ public class AbstractReaderAdapterTest {
         ChannelControl channelControl)
         throws ReaderBrokenCommunicationException,
             CardBrokenCommunicationException,
-            UnexpectedStatusWordException {
+            UnexpectedStatusWordException,
+            UnexpectedResponseTimeException {
       return new ArrayList<CardSelectionResponseApi>();
     }
 
@@ -108,7 +111,8 @@ public class AbstractReaderAdapterTest {
     CardResponseApi processCardRequest(CardRequestSpi cardRequest, ChannelControl channelControl)
         throws ReaderBrokenCommunicationException,
             CardBrokenCommunicationException,
-            UnexpectedStatusWordException {
+            UnexpectedStatusWordException,
+            UnexpectedResponseTimeException {
       return Mockito.mock(CardResponseApi.class);
     }
 
