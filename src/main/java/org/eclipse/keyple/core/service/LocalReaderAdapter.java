@@ -393,8 +393,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         // RL-SW-61XX.1
         // Handle chained responses by accumulating data from multiple GET RESPONSE commands
         List<byte[]> dataChunks = new ArrayList<>();
-        int accumulatedTime =
-            apduResponse.getResponseTime() != null ? apduResponse.getResponseTime() : 0;
 
         // Add initial data if present
         if (apduResponse.getDataOut().length > 0) {
@@ -424,11 +422,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           }
 
           // Execute APDU directly to avoid recursive status handling
-          long chainedStartTimeNano = System.nanoTime();
           byte[] chainedResponseBytes = readerSpi.transmitApdu(getResponseApdu);
-          int chainedResponseTime = (int) ((System.nanoTime() - chainedStartTimeNano) / 1_000_000);
-          accumulatedTime += chainedResponseTime;
-          apduResponse = new ApduResponseAdapter(chainedResponseBytes, chainedResponseTime);
+          apduResponse = new ApduResponseAdapter(chainedResponseBytes);
 
           if (logger.isDebugEnabled()) {
             long timeStamp = System.nanoTime();
@@ -465,7 +460,9 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           completeApdu[totalLength] = (byte) ((apduResponse.getStatusWord() >> 8) & 0xFF);
           completeApdu[totalLength + 1] = (byte) (apduResponse.getStatusWord() & 0xFF);
 
-          apduResponse = new ApduResponseAdapter(completeApdu, accumulatedTime);
+          // Calculate total response time from the beginning of the initial APDU
+          int totalResponseTime = (int) ((System.nanoTime() - startTimeNano) / 1_000_000);
+          apduResponse = new ApduResponseAdapter(completeApdu, totalResponseTime);
         }
 
       } else if (apduResponse.getDataOut().length == 0) {

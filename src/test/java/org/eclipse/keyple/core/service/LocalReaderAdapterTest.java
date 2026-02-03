@@ -53,6 +53,7 @@ public class LocalReaderAdapterTest {
     apduRequestSpi = mock(ApduRequestSpi.class);
     when(apduRequestSpi.getSuccessfulStatusWords())
         .thenReturn(new HashSet<Integer>(Collections.singletonList(0x9000)));
+    when(apduRequestSpi.getMaxExpectedResponseTime()).thenReturn(null);
     cardRequestSpi = mock(CardRequestSpi.class);
     when(cardRequestSpi.getApduRequests()).thenReturn(Collections.singletonList(apduRequestSpi));
   }

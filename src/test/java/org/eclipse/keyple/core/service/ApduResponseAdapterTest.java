@@ -29,4 +29,69 @@ public class ApduResponseAdapterTest {
     assertThat(apduResponseAdapter.getStatusWord()).isEqualTo(0x9000);
     assertThat(apduResponseAdapter.getDataOut()).isEqualTo(HexUtil.toByteArray(HEX_REQUEST_DATA));
   }
+
+  @Test
+  public void buildApduResponseAdapter_withoutResponseTime_shouldReturnNull() {
+    // Given
+    byte[] apdu = HexUtil.toByteArray(HEX_REQUEST);
+
+    // When
+    apduResponseAdapter = new ApduResponseAdapter(apdu);
+
+    // Then
+    assertThat(apduResponseAdapter.getResponseTime()).isNull();
+  }
+
+  @Test
+  public void buildApduResponseAdapter_withResponseTime_shouldReturnResponseTime() {
+    // Given
+    byte[] apdu = HexUtil.toByteArray(HEX_REQUEST);
+    Integer expectedResponseTime = 150;
+
+    // When
+    apduResponseAdapter = new ApduResponseAdapter(apdu, expectedResponseTime);
+
+    // Then
+    assertThat(apduResponseAdapter.getResponseTime()).isEqualTo(150);
+    assertThat(apduResponseAdapter.getApdu()).isEqualTo(HexUtil.toByteArray(HEX_REQUEST));
+    assertThat(apduResponseAdapter.getStatusWord()).isEqualTo(0x9000);
+    assertThat(apduResponseAdapter.getDataOut()).isEqualTo(HexUtil.toByteArray(HEX_REQUEST_DATA));
+  }
+
+  @Test
+  public void buildApduResponseAdapter_withNullResponseTime_shouldReturnNull() {
+    // Given
+    byte[] apdu = HexUtil.toByteArray(HEX_REQUEST);
+
+    // When
+    apduResponseAdapter = new ApduResponseAdapter(apdu, null);
+
+    // Then
+    assertThat(apduResponseAdapter.getResponseTime()).isNull();
+  }
+
+  @Test
+  public void buildApduResponseAdapter_withZeroResponseTime_shouldReturnZero() {
+    // Given
+    byte[] apdu = HexUtil.toByteArray(HEX_REQUEST);
+
+    // When
+    apduResponseAdapter = new ApduResponseAdapter(apdu, 0);
+
+    // Then
+    assertThat(apduResponseAdapter.getResponseTime()).isEqualTo(0);
+  }
+
+  @Test
+  public void buildApduResponseAdapter_withLargeResponseTime_shouldReturnValue() {
+    // Given
+    byte[] apdu = HexUtil.toByteArray(HEX_REQUEST);
+    Integer largeResponseTime = 5000; // 5 seconds
+
+    // When
+    apduResponseAdapter = new ApduResponseAdapter(apdu, largeResponseTime);
+
+    // Then
+    assertThat(apduResponseAdapter.getResponseTime()).isEqualTo(5000);
+  }
 }
