@@ -39,7 +39,7 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
   private static final Logger logger =
       LoggerFactory.getLogger(CardRemovalActiveMonitoringJobAdapter.class);
 
-  private static final String JOB_ID = "RemovalActive";
+  private static final String JOB_ID = "REMOVAL_ACTIVE";
 
   private final AtomicBoolean loop = new AtomicBoolean();
   private final long sleepDurationMillis;

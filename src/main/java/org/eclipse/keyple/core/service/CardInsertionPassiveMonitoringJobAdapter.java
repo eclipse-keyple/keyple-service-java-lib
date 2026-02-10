@@ -41,7 +41,7 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
   private static final Logger logger =
       LoggerFactory.getLogger(CardInsertionPassiveMonitoringJobAdapter.class);
 
-  private static final String JOB_ID = "InsertionPassive";
+  private static final String JOB_ID = "INSERTION_PASSIVE";
 
   private final ObservableReaderSpi readerSpi;
 

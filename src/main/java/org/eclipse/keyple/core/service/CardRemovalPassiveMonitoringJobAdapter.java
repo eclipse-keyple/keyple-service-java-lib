@@ -51,7 +51,7 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
   private static final Logger logger =
       LoggerFactory.getLogger(CardRemovalPassiveMonitoringJobAdapter.class);
 
-  private static final String JOB_ID = "RemovalPassive";
+  private static final String JOB_ID = "REMOVAL_PASSIVE";
 
   private final ObservableReaderSpi readerSpi;
 

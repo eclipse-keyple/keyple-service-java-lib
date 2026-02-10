@@ -31,7 +31,7 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
   private static final Logger logger =
       LoggerFactory.getLogger(CardInsertionActiveMonitoringJobAdapter.class);
 
-  private static final String JOB_ID = "InsertionActive";
+  private static final String JOB_ID = "INSERTION_ACTIVE";
 
   private final long sleepDurationMillis;
   private final boolean monitorInsertion;
