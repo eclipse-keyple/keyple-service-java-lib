@@ -69,10 +69,10 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
   void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "Internal event [{}] received for reader [{}] in current state [{}]",
-          event,
+          "[fsmState={}, reader={}] Processing internal event [type={}]",
+          getMonitoringState(),
           getReader().getName(),
-          getMonitoringState());
+          event);
     }
     /*
      * Process InternalEvent
@@ -98,9 +98,19 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
 
       default:
         if (logger.isTraceEnabled()) {
-          logger.trace("Event ignored");
+          logger.trace(
+              "[fsmState={}, reader={}] Internal event ignored",
+              getMonitoringState(),
+              getReader().getName());
         }
         break;
+    }
+    if (logger.isTraceEnabled()) {
+      logger.trace(
+          "[fsmState={}, reader={}] Internal event processed [type={}]",
+          getMonitoringState(),
+          getReader().getName(),
+          event);
     }
   }
 }

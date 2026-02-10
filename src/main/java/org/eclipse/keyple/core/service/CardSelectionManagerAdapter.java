@@ -205,7 +205,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
                 JsonUtil.getParser().fromJson(cardSelectorsJsonArray.get(i), classOfCardSelector);
       } catch (ClassNotFoundException e) {
         throw new IllegalArgumentException(
-            "Original CardSelector type [" + cardSelectorsTypes.get(i) + "] not found", e);
+            "Original CardSelector type '" + cardSelectorsTypes.get(i) + "' not found", e);
       }
       CardSelectionExtension cardSelection;
       try {
@@ -217,7 +217,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
       } catch (ClassNotFoundException e) {
         // Default card selection
         logger.warn(
-            "Original CardSelection type [{}] not found. Use default type [{}] for deserialization",
+            "Original CardSelection type '{}' not found. Replaced by default type '{}' for deserialization",
             cardSelectionsTypes.get(i),
             CardSelectionAdapter.class.getName());
         cardSelection =

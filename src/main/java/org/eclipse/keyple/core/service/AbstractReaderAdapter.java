@@ -111,14 +111,14 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
 
     List<CardSelectionResponseApi> cardSelectionResponses = null;
 
-    if (logger.isTraceEnabled()) {
+    if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
       long elapsed10ms = (timeStamp - before) / 100000;
       this.before = timeStamp;
-      logger.trace(
-          "Reader [{}] --> cardSelectionRequests: {}, elapsed {} ms",
-          this.getName(),
-          cardSelectionRequests,
+      logger.debug(
+          "[reader={}] Send [type=CardSelectionRequests, cardSelectionRequestCount={}, elapsedMs={}]",
+          getName(),
+          cardSelectionRequests.size(),
           elapsed10ms / 10.0);
     }
 
@@ -130,14 +130,14 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
       throw new CardBrokenCommunicationException(
           e.getCardResponse(), false, "An unexpected status word was received", e);
     } finally {
-      if (logger.isTraceEnabled()) {
+      if (logger.isDebugEnabled()) {
         long timeStamp = System.nanoTime();
         long elapsed10ms = (timeStamp - before) / 100000;
         this.before = timeStamp;
-        logger.trace(
-            "Reader [{}] <-- cardSelectionResponses: {}, elapsed {} ms",
-            this.getName(),
-            cardSelectionResponses,
+        logger.debug(
+            "[reader={}] Receive [type=CardSelectionResponses, cardSelectionResponseCount={}, elapsedMs={}]",
+            getName(),
+            cardSelectionResponses != null ? cardSelectionResponses.size() : 0,
             elapsed10ms / 10.0);
       }
     }
@@ -250,28 +250,28 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
 
     CardResponseApi cardResponse = null;
 
-    if (logger.isTraceEnabled()) {
+    if (logger.isDebugEnabled()) {
       long timeStamp = System.nanoTime();
       long elapsed10ms = (timeStamp - before) / 100000;
       this.before = timeStamp;
-      logger.trace(
-          "Reader [{}] --> cardRequest: {}, elapsed {} ms",
-          this.getName(),
-          cardRequest,
+      logger.debug(
+          "[reader={}] Send [type=CardRequest, apduRequestCount={}, elapsedMs={}]",
+          getName(),
+          cardRequest.getApduRequests().size(),
           elapsed10ms / 10.0);
     }
 
     try {
       cardResponse = processCardRequest(cardRequest, channelControl);
     } finally {
-      if (logger.isTraceEnabled()) {
+      if (logger.isDebugEnabled()) {
         long timeStamp = System.nanoTime();
         long elapsed10ms = (timeStamp - before) / 100000;
         this.before = timeStamp;
-        logger.trace(
-            "Reader [{}] <-- cardResponse: {}, elapsed {} ms",
-            this.getName(),
-            cardResponse,
+        logger.debug(
+            "[reader={}] Receive [type=CardResponse, apduResponseCount={}, elapsedMs={}]",
+            getName(),
+            cardResponse != null ? cardResponse.getApduResponses().size() : 0,
             elapsed10ms / 10.0);
       }
     }

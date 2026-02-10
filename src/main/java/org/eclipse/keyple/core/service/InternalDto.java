@@ -11,10 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.eclipse.keypop.card.CardSelectionResponseApi;
 import org.eclipse.keypop.card.spi.*;
@@ -68,7 +66,7 @@ final class InternalDto {
 
     @Override
     public String toString() {
-      return "CARD_SELECTION = " + JsonUtil.toJson(this);
+      return "CardSelectionAdapter{" + "cardSelectionRequest=" + cardSelectionRequest + '}';
     }
   }
 
@@ -114,7 +112,12 @@ final class InternalDto {
 
     @Override
     public String toString() {
-      return "CARD_SELECTION_REQUEST = " + JsonUtil.toJson(this);
+      return "CardSelectionRequest{"
+          + "cardRequest="
+          + cardRequest
+          + ", successfulSelectionStatusWords="
+          + JsonUtil.toJson(successfulSelectionStatusWords)
+          + '}';
     }
   }
 
@@ -161,7 +164,12 @@ final class InternalDto {
 
     @Override
     public String toString() {
-      return "CARD_REQUEST = " + JsonUtil.toJson(this);
+      return "CardRequest{"
+          + "apduRequests="
+          + apduRequests
+          + ", stopOnUnsuccessfulStatusWord="
+          + stopOnUnsuccessfulStatusWord
+          + '}';
     }
   }
 
@@ -212,7 +220,16 @@ final class InternalDto {
 
     @Override
     public String toString() {
-      return "APDU_REQUEST = " + JsonUtil.toJson(this);
+      return "ApduRequest{"
+          + "apdu='"
+          + HexUtil.toHex(apdu)
+          + '\''
+          + ", successfulStatusWords="
+          + JsonUtil.toJson(successfulStatusWords)
+          + ", info='"
+          + info
+          + '\''
+          + '}';
     }
   }
 }

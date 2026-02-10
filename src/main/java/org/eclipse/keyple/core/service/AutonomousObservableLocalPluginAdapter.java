@@ -45,7 +45,8 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
       autonomousObservablePluginSpi.setCallback(this);
     } catch (Exception e) {
       if (logger.isTraceEnabled()) {
-        logger.trace("Method 'setCallback(...)' unavailable for legacy plugin: {}", e.getMessage());
+        logger.trace(
+            "[plugin={}] Method 'setCallback(...)' unavailable for legacy plugin", getName());
       }
       autonomousObservablePluginSpi.connect(this);
     }
@@ -84,13 +85,13 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
     for (String readerName : readerNames) {
       CardReader reader = this.getReader(readerName);
       if (reader == null) {
-        logger.warn("Plugin [{}] unable to remove unknown reader [{}]", this.getName(), readerName);
+        logger.warn("[plugin={}] Unable to remove unknown reader [name={}]", getName(), readerName);
       } else {
         // unregister and remove reader
         ((LocalReaderAdapter) reader).unregister();
         getReadersMap().remove(reader.getName());
         logger.info(
-            "Plugin [{}] removes reader [{}] from readers list", this.getName(), reader.getName());
+            "[plugin={}] Reader removed from readers list [name={}]", getName(), reader.getName());
         notifyReaders.add(readerName);
       }
     }
@@ -109,6 +110,6 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
     reader.register();
     getReadersMap().put(reader.getName(), reader);
     logger.info(
-        "Plugin [{}] adds reader [{}] to readers list", this.getName(), readerSpi.getName());
+        "[plugin={}] Reader added to readers list [name={}]", getName(), readerSpi.getName());
   }
 }

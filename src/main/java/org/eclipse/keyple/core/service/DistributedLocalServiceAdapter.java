@@ -102,12 +102,17 @@ final class DistributedLocalServiceAdapter
   public String executeLocally(String jsonData, String readerName) {
     if (readerName != null) {
       if (logger.isDebugEnabled()) {
-        logger.debug("Service [{}] processes data on reader [{}]: {}", name, readerName, jsonData);
+        logger.debug(
+            "[localService={}] Processing locally data on reader [name={}, jsonData={}]",
+            name,
+            readerName,
+            jsonData);
       }
       return new LocalReaderExecutor(jsonData, readerName).execute();
     } else {
       if (logger.isDebugEnabled()) {
-        logger.debug("Service [{}] processes data on plugins: {}", name, jsonData);
+        logger.debug(
+            "[localService={}] Processing locally data on plugins [jsonData={}]", name, jsonData);
       }
       return new LocalPluginExecutor(jsonData).execute();
     }
@@ -145,7 +150,7 @@ final class DistributedLocalServiceAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Service [{}] forwards plugin event [{}] associated to local reader [{}] of local plugin [{}]",
+          "[localService={}] Forwarding local plugin event [pluginEvent={}, reader={}, plugin={}]",
           name,
           pluginEvent.getType().name(),
           pluginEvent.getReaderNames().first(),
@@ -169,7 +174,7 @@ final class DistributedLocalServiceAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Service [{}] forwards reader event [{}] associated to local reader [{}] of local plugin [{}]",
+          "[localService={}] Forwarding local reader event [readerEvent={}, reader={}, plugin={}]",
           name,
           readerEvent.getType().name(),
           readerEvent.getReaderName(),
@@ -191,7 +196,8 @@ final class DistributedLocalServiceAdapter
   void register() {
     int distributedApiLevel = localServiceSpi.exchangeApiLevel(CORE_API_LEVEL);
     logger.info(
-        "Distributed Core API level: {}, Distributed API level (Local Service): {}",
+        "[localService={}] Registering distributed local service [coreApiLevel={}, localServiceApiLevel={}]",
+        name,
         CORE_API_LEVEL,
         distributedApiLevel);
     isRegistered = true;

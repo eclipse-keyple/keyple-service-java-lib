@@ -63,13 +63,13 @@ final class DistributedUtilAdapter {
       throws Exception { // NOSONAR
 
     if (logger.isDebugEnabled()) {
-      logger.debug("Plugin [{}] --> jsonData: {}", pluginName, input);
+      logger.debug("[plugin={}] Send [jsonData={}]", pluginName, input);
     }
 
     String outputJson = remotePluginSpi.executeRemotely(input.toString());
 
     if (logger.isDebugEnabled()) {
-      logger.debug("Plugin [{}] <-- jsonData: {}", pluginName, outputJson);
+      logger.debug("[plugin={}] Receive [jsonData={}]", pluginName, outputJson);
     }
 
     return getJsonObject(outputJson);
@@ -93,13 +93,13 @@ final class DistributedUtilAdapter {
       throws Exception { // NOSONAR
 
     if (logger.isDebugEnabled()) {
-      logger.debug("Reader [{}] --> jsonData: {}", readerName, input);
+      logger.debug("[reader={}] Send [jsonData={}]", readerName, input);
     }
 
     String outputJson = remoteReaderSpi.executeRemotely(input.toString());
 
     if (logger.isDebugEnabled()) {
-      logger.debug("Reader [{}] <-- jsonData: {}", readerName, outputJson);
+      logger.debug("[reader={}] Receive [jsonData={}]", readerName, outputJson);
     }
 
     return getJsonObject(outputJson);

@@ -13,7 +13,6 @@ package org.eclipse.keyple.core.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.eclipse.keypop.card.ApduResponseApi;
 import org.eclipse.keypop.card.CardResponseApi;
 
@@ -64,13 +63,18 @@ final class CardResponseAdapter implements CardResponseApi {
   }
 
   /**
-   * Converts the card response into a string where the data is encoded in a json format.
+   * Returns a string representation of the object.
    *
-   * @return A not empty String
+   * @return A string that represents the current state of the object.
    * @since 2.0.0
    */
   @Override
   public String toString() {
-    return "CARD_RESPONSE = " + JsonUtil.toJson(this);
+    return "CardResponseAdapter{"
+        + "apduResponses="
+        + apduResponses
+        + ", isLogicalChannelOpen="
+        + isLogicalChannelOpen
+        + '}';
   }
 }

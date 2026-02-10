@@ -70,10 +70,10 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
   void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "Internal event [{}] received for reader [{}] in current state [{}]",
-          event,
+          "[fsmState={}, reader={}] Processing internal event [type={}]",
+          getMonitoringState(),
           getReader().getName(),
-          getMonitoringState());
+          event);
     }
     /*
      * Process InternalEvent
@@ -92,7 +92,10 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
           // stay in the same state, however switch to WAIT_FOR_CARD_INSERTION to relaunch
           // the monitoring job
           if (logger.isTraceEnabled()) {
-            logger.trace("Inserted card hasn't matched");
+            logger.trace(
+                "[fsmState={}, reader={}] Inserted card hasn't matched",
+                getMonitoringState(),
+                getReader().getName());
           }
           switchState(MonitoringState.WAIT_FOR_CARD_REMOVAL);
         }
@@ -104,9 +107,19 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
 
       default:
         if (logger.isTraceEnabled()) {
-          logger.trace("Event ignored");
+          logger.trace(
+              "[fsmState={}, reader={}] Internal event ignored",
+              getMonitoringState(),
+              getReader().getName());
         }
         break;
+    }
+    if (logger.isTraceEnabled()) {
+      logger.trace(
+          "[fsmState={}, reader={}] Internal event processed [type={}]",
+          getMonitoringState(),
+          getReader().getName(),
+          event);
     }
   }
 }

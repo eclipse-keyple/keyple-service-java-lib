@@ -60,7 +60,8 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     super.register();
     int distributedApiLevel = remotePoolPluginSpi.exchangeApiLevel(CORE_API_LEVEL);
     logger.info(
-        "Distributed Core API level: {}, Distributed API level (Remote Pool Plugin): {}",
+        "[plugin={}] Registering distributed remote pool plugin [coreApiLevel={}, remotePluginApiLevel={}]",
+        getName(),
         CORE_API_LEVEL,
         distributedApiLevel);
   }
@@ -75,7 +76,10 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     try {
       remotePoolPluginSpi.onUnregister();
     } catch (Exception e) {
-      logger.warn("Error unregistering plugin extension [{}]: {}", getName(), e.getMessage());
+      logger.warn(
+          "[plugin={}] Failed to unregister plugin extension [reason={}]",
+          getName(),
+          e.getMessage());
     }
     super.unregister();
   }
@@ -125,7 +129,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Pool plugin [{}] allocates reader of group reference [{}]",
+          "[plugin={}] Allocating reader [readerGroupReference={}]",
           getName(),
           readerGroupReference);
     }
@@ -165,7 +169,11 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
               (SmartCard)
                   JsonUtil.getParser().fromJson(selectedSmartCardJson, classOfSelectedSmartCard);
         } catch (ClassNotFoundException e) {
-          logger.error("Class not found: {}", selectedSmartCardClassName, e);
+          logger.error(
+              "[plugin={}] Class not found [className={}]",
+              getName(),
+              selectedSmartCardClassName,
+              e);
         }
       }
     } catch (RuntimeException e) {
@@ -209,7 +217,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Pool plugin [{}] releases reader [{}]",
+          "[plugin={}] Releasing reader [name={}]",
           getName(),
           reader != null ? reader.getName() : null);
     }

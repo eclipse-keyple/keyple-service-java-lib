@@ -12,7 +12,6 @@
 package org.eclipse.keyple.core.service;
 
 import org.eclipse.keyple.core.util.HexUtil;
-import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.eclipse.keypop.reader.selection.IsoCardSelector;
 
 /**
@@ -145,13 +144,27 @@ final class IsoCardSelectorAdapter implements IsoCardSelector, InternalIsoCardSe
   }
 
   /**
-   * Converts the current instance into a string where the data is encoded in a json format.
+   * Returns a string representation of the object.
    *
-   * @return A not empty String
+   * @return A string that represents the current state of the object.
    * @since 3.0.0
    */
   @Override
   public String toString() {
-    return "ISO_CARD_SELECTOR = " + JsonUtil.toJson(this);
+    return "IsoCardSelectorAdapter{"
+        + "logicalProtocolName='"
+        + logicalProtocolName
+        + '\''
+        + ", powerOnDataRegex='"
+        + powerOnDataRegex
+        + '\''
+        + ", aid='"
+        + HexUtil.toHex(aid)
+        + '\''
+        + ", fileOccurrence="
+        + fileOccurrence
+        + ", fileControlInformation="
+        + fileControlInformation
+        + '}';
   }
 }

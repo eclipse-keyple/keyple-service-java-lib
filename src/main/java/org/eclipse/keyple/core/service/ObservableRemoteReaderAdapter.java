@@ -71,7 +71,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
 
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Reader [{}] notifies event [{}] to {} observer(s)",
+          "[reader={}] Notifying observers [eventType={}, observerCount={}]",
           getName(),
           event.getType().name(),
           countObservers());
@@ -92,12 +92,24 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
                       .getObservationExceptionHandler()
                       .onReaderObservationError(getPluginName(), getName(), e);
                 } catch (Exception e2) {
-                  logger.error("Event notification error: {}", e2.getMessage(), e2);
-                  logger.error("Original cause: {}", e.getMessage(), e);
+                  logger.error(
+                      "[reader={}] Failed to notify observer [reason={}]",
+                      getName(),
+                      e.getMessage(),
+                      e);
+                  logger.error(
+                      "[reader={}] Failed to notify observation exception handler [reason={}]",
+                      getName(),
+                      e2.getMessage(),
+                      e2);
                 }
               }
             }
           });
+    }
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("[reader={}] Observers notified", getName());
     }
   }
 
@@ -160,7 +172,8 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
     try {
       stopCardDetection();
     } catch (Exception e) {
-      logger.warn("Error stopping card detection on reader [{}]: {}", getName(), e.getMessage());
+      logger.warn(
+          "[reader={}] Failed to stop card detection [reason={}]", getName(), e.getMessage());
     }
     notifyObservers(
         new ReaderEventAdapter(getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));
@@ -221,8 +234,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
   public void startCardDetection(DetectionMode detectionMode) {
 
     checkStatus();
-    logger.info(
-        "Reader [{}] starts card detection with polling mode [{}]", getName(), detectionMode);
+    logger.info("[reader={}] Starting card detection [detectionMode={}]", getName(), detectionMode);
     Assert.getInstance().notNull(detectionMode, "detectionMode");
 
     // Build the input JSON data.
@@ -257,7 +269,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
   @Override
   public void stopCardDetection() {
 
-    logger.info("Reader [{}] stops card detection", getName());
+    logger.info("[reader={}] Stopping card detection", getName());
 
     // Notify the SPI first.
     observableRemoteReaderSpi.onStopObservation();
@@ -286,7 +298,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
   @Override
   public void finalizeCardProcessing() {
 
-    logger.info("Reader [{}] starts card removal sequence", getName());
+    logger.info("[reader={}] Starting card removal sequence", getName());
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();

@@ -39,6 +39,8 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
   private static final Logger logger =
       LoggerFactory.getLogger(CardRemovalActiveMonitoringJobAdapter.class);
 
+  private static final String JOB_ID = "REMOVAL_ACTIVE";
+
   private final AtomicBoolean loop = new AtomicBoolean();
   private final long sleepDurationMillis;
 
@@ -79,7 +81,8 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
         try {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "Start monitoring job polling process using 'isCardPresentPing()' method on reader [{}]",
+                "[fsmJob={}, reader={}] Starting monitoring job polling process using 'isCardPresentPing()'",
+                JOB_ID,
                 getReader().getName());
           }
           // re-init loop value to true
@@ -87,7 +90,8 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
           while (loop.get()) {
             if (!getReader().isCardPresentPing()) {
               if (logger.isTraceEnabled()) {
-                logger.trace("Card stop responding");
+                logger.trace(
+                    "[fsmJob={}, reader={}] Card stop responding", JOB_ID, getReader().getName());
               }
               break;
             }
@@ -101,7 +105,10 @@ final class CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobA
             }
           }
           if (logger.isTraceEnabled()) {
-            logger.trace("Monitoring job polling process stopped");
+            logger.trace(
+                "[fsmJob={}, reader={}] Monitoring job polling process stopped",
+                JOB_ID,
+                getReader().getName());
           }
         } catch (RuntimeException e) {
           getReader()

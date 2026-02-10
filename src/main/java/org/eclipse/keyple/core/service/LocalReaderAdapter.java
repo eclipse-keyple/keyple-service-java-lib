@@ -118,7 +118,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       readerSpi.closePhysicalChannel();
     } catch (ReaderIOException e) {
       logger.error(
-          "Error closing physical channel on reader [{}]: {}", this.getName(), e.getMessage(), e);
+          "[reader={}] Failed to close physical channel [reason={}]", getName(), e.getMessage(), e);
     }
   }
 
@@ -134,12 +134,16 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     try {
       readerSpi.closePhysicalChannel();
     } catch (Exception e) {
-      logger.warn("Error closing physical channel on reader [{}]: {}", getName(), e.getMessage());
+      logger.warn(
+          "[reader={}] Failed to close physical channel [reason={}]", getName(), e.getMessage());
     }
     try {
       readerSpi.onUnregister();
     } catch (Exception e) {
-      logger.warn("Error unregistering reader extension [{}]: {}", getName(), e.getMessage());
+      logger.warn(
+          "[reader={}] Failed to unregister reader extension [reason={}]",
+          getName(),
+          e.getMessage());
     }
     super.unregister();
   }
@@ -361,8 +365,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       long elapsed10ms = (timeStamp - before) / 100000;
       this.before = timeStamp;
       logger.debug(
-          "Reader [{}] --> apduRequest: {}, elapsed {} ms",
-          this.getName(),
+          "[reader={}] Send [type=ApduRequest, content={}, elapsedMs={}]",
+          getName(),
           apduRequest,
           elapsed10ms / 10.0);
     }
@@ -374,8 +378,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       long elapsed10ms = (timeStamp - before) / 100000;
       this.before = timeStamp;
       logger.debug(
-          "Reader [{}] <-- apduResponse: {}, elapsed {} ms",
-          this.getName(),
+          "[reader={}] Receive [type=ApduResponse, content={}, elapsedMs={}]",
+          getName(),
           apduResponse,
           elapsed10ms / 10.0);
     }
@@ -408,8 +412,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
             long elapsed10ms = (timeStamp - before) / 100000;
             this.before = timeStamp;
             logger.debug(
-                "Reader [{}] --> GET RESPONSE (chained): {}, elapsed {} ms",
-                this.getName(),
+                "[reader={}] Send [type=RawApduRequest:GetResponse, content={}, elapsedMs={}]",
+                getName(),
                 HexUtil.toHex(getResponseApdu),
                 elapsed10ms / 10.0);
           }
@@ -423,8 +427,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
             long elapsed10ms = (timeStamp - before) / 100000;
             this.before = timeStamp;
             logger.debug(
-                "Reader [{}] <-- apduResponse (chained): {}, elapsed {} ms",
-                this.getName(),
+                "[reader={}] Receive [type=RawApduResponse:GetResponse, content={}, elapsedMs={}]",
+                getName(),
                 apduResponse,
                 elapsed10ms / 10.0);
           }
@@ -627,7 +631,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     if (powerOnData != null && powerOnDataRegex != null && !powerOnData.matches(powerOnDataRegex)) {
       if (logger.isTraceEnabled()) {
         logger.trace(
-            "Power-on data didn't match (powerOnData: {}, powerOnDataRegex: {})",
+            "[reader={}] Power-on data mismatched [powerOnData={}, powerOnDataRegex={}]",
+            getName(),
             powerOnData,
             powerOnDataRegex);
       }
@@ -685,8 +690,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     final byte[] aid = cardSelector.getAid();
     if (logger.isDebugEnabled()) {
-      logger.debug(
-          "Reader [{}] selects application with AID [{}]", this.getName(), HexUtil.toHex(aid));
+      logger.debug("[reader={}] Selecting application [aid={}]", getName(), HexUtil.toHex(aid));
     }
     /*
      * build a get response command the actual length expected by the card in the get response
@@ -769,7 +773,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   /** Close the logical channel. */
   private void closeLogicalChannel() {
     if (logger.isTraceEnabled()) {
-      logger.trace("Reader [{}] closes logical channel", this.getName());
+      logger.trace("[reader={}] Closing logical channel", getName());
     }
     if (readerSpi instanceof AutonomousSelectionReaderSpi) {
       /* AutonomousSelectionReader have an explicit method for closing channels */
@@ -777,7 +781,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     }
     isLogicalChannelOpen = false;
     if (logger.isTraceEnabled()) {
-      logger.trace("Logical channel closed");
+      logger.trace("[reader={}] Logical channel closed", getName());
     }
   }
 

@@ -31,6 +31,8 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
   private static final Logger logger =
       LoggerFactory.getLogger(CardInsertionActiveMonitoringJobAdapter.class);
 
+  private static final String JOB_ID = "INSERTION_ACTIVE";
+
   private final long sleepDurationMillis;
   private final boolean monitorInsertion;
   private final CardReader reader;
@@ -76,7 +78,8 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
         try {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "Start monitoring job polling process using 'isCardPresent()' method on reader [{}]",
+                "[fsmJob={}, reader={}] Starting monitoring job polling process using 'isCardPresent()'",
+                JOB_ID,
                 reader.getName());
           }
           // re-init loop value to true
@@ -85,7 +88,7 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
             // polls for CARD_INSERTED
             if (monitorInsertion && reader.isCardPresent()) {
               if (logger.isTraceEnabled()) {
-                logger.trace("Card present");
+                logger.trace("[fsmJob={}, reader={}] Card present", JOB_ID, reader.getName());
               }
               monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
               return;
@@ -93,7 +96,7 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
             // polls for CARD_REMOVED
             if (!monitorInsertion && !reader.isCardPresent()) {
               if (logger.isTraceEnabled()) {
-                logger.trace("Card not present");
+                logger.trace("[fsmJob={}, reader={}] Card not present", JOB_ID, reader.getName());
               }
               loop.set(false);
               monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
@@ -109,7 +112,10 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
             }
           }
           if (logger.isTraceEnabled()) {
-            logger.trace("Monitoring job polling process stopped");
+            logger.trace(
+                "[fsmJob={}, reader={}] Monitoring job polling process stopped",
+                JOB_ID,
+                reader.getName());
           }
         } catch (RuntimeException e) {
           ((ObservableLocalReaderAdapter) reader)
