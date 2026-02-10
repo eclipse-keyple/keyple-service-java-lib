@@ -47,9 +47,9 @@ final class ObservationManagerAdapter<T, S> {
    */
   ObservationManagerAdapter(String pluginName, String readerName) {
     if (readerName == null) {
-      this.ownerComponent = String.format("Plugin [%s]", pluginName);
+      this.ownerComponent = String.format("[plugin=%s]", pluginName);
     } else {
-      this.ownerComponent = String.format("Reader [%s]", readerName);
+      this.ownerComponent = String.format("[reader=%s]", readerName);
     }
     this.observers = new LinkedHashSet<>(1);
     this.monitor = new Object();
@@ -65,7 +65,7 @@ final class ObservationManagerAdapter<T, S> {
    */
   void addObserver(T observer) {
     logger.info(
-        "{} adds observer [{}]",
+        "{} Adding observer [className={}]",
         ownerComponent,
         observer != null ? observer.getClass().getSimpleName() : null);
     Assert.getInstance().notNull(observer, "observer");
@@ -86,7 +86,7 @@ final class ObservationManagerAdapter<T, S> {
    */
   void removeObserver(T observer) {
     logger.info(
-        "{} removes observer [{}]",
+        "{} Removing observer [className={}]",
         ownerComponent,
         observer != null ? observer.getClass().getSimpleName() : null);
     synchronized (monitor) {
@@ -100,7 +100,7 @@ final class ObservationManagerAdapter<T, S> {
    * @since 2.0.0
    */
   void clearObservers() {
-    logger.info("{} removes all observers", ownerComponent);
+    logger.info("{} Removing all observers", ownerComponent);
     synchronized (monitor) {
       observers.clear();
     }

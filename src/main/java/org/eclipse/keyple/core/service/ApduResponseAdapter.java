@@ -12,7 +12,7 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.Arrays;
-import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
@@ -67,13 +67,20 @@ final class ApduResponseAdapter implements ApduResponseApi {
   }
 
   /**
-   * Converts the APDU response into a string where the data is encoded in a json format.
+   * Returns a string representation of the object.
    *
-   * @return A not empty String
+   * @return A string that represents the current state of the object.
    * @since 2.0.0
    */
   @Override
   public String toString() {
-    return "APDU_RESPONSE = " + JsonUtil.toJson(this);
+    return "ApduResponseAdapter{"
+        + "apdu='"
+        + HexUtil.toHex(apdu)
+        + '\''
+        + ", statusWord='"
+        + HexUtil.toHex(statusWord)
+        + '\''
+        + '}';
   }
 }

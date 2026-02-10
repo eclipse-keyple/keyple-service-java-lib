@@ -229,14 +229,16 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
     // RL-DET-INSNOTIF.1
     if (logger.isTraceEnabled()) {
-      logger.trace("Process inserted card");
+      logger.trace("[reader={}] Processing inserted card", getName());
     }
 
     isCardRemovedEventNotificationEnabled = true;
 
     if (cardSelectionScenario == null) {
       if (logger.isTraceEnabled()) {
-        logger.trace("No card selection scenario defined. Notify [CARD_INSERTED] event");
+        logger.trace(
+            "[reader={}] No card selection scenario defined. Notifying card reader event [eventType=CARD_INSERTED]",
+            getName());
       }
       /* no default request is defined, just notify the card insertion */
       return new ReaderEventAdapter(
@@ -265,15 +267,19 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
         /* notify only if a card matched the selection, just ignore if not */
         if (logger.isTraceEnabled()) {
           logger.trace(
-              "Selection hasn't matched. Do not throw any event because of [MATCHED_ONLY] flag");
+              "[reader={}] Selection hasn't matched. Event not notified because the notification mode is MATCHED_ONLY",
+              getName());
         }
         isCardRemovedEventNotificationEnabled = false;
         return null;
       }
 
       // the card didn't match, notify an CARD_INSERTED event with the received response
-      if (logger.isTraceEnabled()) {
-        logger.trace("None of {} selection cases matched", cardSelectionResponses.size());
+      if (logger.isDebugEnabled()) {
+        logger.debug(
+            "[reader={}] No selection cases matched [selectionCaseCount={}]",
+            getName(),
+            cardSelectionResponses.size());
       }
       return new ReaderEventAdapter(
           getPluginName(),
@@ -294,7 +300,10 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
       closeLogicalAndPhysicalChannelsSilently();
       // The card was removed or not read correctly, no exception raising or event notification,
       // just log.
-      logger.warn("Error while processing card selection scenario: {}", e.getMessage());
+      logger.warn(
+          "[reader={}] Failed to process card selection scenario [reason={}]",
+          getName(),
+          e.getMessage());
     }
 
     // Here we close the physical channel in case it was opened for a card excluded by the selection
@@ -324,7 +333,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
     for (CardSelectionResponseApi cardSelectionResponse : cardSelectionResponses) {
       if (cardSelectionResponse != null && cardSelectionResponse.hasMatched()) {
         if (logger.isTraceEnabled()) {
-          logger.trace("A default selection case matched");
+          logger.trace("[reader={}] A default selection case matched", getName());
         }
         return true;
       }
@@ -371,17 +380,18 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0.0
    */
   final void notifyObservers(final CardReaderEvent event) {
-
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Reader [{}] notifies event [{}] to {} observer(s)",
+          "[reader={}] Notifying observers [eventType={}, observerCount={}]",
           getName(),
           event.getType().name(),
           countObservers());
     }
-
     for (CardReaderObserverSpi observer : observationManager.getObservers()) {
       notifyObserver(observer, event);
+    }
+    if (logger.isDebugEnabled()) {
+      logger.debug("[reader={}] Observers notified", getName());
     }
   }
 
@@ -400,8 +410,13 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
             .getObservationExceptionHandler()
             .onReaderObservationError(getPluginName(), getName(), e);
       } catch (Exception e2) {
-        logger.error("Event notification error: {}", e2.getMessage(), e2);
-        logger.error("Original cause: {}", e.getMessage(), e);
+        logger.error(
+            "[reader={}] Failed to notify observer [reason={}]", getName(), e.getMessage(), e);
+        logger.error(
+            "[reader={}] Failed to notify observation exception handler [reason={}]",
+            getName(),
+            e2.getMessage(),
+            e2);
       }
     }
   }
@@ -442,7 +457,8 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
       stopCardDetection();
       stateService.shutdown();
     } catch (Exception e) {
-      logger.warn("Error stopping card detection on reader [{}]: {}", getName(), e.getMessage());
+      logger.warn(
+          "[reader={}] Failed to stop card detection [reason={}]", getName(), e.getMessage());
     }
     notifyObservers(
         new ReaderEventAdapter(getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));
@@ -525,8 +541,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   public final void startCardDetection(DetectionMode detectionMode) {
     // RL-DET-REMCTRL.1
     checkStatus();
-    logger.info(
-        "Reader [{}] starts card detection with polling mode [{}]", getName(), detectionMode);
+    logger.info("[reader={}] Starting card detection [detectionMode={}]", getName(), detectionMode);
     Assert.getInstance().notNull(detectionMode, "detectionMode");
     this.detectionMode = detectionMode;
     stateService.onEvent(InternalEvent.START_DETECT);
@@ -540,7 +555,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   @Override
   public final void stopCardDetection() {
     // RL-DET-REMCTRL.1
-    logger.info("Reader [{}] stops card detection", getName());
+    logger.info("[reader={}] Stopping card detection", getName());
     stateService.onEvent(InternalEvent.STOP_DETECT);
   }
 
@@ -550,7 +565,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0.0
    */
   public final void finalizeCardProcessing() {
-    logger.info("Reader [{}] starts card removal sequence", getName());
+    logger.info("[reader={}] Starting card removal sequence", getName());
     stateService.onEvent(InternalEvent.CARD_PROCESSED);
   }
 

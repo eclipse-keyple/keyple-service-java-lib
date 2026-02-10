@@ -110,7 +110,11 @@ abstract class AbstractPluginAdapter implements Plugin {
       try {
         ((AbstractReaderAdapter) reader).unregister();
       } catch (Exception e) {
-        logger.warn("Error unregistering reader [{}]: {}", reader.getName(), e.getMessage());
+        logger.warn(
+            "[plugin={}] Failed to unregister reader [name={}, reason={}]",
+            pluginName,
+            reader.getName(),
+            e.getMessage());
       }
     }
     readers.clear();

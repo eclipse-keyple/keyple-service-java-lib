@@ -58,7 +58,8 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
     try {
       poolPluginSpi.onUnregister();
     } catch (Exception e) {
-      logger.warn("Error unregistering plugin extension [{}]: {}", getName(), e.getMessage());
+      logger.warn(
+          "Failed to unregister plugin extension [name={}, reason={}]", getName(), e.getMessage());
     }
     super.unregister();
   }
@@ -93,7 +94,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Pool plugin [{}] allocates reader of group reference [{}]",
+          "[plugin={}] Allocating reader [readerGroupReference={}]",
           getName(),
           readerGroupReference);
     }
@@ -140,7 +141,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Pool plugin [{}] releases reader [{}]",
+          "[plugin={}] Releasing reader [name={}]",
           getName(),
           reader != null ? reader.getName() : null);
     }

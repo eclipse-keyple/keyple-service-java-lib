@@ -58,22 +58,22 @@ final class ObservableReaderStateServiceAdapter {
    */
   ObservableReaderStateServiceAdapter(ObservableLocalReaderAdapter reader) {
     this.reader = reader;
-    this.readerSpi = reader.getObservableReaderSpi();
+    readerSpi = reader.getObservableReaderSpi();
 
-    this.states = new EnumMap<>(AbstractObservableStateAdapter.MonitoringState.class);
-    this.executorService = Executors.newSingleThreadExecutor();
+    states = new EnumMap<>(AbstractObservableStateAdapter.MonitoringState.class);
+    executorService = Executors.newSingleThreadExecutor();
 
     // initialize states for each case:
 
     // wait for start
-    this.states.put(
+    states.put(
         AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_START_DETECTION,
         new WaitForStartDetectStateAdapter(this.reader));
 
     // insertion
     if (readerSpi instanceof CardInsertionWaiterAsynchronousSpi
         || readerSpi instanceof WaitForCardInsertionAutonomousSpi) {
-      this.states.put(
+      states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION,
           new WaitForCardInsertionStateAdapter(this.reader));
     } else if (readerSpi instanceof CardInsertionWaiterNonBlockingSpi
@@ -85,10 +85,10 @@ final class ObservableReaderStateServiceAdapter {
               : 100;
       CardInsertionActiveMonitoringJobAdapter cardInsertionActiveMonitoringJobAdapter =
           new CardInsertionActiveMonitoringJobAdapter(reader, sleepDurationMillis, true);
-      this.states.put(
+      states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION,
           new WaitForCardInsertionStateAdapter(
-              this.reader, cardInsertionActiveMonitoringJobAdapter, this.executorService));
+              this.reader, cardInsertionActiveMonitoringJobAdapter, executorService));
     } else if (readerSpi instanceof CardInsertionWaiterBlockingSpi
         || readerSpi instanceof WaitForCardInsertionBlockingSpi) {
       final CardInsertionPassiveMonitoringJobAdapter cardInsertionPassiveMonitoringJobAdapter =
@@ -96,7 +96,7 @@ final class ObservableReaderStateServiceAdapter {
       states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION,
           new WaitForCardInsertionStateAdapter(
-              this.reader, cardInsertionPassiveMonitoringJobAdapter, this.executorService));
+              this.reader, cardInsertionPassiveMonitoringJobAdapter, executorService));
     } else {
       throw new IllegalStateException(
           "Reader should implement implement a WaitForCardInsertion interface");
@@ -107,12 +107,12 @@ final class ObservableReaderStateServiceAdapter {
         || readerSpi instanceof WaitForCardRemovalDuringProcessingBlockingSpi) {
       final CardRemovalPassiveMonitoringJobAdapter cardRemovalPassiveMonitoringJobAdapter =
           new CardRemovalPassiveMonitoringJobAdapter(reader);
-      this.states.put(
+      states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING,
           new WaitForCardProcessingStateAdapter(
-              this.reader, cardRemovalPassiveMonitoringJobAdapter, this.executorService));
+              this.reader, cardRemovalPassiveMonitoringJobAdapter, executorService));
     } else {
-      this.states.put(
+      states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING,
           new WaitForCardProcessingStateAdapter(this.reader));
     }
@@ -120,7 +120,7 @@ final class ObservableReaderStateServiceAdapter {
     // removal
     if (readerSpi instanceof CardRemovalWaiterAsynchronousSpi
         || readerSpi instanceof WaitForCardRemovalAutonomousSpi) {
-      this.states.put(
+      states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_REMOVAL,
           new WaitForCardRemovalStateAdapter(this.reader));
 
@@ -133,10 +133,10 @@ final class ObservableReaderStateServiceAdapter {
               : 100;
       CardRemovalActiveMonitoringJobAdapter cardRemovalActiveMonitoringJobAdapter =
           new CardRemovalActiveMonitoringJobAdapter(this.reader, sleepDurationMillis);
-      this.states.put(
+      states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_REMOVAL,
           new WaitForCardRemovalStateAdapter(
-              this.reader, cardRemovalActiveMonitoringJobAdapter, this.executorService));
+              this.reader, cardRemovalActiveMonitoringJobAdapter, executorService));
     } else if (readerSpi instanceof CardRemovalWaiterBlockingSpi
         || readerSpi instanceof WaitForCardRemovalBlockingSpi) {
       final CardRemovalPassiveMonitoringJobAdapter cardRemovalPassiveMonitoringJobAdapter =
@@ -144,7 +144,7 @@ final class ObservableReaderStateServiceAdapter {
       states.put(
           AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_REMOVAL,
           new WaitForCardRemovalStateAdapter(
-              this.reader, cardRemovalPassiveMonitoringJobAdapter, this.executorService));
+              this.reader, cardRemovalPassiveMonitoringJobAdapter, executorService));
     } else {
       throw new IllegalStateException(
           "Reader should implement implement a WaitForCardRemoval interface");
@@ -172,7 +172,7 @@ final class ObservableReaderStateServiceAdapter {
         readerSpi.onStartDetection();
         break;
     }
-    this.currentState.onEvent(event);
+    currentState.onEvent(event);
   }
 
   /**
@@ -187,20 +187,21 @@ final class ObservableReaderStateServiceAdapter {
     if (currentState != null) {
       if (logger.isTraceEnabled()) {
         logger.trace(
-            "Switch state of reader [{}] from {} to {}",
-            this.reader.getName(),
-            this.currentState.getMonitoringState(),
+            "[fsmService={}] Switching state [from={}, to={}]",
+            reader.getName(),
+            currentState.getMonitoringState(),
             stateId);
       }
       currentState.onDeactivate();
     } else {
       if (logger.isTraceEnabled()) {
-        logger.trace("Switch state of reader [{}] to {}", this.reader.getName(), stateId);
+        logger.trace(
+            "[fsmService={}] Switching state [from=null, to={}]", reader.getName(), stateId);
       }
     }
 
     // switch currentState
-    currentState = this.states.get(stateId);
+    currentState = states.get(stateId);
 
     // As soon as the state machine returns to the WAIT_FOR_START_DETECTION state,
     // we deactivate card detection in the plugin.
@@ -210,16 +211,14 @@ final class ObservableReaderStateServiceAdapter {
 
     // onActivate the new current state
     currentState.onActivate();
-  }
 
-  /**
-   * Get reader current state
-   *
-   * @return reader current state
-   * @since 2.0.0
-   */
-  synchronized AbstractObservableStateAdapter getCurrentState() {
-    return currentState;
+    if (logger.isTraceEnabled()) {
+      logger.trace(
+          "[fsmService={}] State switched [current={}, expected={}]",
+          reader.getName(),
+          currentState.getMonitoringState(),
+          stateId);
+    }
   }
 
   /**
@@ -229,7 +228,7 @@ final class ObservableReaderStateServiceAdapter {
    * @since 2.0.0
    */
   synchronized AbstractObservableStateAdapter.MonitoringState getCurrentMonitoringState() {
-    return this.currentState.getMonitoringState();
+    return currentState.getMonitoringState();
   }
 
   /**

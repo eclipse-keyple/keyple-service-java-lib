@@ -487,7 +487,6 @@ package "org.eclipse.keyple.core.service" as service {
 
         ~void onEvent (InternalEvent event)
         ~void switchState (MonitoringState stateId)
-        ~AbstractObservableStateAdapter getCurrentState ()
         ~MonitoringState getCurrentMonitoringState ()
         ~void shutdown ()
     }

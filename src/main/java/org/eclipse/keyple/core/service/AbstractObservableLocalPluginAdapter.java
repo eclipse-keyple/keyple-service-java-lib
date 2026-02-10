@@ -66,17 +66,19 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
    * @since 2.0.0
    */
   final void notifyObservers(final PluginEvent event) {
-
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "Plugin [{}] notifies event [{}] to {} observer(s)",
+          "[plugin={}] Notifying observers [eventType={}, readerNames={}, observerCount={}]",
           getName(),
           event.getType().name(),
+          event.getReaderNames(),
           countObservers());
     }
-
     for (PluginObserverSpi observer : observationManager.getObservers()) {
       notifyObserver(observer, event);
+    }
+    if (logger.isDebugEnabled()) {
+      logger.debug("[plugin={}] Observers notified", getName());
     }
   }
 
@@ -93,8 +95,13 @@ abstract class AbstractObservableLocalPluginAdapter extends LocalPluginAdapter
       try {
         observationManager.getObservationExceptionHandler().onPluginObservationError(getName(), e);
       } catch (Exception e2) {
-        logger.error("Event notification error: {}", e2.getMessage(), e2);
-        logger.error("Original cause: {}", e.getMessage(), e);
+        logger.error(
+            "[plugin={}] Failed to notify observer [reason={}]", getName(), e.getMessage(), e);
+        logger.error(
+            "[plugin={}] Failed to notify observation exception handler [reason={}]",
+            getName(),
+            e2.getMessage(),
+            e2);
       }
     }
   }

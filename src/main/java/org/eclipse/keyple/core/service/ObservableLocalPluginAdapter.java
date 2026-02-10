@@ -64,7 +64,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
   public void addObserver(PluginObserverSpi observer) {
     super.addObserver(observer);
     if (countObservers() == 1) {
-      logger.info("Start monitoring of plugin [{}]", getName());
+      logger.info("[plugin={}] Starting plugin monitoring", getName());
       thread = new EventThread(getName());
       thread.setName("PluginEventMonitoringThread");
       thread.setUncaughtExceptionHandler(
@@ -92,7 +92,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       if (countObservers() == 0) {
         if (thread != null) {
           thread.end();
-          logger.info("Plugin monitoring stopped");
+          logger.info("[plugin={}] Plugin monitoring stopped", getName());
         }
       }
     }
@@ -108,7 +108,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
     super.clearObservers();
     if (thread != null) {
       thread.end();
-      logger.info("Plugin monitoring stopped");
+      logger.info("[plugin={}] Plugin monitoring stopped", getName());
     }
   }
 
@@ -148,7 +148,10 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       LocalReaderAdapter reader = buildLocalReaderAdapter(readerSpi);
       reader.register();
       getReadersMap().put(reader.getName(), reader);
-      logger.info("Plugin [{}] adds plugged reader [{}] to readers list", pluginName, readerName);
+      logger.info(
+          "[plugin={}] Adding new plugged reader to readers list [name={}]",
+          pluginName,
+          readerName);
     }
 
     /** Removes a reader from the list of known readers (by the plugin) */
@@ -156,21 +159,9 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       ((LocalReaderAdapter) reader).unregister();
       getReadersMap().remove(reader.getName());
       logger.info(
-          "Plugin [{}] removes unplugged reader [{}] from readers list",
+          "[plugin={}] Removing unplugged reader from readers list [name={}]",
           pluginName,
           reader.getName());
-    }
-
-    /** Notifies observers of changes in the list of readers */
-    private void notifyChanges(PluginEvent.Type type, SortedSet<String> changedReaderNames) {
-      /* grouped notification */
-      if (logger.isTraceEnabled()) {
-        logger.trace(
-            "Notify reader {}(s): {}",
-            type == PluginEvent.Type.READER_CONNECTED ? "connection" : "disconnection",
-            changedReaderNames);
-      }
-      notifyObservers(new PluginEventAdapter(pluginName, changedReaderNames, type));
     }
 
     /**
@@ -201,7 +192,9 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
             removeReader(reader);
           }
         }
-        notifyChanges(PluginEvent.Type.READER_DISCONNECTED, changedReaderNames);
+        notifyObservers(
+            new PluginEventAdapter(
+                pluginName, changedReaderNames, PluginEvent.Type.READER_DISCONNECTED));
         /* clean the list for a possible connection notification */
         changedReaderNames.clear();
       }
@@ -218,7 +211,9 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       }
       /* notify connections if any */
       if (!changedReaderNames.isEmpty()) {
-        notifyChanges(PluginEvent.Type.READER_CONNECTED, changedReaderNames);
+        notifyObservers(
+            new PluginEventAdapter(
+                pluginName, changedReaderNames, PluginEvent.Type.READER_CONNECTED));
       }
     }
 
@@ -246,7 +241,8 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
         }
       } catch (InterruptedException e) {
         logger.info(
-            "Plugin monitoring stopped, possibly because there is no more registered observer");
+            "[plugin={}] Plugin monitoring stopped, possibly because there is no more registered observer",
+            getName());
         // Restore interrupted state...
         Thread.currentThread().interrupt();
       } catch (PluginIOException e) {

@@ -68,7 +68,8 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
 
     int distributedApiLevel = remotePluginSpi.exchangeApiLevel(CORE_API_LEVEL);
     logger.info(
-        "Distributed Core API level: {}, Distributed API level (Remote Plugin): {}",
+        "[plugin={}] Registering distributed remote plugin [coreApiLevel={}, remotePluginApiLevel={}]",
+        getName(),
         CORE_API_LEVEL,
         distributedApiLevel);
 
@@ -113,7 +114,12 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
               new ObservableRemoteReaderAdapter(
                   observableRemoteReaderSpi, getName(), CORE_API_LEVEL);
         } catch (IllegalStateException e) {
-          logger.warn(e.getMessage());
+          logger.warn(
+              "[plugin={}] Failed to create observable remote reader [remoteReaderName={}, localReaderName={}, reason={}]",
+              getName(),
+              remoteReaderName,
+              localReaderName,
+              e.getMessage());
           isObservable = false;
         }
       }
@@ -139,7 +145,10 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
     try {
       remotePluginSpi.onUnregister();
     } catch (Exception e) {
-      logger.warn("Error unregistering plugin extension [{}]: {}", getName(), e.getMessage());
+      logger.warn(
+          "[plugin={}] Failed to unregister plugin extension [reason={}]",
+          getName(),
+          e.getMessage());
     }
     super.unregister();
   }
@@ -154,7 +163,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
 
     checkStatus();
     if (logger.isDebugEnabled()) {
-      logger.debug("Plugin [{}] receives reader event: {}", getName(), jsonData);
+      logger.debug("[plugin={}] Receiving remote reader event [jsonData={}]", getName(), jsonData);
     }
     Assert.getInstance().notEmpty(jsonData, "jsonData");
 

@@ -51,7 +51,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
   private static final Logger logger = LoggerFactory.getLogger(SmartCardServiceAdapter.class);
 
   private static final String MSG_VERSION_MISMATCH_DETECTED =
-      "Version mismatch detected: {} [{}] uses '{}' version '{}' (expected '{}'). Compatibility issues may arise";
+      "Version mismatch detected: {} '{}' uses '{}' version '{}' (expected '{}'). Compatibility issues may arise";
 
   private static final SmartCardServiceAdapter INSTANCE = new SmartCardServiceAdapter();
 
@@ -307,11 +307,11 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @throws IllegalStateException if the plugin is already registered.
    */
   private void checkPluginRegistration(String pluginName) {
-    logger.info("Register plugin [{}]", pluginName);
+    logger.info("Registering plugin [name={}]", pluginName);
     Assert.getInstance().notEmpty(pluginName, "pluginName");
     if (plugins.containsKey(pluginName)) {
       throw new IllegalStateException(
-          String.format("Plugin [%s] has already been registered to the service", pluginName));
+          String.format("Plugin '%s' has already been registered to the service", pluginName));
     }
   }
 
@@ -322,12 +322,12 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @throws IllegalStateException if the distributed local service is already registered.
    */
   private void checkDistributedLocalServiceRegistration(String distributedLocalServiceName) {
-    logger.info("Register distributed local service [{}]", distributedLocalServiceName);
+    logger.info("Registering distributed local service [name={}]", distributedLocalServiceName);
     Assert.getInstance().notEmpty(distributedLocalServiceName, "distributedLocalServiceName");
     if (distributedLocalServices.containsKey(distributedLocalServiceName)) {
       throw new IllegalStateException(
           String.format(
-              "Service [%s] has already been registered to the service",
+              "Service '%s' has already been registered to the service",
               distributedLocalServiceName));
     }
   }
@@ -466,7 +466,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public void unregisterPlugin(String pluginName) {
-    logger.info("Unregister plugin [{}]", pluginName);
+    logger.info("Unregistering plugin [name={}]", pluginName);
     synchronized (pluginMonitor) {
       Plugin plugin = plugins.get(pluginName);
       if (plugin != null) {
@@ -476,7 +476,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
           plugins.remove(pluginName);
         }
       } else {
-        logger.warn("Plugin [{}] not registered", pluginName);
+        logger.warn("Plugin not registered [name={}]", pluginName);
       }
     }
   }
@@ -627,14 +627,15 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public void unregisterDistributedLocalService(String distributedLocalServiceName) {
-    logger.info("Unregister distributed local service [{}]", distributedLocalServiceName);
+    logger.info("Unregistering distributed local service [name={}]", distributedLocalServiceName);
     synchronized (distributedLocalServiceMonitor) {
       DistributedLocalService localService =
           distributedLocalServices.remove(distributedLocalServiceName);
       if (localService != null) {
         ((DistributedLocalServiceAdapter) localService).unregister();
       } else {
-        logger.warn("Distributed local service [{}] not registered", distributedLocalServiceName);
+        logger.warn(
+            "Distributed local service not registered [name={}]", distributedLocalServiceName);
       }
     }
   }

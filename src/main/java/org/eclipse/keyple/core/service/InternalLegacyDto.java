@@ -14,6 +14,7 @@ package org.eclipse.keyple.core.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
@@ -134,7 +135,12 @@ final class InternalLegacyDto {
 
     @Override
     public String toString() {
-      return "CARD_SELECTION_REQUEST = " + JsonUtil.toJson(this);
+      return "LegacyCardSelectionRequestV0{"
+          + "cardSelector="
+          + cardSelector
+          + ", cardRequest="
+          + cardRequest
+          + '}';
     }
   }
 
@@ -147,7 +153,12 @@ final class InternalLegacyDto {
 
     @Override
     public String toString() {
-      return "CARD_SELECTION_REQUEST = " + JsonUtil.toJson(this);
+      return "LegacyCardSelectionRequestV1{"
+          + "cardSelector="
+          + cardSelector
+          + ", cardRequest="
+          + cardRequest
+          + '}';
     }
   }
 
@@ -164,7 +175,23 @@ final class InternalLegacyDto {
 
     @Override
     public String toString() {
-      return "CARD_SELECTOR = " + JsonUtil.toJson(this);
+      return "LegacyCardSelector{"
+          + "cardProtocol='"
+          + cardProtocol
+          + '\''
+          + ", powerOnDataRegex='"
+          + powerOnDataRegex
+          + '\''
+          + ", aid='"
+          + HexUtil.toHex(aid)
+          + '\''
+          + ", fileOccurrence="
+          + fileOccurrence
+          + ", fileControlInformation="
+          + fileControlInformation
+          + ", successfulSelectionStatusWords="
+          + JsonUtil.toJson(successfulSelectionStatusWords)
+          + '}';
     }
   }
 
@@ -177,7 +204,12 @@ final class InternalLegacyDto {
 
     @Override
     public String toString() {
-      return "CARD_REQUEST = " + JsonUtil.toJson(this);
+      return "LegacyCardRequestV0{"
+          + "apduRequests="
+          + apduRequests
+          + ", isStatusCodesVerificationEnabled="
+          + isStatusCodesVerificationEnabled
+          + '}';
     }
   }
 
@@ -190,7 +222,12 @@ final class InternalLegacyDto {
 
     @Override
     public String toString() {
-      return "CARD_REQUEST = " + JsonUtil.toJson(this);
+      return "LegacyCardRequestV1{"
+          + "apduRequests="
+          + apduRequests
+          + ", stopOnUnsuccessfulStatusWord="
+          + stopOnUnsuccessfulStatusWord
+          + '}';
     }
   }
 
@@ -204,7 +241,16 @@ final class InternalLegacyDto {
 
     @Override
     public String toString() {
-      return "APDU_REQUEST = " + JsonUtil.toJson(this);
+      return "LegacyApduRequest{"
+          + "apdu='"
+          + HexUtil.toHex(apdu)
+          + '\''
+          + ", successfulStatusWords="
+          + JsonUtil.toJson(successfulStatusWords)
+          + ", info='"
+          + info
+          + '\''
+          + '}';
     }
   }
 }

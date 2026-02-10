@@ -41,6 +41,8 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
   private static final Logger logger =
       LoggerFactory.getLogger(CardInsertionPassiveMonitoringJobAdapter.class);
 
+  private static final String JOB_ID = "InsertionPassive";
+
   private final ObservableReaderSpi readerSpi;
 
   /**
@@ -76,7 +78,10 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
       public void run() {
         try {
           if (logger.isTraceEnabled()) {
-            logger.trace("Start monitoring job process on reader [{}]", getReader().getName());
+            logger.trace(
+                "[fsmJob={}, reader={}] Starting monitoring job process",
+                JOB_ID,
+                getReader().getName());
           }
           if (readerSpi instanceof CardInsertionWaiterBlockingSpi) {
             ((CardInsertionWaiterBlockingSpi) readerSpi).waitForCardInsertion();
@@ -87,11 +92,16 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
         } catch (ReaderIOException e) {
           // just warn as it can be a disconnection of the reader.
           logger.warn(
-              "Monitoring job error while processing card insertion event on reader [{}]: {}",
+              "[fsmJob={}, reader={}] Failed to process card insertion event [reason={}]",
+              JOB_ID,
               getReader().getName(),
               e.getMessage());
         } catch (TaskCanceledException e) {
-          logger.warn("Monitoring job process cancelled: {}", e.getMessage());
+          logger.warn(
+              "[fsmJob={}, reader={}] Monitoring job process cancelled [reason={}]",
+              JOB_ID,
+              getReader().getName(),
+              e.getMessage());
         } catch (RuntimeException e) {
           getReader()
               .getObservationExceptionHandler()
@@ -109,7 +119,8 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
   @Override
   void stop() {
     if (logger.isTraceEnabled()) {
-      logger.trace("Stop monitoring job process");
+      logger.trace(
+          "[fsmJob={}, reader={}] Stopping monitoring job process", JOB_ID, getReader().getName());
     }
     if (readerSpi instanceof CardInsertionWaiterBlockingSpi) {
       ((CardInsertionWaiterBlockingSpi) readerSpi).stopWaitForCardInsertion();
@@ -117,7 +128,8 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
       ((WaitForCardInsertionBlockingSpi) readerSpi).stopWaitForCardInsertion();
     }
     if (logger.isTraceEnabled()) {
-      logger.trace("Monitoring job process stopped");
+      logger.trace(
+          "[fsmJob={}, reader={}] Monitoring job process stopped", JOB_ID, getReader().getName());
     }
   }
 }

@@ -51,6 +51,8 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
   private static final Logger logger =
       LoggerFactory.getLogger(CardRemovalPassiveMonitoringJobAdapter.class);
 
+  private static final String JOB_ID = "RemovalPassive";
+
   private final ObservableReaderSpi readerSpi;
 
   /**
@@ -98,12 +100,17 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
         } catch (ReaderIOException e) {
           // just warn as it can be a disconnection of the reader.
           logger.warn(
-              "Monitoring job error while processing card removal event on reader [{}]: {}",
+              "[fsmJob={}, reader={}] Failed to process card removal event [reason={}]",
+              JOB_ID,
               getReader().getName(),
               e.getMessage());
         } catch (TaskCanceledException e) {
           isTaskCanceled = true;
-          logger.warn("Monitoring job process cancelled: {}", e.getMessage());
+          logger.warn(
+              "[fsmJob={}, reader={}] Monitoring job process cancelled [reason={}]",
+              JOB_ID,
+              getReader().getName(),
+              e.getMessage());
         } catch (RuntimeException e) {
           getReader()
               .getObservationExceptionHandler()
@@ -125,7 +132,8 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
   @Override
   void stop() {
     if (logger.isTraceEnabled()) {
-      logger.trace("Stop monitoring job process");
+      logger.trace(
+          "[fsmJob={}, reader={}] Stopping monitoring job process", JOB_ID, getReader().getName());
     }
     if (readerSpi instanceof CardRemovalWaiterBlockingSpi) {
       ((CardRemovalWaiterBlockingSpi) readerSpi).stopWaitForCardRemoval();
@@ -138,7 +146,8 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
           .stopWaitForCardRemovalDuringProcessing();
     }
     if (logger.isTraceEnabled()) {
-      logger.trace("Monitoring job process stopped");
+      logger.trace(
+          "[fsmJob={}, reader={}] Monitoring job process stopped", JOB_ID, getReader().getName());
     }
   }
 }
