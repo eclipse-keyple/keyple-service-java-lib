@@ -47,12 +47,12 @@ final class ObservationManagerAdapter<T, S> {
    */
   ObservationManagerAdapter(String pluginName, String readerName) {
     if (readerName == null) {
-      this.ownerComponent = String.format("[plugin=%s]", pluginName);
+      ownerComponent = "[plugin=" + pluginName + "]";
     } else {
-      this.ownerComponent = String.format("[reader=%s]", readerName);
+      ownerComponent = "[reader=" + readerName + "]";
     }
-    this.observers = new LinkedHashSet<>(1);
-    this.monitor = new Object();
+    observers = new LinkedHashSet<>(1);
+    monitor = new Object();
   }
 
   /**
