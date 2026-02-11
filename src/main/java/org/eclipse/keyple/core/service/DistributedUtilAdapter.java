@@ -156,9 +156,9 @@ final class DistributedUtilAdapter {
           throw new UnexpectedStatusWordException(null, false, message);
         } else {
           throw new RuntimeException(
-              "The distributed message sender received an unknown error: code="
+              "The distributed message sender received an unknown error. Code: "
                   + code
-                  + ", message="
+                  + ", Message: "
                   + message);
         }
       } else {
