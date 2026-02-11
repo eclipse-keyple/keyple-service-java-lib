@@ -114,10 +114,11 @@ final class SmartCardServiceAdapter implements SmartCardService {
     String[] localVersions = localVersion.split("[.]");
     if (providedVersions.length != localVersions.length) {
       throw new IllegalStateException(
-          "Inconsistent version numbers: provided = "
+          "Inconsistent version numbers [provided="
               + providedVersion
-              + ", local = "
-              + localVersion);
+              + ", local="
+              + localVersion
+              + "]");
     }
     Integer provided = 0;
     int local = 0;
@@ -132,7 +133,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
       }
     } catch (NumberFormatException e) {
       throw new IllegalStateException(
-          "Bad version numbers: provided = " + providedVersion + ", local = " + localVersion, e);
+          "Bad version numbers [provided=" + providedVersion + ", local=" + localVersion + "]", e);
     }
     return provided.compareTo(local);
   }
@@ -311,7 +312,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     Assert.getInstance().notEmpty(pluginName, "pluginName");
     if (plugins.containsKey(pluginName)) {
       throw new IllegalStateException(
-          String.format("Plugin '%s' has already been registered to the service", pluginName));
+          "Plugin '" + pluginName + "' has already been registered to the service");
     }
   }
 
@@ -326,9 +327,9 @@ final class SmartCardServiceAdapter implements SmartCardService {
     Assert.getInstance().notEmpty(distributedLocalServiceName, "distributedLocalServiceName");
     if (distributedLocalServices.containsKey(distributedLocalServiceName)) {
       throw new IllegalStateException(
-          String.format(
-              "Service '%s' has already been registered to the service",
-              distributedLocalServiceName));
+          "Local service '"
+              + distributedLocalServiceName
+              + "' has already been registered to the service");
     }
   }
 
@@ -355,7 +356,11 @@ final class SmartCardServiceAdapter implements SmartCardService {
           plugin = createRemotePlugin((RemotePluginFactorySpi) pluginFactory);
 
         } else {
-          throw new IllegalArgumentException("The factory doesn't implement the right SPI");
+          throw new IllegalArgumentException(
+              "Cannot cast the provided factory to "
+                  + "PluginFactorySpi, PoolPluginFactorySpi or RemotePluginFactorySpi. "
+                  + "Actual type: "
+                  + pluginFactory.getClass().getName());
         }
 
         plugins.put(plugin.getName(), plugin);
@@ -366,9 +371,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
           "The provided plugin factory doesn't implement the plugin API properly", e);
 
     } catch (PluginIOException e) {
-      throw new KeyplePluginException(
-          String.format("Unable to register the plugin [%s]: %s", plugin.getName(), e.getMessage()),
-          e);
+      throw new KeyplePluginException("Failed to register plugin: " + plugin.getName(), e);
     }
     return plugin;
   }
@@ -388,9 +391,11 @@ final class SmartCardServiceAdapter implements SmartCardService {
 
     if (!pluginSpi.getName().equals(pluginFactorySpi.getPluginName())) {
       throw new IllegalArgumentException(
-          String.format(
-              "Plugin name [%s] mismatches the expected name [%s] provided by the factory",
-              pluginSpi.getName(), pluginFactorySpi.getPluginName()));
+          "Plugin name '"
+              + pluginSpi.getName()
+              + "' mismatches the expected name '"
+              + pluginFactorySpi.getPluginName()
+              + "' provided by the factory");
     }
 
     AbstractPluginAdapter plugin;
@@ -420,9 +425,11 @@ final class SmartCardServiceAdapter implements SmartCardService {
 
     if (!poolPluginSpi.getName().equals(poolPluginFactorySpi.getPoolPluginName())) {
       throw new IllegalArgumentException(
-          String.format(
-              "Pool plugin name [%s] mismatches the expected name [%s] provided by the factory",
-              poolPluginSpi.getName(), poolPluginFactorySpi.getPoolPluginName()));
+          "Pool plugin name '"
+              + poolPluginSpi.getName()
+              + "' mismatches the expected name '"
+              + poolPluginFactorySpi.getPoolPluginName()
+              + "' provided by the factory");
     }
 
     return new LocalPoolPluginAdapter(poolPluginSpi);
@@ -443,9 +450,11 @@ final class SmartCardServiceAdapter implements SmartCardService {
 
     if (!remotePluginSpi.getName().equals(remotePluginFactorySpi.getRemotePluginName())) {
       throw new IllegalArgumentException(
-          String.format(
-              "Remote plugin name [%s] mismatches the expected name [%s] provided by the factory",
-              remotePluginSpi.getName(), remotePluginFactorySpi.getRemotePluginName()));
+          "Remote plugin name '"
+              + remotePluginSpi.getName()
+              + "' mismatches the expected name '"
+              + remotePluginFactorySpi.getRemotePluginName()
+              + "' provided by the factory");
     }
 
     AbstractPluginAdapter plugin;
@@ -586,7 +595,9 @@ final class SmartCardServiceAdapter implements SmartCardService {
     DistributedLocalServiceAdapter distributedLocalService;
     try {
       if (!(distributedLocalServiceExtensionFactory instanceof LocalServiceFactorySpi)) {
-        throw new IllegalArgumentException("The factory doesn't implement the right SPI");
+        throw new IllegalArgumentException(
+            "Cannot cast the provided factory to LocalServiceFactorySpi. Actual type: "
+                + distributedLocalServiceExtensionFactory.getClass().getName());
       }
 
       LocalServiceFactorySpi factory =
@@ -602,9 +613,11 @@ final class SmartCardServiceAdapter implements SmartCardService {
 
         if (!localServiceSpi.getName().equals(localServiceName)) {
           throw new IllegalArgumentException(
-              String.format(
-                  "The local service name [%s] mismatches the expected name [%s] provided by the factory",
-                  localServiceSpi.getName(), localServiceName));
+              "Local service name '"
+                  + localServiceSpi.getName()
+                  + "' mismatches the expected name '"
+                  + localServiceName
+                  + "' provided by the factory");
         }
 
         distributedLocalService = new DistributedLocalServiceAdapter(localServiceSpi);

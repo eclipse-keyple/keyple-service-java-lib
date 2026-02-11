@@ -95,7 +95,8 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
 
     if (!(cardSelectionExtension instanceof CardSelectionExtensionSpi)) {
       throw new IllegalArgumentException(
-          "The provided 'cardSelectionExtension' must be an instance of 'CardSelectionExtensionSpi'");
+          "Cannot cast 'cardSelectionExtension' to CardSelectionExtensionSpi. Actual type: "
+              + cardSelectionExtension.getClass().getName());
     }
 
     /* keep the selection request */
@@ -205,7 +206,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
                 JsonUtil.getParser().fromJson(cardSelectorsJsonArray.get(i), classOfCardSelector);
       } catch (ClassNotFoundException e) {
         throw new IllegalArgumentException(
-            "Original CardSelector type '" + cardSelectorsTypes.get(i) + "' not found", e);
+            "Original CardSelector type '" + cardSelectorsTypes.get(i) + "' is not found", e);
       }
       CardSelectionExtension cardSelection;
       try {
@@ -217,7 +218,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
       } catch (ClassNotFoundException e) {
         // Default card selection
         logger.warn(
-            "Original CardSelection type '{}' not found. Replaced by default type '{}' for deserialization",
+            "Original CardSelection type '{}' is not found. Replaced by default type '{}' for deserialization",
             cardSelectionsTypes.get(i),
             CardSelectionAdapter.class.getName());
         cardSelection =
@@ -282,7 +283,10 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
       ((ObservableRemoteReaderAdapter) observableCardReader)
           .scheduleCardSelectionScenario(cardSelectionScenario, notificationMode);
     } else {
-      throw new IllegalArgumentException("Not a Keyple reader implementation");
+      throw new IllegalArgumentException(
+          "Cannot cast 'observableCardReader' to ObservableLocalReaderAdapter or ObservableRemoteReaderAdapter. "
+              + "Actual type: "
+              + observableCardReader.getClass().getName());
     }
   }
 
@@ -333,10 +337,15 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
                   processedCardSelectionScenario,
                   new TypeToken<ArrayList<CardSelectionResponseApi>>() {}.getType());
     } catch (JsonSyntaxException e) {
-      throw new IllegalArgumentException("Input string is invalid: " + e.getMessage(), e);
+      throw new IllegalArgumentException(
+          "Parameter 'processedCardSelectionScenario' has an invalid JSON synthax: "
+              + processedCardSelectionScenario,
+          e);
     }
     if (cardSelectionResponses == null) {
-      throw new IllegalArgumentException("Input string is null or empty");
+      throw new IllegalArgumentException(
+          "Parameter 'processedCardSelectionScenario' is null or empty: "
+              + processedCardSelectionScenario);
     }
     return processCardSelectionResponses(cardSelectionResponses);
   }
@@ -366,7 +375,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
           smartCard = (SmartCard) cardSelections.get(index).parse(cardSelectionResponse);
         } catch (ParseException e) {
           throw new InvalidCardResponseException(
-              "Error occurred while parsing the card response: " + e.getMessage(), e);
+              "Failed to parse the card response: " + cardSelectionResponse, e);
         } catch (UnsupportedOperationException e) {
           logger.warn(
               "Unable to parse card selection responses due to missing card extensions in runtime environment");

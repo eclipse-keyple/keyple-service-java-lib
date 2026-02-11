@@ -41,7 +41,7 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   private static final Logger logger = LoggerFactory.getLogger(RemoteReaderAdapter.class);
 
   private static final String MSG_CLIENT_CORE_JSON_API_LEVEL_NOT_SUPPORTED =
-      "Client Core JSON API level not supported: ";
+      "Client Core JSON API level is not supported: ";
   private static final String OUTPUT = "output";
 
   private final RemoteReaderSpi remoteReaderSpi;

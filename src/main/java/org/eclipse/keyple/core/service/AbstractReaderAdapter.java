@@ -128,7 +128,10 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
               cardSelectors, cardSelectionRequests, multiSelectionProcessing, channelControl);
     } catch (UnexpectedStatusWordException e) {
       throw new CardBrokenCommunicationException(
-          e.getCardResponse(), false, "An unexpected status word was received", e);
+          e.getCardResponse(),
+          false,
+          "Failed to process card selection requests. An unexpected status word was received",
+          e);
     } finally {
       if (logger.isDebugEnabled()) {
         long timeStamp = System.nanoTime();
@@ -153,8 +156,7 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
    */
   final void checkStatus() {
     if (!isRegistered) {
-      throw new IllegalStateException(
-          String.format("This reader, %s, is not registered", getName()));
+      throw new IllegalStateException("Reader '" + getName() + "' is not registered");
     }
   }
 

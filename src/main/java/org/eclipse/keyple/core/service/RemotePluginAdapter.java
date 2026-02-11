@@ -178,16 +178,18 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
                   ReaderEventAdapter.class);
     } catch (RuntimeException e) {
       throw new IllegalArgumentException(
-          String.format("JSON data of the reader event is malformed : %s", e.getMessage()), e);
+          "Reader event contains malformed JSON data. Unable to parse event payload: " + jsonData,
+          e);
     }
 
     // Get the target reader.
     CardReader reader = getReader(readerEvent.getReaderName());
     if (!(reader instanceof ObservableCardReader)) {
       throw new IllegalArgumentException(
-          String.format(
-              "Reader [%s] does not exists or is not observable: %s",
-              readerEvent.getReaderName(), reader));
+          "Reader '"
+              + readerEvent.getReaderName()
+              + "' does not exists or is not observable: "
+              + reader);
     }
 
     // Notify the observers.

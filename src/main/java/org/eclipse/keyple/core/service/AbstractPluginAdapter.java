@@ -85,8 +85,7 @@ abstract class AbstractPluginAdapter implements Plugin {
    */
   final void checkStatus() {
     if (!isRegistered) {
-      throw new IllegalStateException(
-          String.format("Plugin [%s] is not or no longer registered", pluginName));
+      throw new IllegalStateException("Plugin '" + pluginName + "' is not or no longer registered");
     }
   }
 
@@ -153,7 +152,7 @@ abstract class AbstractPluginAdapter implements Plugin {
     checkStatus();
     AbstractReaderAdapter reader = (AbstractReaderAdapter) getReader(readerName);
     if (reader == null) {
-      throw new IllegalArgumentException("Reader [" + readerName + "] not found");
+      throw new IllegalArgumentException("Reader '" + readerName + "' is not found");
     }
     return reader.getExtension(readerExtensionClass);
   }
@@ -213,7 +212,8 @@ abstract class AbstractPluginAdapter implements Plugin {
           return reader;
         }
       } catch (PatternSyntaxException e) {
-        throw new IllegalArgumentException("readerNameRegex is invalid: " + e.getMessage(), e);
+        throw new IllegalArgumentException(
+            "Parameter 'readerNameRegex' has an invalid regex synthax: " + readerNameRegex, e);
       }
     }
     return null;

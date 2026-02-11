@@ -298,7 +298,8 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
       getReadersMap().remove(reader.getName());
       ((RemoteReaderAdapter) reader).unregister();
     } else {
-      throw new IllegalArgumentException("Reader is not found, not registered or not remote");
+      throw new IllegalArgumentException(
+          "Reader '" + remoteReaderName + "' is not found, not registered or not remote");
     }
   }
 
@@ -327,7 +328,8 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
                   PluginEventAdapter.class);
     } catch (RuntimeException e) {
       throw new IllegalArgumentException(
-          String.format("JSON data of the plugin event is malformed: %s", e.getMessage()), e);
+          "Plugin event contains malformed JSON data. Unable to parse event payload: " + jsonData,
+          e);
     }
 
     // Notify the observers for a plugin event.

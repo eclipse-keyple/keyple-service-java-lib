@@ -172,10 +172,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         computeCurrentProtocol();
       } catch (ReaderIOException e) {
         throw new ReaderBrokenCommunicationException(
-            null, false, "Reader communication failure while opening physical channel", e);
+            null, false, "Failed to communicate with reader. Unable to open physical channel", e);
       } catch (CardIOException e) {
         throw new CardBrokenCommunicationException(
-            null, false, "Card communication failure while opening physical channel", e);
+            null, false, "Failed to communicate with card. Unable to open physical channel", e);
       }
     }
 
@@ -244,14 +244,14 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         throw new ReaderBrokenCommunicationException(
             new CardResponseAdapter(apduResponses, false),
             false,
-            "Reader communication failure while transmitting a card request",
+            "Failed to communicate with reader. Unable to transmit card request",
             e);
       } catch (CardIOException e) {
         closeLogicalAndPhysicalChannelsSilently();
         throw new CardBrokenCommunicationException(
             new CardResponseAdapter(apduResponses, false),
             false,
-            "Card communication failure while transmitting a card request",
+            "Failed to communicate with card. Unable to transmit card request",
             e);
       }
     }
@@ -288,7 +288,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       return readerSpi.checkCardPresence();
     } catch (ReaderIOException e) {
       throw new ReaderCommunicationException(
-          "An exception occurred while checking the card presence", e);
+          "Failed to communicate with reader. Unable to check card presence", e);
     }
   }
 
@@ -306,7 +306,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         .notEmpty(readerProtocol, "readerProtocol")
         .notEmpty(applicationProtocol, "applicationProtocol");
     if (!((ConfigurableReaderSpi) readerSpi).isProtocolSupported(readerProtocol)) {
-      throw new ReaderProtocolNotSupportedException(readerProtocol);
+      throw new ReaderProtocolNotSupportedException(
+          "Reader protocol '"
+              + readerProtocol
+              + "' is not supported. Unable to activate reader protocol");
     }
     ((ConfigurableReaderSpi) readerSpi).activateProtocol(readerProtocol);
     protocolAssociations.put(readerProtocol, applicationProtocol);
@@ -324,7 +327,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     Assert.getInstance().notEmpty(readerProtocol, "readerProtocol");
     protocolAssociations.remove(readerProtocol);
     if (!((ConfigurableReaderSpi) readerSpi).isProtocolSupported(readerProtocol)) {
-      throw new ReaderProtocolNotSupportedException(readerProtocol);
+      throw new ReaderProtocolNotSupportedException(
+          "Reader protocol '"
+              + readerProtocol
+              + "' is not supported. Unable to deactivate reader protocol");
     }
     ((ConfigurableReaderSpi) readerSpi).deactivateProtocol(readerProtocol);
   }
@@ -341,7 +347,10 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       readerSpi.closePhysicalChannel();
     } catch (ReaderIOException e) {
       throw new ReaderBrokenCommunicationException(
-          null, false, "Failed to release the physical channel", e);
+          null,
+          false,
+          "Failed to communicate with reader. Unable to release the physical channel",
+          e);
     }
   }
 
@@ -568,9 +577,9 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       String logicalProtocolName = ((InternalCardSelector) cardSelector).getLogicalProtocolName();
       if (logicalProtocolName != null && useDefaultProtocol) {
         throw new IllegalStateException(
-            "Protocol "
+            "Logical protocol '"
                 + ((InternalCardSelector) cardSelector).getLogicalProtocolName()
-                + " not associated to a reader protocol");
+                + "' is not associated to a reader protocol");
       }
       // check protocol if enabled
       if (logicalProtocolName == null || logicalProtocolName.equals(currentLogicalProtocolName)) {
@@ -747,7 +756,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         p2 = (byte) 0x03;
         break;
       default:
-        throw new IllegalStateException("Unexpected value: " + fileOccurrence);
+        throw new IllegalStateException("Unexpected FileOccurrence value: " + fileOccurrence);
     }
 
     switch (fileControlInformation) {
@@ -764,7 +773,8 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         p2 |= (byte) 0x0C;
         break;
       default:
-        throw new IllegalStateException("Unexpected value: " + fileControlInformation);
+        throw new IllegalStateException(
+            "Unexpected FileControlInformation value: " + fileControlInformation);
     }
 
     return p2;
