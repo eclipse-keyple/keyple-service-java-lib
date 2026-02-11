@@ -617,9 +617,7 @@ final class DistributedLocalServiceAdapter
       PoolPlugin poolPlugin = getPoolPlugin(readerGroupReference);
       if (poolPlugin == null) {
         throw new IllegalStateException(
-            "No pool plugin is registered for reader group reference '"
-                + readerGroupReference
-                + "'");
+            "No pool plugin is registered for reader group reference: " + readerGroupReference);
       }
       CardReader reader = poolPlugin.allocateReader(readerGroupReference);
 
@@ -674,7 +672,7 @@ final class DistributedLocalServiceAdapter
       }
       if (!isObservationStarted) {
         throw new IllegalStateException(
-            "There is no observable local plugin. Cannot start reader detection");
+            "There is no observable local plugin. Unable to start reader detection");
       }
     }
 

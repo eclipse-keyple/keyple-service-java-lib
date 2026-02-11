@@ -114,11 +114,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
     String[] localVersions = localVersion.split("[.]");
     if (providedVersions.length != localVersions.length) {
       throw new IllegalStateException(
-          "Inconsistent version numbers [provided="
-              + providedVersion
-              + ", local="
-              + localVersion
-              + "]");
+          "Inconsistent version numbers: provided=" + providedVersion + ", local=" + localVersion);
     }
     Integer provided = 0;
     int local = 0;
@@ -133,7 +129,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
       }
     } catch (NumberFormatException e) {
       throw new IllegalStateException(
-          "Bad version numbers [provided=" + providedVersion + ", local=" + localVersion + "]", e);
+          "Bad version numbers: provided=" + providedVersion + ", local=" + localVersion, e);
     }
     return provided.compareTo(local);
   }

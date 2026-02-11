@@ -130,7 +130,7 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
       throw new CardBrokenCommunicationException(
           e.getCardResponse(),
           false,
-          "Failed to process card selection requests. An unexpected status word was received",
+          "An unexpected status word was received during the processing of the card selection requests",
           e);
     } finally {
       if (logger.isDebugEnabled()) {

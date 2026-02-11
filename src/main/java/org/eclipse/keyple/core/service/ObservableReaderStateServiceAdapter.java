@@ -99,7 +99,7 @@ final class ObservableReaderStateServiceAdapter {
               this.reader, cardInsertionPassiveMonitoringJobAdapter, executorService));
     } else {
       throw new IllegalStateException(
-          "Cannot cast provided reader extension to a valid WaitForCardInsertion interface. "
+          "Cannot cast the provided reader extension to a valid WaitForCardInsertion interface. "
               + "Actual type: "
               + readerSpi.getClass().getName());
     }
@@ -149,7 +149,7 @@ final class ObservableReaderStateServiceAdapter {
               this.reader, cardRemovalPassiveMonitoringJobAdapter, executorService));
     } else {
       throw new IllegalStateException(
-          "Cannot cast provided reader extension to a valid WaitForCardRemoval interface. "
+          "Cannot cast the provided reader extension to a valid WaitForCardRemoval interface. "
               + "Actual type: "
               + readerSpi.getClass().getName());
     }
