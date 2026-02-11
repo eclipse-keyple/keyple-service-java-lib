@@ -70,7 +70,7 @@ final class ObservationManagerAdapter<T, S> {
         observer != null ? observer.getClass().getSimpleName() : null);
     Assert.getInstance().notNull(observer, "observer");
     if (exceptionHandler == null) {
-      throw new IllegalStateException("No exception handler defined");
+      throw new IllegalStateException("No exception handler is defined");
     }
     synchronized (monitor) {
       observers.add(observer);

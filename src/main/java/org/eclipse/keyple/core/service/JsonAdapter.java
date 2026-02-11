@@ -87,9 +87,10 @@ final class JsonAdapter {
         exceptionClass = (Class<? extends AbstractApduException>) Class.forName(type.getTypeName());
       } catch (ClassNotFoundException e) {
         throw new JsonParseException(
-            String.format(
-                "Exception [%s] not founded in runtime environment. Original message: %s",
-                type, message));
+            "Exception '"
+                + type
+                + "' is not found in runtime environment. Original message: "
+                + message);
       }
 
       try {
@@ -100,12 +101,10 @@ final class JsonAdapter {
 
       } catch (NoSuchMethodException e) {
         throw new JsonParseException(
-            String.format(
-                "No valid constructor found for exception [%s] with message [%s]", type, message));
+            "No valid constructor found for exception '" + type + "' with message: " + message, e);
       } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
         throw new JsonParseException(
-            String.format(
-                "Error while trying to build exception [%s] with message [%s]", type, message));
+            "Failed to build exception '" + type + "' with message: " + message, e);
       }
     }
   }
@@ -284,7 +283,7 @@ final class JsonAdapter {
                       .fromJson(cardSelectorsJsonArray.get(i), classOfCardSelector));
         } catch (ClassNotFoundException e) {
           throw new IllegalArgumentException(
-              "Original CardSelector type [" + cardSelectorsTypes.get(i) + "] not found", e);
+              "Original CardSelector type '" + cardSelectorsTypes.get(i) + "' is not found", e);
         }
       }
 

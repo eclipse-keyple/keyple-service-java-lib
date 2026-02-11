@@ -129,7 +129,7 @@ abstract class AbstractObservableStateAdapter {
     // launch the monitoringJob is necessary
     if (monitoringJob != null) {
       if (executorService == null) {
-        throw new IllegalStateException("ExecutorService must be set");
+        throw new IllegalStateException("ExecutorService is not set. Cannot launch monitoring job");
       }
       monitoringEvent = executorService.submit(monitoringJob.getMonitoringJob(this));
     }

@@ -61,7 +61,7 @@ final class InternalDto {
 
     @Override
     public SmartCardSpi parse(CardSelectionResponseApi cardSelectionResponseApi) {
-      throw new UnsupportedOperationException("Method not supported for internal DTO");
+      throw new UnsupportedOperationException("Method 'parse' is not supported for internal DTO");
     }
 
     @Override

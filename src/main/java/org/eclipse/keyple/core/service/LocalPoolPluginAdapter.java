@@ -76,10 +76,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
       return poolPluginSpi.getReaderGroupReferences();
     } catch (PluginIOException e) {
       throw new KeyplePluginException(
-          String.format(
-              "Pool plugin [%s] is unable to get reader group references: %s",
-              getName(), e.getMessage()),
-          e);
+          "Plugin '" + getName() + "' failed to retrieve reader group references", e);
     }
   }
 
@@ -105,9 +102,10 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
       readerSpi = poolPluginSpi.allocateReader(readerGroupReference);
     } catch (PluginIOException e) {
       throw new KeyplePluginException(
-          String.format(
-              "Pool plugin [%s] unable to allocate reader of reader group reference [%s]: %s",
-              getName(), readerGroupReference, e.getMessage()),
+          "Plugin '"
+              + getName()
+              + "' failed to allocate reader of reader group reference: "
+              + readerGroupReference,
           e);
     }
 
@@ -152,10 +150,7 @@ final class LocalPoolPluginAdapter extends AbstractPluginAdapter implements Pool
           ((LocalReaderAdapter) reader).getReaderSpi()); // NOSONAR nullity check is done above
     } catch (PluginIOException e) {
       throw new KeyplePluginException(
-          String.format(
-              "Pool plugin [%s] unable to release reader [%s]: %s",
-              getName(), reader.getName(), e.getMessage()),
-          e);
+          "Plugin '" + getName() + "' failed to release reader: " + reader.getName(), e);
     } finally {
       getReadersMap().remove(reader.getName());
       ((LocalReaderAdapter) reader).unregister();

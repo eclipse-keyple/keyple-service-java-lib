@@ -156,9 +156,10 @@ final class DistributedUtilAdapter {
           throw new UnexpectedStatusWordException(null, false, message);
         } else {
           throw new RuntimeException(
-              String.format(
-                  "The distributed message sender received an unknown error: code: %s, message: %s",
-                  code, message));
+              "The distributed message sender received an unknown error: code="
+                  + code
+                  + ", message="
+                  + message);
         }
       } else {
         // Standard error.
@@ -178,9 +179,7 @@ final class DistributedUtilAdapter {
    */
   static void throwRuntimeException(Exception e) {
     throw new RuntimeException( // NOSONAR
-        String.format(
-            "The distributed message sender received an unexpected error: %s", e.getMessage()),
-        e);
+        "The distributed message sender received an unexpected error", e);
   }
 
   /**
