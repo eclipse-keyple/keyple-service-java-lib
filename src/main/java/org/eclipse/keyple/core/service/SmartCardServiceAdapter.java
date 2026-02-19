@@ -307,7 +307,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @throws IllegalStateException if the plugin is already registered.
    */
   private void checkPluginRegistration(String pluginName) {
-    logger.info("Registering plugin [name={}]", pluginName);
+    logger.info("Registering plugin [plugin={}]", pluginName);
     Assert.getInstance().notEmpty(pluginName, "pluginName");
     if (plugins.containsKey(pluginName)) {
       throw new IllegalStateException(
@@ -322,7 +322,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
    * @throws IllegalStateException if the distributed local service is already registered.
    */
   private void checkDistributedLocalServiceRegistration(String distributedLocalServiceName) {
-    logger.info("Registering distributed local service [name={}]", distributedLocalServiceName);
+    logger.info(
+        "Registering distributed local service [localService={}]", distributedLocalServiceName);
     Assert.getInstance().notEmpty(distributedLocalServiceName, "distributedLocalServiceName");
     if (distributedLocalServices.containsKey(distributedLocalServiceName)) {
       throw new IllegalStateException(
@@ -474,7 +475,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public void unregisterPlugin(String pluginName) {
-    logger.info("Unregistering plugin [name={}]", pluginName);
+    logger.info("Unregistering plugin [plugin={}]", pluginName);
     synchronized (pluginMonitor) {
       Plugin plugin = plugins.get(pluginName);
       if (plugin != null) {
@@ -484,7 +485,7 @@ final class SmartCardServiceAdapter implements SmartCardService {
           plugins.remove(pluginName);
         }
       } else {
-        logger.warn("Plugin not registered [name={}]", pluginName);
+        logger.warn("Plugin not registered [plugin={}]", pluginName);
       }
     }
   }
@@ -639,7 +640,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   @Override
   public void unregisterDistributedLocalService(String distributedLocalServiceName) {
-    logger.info("Unregistering distributed local service [name={}]", distributedLocalServiceName);
+    logger.info(
+        "Unregistering distributed local service [localService={}]", distributedLocalServiceName);
     synchronized (distributedLocalServiceMonitor) {
       DistributedLocalService localService =
           distributedLocalServices.remove(distributedLocalServiceName);
@@ -647,7 +649,8 @@ final class SmartCardServiceAdapter implements SmartCardService {
         ((DistributedLocalServiceAdapter) localService).unregister();
       } else {
         logger.warn(
-            "Distributed local service not registered [name={}]", distributedLocalServiceName);
+            "Distributed local service not registered [localService={}]",
+            distributedLocalServiceName);
       }
     }
   }

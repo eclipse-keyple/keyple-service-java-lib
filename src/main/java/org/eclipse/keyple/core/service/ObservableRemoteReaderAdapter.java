@@ -173,7 +173,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
       stopCardDetection();
     } catch (Exception e) {
       logger.warn(
-          "[reader={}] Failed to stop card detection [reason={}]", getName(), e.getMessage());
+          "[reader={}] Failed to stop card monitoring [reason={}]", getName(), e.getMessage());
     }
     notifyObservers(
         new ReaderEventAdapter(getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));
@@ -234,7 +234,8 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
   public void startCardDetection(DetectionMode detectionMode) {
 
     checkStatus();
-    logger.info("[reader={}] Starting card detection [detectionMode={}]", getName(), detectionMode);
+    logger.info(
+        "[reader={}] Starting remote card monitoring [detectionMode={}]", getName(), detectionMode);
     Assert.getInstance().notNull(detectionMode, "detectionMode");
 
     // Build the input JSON data.
@@ -259,6 +260,8 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
 
     // Notify the SPI.
     observableRemoteReaderSpi.onStartObservation();
+
+    logger.info("[reader={}] Remote card monitoring started", getName());
   }
 
   /**
@@ -269,7 +272,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
   @Override
   public void stopCardDetection() {
 
-    logger.info("[reader={}] Stopping card detection", getName());
+    logger.info("[reader={}] Stopping remote card monitoring", getName());
 
     // Notify the SPI first.
     observableRemoteReaderSpi.onStopObservation();
@@ -288,6 +291,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
     } catch (Exception e) {
       throwRuntimeException(e);
     }
+    logger.info("[reader={}] Remote card monitoring stopped", getName());
   }
 
   /**
@@ -298,7 +302,7 @@ final class ObservableRemoteReaderAdapter extends RemoteReaderAdapter
   @Override
   public void finalizeCardProcessing() {
 
-    logger.info("[reader={}] Starting card removal sequence", getName());
+    logger.info("[reader={}] Starting remote card removal sequence", getName());
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();

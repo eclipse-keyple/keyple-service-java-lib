@@ -458,7 +458,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
       stateService.shutdown();
     } catch (Exception e) {
       logger.warn(
-          "[reader={}] Failed to stop card detection [reason={}]", getName(), e.getMessage());
+          "[reader={}] Failed to stop card monitoring [reason={}]", getName(), e.getMessage());
     }
     notifyObservers(
         new ReaderEventAdapter(getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));
@@ -541,7 +541,8 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   public final void startCardDetection(DetectionMode detectionMode) {
     // RL-DET-REMCTRL.1
     checkStatus();
-    logger.info("[reader={}] Starting card detection [detectionMode={}]", getName(), detectionMode);
+    logger.info(
+        "[reader={}] Starting card monitoring [detectionMode={}]", getName(), detectionMode);
     Assert.getInstance().notNull(detectionMode, "detectionMode");
     this.detectionMode = detectionMode;
     stateService.onEvent(InternalEvent.START_DETECT);
@@ -555,7 +556,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   @Override
   public final void stopCardDetection() {
     // RL-DET-REMCTRL.1
-    logger.info("[reader={}] Stopping card detection", getName());
+    logger.info("[reader={}] Stopping card monitoring", getName());
     stateService.onEvent(InternalEvent.STOP_DETECT);
   }
 

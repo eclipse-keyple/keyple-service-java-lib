@@ -64,10 +64,6 @@ final class ObservationManagerAdapter<T, S> {
    * @since 2.0.0
    */
   void addObserver(T observer) {
-    logger.info(
-        "{} Adding observer [className={}]",
-        ownerComponent,
-        observer != null ? observer.getClass().getSimpleName() : null);
     Assert.getInstance().notNull(observer, "observer");
     if (exceptionHandler == null) {
       throw new IllegalStateException("No exception handler is defined");
@@ -75,6 +71,8 @@ final class ObservationManagerAdapter<T, S> {
     synchronized (monitor) {
       observers.add(observer);
     }
+    logger.info(
+        "{} Observer added [className={}]", ownerComponent, observer.getClass().getSimpleName());
   }
 
   /**
@@ -85,13 +83,13 @@ final class ObservationManagerAdapter<T, S> {
    * @since 2.0.0
    */
   void removeObserver(T observer) {
-    logger.info(
-        "{} Removing observer [className={}]",
-        ownerComponent,
-        observer != null ? observer.getClass().getSimpleName() : null);
     synchronized (monitor) {
       observers.remove(observer);
     }
+    logger.info(
+        "{} Observer removed [className={}]",
+        ownerComponent,
+        observer != null ? observer.getClass().getSimpleName() : null);
   }
 
   /**
@@ -100,10 +98,10 @@ final class ObservationManagerAdapter<T, S> {
    * @since 2.0.0
    */
   void clearObservers() {
-    logger.info("{} Removing all observers", ownerComponent);
     synchronized (monitor) {
       observers.clear();
     }
+    logger.info("{} Observers removed", ownerComponent);
   }
 
   /**

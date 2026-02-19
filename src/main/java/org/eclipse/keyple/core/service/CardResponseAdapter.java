@@ -63,9 +63,8 @@ final class CardResponseAdapter implements CardResponseApi {
   }
 
   /**
-   * Returns a string representation of the object.
+   * {@inheritDoc}
    *
-   * @return A string that represents the current state of the object.
    * @since 2.0.0
    */
   @Override

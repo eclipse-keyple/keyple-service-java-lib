@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
-- Normalized logging using Keyple coding standards.
+- Normalized logging and error messages using Keyple coding standards.
 ### Upgraded
 - `keyple-plugin-java-api` from `2.3.1` to `2.3.2` (code source not impacted)
 - `keyple-distributed-remote-java-api` from `3.1.0` to `3.1.1` (code source not impacted)

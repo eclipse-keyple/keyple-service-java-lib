@@ -64,7 +64,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
   public void addObserver(PluginObserverSpi observer) {
     super.addObserver(observer);
     if (countObservers() == 1) {
-      logger.info("[plugin={}] Starting plugin monitoring", getName());
+      logger.info("[plugin={}] Starting reader monitoring", getName());
       thread = new EventThread(getName());
       thread.setName("PluginEventMonitoringThread");
       thread.setUncaughtExceptionHandler(
@@ -92,7 +92,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       if (countObservers() == 0) {
         if (thread != null) {
           thread.end();
-          logger.info("[plugin={}] Plugin monitoring stopped", getName());
+          logger.info("[plugin={}] Reader monitoring stopped", getName());
         }
       }
     }
@@ -108,7 +108,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
     super.clearObservers();
     if (thread != null) {
       thread.end();
-      logger.info("[plugin={}] Plugin monitoring stopped", getName());
+      logger.info("[plugin={}] Reader monitoring stopped", getName());
     }
   }
 
@@ -149,7 +149,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       reader.register();
       getReadersMap().put(reader.getName(), reader);
       logger.info(
-          "[plugin={}] Adding new plugged reader to readers list [name={}]",
+          "[plugin={}] New plugged reader added to readers list [reader={}]",
           pluginName,
           readerName);
     }
@@ -159,7 +159,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
       ((LocalReaderAdapter) reader).unregister();
       getReadersMap().remove(reader.getName());
       logger.info(
-          "[plugin={}] Removing unplugged reader from readers list [name={}]",
+          "[plugin={}] Unplugged reader removed from readers list [reader={}]",
           pluginName,
           reader.getName());
     }
@@ -241,7 +241,7 @@ final class ObservableLocalPluginAdapter extends AbstractObservableLocalPluginAd
         }
       } catch (InterruptedException e) {
         logger.info(
-            "[plugin={}] Plugin monitoring stopped, possibly because there is no more registered observer",
+            "[plugin={}] Reader monitoring stopped, possibly because there is no more registered observer",
             getName());
         // Restore interrupted state...
         Thread.currentThread().interrupt();
