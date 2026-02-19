@@ -897,7 +897,16 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
     @Override
     public String toString() {
-      return "APDU_REQUEST = " + JsonUtil.toJson(this);
+      return "ApduRequest{"
+          + "apdu='"
+          + HexUtil.toHex(apdu)
+          + '\''
+          + ", successfulStatusWords="
+          + JsonUtil.toJson(successfulStatusWords)
+          + ", info='"
+          + info
+          + '\''
+          + '}';
     }
   }
 }
