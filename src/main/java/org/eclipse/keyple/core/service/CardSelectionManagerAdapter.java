@@ -218,7 +218,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
       } catch (ClassNotFoundException e) {
         // Default card selection
         logger.warn(
-            "Original CardSelection type '{}' is not found. Replaced by default type '{}' for deserialization",
+            "Original CardSelection type '{}' not found. Replaced by default type '{}' for deserialization",
             cardSelectionsTypes.get(i),
             CardSelectionAdapter.class.getName());
         cardSelection =

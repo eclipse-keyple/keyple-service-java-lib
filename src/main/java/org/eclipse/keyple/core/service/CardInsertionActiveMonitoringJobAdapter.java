@@ -78,7 +78,7 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
         try {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, reader={}] Starting monitoring job polling process using 'isCardPresent()'",
+                "[fsmJob={}, reader={}] Starting monitoring job process [mode=Polling using 'isCardPresent()']",
                 JOB_ID,
                 reader.getName());
           }

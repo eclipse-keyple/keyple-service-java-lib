@@ -115,7 +115,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
                   observableRemoteReaderSpi, getName(), CORE_API_LEVEL);
         } catch (IllegalStateException e) {
           logger.warn(
-              "[plugin={}] Failed to create observable remote reader [remoteReaderName={}, localReaderName={}, reason={}]",
+              "[plugin={}] Failed to create observable remote reader [remoteReader={}, localReader={}, reason={}]",
               getName(),
               remoteReaderName,
               localReaderName,
@@ -133,6 +133,8 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
       getReadersMap().put(localReaderName, remoteReaderAdapter);
       remoteReaderAdapter.register();
     }
+
+    logger.info("[plugin={}] Distributed remote plugin registered", getName());
   }
 
   /**
@@ -163,7 +165,7 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
 
     checkStatus();
     if (logger.isDebugEnabled()) {
-      logger.debug("[plugin={}] Receiving remote reader event [jsonData={}]", getName(), jsonData);
+      logger.debug("[plugin={}] Remote reader event received [jsonData={}]", getName(), jsonData);
     }
     Assert.getInstance().notEmpty(jsonData, "jsonData");
 

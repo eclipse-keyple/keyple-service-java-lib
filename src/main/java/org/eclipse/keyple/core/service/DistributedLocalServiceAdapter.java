@@ -100,7 +100,7 @@ final class DistributedLocalServiceAdapter
     if (readerName != null) {
       if (logger.isDebugEnabled()) {
         logger.debug(
-            "[localService={}] Processing locally data on reader [name={}, jsonData={}]",
+            "[localService={}] Processing data on local reader [reader={}, jsonData={}]",
             name,
             readerName,
             jsonData);
@@ -109,7 +109,7 @@ final class DistributedLocalServiceAdapter
     } else {
       if (logger.isDebugEnabled()) {
         logger.debug(
-            "[localService={}] Processing locally data on plugins [jsonData={}]", name, jsonData);
+            "[localService={}] Processing data on local plugins [jsonData={}]", name, jsonData);
       }
       return new LocalPluginExecutor(jsonData).execute();
     }
@@ -192,12 +192,12 @@ final class DistributedLocalServiceAdapter
    */
   void register() {
     int distributedApiLevel = localServiceSpi.exchangeApiLevel(CORE_API_LEVEL);
+    isRegistered = true;
     logger.info(
-        "[localService={}] Registering distributed local service [coreApiLevel={}, localServiceApiLevel={}]",
+        "[localService={}] Distributed local service registered [coreApiLevel={}, localServiceApiLevel={}]",
         name,
         CORE_API_LEVEL,
         distributedApiLevel);
-    isRegistered = true;
   }
 
   /**

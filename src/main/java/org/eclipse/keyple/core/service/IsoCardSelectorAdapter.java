@@ -144,9 +144,8 @@ final class IsoCardSelectorAdapter implements IsoCardSelector, InternalIsoCardSe
   }
 
   /**
-   * Returns a string representation of the object.
+   * {@inheritDoc}
    *
-   * @return A string that represents the current state of the object.
    * @since 3.0.0
    */
   @Override

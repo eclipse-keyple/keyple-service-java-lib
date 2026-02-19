@@ -145,7 +145,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     observationManager.addObserver(observer);
     if (observationManager.countObservers() == 1) {
 
-      logger.info("[plugin={}] Starting plugin monitoring", getName());
+      logger.info("[plugin={}] Starting remote reader monitoring", getName());
 
       // Start the observation remotely.
       JsonObject input = new JsonObject();
@@ -164,6 +164,8 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
 
       // Notify the SPI.
       observableRemotePluginSpi.onStartObservation();
+
+      logger.info("[plugin={}] Remote reader monitoring started", getName());
     }
   }
 
@@ -197,7 +199,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   /** Stops the monitoring of the plugin. */
   private void stopPluginMonitoring() {
 
-    logger.info("[plugin={}] Stopping plugin monitoring", getName());
+    logger.info("[plugin={}] Stopping remote reader monitoring", getName());
 
     // Notify the SPI first.
     observableRemotePluginSpi.onStopObservation();
@@ -216,7 +218,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     } catch (Exception e) {
       throwRuntimeException(e);
     }
-    logger.info("[plugin={}] Plugin monitoring stopped", getName());
+    logger.info("[plugin={}] Remote reader monitoring stopped", getName());
   }
 
   /**
@@ -249,12 +251,6 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   public void addRemoteReader(RemoteReaderSpi remoteReaderSpi, int clientCoreApiLevel) {
 
     checkStatus();
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "[plugin={}] Registering remote reader [name={}]",
-          getName(),
-          remoteReaderSpi != null ? remoteReaderSpi.getName() : null);
-    }
     Assert.getInstance().notNull(remoteReaderSpi, "remoteReaderSpi");
 
     // Create the reader.
@@ -272,6 +268,11 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     getReadersMap().put(remoteReaderAdapter.getName(), remoteReaderAdapter);
     remoteReaderAdapter.register();
 
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "[plugin={}] Remote reader registered [reader={}]", getName(), remoteReaderSpi.getName());
+    }
+
     // Notify observers for a plugin event.
     notifyObservers(
         new PluginEventAdapter(
@@ -286,10 +287,6 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   @Override
   public void removeRemoteReader(String remoteReaderName) {
 
-    if (logger.isDebugEnabled()) {
-      logger.debug(
-          "[plugin={}] Unregistering remote reader [name={}]", getName(), remoteReaderName);
-    }
     Assert.getInstance().notEmpty(remoteReaderName, "remoteReaderName");
 
     CardReader reader = getReader(remoteReaderName);
@@ -300,6 +297,11 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
     } else {
       throw new IllegalArgumentException(
           "Reader '" + remoteReaderName + "' is not found, not registered or not remote");
+    }
+
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "[plugin={}] Remote reader unregistered [reader={}]", getName(), remoteReaderName);
     }
   }
 
@@ -313,7 +315,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
 
     checkStatus();
     if (logger.isDebugEnabled()) {
-      logger.debug("[plugin={}] Receiving remote plugin event [jsonData={}]", getName(), jsonData);
+      logger.debug("[plugin={}] Remote plugin event received [jsonData={}]", getName(), jsonData);
     }
     Assert.getInstance().notEmpty(jsonData, "jsonData");
 

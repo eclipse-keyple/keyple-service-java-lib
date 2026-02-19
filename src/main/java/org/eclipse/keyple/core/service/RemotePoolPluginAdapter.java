@@ -60,7 +60,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     super.register();
     int distributedApiLevel = remotePoolPluginSpi.exchangeApiLevel(CORE_API_LEVEL);
     logger.info(
-        "[plugin={}] Registering distributed remote pool plugin [coreApiLevel={}, remotePluginApiLevel={}]",
+        "[plugin={}] Distributed remote pool plugin registered [coreApiLevel={}, remotePluginApiLevel={}]",
         getName(),
         CORE_API_LEVEL,
         distributedApiLevel);
@@ -191,6 +191,10 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
 
     getReadersMap().put(remoteReaderSpi.getName(), remoteReaderAdapter);
     remoteReaderAdapter.register();
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("[plugin={}] Reader allocated", getName());
+    }
     return remoteReaderAdapter;
   }
 
@@ -217,7 +221,7 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     checkStatus();
     if (logger.isDebugEnabled()) {
       logger.debug(
-          "[plugin={}] Releasing reader [name={}]",
+          "[plugin={}] Releasing reader [reader={}]",
           getName(),
           reader != null ? reader.getName() : null);
     }
@@ -246,6 +250,10 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
     } finally {
       getReadersMap().remove(reader.getName());
       ((RemoteReaderAdapter) reader).unregister();
+    }
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("[plugin={}] Reader released", getName());
     }
   }
 }

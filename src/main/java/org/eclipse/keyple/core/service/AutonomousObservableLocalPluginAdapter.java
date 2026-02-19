@@ -85,14 +85,17 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
     for (String readerName : readerNames) {
       CardReader reader = this.getReader(readerName);
       if (reader == null) {
-        logger.warn("[plugin={}] Unable to remove unknown reader [name={}]", getName(), readerName);
+        logger.warn(
+            "[plugin={}] Unable to remove unknown reader [reader={}]", getName(), readerName);
       } else {
         // unregister and remove reader
         ((LocalReaderAdapter) reader).unregister();
         getReadersMap().remove(reader.getName());
-        logger.info(
-            "[plugin={}] Reader removed from readers list [name={}]", getName(), reader.getName());
         notifyReaders.add(readerName);
+        logger.info(
+            "[plugin={}] Reader removed from readers list [reader={}]",
+            getName(),
+            reader.getName());
       }
     }
 
@@ -110,6 +113,6 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
     reader.register();
     getReadersMap().put(reader.getName(), reader);
     logger.info(
-        "[plugin={}] Reader added to readers list [name={}]", getName(), readerSpi.getName());
+        "[plugin={}] Reader added to readers list [reader={}]", getName(), readerSpi.getName());
   }
 }
