@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - keyple-service-java-lib - 3.1.+ (2023-12-18)
+    Keyple - keyple-service-java-lib - 3.5.+ (2026-04-13)
 end title
 
 ' == THEME ==
@@ -71,7 +71,7 @@ package "org.eclipse.keyple.core.service" as service {
         +Plugin getPlugin (String pluginName)
         +Plugin getPlugin (<back:yellow>CardReader</back> reader)
         +<back:yellow>CardReader</back> getReader (String readerName)
-        +<color:blue><back:yellow>CardReader</back> findReader (String readerNameRegex)
+        +<back:yellow>CardReader</back> findReader (String readerNameRegex)
 
         +void checkCardExtension (<back:cyan>KeypleCardExtension</back> cardExtension)
 
@@ -89,19 +89,22 @@ package "org.eclipse.keyple.core.service" as service {
         +Set<String> getReaderNames ()
         +Set<<back:yellow>CardReader</back>> getReaders ()
         +<back:yellow>CardReader</back> getReader (String readerName)
-        +<color:blue><back:yellow>CardReader</back> findReader (String readerNameRegex)
+        +<back:yellow>CardReader</back> findReader (String readerNameRegex)
     }
     +interface DistributedLocalService {
         +String getName ()
         +<T extends <back:cyan>KeypleDistributedLocalServiceExtension</back>> T getExtension (\n\tClass<T> distributedLocalServiceExtensionClass)
     }
     +interface ObservablePlugin extends Plugin {
-        +void setPluginObservationExceptionHandler (PluginObservationExceptionHandlerSpi exceptionHandler)
+        +<color:blue>void startReaderDetection (PluginEventHandler eventHandler)
+        +<color:blue>void stopReaderDetection ()
 
-        +void addObserver (PluginObserverSpi observer)
-        +void removeObserver (PluginObserverSpi observer)
-        +void clearObservers ()
-        +int countObservers ()
+        +<color:red><s>void setPluginObservationExceptionHandler (PluginObservationExceptionHandlerSpi exceptionHandler)
+
+        +<color:red><s>void addObserver (PluginObserverSpi observer)
+        +<color:red><s>void removeObserver (PluginObserverSpi observer)
+        +<color:red><s>void clearObservers ()
+        +<color:red><s>int countObservers ()
     }
     +interface PoolPlugin extends Plugin {
         +SortedSet<String> getReaderGroupReferences ()
@@ -113,11 +116,15 @@ package "org.eclipse.keyple.core.service" as service {
     }
     ' SPI
     package spi {
-        +interface PluginObserverSpi <<red>> {
-            +void onPluginEvent (PluginEvent pluginEvent)
+        +interface "<color:blue>PluginEventHandler" as PluginEventHandler <<red>> {
+            +<color:blue>void onPluginEvent (PluginEvent pluginEvent)
+            +<color:blue>void onPluginError (String pluginName, Throwable e)
         }
-        +interface PluginObservationExceptionHandlerSpi <<red>> {
-            +void onPluginObservationError (String pluginName, Throwable e)
+        +interface "<color:red><s>PluginObserverSpi" as PluginObserverSpi <<red>> {
+            +<color:red><s>void onPluginEvent (PluginEvent pluginEvent)
+        }
+        +interface "<color:red><s>PluginObservationExceptionHandlerSpi" as PluginObservationExceptionHandlerSpi <<red>> {
+            +<color:red><s>void onPluginObservationError (String pluginName, Throwable e)
         }
     }
 
@@ -149,10 +156,13 @@ SmartCardService ..> DistributedLocalService #C_LINK : provide >
 PluginEvent +-- PluginEventType
 PluginEvent ..> PluginEventType #C_LINK : provide >
 
+ObservablePlugin ..> PluginEventHandler #C_USE : use >
 ObservablePlugin ..> PluginObserverSpi #C_USE : use >
 ObservablePlugin ..> PluginObservationExceptionHandlerSpi #C_USE : use >
 
 PluginObserverSpi ..> PluginEvent #C_USE : use >
+
+PluginEventHandler ..> PluginEvent #C_USE : use >
 
 ' == LAYOUT ==
 
