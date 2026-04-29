@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - keyple-service-java-lib - 3.5.+ (2026-04-13)
+    Keyple - keyple-service-java-lib - 3.5.+ (2026-04-29)
 end title
 
 ' == THEME ==
@@ -136,7 +136,8 @@ package "org.eclipse.keyple.core.service" as service {
     +enum "Type" as PluginEventType <<green>> {
         READER_CONNECTED
         READER_DISCONNECTED
-        UNAVAILABLE
+        <color:red><s>UNAVAILABLE
+        <color:blue>PLUGIN_UNREGISTERED
     }
     ' EXCEPTIONS
     +class "<<RuntimeException>>\nKeyplePluginException" as KeyplePluginException <<green>> {
