@@ -395,7 +395,7 @@ final class DistributedLocalServiceAdapter
       // Execute the service on the reader
       List<CardSelectionResponseApi> cardSelectionResponses =
           reader.transmitCardSelectionRequests(
-              cardSelectors, cardSelectionRequests, multiSelectionProcessing, channelControl);
+              cardSelectors, cardSelectionRequests, multiSelectionProcessing);
 
       // Build result
       output.add(

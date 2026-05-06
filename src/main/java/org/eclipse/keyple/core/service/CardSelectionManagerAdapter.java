@@ -248,7 +248,7 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
       cardSelectionResponses =
           ((AbstractReaderAdapter) reader)
               .transmitCardSelectionRequests(
-                  cardSelectors, cardSelectionRequests, multiSelectionProcessing, channelControl);
+                  cardSelectors, cardSelectionRequests, multiSelectionProcessing);
     } catch (ReaderBrokenCommunicationException e) {
       throw new ReaderCommunicationException(e.getMessage(), e);
     } catch (CardBrokenCommunicationException e) {

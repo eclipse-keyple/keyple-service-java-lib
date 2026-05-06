@@ -29,14 +29,12 @@ public class ObservableReaderNonBlockingSpiMock
         ControllableReaderSpiMock {
 
   boolean detectionStarted;
-  boolean physicalChannelOpen;
   AtomicBoolean cardPresent;
   String name;
 
   public ObservableReaderNonBlockingSpiMock(String name) {
     this.detectionStarted = false;
     this.name = name;
-    this.physicalChannelOpen = false;
     this.cardPresent = new AtomicBoolean(false);
   }
 
@@ -49,6 +47,9 @@ public class ObservableReaderNonBlockingSpiMock
   public void onStopDetection() {
     detectionStarted = false;
   }
+
+  @Override
+  public void deselectCard() {}
 
   @Override
   public String getName() {
@@ -72,22 +73,7 @@ public class ObservableReaderNonBlockingSpiMock
   }
 
   @Override
-  public void openPhysicalChannel() throws ReaderIOException, CardIOException {
-    physicalChannelOpen = true;
-  }
-
-  @Override
-  public void closePhysicalChannel() throws ReaderIOException {
-    physicalChannelOpen = false;
-  }
-
-  @Override
-  public boolean isPhysicalChannelOpen() {
-    return physicalChannelOpen;
-  }
-
-  @Override
-  public boolean checkCardPresence() throws ReaderIOException {
+  public boolean isCardPresent() throws ReaderIOException {
     return cardPresent.get();
   }
 

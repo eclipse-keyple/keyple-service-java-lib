@@ -94,7 +94,6 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
    * @param cardSelectionRequests A list of selection cases composed of one or more {@link
    *     CardSelectionRequestSpi}.
    * @param multiSelectionProcessing The multi selection policy.
-   * @param channelControl The channel control policy.
    * @return An empty list if no response was received.
    * @throws ReaderBrokenCommunicationException if the communication with the reader has failed.
    * @throws CardBrokenCommunicationException if the communication with the card has failed.
@@ -103,8 +102,7 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
   final List<CardSelectionResponseApi> transmitCardSelectionRequests(
       List<CardSelector<?>> cardSelectors,
       List<CardSelectionRequestSpi> cardSelectionRequests,
-      MultiSelectionProcessing multiSelectionProcessing,
-      ChannelControl channelControl)
+      MultiSelectionProcessing multiSelectionProcessing)
       throws ReaderBrokenCommunicationException, CardBrokenCommunicationException {
 
     checkStatus();
@@ -125,7 +123,7 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
     try {
       cardSelectionResponses =
           processCardSelectionRequests(
-              cardSelectors, cardSelectionRequests, multiSelectionProcessing, channelControl);
+              cardSelectors, cardSelectionRequests, multiSelectionProcessing);
     } catch (UnexpectedStatusWordException e) {
       throw new CardBrokenCommunicationException(
           e.getCardResponse(),
@@ -188,7 +186,6 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
    * @param cardSelectionRequests A list of selection cases composed of one or more {@link
    *     CardSelectionRequestSpi}.
    * @param multiSelectionProcessing The multi selection policy.
-   * @param channelControl The channel control policy.
    * @return A not empty list containing at most as many responses as there are selection cases.
    * @throws ReaderBrokenCommunicationException if the communication with the reader has failed.
    * @throws CardBrokenCommunicationException if the communication with the card has failed.
@@ -199,8 +196,7 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
   abstract List<CardSelectionResponseApi> processCardSelectionRequests(
       List<CardSelector<?>> cardSelectors,
       List<CardSelectionRequestSpi> cardSelectionRequests,
-      MultiSelectionProcessing multiSelectionProcessing,
-      ChannelControl channelControl)
+      MultiSelectionProcessing multiSelectionProcessing)
       throws ReaderBrokenCommunicationException,
           CardBrokenCommunicationException,
           UnexpectedStatusWordException;
@@ -209,7 +205,6 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
    * Abstract method performing the actual transmission of the card request.
    *
    * @param cardRequest The card request.
-   * @param channelControl The channel control policy to apply.
    * @return A not null reference.
    * @throws ReaderBrokenCommunicationException if the communication with the reader has failed.
    * @throws CardBrokenCommunicationException if the communication with the card has failed.
@@ -217,8 +212,7 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
    *     request and the card returned an unexpected code.
    * @since 2.0.0
    */
-  abstract CardResponseApi processCardRequest(
-      CardRequestSpi cardRequest, ChannelControl channelControl)
+  abstract CardResponseApi processCardRequest(CardRequestSpi cardRequest)
       throws ReaderBrokenCommunicationException,
           CardBrokenCommunicationException,
           UnexpectedStatusWordException;
@@ -264,7 +258,7 @@ abstract class AbstractReaderAdapter implements CardReader, ProxyReaderApi {
     }
 
     try {
-      cardResponse = processCardRequest(cardRequest, channelControl);
+      cardResponse = processCardRequest(cardRequest);
     } finally {
       if (logger.isDebugEnabled()) {
         long timeStamp = System.nanoTime();

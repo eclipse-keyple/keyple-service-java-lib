@@ -31,14 +31,12 @@ public class ObservableReaderAsynchronousSpiMock
   CardInsertionWaiterAsynchronousApi cardInsertionWaiterAsynchronousApi;
   CardRemovalWaiterAsynchronousApi cardRemovalWaiterAsynchronousApi;
   boolean detectionStarted;
-  boolean physicalChannelOpen;
   AtomicBoolean cardPresent;
   String name;
 
   public ObservableReaderAsynchronousSpiMock(String name) {
     this.detectionStarted = false;
     this.name = name;
-    this.physicalChannelOpen = false;
     this.cardPresent = new AtomicBoolean(false);
   }
 
@@ -51,6 +49,9 @@ public class ObservableReaderAsynchronousSpiMock
   public void onStopDetection() {
     detectionStarted = false;
   }
+
+  @Override
+  public void deselectCard() {}
 
   @Override
   public String getName() {
@@ -74,22 +75,7 @@ public class ObservableReaderAsynchronousSpiMock
   }
 
   @Override
-  public void openPhysicalChannel() {
-    physicalChannelOpen = true;
-  }
-
-  @Override
-  public void closePhysicalChannel() {
-    physicalChannelOpen = false;
-  }
-
-  @Override
-  public boolean isPhysicalChannelOpen() {
-    return physicalChannelOpen;
-  }
-
-  @Override
-  public boolean checkCardPresence() {
+  public boolean isCardPresent() {
     return cardPresent.get();
   }
 

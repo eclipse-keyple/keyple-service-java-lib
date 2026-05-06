@@ -35,7 +35,6 @@ public class ObservableReaderBlockingSpiMock
         ControllableReaderSpiMock {
 
   boolean detectionStarted;
-  boolean physicalChannelOpen;
   AtomicBoolean cardPresent;
   AtomicInteger insertions;
   AtomicInteger removals;
@@ -46,7 +45,6 @@ public class ObservableReaderBlockingSpiMock
   public ObservableReaderBlockingSpiMock(String name, long waitInsertion, long waitRemoval) {
     this.detectionStarted = false;
     this.name = name;
-    this.physicalChannelOpen = false;
     this.cardPresent = new AtomicBoolean(false);
     this.insertions = new AtomicInteger(0);
     this.removals = new AtomicInteger(0);
@@ -70,6 +68,9 @@ public class ObservableReaderBlockingSpiMock
   }
 
   @Override
+  public void deselectCard() {}
+
+  @Override
   public String getName() {
     return name;
   }
@@ -91,22 +92,7 @@ public class ObservableReaderBlockingSpiMock
   }
 
   @Override
-  public void openPhysicalChannel() {
-    physicalChannelOpen = true;
-  }
-
-  @Override
-  public void closePhysicalChannel() {
-    physicalChannelOpen = false;
-  }
-
-  @Override
-  public boolean isPhysicalChannelOpen() {
-    return physicalChannelOpen;
-  }
-
-  @Override
-  public boolean checkCardPresence() {
+  public boolean isCardPresent() {
     return cardPresent.get();
   }
 

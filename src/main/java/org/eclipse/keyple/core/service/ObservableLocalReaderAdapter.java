@@ -15,9 +15,7 @@ import java.util.*;
 import org.eclipse.keyple.core.plugin.*;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterAsynchronousSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionAutonomousSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterAsynchronousSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.WaitForCardRemovalAutonomousSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keypop.card.CardBrokenCommunicationException;
 import org.eclipse.keypop.card.CardSelectionResponseApi;
@@ -31,17 +29,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation for {@link ObservableCardReader}, {@link WaitForCardInsertionAutonomousReaderApi}
- * and {@link WaitForCardRemovalAutonomousReaderApi}.
+ * Implementation for {@link ObservableCardReader}, {@link CardInsertionWaiterAsynchronousApi} and
+ * {@link CardRemovalWaiterAsynchronousApi}.
  *
  * @since 2.0.0
  */
 class ObservableLocalReaderAdapter extends LocalReaderAdapter
     implements ObservableCardReader,
         CardInsertionWaiterAsynchronousApi,
-        CardRemovalWaiterAsynchronousApi,
-        WaitForCardInsertionAutonomousReaderApi,
-        WaitForCardRemovalAutonomousReaderApi {
+        CardRemovalWaiterAsynchronousApi {
 
   private static final Logger logger = LoggerFactory.getLogger(ObservableLocalReaderAdapter.class);
 
@@ -123,13 +119,9 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
     this.observationManager = new ObservationManagerAdapter<>(pluginName, getName());
     if (observableReaderSpi instanceof CardInsertionWaiterAsynchronousSpi) {
       ((CardInsertionWaiterAsynchronousSpi) observableReaderSpi).setCallback(this);
-    } else if (observableReaderSpi instanceof WaitForCardInsertionAutonomousSpi) {
-      ((WaitForCardInsertionAutonomousSpi) observableReaderSpi).connect(this);
     }
     if (observableReaderSpi instanceof CardRemovalWaiterAsynchronousSpi) {
       ((CardRemovalWaiterAsynchronousSpi) observableReaderSpi).setCallback(this);
-    } else if (observableReaderSpi instanceof WaitForCardRemovalAutonomousSpi) {
-      ((WaitForCardRemovalAutonomousSpi) observableReaderSpi).connect(this);
     }
   }
 
@@ -252,8 +244,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
           transmitCardSelectionRequests(
               cardSelectionScenario.getCardSelectors(),
               cardSelectionScenario.getCardSelectionRequests(),
-              cardSelectionScenario.getMultiSelectionProcessing(),
-              cardSelectionScenario.getChannelControl());
+              cardSelectionScenario.getMultiSelectionProcessing());
 
       if (hasACardMatched(cardSelectionResponses)) {
         return new ReaderEventAdapter(
@@ -296,27 +287,12 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
               new ReaderCommunicationException(READER_MONITORING_ERROR, e));
 
     } catch (CardBrokenCommunicationException e) {
-      // The last transmission failed, close the logical and physical channels.
-      closeLogicalAndPhysicalChannelsSilently();
       // The card was removed or not read correctly, no exception raising or event notification,
       // just log.
       logger.warn(
           "[reader={}] Failed to process card selection scenario [reason={}]",
           getName(),
           e.getMessage());
-    }
-
-    // Here we close the physical channel in case it was opened for a card excluded by the selection
-    // scenario.
-    try {
-      observableReaderSpi.closePhysicalChannel();
-    } catch (ReaderIOException e) {
-      // Notify the reader communication failure with the exception handler.
-      getObservationExceptionHandler()
-          .onReaderObservationError(
-              getPluginName(),
-              getName(),
-              new ReaderCommunicationException(READER_MONITORING_ERROR, e));
     }
 
     // no event returned
@@ -345,14 +321,10 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * This method is invoked when a card is removed to notify the application of the {@link
    * CardReaderEvent.Type#CARD_REMOVED} event.
    *
-   * <p>It will also be invoked if {@link #isCardPresent()} is called and at least one of the
-   * physical or logical channels is still open.
-   *
    * @since 2.0.0
    */
   final void processCardRemoved() {
     // RL-DET-REMNOTIF.1
-    closeLogicalAndPhysicalChannelsSilently();
     if (isCardRemovedEventNotificationEnabled) {
       notifyObservers(
           new ReaderEventAdapter(
@@ -464,28 +436,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
         new ReaderEventAdapter(getPluginName(), getName(), CardReaderEvent.Type.UNAVAILABLE, null));
     clearObservers();
     super.unregister();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.0.0
-   */
-  @Override
-  public final boolean isCardPresent() {
-    checkStatus();
-    if (super.isCardPresent()) {
-      return true;
-    } else {
-      /*
-       * if the card is no longer present but one of the channels is still open, then the
-       * card removal sequence is initiated.
-       */
-      if (isLogicalChannelOpen() || observableReaderSpi.isPhysicalChannelOpen()) {
-        processCardRemoved();
-      }
-      return false;
-    }
   }
 
   /**

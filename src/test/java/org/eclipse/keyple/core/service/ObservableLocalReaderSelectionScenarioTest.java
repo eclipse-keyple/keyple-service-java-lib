@@ -149,10 +149,7 @@ public class ObservableLocalReaderSelectionScenarioTest {
     doThrow(new ReaderBrokenCommunicationException(null, true, "", new RuntimeException()))
         .when(readerSpy)
         .transmitCardSelectionRequests(
-            any(List.class),
-            any(List.class),
-            any(MultiSelectionProcessing.class),
-            any(ChannelControl.class));
+            any(List.class), any(List.class), any(MultiSelectionProcessing.class));
 
     readerSpy.scheduleCardSelectionScenario(
         new CardSelectionScenarioAdapter(
@@ -172,10 +169,7 @@ public class ObservableLocalReaderSelectionScenarioTest {
     doThrow(new CardBrokenCommunicationException(null, true, "", new RuntimeException()))
         .when(readerSpy)
         .transmitCardSelectionRequests(
-            any(List.class),
-            any(List.class),
-            any(MultiSelectionProcessing.class),
-            any(ChannelControl.class));
+            any(List.class), any(List.class), any(MultiSelectionProcessing.class));
 
     readerSpy.scheduleCardSelectionScenario(
         new CardSelectionScenarioAdapter(
@@ -205,10 +199,7 @@ public class ObservableLocalReaderSelectionScenarioTest {
     doReturn(cardSelectionResponse)
         .when(readerSpy)
         .transmitCardSelectionRequests(
-            any(List.class),
-            any(List.class),
-            any(MultiSelectionProcessing.class),
-            any(ChannelControl.class));
+            any(List.class), any(List.class), any(MultiSelectionProcessing.class));
 
     readerSpy.scheduleCardSelectionScenario(
         new CardSelectionScenarioAdapter(

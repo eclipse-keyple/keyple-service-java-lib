@@ -60,7 +60,7 @@ public class ReaderAdapterTestUtils {
   public static ReaderSpiMock getReaderSpi() throws ReaderIOException, CardIOException {
     ReaderSpiMock readerSpi = mock(ReaderSpiMock.class);
     when(readerSpi.getName()).thenReturn(READER_NAME);
-    when(readerSpi.checkCardPresence()).thenReturn(true);
+    when(readerSpi.isCardPresent()).thenReturn(true);
     when(readerSpi.getPowerOnData()).thenReturn(POWER_ON_DATA);
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(HexUtil.toByteArray("6D00"));
     when(readerSpi.isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
@@ -71,7 +71,7 @@ public class ReaderAdapterTestUtils {
   public static ReaderSpiMock getReaderSpiSpy() throws ReaderIOException, CardIOException {
     ReaderSpiMock readerSpi = Mockito.spy(ReaderSpiMock.class);
     when(readerSpi.getName()).thenReturn(READER_NAME);
-    when(readerSpi.checkCardPresence()).thenReturn(true);
+    when(readerSpi.isCardPresent()).thenReturn(true);
     when(readerSpi.getPowerOnData()).thenReturn(POWER_ON_DATA);
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(HexUtil.toByteArray("6D00"));
     when(readerSpi.isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
@@ -83,7 +83,7 @@ public class ReaderAdapterTestUtils {
       throws ReaderIOException, CardIOException {
     ObservableReaderSpiMock readerSpi = mock(ObservableReaderSpiMock.class);
     when(readerSpi.getName()).thenReturn(READER_NAME);
-    when(readerSpi.checkCardPresence()).thenReturn(true);
+    when(readerSpi.isCardPresent()).thenReturn(true);
     when(readerSpi.getPowerOnData()).thenReturn(POWER_ON_DATA);
     when(readerSpi.transmitApdu(any(byte[].class))).thenReturn(HexUtil.toByteArray("6D00"));
     when(readerSpi.isProtocolSupported(CARD_PROTOCOL)).thenReturn(true);
