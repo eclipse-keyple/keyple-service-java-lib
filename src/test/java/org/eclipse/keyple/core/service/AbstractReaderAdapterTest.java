@@ -82,7 +82,7 @@ public class AbstractReaderAdapterTest {
     readerAdapter = Mockito.spy(readerAdapter);
     readerAdapter.register();
     readerAdapter.transmitCardRequest(cardRequestSpi, ChannelControl.KEEP_OPEN);
-    verify(readerAdapter, times(1)).processCardRequest(cardRequestSpi, ChannelControl.KEEP_OPEN);
+    verify(readerAdapter, times(1)).processCardRequest(cardRequestSpi);
   }
 
   private static class DefaultAbstractReaderAdapter extends AbstractReaderAdapter {
@@ -96,8 +96,7 @@ public class AbstractReaderAdapterTest {
     List<CardSelectionResponseApi> processCardSelectionRequests(
         List<CardSelector<?>> cardSelectors,
         List<CardSelectionRequestSpi> cardSelectionRequests,
-        MultiSelectionProcessing multiSelectionProcessing,
-        ChannelControl channelControl)
+        MultiSelectionProcessing multiSelectionProcessing)
         throws ReaderBrokenCommunicationException,
             CardBrokenCommunicationException,
             UnexpectedStatusWordException {
@@ -105,7 +104,7 @@ public class AbstractReaderAdapterTest {
     }
 
     @Override
-    CardResponseApi processCardRequest(CardRequestSpi cardRequest, ChannelControl channelControl)
+    CardResponseApi processCardRequest(CardRequestSpi cardRequest)
         throws ReaderBrokenCommunicationException,
             CardBrokenCommunicationException,
             UnexpectedStatusWordException {

@@ -58,7 +58,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
 
   private final ReaderSpi readerSpi;
   private long before;
-  private boolean isLogicalChannelOpen;
+  private boolean hasSelectionMatched;
   private boolean useDefaultProtocol;
   private String currentLogicalProtocolName;
   private String currentPhysicalProtocolName;
@@ -92,37 +92,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   }
 
   /**
-   * Gets the logical channel's opening state.
-   *
-   * @return True if the channel is open, false if not.
-   * @since 2.0.0
-   */
-  final boolean isLogicalChannelOpen() {
-    return isLogicalChannelOpen;
-  }
-
-  /**
-   * Close both logical and physical channels
-   *
-   * <p>This method doesn't raise any exception.
-   *
-   * @since 2.0.0
-   */
-  final void closeLogicalAndPhysicalChannelsSilently() {
-
-    closeLogicalChannel();
-    // Closes the physical channel and resets the current protocol info.
-    currentLogicalProtocolName = null;
-    useDefaultProtocol = false;
-    try {
-      readerSpi.closePhysicalChannel();
-    } catch (ReaderIOException e) {
-      logger.error(
-          "[reader={}] Failed to close physical channel [reason={}]", getName(), e.getMessage(), e);
-    }
-  }
-
-  /**
    * {@inheritDoc}
    *
    * <p>Invoke {@link ReaderSpi#onUnregister()} on the associated SPI.
@@ -131,12 +100,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    */
   @Override
   void unregister() {
-    try {
-      readerSpi.closePhysicalChannel();
-    } catch (Exception e) {
-      logger.warn(
-          "[reader={}] Failed to close physical channel [reason={}]", getName(), e.getMessage());
-    }
     try {
       readerSpi.onUnregister();
     } catch (Exception e) {
@@ -157,27 +120,14 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   final List<CardSelectionResponseApi> processCardSelectionRequests(
       List<CardSelector<?>> cardSelectors,
       List<CardSelectionRequestSpi> cardSelectionRequests,
-      MultiSelectionProcessing multiSelectionProcessing,
-      ChannelControl channelControl)
+      MultiSelectionProcessing multiSelectionProcessing)
       throws ReaderBrokenCommunicationException,
           CardBrokenCommunicationException,
           UnexpectedStatusWordException {
 
     checkStatus();
 
-    /* Open the physical channel, determine the current protocol */
-    if (!readerSpi.isPhysicalChannelOpen()) {
-      try {
-        readerSpi.openPhysicalChannel();
-        computeCurrentProtocol();
-      } catch (ReaderIOException e) {
-        throw new ReaderBrokenCommunicationException(
-            null, false, "Failed to communicate with reader. Unable to open physical channel", e);
-      } catch (CardIOException e) {
-        throw new CardBrokenCommunicationException(
-            null, false, "Failed to communicate with card. Unable to open physical channel", e);
-      }
-    }
+    computeCurrentProtocol();
 
     List<CardSelectionResponseApi> cardSelectionResponses = new ArrayList<>();
 
@@ -187,23 +137,11 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     for (CardSelectionRequestSpi cardSelectionRequest : cardSelectionRequests) {
       /* process the CardRequest and append the CardResponse list */
       CardSelectionResponseApi cardSelectionResponse =
-          processCardSelectionRequest(
-              cardSelectorIterator.next(), cardSelectionRequest, channelControl);
+          processCardSelectionRequest(cardSelectorIterator.next(), cardSelectionRequest);
       cardSelectionResponses.add(cardSelectionResponse);
-      if (multiSelectionProcessing == MultiSelectionProcessing.PROCESS_ALL) {
-        /* multi CardRequest case: just close the logical channel and go on with the next selection. */
-        closeLogicalChannel();
-      } else {
-        if (isLogicalChannelOpen) {
-          /* the logical channel being open, we stop here */
-          break; // exit for loop
-        }
+      if (hasSelectionMatched && multiSelectionProcessing == MultiSelectionProcessing.FIRST_MATCH) {
+        break;
       }
-    }
-
-    /* close the channel if requested */
-    if (channelControl == ChannelControl.CLOSE_AFTER) {
-      releaseChannel();
     }
 
     return cardSelectionResponses;
@@ -215,8 +153,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0.0
    */
   @Override
-  final CardResponseApi processCardRequest(
-      CardRequestSpi cardRequest, ChannelControl channelControl)
+  final CardResponseApi processCardRequest(CardRequestSpi cardRequest)
       throws CardBrokenCommunicationException,
           ReaderBrokenCommunicationException,
           UnexpectedStatusWordException {
@@ -231,23 +168,18 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
         apduResponses.add(apduResponse);
         if (cardRequest.stopOnUnsuccessfulStatusWord()
             && !apduRequest.getSuccessfulStatusWords().contains(apduResponse.getStatusWord())) {
-          if (channelControl == ChannelControl.CLOSE_AFTER) {
-            closeLogicalAndPhysicalChannelsSilently();
-          }
           throw new UnexpectedStatusWordException(
               new CardResponseAdapter(apduResponses, false),
               cardRequest.getApduRequests().size() == apduResponses.size(),
               "Unexpected status word");
         }
       } catch (ReaderIOException e) {
-        closeLogicalAndPhysicalChannelsSilently();
         throw new ReaderBrokenCommunicationException(
             new CardResponseAdapter(apduResponses, false),
             false,
             "Failed to communicate with reader. Unable to transmit card request",
             e);
       } catch (CardIOException e) {
-        closeLogicalAndPhysicalChannelsSilently();
         throw new CardBrokenCommunicationException(
             new CardResponseAdapter(apduResponses, false),
             false,
@@ -256,12 +188,7 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
       }
     }
 
-    /* close the channel if requested */
-    if (channelControl == ChannelControl.CLOSE_AFTER) {
-      releaseChannel();
-    }
-
-    return new CardResponseAdapter(apduResponses, isLogicalChannelOpen);
+    return new CardResponseAdapter(apduResponses, true);
   }
 
   /**
@@ -280,12 +207,12 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0.0
    */
   @Override
-  public boolean isCardPresent() {
+  public final boolean isCardPresent() {
     // RL-DET-PCRQ.1
     // RL-DET-PCAPDU.1
     checkStatus();
     try {
-      return readerSpi.checkCardPresence();
+      return readerSpi.isCardPresent();
     } catch (ReaderIOException e) {
       throw new ReaderCommunicationException(
           "Failed to communicate with reader. Unable to check card presence", e);
@@ -343,15 +270,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
   @Override
   public final void releaseChannel() throws ReaderBrokenCommunicationException {
     checkStatus();
-    try {
-      readerSpi.closePhysicalChannel();
-    } catch (ReaderIOException e) {
-      throw new ReaderBrokenCommunicationException(
-          null,
-          false,
-          "Failed to communicate with reader. Unable to release the physical channel",
-          e);
-    }
   }
 
   /**
@@ -506,7 +424,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    * Attempts to select the card and executes the optional requests if any.
    *
    * @param cardSelectionRequest The {@link CardSelectionRequestSpi} to be processed.
-   * @param channelControl The channel control.
    * @return A not null reference.
    * @throws ReaderBrokenCommunicationException If the communication with the reader has failed.
    * @throws CardBrokenCommunicationException If the communication with the card has failed.
@@ -514,14 +431,12 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
    *     request and the card returned an unexpected code.
    */
   private CardSelectionResponseApi processCardSelectionRequest(
-      CardSelector<?> cardSelector,
-      CardSelectionRequestSpi cardSelectionRequest,
-      ChannelControl channelControl)
+      CardSelector<?> cardSelector, CardSelectionRequestSpi cardSelectionRequest)
       throws ReaderBrokenCommunicationException,
           CardBrokenCommunicationException,
           UnexpectedStatusWordException {
 
-    isLogicalChannelOpen = false;
+    hasSelectionMatched = false;
 
     SelectionStatus selectionStatus = processSelection(cardSelector, cardSelectionRequest);
     if (!selectionStatus.hasMatched) {
@@ -533,13 +448,12 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
           new CardResponseAdapter(new ArrayList<>(), false));
     }
 
-    isLogicalChannelOpen = true;
+    hasSelectionMatched = true;
 
     CardResponseAdapter cardResponse;
     if (cardSelectionRequest.getCardRequest() != null) {
       cardResponse =
-          (CardResponseAdapter)
-              processCardRequest(cardSelectionRequest.getCardRequest(), channelControl);
+          (CardResponseAdapter) processCardRequest(cardSelectionRequest.getCardRequest());
     } else {
       cardResponse = null;
     }
@@ -778,21 +692,6 @@ class LocalReaderAdapter extends AbstractReaderAdapter {
     }
 
     return p2;
-  }
-
-  /** Close the logical channel. */
-  private void closeLogicalChannel() {
-    if (logger.isTraceEnabled()) {
-      logger.trace("[reader={}] Closing logical channel", getName());
-    }
-    if (readerSpi instanceof AutonomousSelectionReaderSpi) {
-      /* AutonomousSelectionReader have an explicit method for closing channels */
-      ((AutonomousSelectionReaderSpi) readerSpi).closeLogicalChannel();
-    }
-    isLogicalChannelOpen = false;
-    if (logger.isTraceEnabled()) {
-      logger.trace("[reader={}] Logical channel closed", getName());
-    }
   }
 
   /**

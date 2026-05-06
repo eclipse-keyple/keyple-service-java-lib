@@ -100,11 +100,12 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
   final List<CardSelectionResponseApi> processCardSelectionRequests(
       List<CardSelector<?>> cardSelectors,
       List<CardSelectionRequestSpi> cardSelectionRequests,
-      MultiSelectionProcessing multiSelectionProcessing,
-      ChannelControl channelControl)
+      MultiSelectionProcessing multiSelectionProcessing)
       throws ReaderBrokenCommunicationException, CardBrokenCommunicationException {
 
     checkStatus();
+
+    ChannelControl channelControl = ChannelControl.KEEP_OPEN;
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();
@@ -235,11 +236,12 @@ class RemoteReaderAdapter extends AbstractReaderAdapter {
    * @since 2.0.0
    */
   @Override
-  final CardResponseApi processCardRequest(
-      CardRequestSpi cardRequest, ChannelControl channelControl)
+  final CardResponseApi processCardRequest(CardRequestSpi cardRequest)
       throws CardBrokenCommunicationException, ReaderBrokenCommunicationException {
 
     checkStatus();
+
+    ChannelControl channelControl = ChannelControl.KEEP_OPEN;
 
     // Build the input JSON data.
     JsonObject input = new JsonObject();

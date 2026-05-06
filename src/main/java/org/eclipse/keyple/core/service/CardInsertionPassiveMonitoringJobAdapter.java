@@ -15,14 +15,12 @@ import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.TaskCanceledException;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterBlockingSpi;
-import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.WaitForCardInsertionBlockingSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Detect the card insertion thanks to the method {@link
- * CardInsertionWaiterBlockingSpi#waitForCardInsertion()} or {@link
- * WaitForCardInsertionBlockingSpi#waitForCardInsertion()}.
+ * CardInsertionWaiterBlockingSpi#waitForCardInsertion()}}.
  *
  * <p>This method is invoked in another thread.
  *
@@ -85,8 +83,6 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
           }
           if (readerSpi instanceof CardInsertionWaiterBlockingSpi) {
             ((CardInsertionWaiterBlockingSpi) readerSpi).waitForCardInsertion();
-          } else if (readerSpi instanceof WaitForCardInsertionBlockingSpi) {
-            ((WaitForCardInsertionBlockingSpi) readerSpi).waitForCardInsertion();
           }
           monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
         } catch (ReaderIOException e) {
@@ -124,8 +120,6 @@ final class CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJ
     }
     if (readerSpi instanceof CardInsertionWaiterBlockingSpi) {
       ((CardInsertionWaiterBlockingSpi) readerSpi).stopWaitForCardInsertion();
-    } else if (readerSpi instanceof WaitForCardInsertionBlockingSpi) {
-      ((WaitForCardInsertionBlockingSpi) readerSpi).stopWaitForCardInsertion();
     }
     if (logger.isTraceEnabled()) {
       logger.trace(
