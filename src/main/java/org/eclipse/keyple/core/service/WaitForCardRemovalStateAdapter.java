@@ -79,9 +79,7 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
      */
     switch (event) {
       case CARD_REMOVED:
-        // the card has been removed, we close all channels and return to
-        // the currentState of waiting
-        // for insertion
+        // the card has been removed, we return to the currentState of waiting for insertion.
         // We notify the application of the CARD_REMOVED event.
         getReader().processCardRemoved();
         if (getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
