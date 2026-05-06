@@ -75,13 +75,10 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
           getReader().getName(),
           event);
     }
-    /*
-     * Process InternalEvent
-     */
     switch (event) {
       case CARD_INSERTED:
         // process default selection if any, return an event, can be null
-        CardReaderEvent cardEvent = this.getReader().processCardInserted();
+        CardReaderEvent cardEvent = getReader().processCardInserted();
         if (cardEvent != null) {
           // switch internal state
           switchState(MonitoringState.WAIT_FOR_CARD_PROCESSING);

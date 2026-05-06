@@ -75,7 +75,7 @@ final class AutonomousObservableLocalPluginAdapter extends AbstractObservableLoc
     Set<String> notifyReaders = new HashSet<>();
 
     for (String readerName : readerNames) {
-      CardReader reader = this.getReader(readerName);
+      CardReader reader = getReader(readerName);
       if (reader == null) {
         logger.warn(
             "[plugin={}] Unable to remove unknown reader [reader={}]", getName(), readerName);
