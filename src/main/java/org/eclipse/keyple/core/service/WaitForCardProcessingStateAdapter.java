@@ -82,17 +82,14 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
         if (this.getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
           switchState(MonitoringState.WAIT_FOR_CARD_REMOVAL);
         } else {
-          // We close the channels now and notify the application of
-          // the CARD_REMOVED event.
+          // We notify the application of the CARD_REMOVED event.
           this.getReader().processCardRemoved();
           switchState(MonitoringState.WAIT_FOR_START_DETECTION);
         }
         break;
 
       case CARD_REMOVED:
-        // the card has been removed, we close all channels and return to
-        // the currentState of waiting
-        // for insertion
+        // the card has been removed, we return to the currentState of waiting for insertion.
         // We notify the application of the CARD_REMOVED event.
 
         // FIXME bug if mode REPEATING and if user execute the stopCardDetection in the same thread

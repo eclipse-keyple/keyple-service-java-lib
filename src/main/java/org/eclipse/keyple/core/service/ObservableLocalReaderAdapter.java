@@ -516,7 +516,13 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @since 2.0.0
    */
   public final void finalizeCardProcessing() {
-    logger.info("[reader={}] Starting card removal sequence", getName());
+    logger.info("[reader={}] End card processing", getName());
+    try {
+      observableReaderSpi.deselectCard();
+    } catch (ReaderIOException e) {
+      throw new ReaderCommunicationException(
+          "Failed to communicate with reader. Unable to deselect card", e);
+    }
     stateService.onEvent(InternalEvent.CARD_PROCESSED);
   }
 
