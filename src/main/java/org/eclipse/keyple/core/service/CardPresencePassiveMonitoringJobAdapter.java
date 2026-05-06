@@ -14,6 +14,7 @@ package org.eclipse.keyple.core.service;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.TaskCanceledException;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterBlockingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.CardPresenceMonitorBlockingSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterBlockingSpi;
 import org.slf4j.Logger;
@@ -42,14 +43,16 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0.0
  */
-final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+final class CardPresencePassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
 
   private static final Logger logger =
-      LoggerFactory.getLogger(CardRemovalPassiveMonitoringJobAdapter.class);
+      LoggerFactory.getLogger(CardPresencePassiveMonitoringJobAdapter.class);
 
-  private static final String JOB_ID = "REMOVAL_PASSIVE";
+  private static final String JOB_ID = "PASSIVE_MONITOR";
 
   private final ObservableReaderSpi readerSpi;
+
+  private final AbstractObservableStateAdapter.MonitoringState state;
 
   /**
    * Constructor.
@@ -57,9 +60,11 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
    * @param reader reference to the reader
    * @since 2.0.0
    */
-  public CardRemovalPassiveMonitoringJobAdapter(ObservableLocalReaderAdapter reader) {
+  public CardPresencePassiveMonitoringJobAdapter(
+      ObservableLocalReaderAdapter reader, AbstractObservableStateAdapter.MonitoringState state) {
     super(reader);
     readerSpi = reader.getObservableReaderSpi();
+    this.state = state;
   }
 
   /**
@@ -81,35 +86,52 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
        */
       @Override
       public void run() {
-        boolean isTaskCanceled = false;
         try {
-          if (readerSpi instanceof CardRemovalWaiterBlockingSpi) {
-            ((CardRemovalWaiterBlockingSpi) readerSpi).waitForCardRemoval();
-          } else if (readerSpi instanceof CardPresenceMonitorBlockingSpi) {
-            ((CardPresenceMonitorBlockingSpi) readerSpi).monitorCardPresenceDuringProcessing();
+          if (logger.isTraceEnabled()) {
+            logger.trace(
+                "[fsmJob={}, reader={}] Monitoring job started", JOB_ID, getReader().getName());
           }
-        } catch (ReaderIOException e) {
-          // just warn as it can be a disconnection of the reader.
-          logger.warn(
-              "[fsmJob={}, reader={}] Failed to process card removal event [reason={}]",
-              JOB_ID,
-              getReader().getName(),
-              e.getMessage());
+          switch (state) {
+            case WAIT_FOR_CARD_INSERTION:
+              ((CardInsertionWaiterBlockingSpi) readerSpi).waitForCardInsertion();
+              if (logger.isTraceEnabled()) {
+                logger.trace("[fsmJob={}, reader={}] Card detected", JOB_ID, getReader().getName());
+              }
+              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
+              return;
+            case WAIT_FOR_CARD_PROCESSING:
+              ((CardPresenceMonitorBlockingSpi) readerSpi).monitorCardPresenceDuringProcessing();
+              if (logger.isTraceEnabled()) {
+                logger.trace("[fsmJob={}, reader={}] Card removed", JOB_ID, getReader().getName());
+              }
+              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
+              return;
+            case WAIT_FOR_CARD_REMOVAL:
+              ((CardRemovalWaiterBlockingSpi) readerSpi).waitForCardRemoval();
+              if (logger.isTraceEnabled()) {
+                logger.trace("[fsmJob={}, reader={}] Card removed", JOB_ID, getReader().getName());
+              }
+              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
+              return;
+            default:
+          }
         } catch (TaskCanceledException e) {
-          isTaskCanceled = true;
+          if (logger.isTraceEnabled()) {
+            logger.trace(
+                "[fsmJob={}, reader={}] Monitoring job stopped [reason={}]",
+                JOB_ID,
+                getReader().getName(),
+                e.getMessage());
+          }
+        } catch (ReaderIOException | RuntimeException e) {
           logger.warn(
-              "[fsmJob={}, reader={}] Monitoring job process cancelled [reason={}]",
+              "[fsmJob={}, reader={}] Monitoring job failure [reason={}]",
               JOB_ID,
               getReader().getName(),
               e.getMessage());
-        } catch (RuntimeException e) {
           getReader()
               .getObservationExceptionHandler()
               .onReaderObservationError(getReader().getPluginName(), getReader().getName(), e);
-        } finally {
-          if (!isTaskCanceled) {
-            monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
-          }
         }
       }
     };
@@ -123,17 +145,19 @@ final class CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJob
   @Override
   void stop() {
     if (logger.isTraceEnabled()) {
-      logger.trace(
-          "[fsmJob={}, reader={}] Stopping monitoring job process", JOB_ID, getReader().getName());
+      logger.trace("[fsmJob={}, reader={}] Stopping monitoring job", JOB_ID, getReader().getName());
     }
-    if (readerSpi instanceof CardRemovalWaiterBlockingSpi) {
-      ((CardRemovalWaiterBlockingSpi) readerSpi).stopWaitForCardRemoval();
-    } else if (readerSpi instanceof CardPresenceMonitorBlockingSpi) {
-      ((CardPresenceMonitorBlockingSpi) readerSpi).stopCardPresenceMonitoringDuringProcessing();
-    }
-    if (logger.isTraceEnabled()) {
-      logger.trace(
-          "[fsmJob={}, reader={}] Monitoring job process stopped", JOB_ID, getReader().getName());
+    switch (state) {
+      case WAIT_FOR_CARD_INSERTION:
+        ((CardInsertionWaiterBlockingSpi) readerSpi).stopWaitForCardInsertion();
+        break;
+      case WAIT_FOR_CARD_PROCESSING:
+        ((CardPresenceMonitorBlockingSpi) readerSpi).stopCardPresenceMonitoringDuringProcessing();
+        break;
+      case WAIT_FOR_CARD_REMOVAL:
+        ((CardRemovalWaiterBlockingSpi) readerSpi).stopWaitForCardRemoval();
+        break;
+      default:
     }
   }
 }

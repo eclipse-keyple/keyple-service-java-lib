@@ -72,9 +72,6 @@ final class WaitForStartDetectStateAdapter extends AbstractObservableStateAdapte
           getReader().getName(),
           event);
     }
-    /*
-     * Process InternalEvent
-     */
     switch (event) {
       case START_DETECT:
         switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);

@@ -12,6 +12,8 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.eclipse.keyple.core.plugin.ReaderIOException;
+import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keypop.reader.CardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,32 +28,34 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0.0
  */
-final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+final class CardPresenceActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
 
   private static final Logger logger =
-      LoggerFactory.getLogger(CardInsertionActiveMonitoringJobAdapter.class);
+      LoggerFactory.getLogger(CardPresenceActiveMonitoringJobAdapter.class);
 
-  private static final String JOB_ID = "INSERTION_ACTIVE";
+  private static final String JOB_ID = "ACTIVE_MONITOR";
 
   private final long sleepDurationMillis;
-  private final boolean monitorInsertion;
-  private final CardReader reader;
+  private final AbstractObservableStateAdapter.MonitoringState state;
   private final AtomicBoolean loop = new AtomicBoolean();
+  private final ObservableReaderSpi readerSpi;
 
   /**
-   * Build a monitoring job to detect the card insertion
+   * Build a monitoring job to detect a card insertion or a card removal.
    *
    * @param reader reader that will be polled with the method isCardPresent()
    * @param sleepDurationMillis time interval between two presence polls.
-   * @param monitorInsertion if true, polls for CARD_INSERTED, else CARD_REMOVED
+   * @param state the associated monitoring state
    * @since 2.0.0
    */
-  public CardInsertionActiveMonitoringJobAdapter(
-      ObservableLocalReaderAdapter reader, long sleepDurationMillis, boolean monitorInsertion) {
+  public CardPresenceActiveMonitoringJobAdapter(
+      ObservableLocalReaderAdapter reader,
+      long sleepDurationMillis,
+      AbstractObservableStateAdapter.MonitoringState state) {
     super(reader);
     this.sleepDurationMillis = sleepDurationMillis;
-    this.reader = reader;
-    this.monitorInsertion = monitorInsertion;
+    readerSpi = reader.getObservableReaderSpi();
+    this.state = state;
   }
 
   /**
@@ -65,40 +69,40 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
     return new Runnable() {
 
       /**
-       * Monitoring loop
+       * Executes the monitoring loop for the card reader.
        *
-       * <p>Polls for the presence of a card and loops until no card responds. <br>
-       * Triggers a CARD_INSERTED event and exits as soon as a communication with a card is
-       * established.
+       * <p>The method continuously polls the card reader to detect card insertion or removal
+       * events. If a card is detected or removed based on the current monitoring state, the
+       * respective event is triggered, and the monitoring loop exits.
        *
-       * <p>Any exceptions are notified to the application using the exception handler.
+       * <p>Exceptions: - Handles {@link ReaderIOException} and {@link RuntimeException}, notifying
+       * the application through the configured exception handler.
        */
       @Override
       public void run() {
         try {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, reader={}] Starting monitoring job process [mode=Polling using 'isCardPresent()']",
-                JOB_ID,
-                reader.getName());
+                "[fsmJob={}, reader={}] Monitoring job started", JOB_ID, getReader().getName());
           }
           // re-init loop value to true
           loop.set(true);
           while (loop.get()) {
             // polls for CARD_INSERTED
-            if (monitorInsertion && reader.isCardPresent()) {
+            if (state == AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION
+                && readerSpi.isCardPresent()) {
               if (logger.isTraceEnabled()) {
-                logger.trace("[fsmJob={}, reader={}] Card present", JOB_ID, reader.getName());
+                logger.trace("[fsmJob={}, reader={}] Card detected", JOB_ID, getReader().getName());
               }
               monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
               return;
             }
             // polls for CARD_REMOVED
-            if (!monitorInsertion && !reader.isCardPresent()) {
+            if (state == AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_REMOVAL
+                && !readerSpi.isCardPresent()) {
               if (logger.isTraceEnabled()) {
-                logger.trace("[fsmJob={}, reader={}] Card not present", JOB_ID, reader.getName());
+                logger.trace("[fsmJob={}, reader={}] Card removed", JOB_ID, getReader().getName());
               }
-              loop.set(false);
               monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
               return;
             }
@@ -113,15 +117,17 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
           }
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, reader={}] Monitoring job polling process stopped",
-                JOB_ID,
-                reader.getName());
+                "[fsmJob={}, reader={}] Monitoring job stopped", JOB_ID, getReader().getName());
           }
-        } catch (RuntimeException e) {
-          ((ObservableLocalReaderAdapter) reader)
+        } catch (ReaderIOException | RuntimeException e) {
+          logger.warn(
+              "[fsmJob={}, reader={}] Monitoring job failure [reason={}]",
+              JOB_ID,
+              getReader().getName(),
+              e.getMessage());
+          getReader()
               .getObservationExceptionHandler()
-              .onReaderObservationError(
-                  ((ObservableLocalReaderAdapter) reader).getPluginName(), reader.getName(), e);
+              .onReaderObservationError(getReader().getPluginName(), getReader().getName(), e);
         }
       }
     };
@@ -134,6 +140,9 @@ final class CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJo
    */
   @Override
   void stop() {
+    if (logger.isTraceEnabled()) {
+      logger.trace("[fsmJob={}, reader={}] Stopping monitoring job", JOB_ID, getReader().getName());
+    }
     loop.set(false);
   }
 }
