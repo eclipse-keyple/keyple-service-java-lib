@@ -83,7 +83,10 @@ final class CardPresenceActiveMonitoringJobAdapter extends AbstractMonitoringJob
         try {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, reader={}] Monitoring job started", JOB_ID, getReader().getName());
+                "[fsmJob={}, reader={}] Monitoring job started [state={}]",
+                JOB_ID,
+                getReader().getName(),
+                state);
           }
           // re-init loop value to true
           loop.set(true);
@@ -141,7 +144,11 @@ final class CardPresenceActiveMonitoringJobAdapter extends AbstractMonitoringJob
   @Override
   void stop() {
     if (logger.isTraceEnabled()) {
-      logger.trace("[fsmJob={}, reader={}] Stopping monitoring job", JOB_ID, getReader().getName());
+      logger.trace(
+          "[fsmJob={}, reader={}] Stopping monitoring job [state={}]",
+          JOB_ID,
+          getReader().getName(),
+          state);
     }
     loop.set(false);
   }

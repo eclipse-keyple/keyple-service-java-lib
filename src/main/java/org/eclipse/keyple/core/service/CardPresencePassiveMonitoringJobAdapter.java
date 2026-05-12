@@ -89,7 +89,10 @@ final class CardPresencePassiveMonitoringJobAdapter extends AbstractMonitoringJo
         try {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, reader={}] Monitoring job started", JOB_ID, getReader().getName());
+                "[fsmJob={}, reader={}] Monitoring job started [state={}]",
+                JOB_ID,
+                getReader().getName(),
+                state);
           }
           switch (state) {
             case WAIT_FOR_CARD_INSERTION:
@@ -145,7 +148,11 @@ final class CardPresencePassiveMonitoringJobAdapter extends AbstractMonitoringJo
   @Override
   void stop() {
     if (logger.isTraceEnabled()) {
-      logger.trace("[fsmJob={}, reader={}] Stopping monitoring job", JOB_ID, getReader().getName());
+      logger.trace(
+          "[fsmJob={}, reader={}] Monitoring job stop requested [state={}]",
+          JOB_ID,
+          getReader().getName(),
+          state);
     }
     switch (state) {
       case WAIT_FOR_CARD_INSERTION:
