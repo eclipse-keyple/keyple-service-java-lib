@@ -52,18 +52,18 @@ final class FsmStateWaitForCardProcessing extends FsmState {
   /**
    * Creates an instance without a background monitoring job.
    *
-   * @param fsmService The FSM service that owns this state; must not be null.
+   * @param service The FSM service that owns this state; must not be null.
    * @param reader The observable local reader adapter; must not be null.
    * @since 2.0.0
    */
-  FsmStateWaitForCardProcessing(FsmService fsmService, ObservableLocalReaderAdapter reader) {
-    this(fsmService, reader, null, null);
+  FsmStateWaitForCardProcessing(FsmService service, ObservableLocalReaderAdapter reader) {
+    this(service, reader, null, null);
   }
 
   /**
    * Creates an instance with an optional background monitoring job.
    *
-   * @param fsmService The FSM service that owns this state; must not be null.
+   * @param service The FSM service that owns this state; must not be null.
    * @param reader The observable local reader adapter; must not be null.
    * @param monitoringJob The background monitoring job, or {@code null} if none is required.
    * @param executorService The executor service used to submit the job, or {@code null} when {@code
@@ -71,11 +71,11 @@ final class FsmStateWaitForCardProcessing extends FsmState {
    * @since 2.0.0
    */
   FsmStateWaitForCardProcessing(
-      FsmService fsmService,
+      FsmService service,
       ObservableLocalReaderAdapter reader,
       FsmJob monitoringJob,
       ExecutorService executorService) {
-    super(STATE_ID, fsmService, reader, monitoringJob, executorService);
+    super(STATE_ID, service, reader, monitoringJob, executorService);
   }
 
   /**
@@ -87,9 +87,9 @@ final class FsmStateWaitForCardProcessing extends FsmState {
   void onTrigger(FsmService.Trigger trigger) {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[fsmState={}, fsmService={}] Processing internal event [type={}]",
-          getStateId(),
+          "[fsm={}] Processing trigger [state={}, trigger={}]",
           getServiceId(),
+          getStateId(),
           trigger);
     }
     switch (trigger) {
@@ -116,17 +116,9 @@ final class FsmStateWaitForCardProcessing extends FsmState {
 
       default:
         if (logger.isTraceEnabled()) {
-          logger.trace(
-              "[fsmState={}, fsmService={}] Internal event ignored", getStateId(), getServiceId());
+          logger.trace("[fsm={}] Trigger ignored [state={}]", getServiceId(), getStateId());
         }
         break;
-    }
-    if (logger.isTraceEnabled()) {
-      logger.trace(
-          "[fsmState={}, fsmService={}] Internal event processed [type={}]",
-          getStateId(),
-          getServiceId(),
-          trigger);
     }
   }
 }

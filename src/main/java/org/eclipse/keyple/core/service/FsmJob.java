@@ -31,12 +31,12 @@ interface FsmJob {
    * <p>This method is called once, during the construction of the owning {@link FsmState}, before
    * the job is submitted for execution.
    *
-   * @param fsmState The FSM state that owns this job; must not be null.
+   * @param state The FSM state that owns this job; must not be null.
    * @param readerSpi The observable reader SPI used to interact with the hardware; must not be
    *     null.
    * @since 4.0.0
    */
-  void initialize(FsmState fsmState, ObservableReaderSpi readerSpi);
+  void initialize(FsmState state, ObservableReaderSpi readerSpi);
 
   /**
    * Returns the {@link Runnable} task that performs the monitoring work.

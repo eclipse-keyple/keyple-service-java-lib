@@ -11,6 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import static org.eclipse.keyple.core.service.FsmState.StateId.*;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
@@ -62,9 +64,9 @@ final class FsmJobActive implements FsmJob {
    * @since 4.0.0
    */
   @Override
-  public void initialize(FsmState fsmState, ObservableReaderSpi readerSpi) {
-    this.state = fsmState;
-    this.stateId = fsmState.getStateId();
+  public void initialize(FsmState state, ObservableReaderSpi readerSpi) {
+    this.state = state;
+    this.stateId = state.getStateId();
     this.readerSpi = readerSpi;
   }
 
@@ -99,28 +101,26 @@ final class FsmJobActive implements FsmJob {
         try {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, fsmService={}] Monitoring job started [stateId={}]",
-                JOB_ID,
+                "[fsm={}] Monitoring job started [job={}, state={}]",
                 state.getServiceId(),
+                JOB_ID,
                 stateId);
           }
           // re-init running flag to true
           running.set(true);
           while (running.get()) {
             // polls for CARD_INSERTED
-            if (stateId == FsmState.StateId.WAIT_FOR_CARD_INSERTION && readerSpi.isCardPresent()) {
+            if (stateId == WAIT_FOR_CARD_INSERTION && readerSpi.isCardPresent()) {
               if (logger.isTraceEnabled()) {
-                logger.trace(
-                    "[fsmJob={}, fsmService={}] Card detected", JOB_ID, state.getServiceId());
+                logger.trace("[fsm={}] Card detected [job={}]", state.getServiceId(), JOB_ID);
               }
               state.fire(FsmService.Trigger.CARD_INSERTED);
               return;
             }
             // polls for CARD_REMOVED
-            if (stateId == FsmState.StateId.WAIT_FOR_CARD_REMOVAL && !readerSpi.isCardPresent()) {
+            if (stateId == WAIT_FOR_CARD_REMOVAL && !readerSpi.isCardPresent()) {
               if (logger.isTraceEnabled()) {
-                logger.trace(
-                    "[fsmJob={}, fsmService={}] Card removed", JOB_ID, state.getServiceId());
+                logger.trace("[fsm={}] Card removed [job={}]", state.getServiceId(), JOB_ID);
               }
               state.fire(FsmService.Trigger.CARD_REMOVED);
               return;
@@ -135,15 +135,14 @@ final class FsmJobActive implements FsmJob {
             }
           }
           if (logger.isTraceEnabled()) {
-            logger.trace(
-                "[fsmJob={}, fsmService={}] Monitoring job stopped", JOB_ID, state.getServiceId());
+            logger.trace("[fsm={}] Monitoring job stopped [job={}]", state.getServiceId(), JOB_ID);
           }
         } catch (ReaderIOException | RuntimeException e) {
           logger.warn(
-              "[fsmJob={}, fsmService={}] Monitoring job failure [reason={}]",
-              JOB_ID,
+              "[fsm={}] Monitoring job failure [job={}, reason={}]",
               state.getServiceId(),
-              e.getMessage());
+              JOB_ID,
+              e.toString());
           state.onError(e);
         }
       }
@@ -159,10 +158,7 @@ final class FsmJobActive implements FsmJob {
   public void stop() {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[fsmJob={}, fsmService={}] Stopping monitoring job [stateId={}]",
-          JOB_ID,
-          state.getServiceId(),
-          stateId);
+          "[fsm={}] Stop requested [job={}, state={}]", state.getServiceId(), JOB_ID, stateId);
     }
     running.set(false);
   }

@@ -60,9 +60,9 @@ final class FsmJobPassive implements FsmJob {
    * @since 4.0.0
    */
   @Override
-  public void initialize(FsmState fsmState, ObservableReaderSpi readerSpi) {
-    this.state = fsmState;
-    this.stateId = fsmState.getStateId();
+  public void initialize(FsmState state, ObservableReaderSpi readerSpi) {
+    this.state = state;
+    this.stateId = state.getStateId();
     this.readerSpi = readerSpi;
   }
 
@@ -93,33 +93,30 @@ final class FsmJobPassive implements FsmJob {
         try {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, fsmService={}] Monitoring job started [stateId={}]",
-                JOB_ID,
+                "[fsm={}] Monitoring job started [job={}, state={}]",
                 state.getServiceId(),
+                JOB_ID,
                 stateId);
           }
           switch (stateId) {
             case WAIT_FOR_CARD_INSERTION:
               ((CardInsertionWaiterBlockingSpi) readerSpi).waitForCardInsertion();
               if (logger.isTraceEnabled()) {
-                logger.trace(
-                    "[fsmJob={}, fsmService={}] Card detected", JOB_ID, state.getServiceId());
+                logger.trace("[fsm={}] Card detected [job={}]", state.getServiceId(), JOB_ID);
               }
               state.fire(FsmService.Trigger.CARD_INSERTED);
               return;
             case WAIT_FOR_CARD_PROCESSING:
               ((CardPresenceMonitorBlockingSpi) readerSpi).monitorCardPresenceDuringProcessing();
               if (logger.isTraceEnabled()) {
-                logger.trace(
-                    "[fsmJob={}, fsmService={}] Card removed", JOB_ID, state.getServiceId());
+                logger.trace("[fsm={}] Card removed [job={}]", state.getServiceId(), JOB_ID);
               }
               state.fire(FsmService.Trigger.CARD_REMOVED);
               return;
             case WAIT_FOR_CARD_REMOVAL:
               ((CardRemovalWaiterBlockingSpi) readerSpi).waitForCardRemoval();
               if (logger.isTraceEnabled()) {
-                logger.trace(
-                    "[fsmJob={}, fsmService={}] Card removed", JOB_ID, state.getServiceId());
+                logger.trace("[fsm={}] Card removed [job={}]", state.getServiceId(), JOB_ID);
               }
               state.fire(FsmService.Trigger.CARD_REMOVED);
               return;
@@ -128,17 +125,17 @@ final class FsmJobPassive implements FsmJob {
         } catch (TaskCanceledException e) {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, fsmService={}] Monitoring job stopped [reason={}]",
-                JOB_ID,
+                "[fsm={}] Monitoring job stopped [job={}, reason={}]",
                 state.getServiceId(),
+                JOB_ID,
                 e.getMessage());
           }
         } catch (ReaderIOException | RuntimeException e) {
           logger.warn(
-              "[fsmJob={}, fsmService={}] Monitoring job failure [reason={}]",
-              JOB_ID,
+              "[fsm={}] Monitoring job failure [job={}, reason={}]",
               state.getServiceId(),
-              e.getMessage());
+              JOB_ID,
+              e.toString());
           state.onError(e);
         }
       }
@@ -154,10 +151,7 @@ final class FsmJobPassive implements FsmJob {
   public void stop() {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[fsmJob={}, fsmService={}] Monitoring job stop requested [stateId={}]",
-          JOB_ID,
-          state.getServiceId(),
-          stateId);
+          "[fsm={}] Stop requested [job={}, state={}]", state.getServiceId(), JOB_ID, stateId);
     }
     switch (stateId) {
       case WAIT_FOR_CARD_INSERTION:

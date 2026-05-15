@@ -141,7 +141,7 @@ final class FsmService {
     switchState(WAIT_FOR_START_DETECTION);
 
     if (logger.isTraceEnabled()) {
-      logger.trace("[fsmService={}] FSM service initialized [reader={}]", id, reader.getName());
+      logger.trace("[fsm={}] FSM service initialized [reader={}]", id, reader.getName());
     }
   }
 
@@ -180,7 +180,7 @@ final class FsmService {
     if (currentState != null) {
       if (logger.isTraceEnabled()) {
         logger.trace(
-            "[fsmService={}] Switching state [from={}, to={}]",
+            "[fsm={}] Switching state [from={}, to={}]",
             id,
             currentState.getStateId(),
             targetStateId);
@@ -188,18 +188,11 @@ final class FsmService {
       currentState.onDeactivate();
     } else {
       if (logger.isTraceEnabled()) {
-        logger.trace("[fsmService={}] Switching state [from=null, to={}]", id, targetStateId);
+        logger.trace("[fsm={}] Switching state [from=null, to={}]", id, targetStateId);
       }
     }
     currentState = states.get(targetStateId);
     currentState.onActivate();
-    if (logger.isTraceEnabled()) {
-      logger.trace(
-          "[fsmService={}] State switched [current={}, expected={}]",
-          id,
-          currentState.getStateId(),
-          targetStateId);
-    }
   }
 
   /**
