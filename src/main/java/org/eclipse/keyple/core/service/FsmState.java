@@ -102,6 +102,22 @@ abstract class FsmState {
   }
 
   /**
+   * Routes the given trigger through the parent FSM service's synchronized dispatch method.
+   *
+   * <p>Monitoring jobs must use this method instead of calling {@link
+   * #onTrigger(FsmService.Trigger)} directly. This ensures that transitions initiated from a
+   * background monitoring thread are serialized on the same lock as those initiated by external
+   * callers via {@link FsmService#fire(FsmService.Trigger)}, preventing concurrent state
+   * transitions.
+   *
+   * @param trigger The trigger event to dispatch; must not be null.
+   * @since 4.0.0
+   */
+  final void fire(FsmService.Trigger trigger) {
+    fsmService.fire(trigger);
+  }
+
+  /**
    * Invoked when this state becomes active.
    *
    * <p>If a monitoring job is configured, it is submitted to the executor service. Subclasses may
@@ -122,14 +138,20 @@ abstract class FsmState {
   }
 
   /**
-   * Invoked when this state is deactivated. Cancels the monitoring job if one is running.
+   * Invoked when this state is deactivated.
+   *
+   * <p>If a monitoring job is running, {@link FsmJob#stop()} is called first so that the job can
+   * release its blocking resource (e.g. cancel a blocking SPI call or clear a loop flag). The
+   * future is then cancelled with interruption enabled ({@code mayInterruptIfRunning = true}) so
+   * that a thread sleeping in an active polling loop wakes up immediately rather than waiting for
+   * the next poll interval to elapse.
    *
    * @since 2.0.0
    */
   final void onDeactivate() {
     if (monitoringTask != null && !monitoringTask.isDone()) {
       fsmJob.stop();
-      monitoringTask.cancel(false);
+      monitoringTask.cancel(true);
     }
   }
 
