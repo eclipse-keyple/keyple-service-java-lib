@@ -16,7 +16,8 @@ package org.eclipse.keyple.core.service;
  *
  * @since 2.0.0
  */
-abstract class AbstractMonitoringJobAdapter {
+abstract class FsmJob {
+
   private final ObservableLocalReaderAdapter reader;
 
   /**
@@ -25,7 +26,7 @@ abstract class AbstractMonitoringJobAdapter {
    * @param reader The reader.
    * @since 2.0.0
    */
-  AbstractMonitoringJobAdapter(ObservableLocalReaderAdapter reader) {
+  FsmJob(ObservableLocalReaderAdapter reader) {
     this.reader = reader;
   }
 
@@ -42,11 +43,11 @@ abstract class AbstractMonitoringJobAdapter {
   /**
    * Gets the task of the monitoring job.
    *
-   * @param monitoringState reference to the state the monitoring job in running against.
+   * @param fsmState reference to the state the monitoring job in running against.
    * @return A not null reference.
    * @since 2.0.0
    */
-  abstract Runnable getMonitoringJob(AbstractObservableStateAdapter monitoringState);
+  abstract Runnable getRunnableTask(FsmState fsmState);
 
   /**
    * Stops/interrupts the monitoring job

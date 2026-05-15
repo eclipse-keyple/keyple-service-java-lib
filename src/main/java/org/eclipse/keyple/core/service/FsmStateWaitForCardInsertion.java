@@ -31,10 +31,9 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0.0
  */
-final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdapter {
+final class FsmStateWaitForCardInsertion extends FsmState {
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(WaitForCardInsertionStateAdapter.class);
+  private static final Logger logger = LoggerFactory.getLogger(FsmStateWaitForCardInsertion.class);
 
   /**
    * Creates an instance.
@@ -42,7 +41,7 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
    * @param reader The observable local reader adapter.
    * @since 2.0.0
    */
-  WaitForCardInsertionStateAdapter(ObservableLocalReaderAdapter reader) {
+  FsmStateWaitForCardInsertion(ObservableLocalReaderAdapter reader) {
     this(reader, null, null);
   }
 
@@ -54,11 +53,9 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
    * @param executorService The executor service to use.
    * @since 2.0.0
    */
-  WaitForCardInsertionStateAdapter(
-      ObservableLocalReaderAdapter reader,
-      AbstractMonitoringJobAdapter monitoringJob,
-      ExecutorService executorService) {
-    super(MonitoringState.WAIT_FOR_CARD_INSERTION, reader, monitoringJob, executorService);
+  FsmStateWaitForCardInsertion(
+      ObservableLocalReaderAdapter reader, FsmJob monitoringJob, ExecutorService executorService) {
+    super(State.WAIT_FOR_CARD_INSERTION, reader, monitoringJob, executorService);
   }
 
   /**
@@ -67,21 +64,21 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
    * @since 2.0.0
    */
   @Override
-  void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
+  void onTrigger(FsmService.Trigger trigger) {
     if (logger.isTraceEnabled()) {
       logger.trace(
           "[fsmState={}, reader={}] Processing internal event [type={}]",
           getMonitoringState(),
           getReader().getName(),
-          event);
+          trigger);
     }
-    switch (event) {
+    switch (trigger) {
       case CARD_INSERTED:
         // process default selection if any, return an event, can be null
         CardReaderEvent cardEvent = getReader().processCardInserted();
         if (cardEvent != null) {
           // switch internal state
-          switchState(MonitoringState.WAIT_FOR_CARD_PROCESSING);
+          switchState(State.WAIT_FOR_CARD_PROCESSING);
           // notify the external observer of the event
           getReader().notifyObservers(cardEvent);
         } else {
@@ -94,12 +91,12 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
                 getMonitoringState(),
                 getReader().getName());
           }
-          switchState(MonitoringState.WAIT_FOR_CARD_REMOVAL);
+          switchState(State.WAIT_FOR_CARD_REMOVAL);
         }
         break;
 
-      case STOP_DETECT:
-        switchState(MonitoringState.WAIT_FOR_START_DETECTION);
+      case CARD_DETECTION_STOP_REQUESTED:
+        switchState(State.WAIT_FOR_START_DETECTION);
         break;
 
       default:
@@ -116,7 +113,7 @@ final class WaitForCardInsertionStateAdapter extends AbstractObservableStateAdap
           "[fsmState={}, reader={}] Internal event processed [type={}]",
           getMonitoringState(),
           getReader().getName(),
-          event);
+          trigger);
     }
   }
 }

@@ -28,15 +28,15 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0.0
  */
-final class CardPresenceActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+final class FsmJobCardPresenceActiveMonitoring extends FsmJob {
 
   private static final Logger logger =
-      LoggerFactory.getLogger(CardPresenceActiveMonitoringJobAdapter.class);
+      LoggerFactory.getLogger(FsmJobCardPresenceActiveMonitoring.class);
 
   private static final String JOB_ID = "ACTIVE_MONITOR";
 
   private final long sleepDurationMillis;
-  private final AbstractObservableStateAdapter.MonitoringState state;
+  private final FsmState.State state;
   private final AtomicBoolean loop = new AtomicBoolean();
   private final ObservableReaderSpi readerSpi;
 
@@ -48,10 +48,8 @@ final class CardPresenceActiveMonitoringJobAdapter extends AbstractMonitoringJob
    * @param state the associated monitoring state
    * @since 2.0.0
    */
-  public CardPresenceActiveMonitoringJobAdapter(
-      ObservableLocalReaderAdapter reader,
-      long sleepDurationMillis,
-      AbstractObservableStateAdapter.MonitoringState state) {
+  public FsmJobCardPresenceActiveMonitoring(
+      ObservableLocalReaderAdapter reader, long sleepDurationMillis, FsmState.State state) {
     super(reader);
     this.sleepDurationMillis = sleepDurationMillis;
     readerSpi = reader.getObservableReaderSpi();
@@ -65,7 +63,7 @@ final class CardPresenceActiveMonitoringJobAdapter extends AbstractMonitoringJob
    * @since 2.0.0
    */
   @Override
-  Runnable getMonitoringJob(final AbstractObservableStateAdapter monitoringState) {
+  Runnable getRunnableTask(final FsmState fsmState) {
     return new Runnable() {
 
       /**
@@ -92,21 +90,19 @@ final class CardPresenceActiveMonitoringJobAdapter extends AbstractMonitoringJob
           loop.set(true);
           while (loop.get()) {
             // polls for CARD_INSERTED
-            if (state == AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION
-                && readerSpi.isCardPresent()) {
+            if (state == FsmState.State.WAIT_FOR_CARD_INSERTION && readerSpi.isCardPresent()) {
               if (logger.isTraceEnabled()) {
                 logger.trace("[fsmJob={}, reader={}] Card detected", JOB_ID, getReader().getName());
               }
-              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
+              fsmState.onTrigger(FsmService.Trigger.CARD_INSERTED);
               return;
             }
             // polls for CARD_REMOVED
-            if (state == AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_REMOVAL
-                && !readerSpi.isCardPresent()) {
+            if (state == FsmState.State.WAIT_FOR_CARD_REMOVAL && !readerSpi.isCardPresent()) {
               if (logger.isTraceEnabled()) {
                 logger.trace("[fsmJob={}, reader={}] Card removed", JOB_ID, getReader().getName());
               }
-              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
+              fsmState.onTrigger(FsmService.Trigger.CARD_REMOVED);
               return;
             }
             // wait a bit

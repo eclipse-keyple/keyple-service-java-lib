@@ -12,28 +12,25 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.concurrent.ExecutorService;
-import org.eclipse.keypop.reader.ObservableCardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Wait for card processing state implementation.
+ * Wait for start the card detection state implementation.
  *
- * <p>The state during which the card is being processed by the application.
+ * <p>The state during which the reader does not wait for a card to be inserted but for a signal
+ * from the application to do so (switch to the WAIT_FOR_CARD_INSERTION state).
  *
  * <ul>
- *   <li>Upon CARD_PROCESSED event, the machine changes state for WAIT_FOR_CARD_REMOVAL or
- *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableCardReader.DetectionMode}
- *       setting.
- *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_CARD_DETECTION.
+ *   <li>Upon START_DETECT event, the machine changes state for WAIT_FOR_CARD_INSERTION.
  * </ul>
  *
  * @since 2.0.0
  */
-final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAdapter {
+final class FsmStateWaitForStartDetection extends FsmState {
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(WaitForCardProcessingStateAdapter.class);
+  /** logger */
+  private static final Logger logger = LoggerFactory.getLogger(FsmStateWaitForStartDetection.class);
 
   /**
    * Creates an instance.
@@ -41,7 +38,7 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
    * @param reader The observable local reader adapter.
    * @since 2.0.0
    */
-  WaitForCardProcessingStateAdapter(ObservableLocalReaderAdapter reader) {
+  FsmStateWaitForStartDetection(ObservableLocalReaderAdapter reader) {
     this(reader, null, null);
   }
 
@@ -53,11 +50,9 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
    * @param executorService The executor service to use.
    * @since 2.0.0
    */
-  WaitForCardProcessingStateAdapter(
-      ObservableLocalReaderAdapter reader,
-      AbstractMonitoringJobAdapter monitoringJob,
-      ExecutorService executorService) {
-    super(MonitoringState.WAIT_FOR_CARD_PROCESSING, reader, monitoringJob, executorService);
+  FsmStateWaitForStartDetection(
+      ObservableLocalReaderAdapter reader, FsmJob monitoringJob, ExecutorService executorService) {
+    super(State.WAIT_FOR_START_DETECTION, reader, monitoringJob, executorService);
   }
 
   /**
@@ -66,36 +61,18 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
    * @since 2.0.0
    */
   @Override
-  void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
+  void onTrigger(FsmService.Trigger trigger) {
     if (logger.isTraceEnabled()) {
       logger.trace(
           "[fsmState={}, reader={}] Processing internal event [type={}]",
           getMonitoringState(),
           getReader().getName(),
-          event);
+          trigger);
     }
-    switch (event) {
-      case CARD_PROCESSED:
-        if (getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
-          switchState(MonitoringState.WAIT_FOR_CARD_REMOVAL);
-        } else {
-          switchState(MonitoringState.WAIT_FOR_START_DETECTION);
-        }
+    switch (trigger) {
+      case CARD_DETECTION_START_REQUESTED:
+        switchState(State.WAIT_FOR_CARD_INSERTION);
         break;
-
-      case CARD_REMOVED:
-        if (getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
-          switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
-        } else {
-          switchState(MonitoringState.WAIT_FOR_START_DETECTION);
-        }
-        getReader().processCardRemoved();
-        break;
-
-      case STOP_DETECT:
-        switchState(MonitoringState.WAIT_FOR_START_DETECTION);
-        break;
-
       default:
         if (logger.isTraceEnabled()) {
           logger.trace(
@@ -110,7 +87,7 @@ final class WaitForCardProcessingStateAdapter extends AbstractObservableStateAda
           "[fsmState={}, reader={}] Internal event processed [type={}]",
           getMonitoringState(),
           getReader().getName(),
-          event);
+          trigger);
     }
   }
 }

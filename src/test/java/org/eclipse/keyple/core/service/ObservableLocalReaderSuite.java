@@ -47,16 +47,14 @@ public class ObservableLocalReaderSuite {
 
   public void addFirstObserver_should_startDetection() {
 
-    assertThat(reader.getCurrentMonitoringState())
-        .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_START_DETECTION);
+    assertThat(reader.getCurrentState()).isEqualTo(FsmState.State.WAIT_FOR_START_DETECTION);
 
     reader.setReaderObservationExceptionHandler(handler);
     reader.addObserver(observer);
     reader.startCardDetection(ObservableCardReader.DetectionMode.REPEATING);
     assertThat(reader.countObservers()).isEqualTo(1);
 
-    assertThat(reader.getCurrentMonitoringState())
-        .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION);
+    assertThat(reader.getCurrentState()).isEqualTo(FsmState.State.WAIT_FOR_CARD_INSERTION);
   }
 
   public void removeLastObserver_shoul_StopDetection() {
@@ -65,8 +63,7 @@ public class ObservableLocalReaderSuite {
     assertThat(reader.countObservers()).isZero();
 
     // state is not changed
-    assertThat(reader.getCurrentMonitoringState())
-        .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION);
+    assertThat(reader.getCurrentState()).isEqualTo(FsmState.State.WAIT_FOR_CARD_INSERTION);
   }
 
   public void clearObservers_shouldRemove_allObservers() {
@@ -80,9 +77,7 @@ public class ObservableLocalReaderSuite {
     logger.debug("Insert card...");
     readerSpi.setCardPresent(true);
 
-    await()
-        .atMost(2, TimeUnit.SECONDS)
-        .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING));
+    await().atMost(2, TimeUnit.SECONDS).until(stateIs(FsmState.State.WAIT_FOR_CARD_PROCESSING));
 
     // check event is well formed
     CardReaderEvent event = observer.getLastEventOfType(CardReaderEvent.Type.CARD_INSERTED);
@@ -96,9 +91,7 @@ public class ObservableLocalReaderSuite {
     logger.debug("Finalize processing...");
     reader.finalizeCardProcessing();
 
-    await()
-        .atMost(3, TimeUnit.SECONDS)
-        .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_REMOVAL));
+    await().atMost(3, TimeUnit.SECONDS).until(stateIs(FsmState.State.WAIT_FOR_CARD_REMOVAL));
   }
 
   // @Test
@@ -108,9 +101,7 @@ public class ObservableLocalReaderSuite {
     logger.debug("Remove card...");
     readerSpi.setCardPresent(false);
 
-    await()
-        .atMost(1, TimeUnit.SECONDS)
-        .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION));
+    await().atMost(1, TimeUnit.SECONDS).until(stateIs(FsmState.State.WAIT_FOR_CARD_INSERTION));
 
     // check event is well formed
     CardReaderEvent event = observer.getLastEventOfType(CardReaderEvent.Type.CARD_REMOVED);
@@ -124,9 +115,7 @@ public class ObservableLocalReaderSuite {
     logger.debug("Remove card...");
     readerSpi.setCardPresent(false);
 
-    await()
-        .atMost(2, TimeUnit.SECONDS)
-        .until(stateIs(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_INSERTION));
+    await().atMost(2, TimeUnit.SECONDS).until(stateIs(FsmState.State.WAIT_FOR_CARD_INSERTION));
 
     // check event is well formed
     CardReaderEvent event = observer.getLastEventOfType(CardReaderEvent.Type.CARD_REMOVED);
@@ -146,14 +135,12 @@ public class ObservableLocalReaderSuite {
     };
   }
 
-  private Callable<Boolean> stateIs(
-      final AbstractObservableStateAdapter.MonitoringState monitoringState) {
+  private Callable<Boolean> stateIs(final FsmState.State state) {
     return new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
-        logger.trace(
-            "TEST ... wait for {} is {}", reader.getCurrentMonitoringState(), monitoringState);
-        return reader.getCurrentMonitoringState().equals(monitoringState);
+        logger.trace("TEST ... wait for {} is {}", reader.getCurrentState(), state);
+        return reader.getCurrentState().equals(state);
       }
     };
   }
