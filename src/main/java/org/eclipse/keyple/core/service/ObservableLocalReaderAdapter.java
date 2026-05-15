@@ -41,14 +41,8 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
 
   private static final Logger logger = LoggerFactory.getLogger(ObservableLocalReaderAdapter.class);
 
-  private static final String READER_MONITORING_ERROR =
-      "An error occurred while monitoring the reader";
-  private static final byte[] APDU_PING_CARD_PRESENCE = {
-    (byte) 0x00, (byte) 0xC0, (byte) 0x00, (byte) 0x00, (byte) 0x00
-  };
-
   private final ObservableReaderSpi observableReaderSpi;
-  private final ObservableReaderStateServiceAdapter stateService;
+  private final FsmService fsmService;
   private final ObservationManagerAdapter<
           CardReaderObserverSpi, CardReaderObservationExceptionHandlerSpi>
       observationManager;
@@ -59,54 +53,9 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   private boolean isCardRemovedEventNotificationEnabled;
 
   /**
-   * The events that drive the card's observation state machine.
-   *
-   * @since 2.0.0
-   */
-  enum InternalEvent {
-    /**
-     * A card has been inserted
-     *
-     * @since 2.0.0
-     */
-    CARD_INSERTED,
-    /**
-     * The card has been removed
-     *
-     * @since 2.0.0
-     */
-    CARD_REMOVED,
-    /**
-     * The application has completed the processing of the card
-     *
-     * @since 2.0.0
-     */
-    CARD_PROCESSED,
-    /**
-     * The application has requested the start of card detection
-     *
-     * @since 2.0.0
-     */
-    START_DETECT,
-    /**
-     * The application has requested that card detection is to be stopped.
-     *
-     * @since 2.0.0
-     */
-    STOP_DETECT,
-    /**
-     * A timeout has occurred (not yet implemented)
-     *
-     * @since 2.0.0
-     */
-    TIME_OUT
-  }
-
-  /**
    * Creates an instance of {@link ObservableLocalReaderAdapter}.
    *
-   * <p>Creates the {@link ObservableReaderStateServiceAdapter} with the possible states and their
-   * implementation.
+   * <p>Creates the {@link FsmService} with the possible states and their implementation.
    *
    * @param observableReaderSpi The reader SPI.
    * @param pluginName The plugin name.
@@ -115,7 +64,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   ObservableLocalReaderAdapter(ObservableReaderSpi observableReaderSpi, String pluginName) {
     super(observableReaderSpi, pluginName);
     this.observableReaderSpi = observableReaderSpi;
-    this.stateService = new ObservableReaderStateServiceAdapter(this);
+    this.fsmService = new FsmService(this);
     this.observationManager = new ObservationManagerAdapter<>(pluginName, getName());
     if (observableReaderSpi instanceof CardInsertionWaiterAsynchronousSpi) {
       ((CardInsertionWaiterAsynchronousSpi) observableReaderSpi).setCallback(this);
@@ -157,41 +106,11 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * Get the current monitoring state
-   *
-   * @return current getMonitoringState
+   * @return the current FSM state.
    * @since 2.0.0
    */
-  final AbstractObservableStateAdapter.MonitoringState getCurrentMonitoringState() {
-    return stateService.getCurrentMonitoringState();
-  }
-
-  /**
-   * Sends a neutral APDU to the card to check its presence. The status of the response is not
-   * verified as long as the mere fact that the card responds is sufficient to indicate whether or
-   * not it is present.
-   *
-   * <p>This method has to be called regularly until the card no longer respond.
-   *
-   * @return True if the card still responds, false if not
-   * @since 2.0.0
-   */
-  final boolean isCardPresentPing() {
-    // transmits the APDU and checks for the IO exception.
-    try {
-      observableReaderSpi.transmitApdu(APDU_PING_CARD_PRESENCE);
-    } catch (ReaderIOException e) {
-      // Notify the reader communication failure with the exception handler.
-      getObservationExceptionHandler()
-          .onReaderObservationError(
-              getPluginName(),
-              getName(),
-              new ReaderCommunicationException(READER_MONITORING_ERROR, e));
-      return false;
-    } catch (CardIOException e) {
-      return false;
-    }
-    return true;
+  final FsmState.State getCurrentState() {
+    return fsmService.getCurrentState();
   }
 
   /**
@@ -284,7 +203,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
           .onReaderObservationError(
               getPluginName(),
               getName(),
-              new ReaderCommunicationException(READER_MONITORING_ERROR, e));
+              new ReaderCommunicationException("An error occurred while monitoring the reader", e));
 
     } catch (CardBrokenCommunicationException e) {
       // The card was removed or not read correctly, no exception raising or event notification,
@@ -338,8 +257,8 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    * @param stateId new stateId
    * @since 2.0.0
    */
-  final void switchState(AbstractObservableStateAdapter.MonitoringState stateId) {
-    stateService.switchState(stateId);
+  final void switchState(FsmState.State stateId) {
+    fsmService.switchState(stateId);
   }
 
   /**
@@ -427,7 +346,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   final void unregister() {
     try {
       stopCardDetection();
-      stateService.shutdown();
+      fsmService.shutdown();
     } catch (Exception e) {
       logger.warn(
           "[reader={}] Failed to stop card monitoring [reason={}]", getName(), e.getMessage());
@@ -495,7 +414,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
         "[reader={}] Starting card monitoring [detectionMode={}]", getName(), detectionMode);
     Assert.getInstance().notNull(detectionMode, "detectionMode");
     this.detectionMode = detectionMode;
-    stateService.onEvent(InternalEvent.START_DETECT);
+    fsmService.onTrigger(FsmService.Trigger.CARD_DETECTION_START_REQUESTED);
   }
 
   /**
@@ -507,7 +426,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   public final void stopCardDetection() {
     // RL-DET-REMCTRL.1
     logger.info("[reader={}] Stopping card monitoring", getName());
-    stateService.onEvent(InternalEvent.STOP_DETECT);
+    fsmService.onTrigger(FsmService.Trigger.CARD_DETECTION_STOP_REQUESTED);
   }
 
   /**
@@ -523,7 +442,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
       throw new ReaderCommunicationException(
           "Failed to communicate with reader. Unable to deselect card", e);
     }
-    stateService.onEvent(InternalEvent.CARD_PROCESSED);
+    fsmService.onTrigger(FsmService.Trigger.CARD_PROCESSING_ENDED);
   }
 
   /**
@@ -545,7 +464,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public final void onCardInserted() {
-    stateService.onEvent(InternalEvent.CARD_INSERTED);
+    fsmService.onTrigger(FsmService.Trigger.CARD_INSERTED);
   }
 
   /**
@@ -555,6 +474,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public final void onCardRemoved() {
-    stateService.onEvent(InternalEvent.CARD_REMOVED);
+    fsmService.onTrigger(FsmService.Trigger.CARD_REMOVED);
   }
 }

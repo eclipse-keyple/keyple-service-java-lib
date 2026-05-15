@@ -43,16 +43,16 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0.0
  */
-final class CardPresencePassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+final class FsmJobCardPresencePassiveMonitoring extends FsmJob {
 
   private static final Logger logger =
-      LoggerFactory.getLogger(CardPresencePassiveMonitoringJobAdapter.class);
+      LoggerFactory.getLogger(FsmJobCardPresencePassiveMonitoring.class);
 
   private static final String JOB_ID = "PASSIVE_MONITOR";
 
   private final ObservableReaderSpi readerSpi;
 
-  private final AbstractObservableStateAdapter.MonitoringState state;
+  private final FsmState.State state;
 
   /**
    * Constructor.
@@ -60,8 +60,8 @@ final class CardPresencePassiveMonitoringJobAdapter extends AbstractMonitoringJo
    * @param reader reference to the reader
    * @since 2.0.0
    */
-  public CardPresencePassiveMonitoringJobAdapter(
-      ObservableLocalReaderAdapter reader, AbstractObservableStateAdapter.MonitoringState state) {
+  public FsmJobCardPresencePassiveMonitoring(
+      ObservableLocalReaderAdapter reader, FsmState.State state) {
     super(reader);
     readerSpi = reader.getObservableReaderSpi();
     this.state = state;
@@ -74,7 +74,7 @@ final class CardPresencePassiveMonitoringJobAdapter extends AbstractMonitoringJo
    * @since 2.0.0
    */
   @Override
-  Runnable getMonitoringJob(final AbstractObservableStateAdapter monitoringState) {
+  Runnable getRunnableTask(final FsmState fsmState) {
     return new Runnable() {
       /**
        * Monitoring loop
@@ -100,21 +100,21 @@ final class CardPresencePassiveMonitoringJobAdapter extends AbstractMonitoringJo
               if (logger.isTraceEnabled()) {
                 logger.trace("[fsmJob={}, reader={}] Card detected", JOB_ID, getReader().getName());
               }
-              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_INSERTED);
+              fsmState.onTrigger(FsmService.Trigger.CARD_INSERTED);
               return;
             case WAIT_FOR_CARD_PROCESSING:
               ((CardPresenceMonitorBlockingSpi) readerSpi).monitorCardPresenceDuringProcessing();
               if (logger.isTraceEnabled()) {
                 logger.trace("[fsmJob={}, reader={}] Card removed", JOB_ID, getReader().getName());
               }
-              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
+              fsmState.onTrigger(FsmService.Trigger.CARD_REMOVED);
               return;
             case WAIT_FOR_CARD_REMOVAL:
               ((CardRemovalWaiterBlockingSpi) readerSpi).waitForCardRemoval();
               if (logger.isTraceEnabled()) {
                 logger.trace("[fsmJob={}, reader={}] Card removed", JOB_ID, getReader().getName());
               }
-              monitoringState.onEvent(ObservableLocalReaderAdapter.InternalEvent.CARD_REMOVED);
+              fsmState.onTrigger(FsmService.Trigger.CARD_REMOVED);
               return;
             default:
           }

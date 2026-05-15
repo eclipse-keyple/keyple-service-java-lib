@@ -17,12 +17,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Wait for card removal state implementation.
+ * Wait for card processing state implementation.
  *
- * <p>The state in which the card is still present and awaiting removal.
+ * <p>The state during which the card is being processed by the application.
  *
  * <ul>
- *   <li>Upon CARD_REMOVED event, the machine changes state for WAIT_FOR_CARD_INSERTION or
+ *   <li>Upon CARD_PROCESSED event, the machine changes state for WAIT_FOR_CARD_REMOVAL or
  *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableCardReader.DetectionMode}
  *       setting.
  *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_CARD_DETECTION.
@@ -30,10 +30,9 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0.0
  */
-final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapter {
+final class FsmStateWaitForCardProcessing extends FsmState {
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(WaitForCardRemovalStateAdapter.class);
+  private static final Logger logger = LoggerFactory.getLogger(FsmStateWaitForCardProcessing.class);
 
   /**
    * Creates an instance.
@@ -41,7 +40,7 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
    * @param reader The observable local reader adapter.
    * @since 2.0.0
    */
-  WaitForCardRemovalStateAdapter(ObservableLocalReaderAdapter reader) {
+  FsmStateWaitForCardProcessing(ObservableLocalReaderAdapter reader) {
     this(reader, null, null);
   }
 
@@ -53,11 +52,9 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
    * @param executorService The executor service to use.
    * @since 2.0.0
    */
-  WaitForCardRemovalStateAdapter(
-      ObservableLocalReaderAdapter reader,
-      AbstractMonitoringJobAdapter monitoringJob,
-      ExecutorService executorService) {
-    super(MonitoringState.WAIT_FOR_CARD_REMOVAL, reader, monitoringJob, executorService);
+  FsmStateWaitForCardProcessing(
+      ObservableLocalReaderAdapter reader, FsmJob monitoringJob, ExecutorService executorService) {
+    super(State.WAIT_FOR_CARD_PROCESSING, reader, monitoringJob, executorService);
   }
 
   /**
@@ -66,26 +63,34 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
    * @since 2.0.0
    */
   @Override
-  void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
+  void onTrigger(FsmService.Trigger trigger) {
     if (logger.isTraceEnabled()) {
       logger.trace(
           "[fsmState={}, reader={}] Processing internal event [type={}]",
           getMonitoringState(),
           getReader().getName(),
-          event);
+          trigger);
     }
-    switch (event) {
+    switch (trigger) {
+      case CARD_PROCESSING_ENDED:
+        if (getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
+          switchState(State.WAIT_FOR_CARD_REMOVAL);
+        } else {
+          switchState(State.WAIT_FOR_START_DETECTION);
+        }
+        break;
+
       case CARD_REMOVED:
         if (getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
-          switchState(MonitoringState.WAIT_FOR_CARD_INSERTION);
+          switchState(State.WAIT_FOR_CARD_INSERTION);
         } else {
-          switchState(MonitoringState.WAIT_FOR_START_DETECTION);
+          switchState(State.WAIT_FOR_START_DETECTION);
         }
         getReader().processCardRemoved();
         break;
 
-      case STOP_DETECT:
-        switchState(MonitoringState.WAIT_FOR_START_DETECTION);
+      case CARD_DETECTION_STOP_REQUESTED:
+        switchState(State.WAIT_FOR_START_DETECTION);
         break;
 
       default:
@@ -102,7 +107,7 @@ final class WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapte
           "[fsmState={}, reader={}] Internal event processed [type={}]",
           getMonitoringState(),
           getReader().getName(),
-          event);
+          trigger);
     }
   }
 }

@@ -93,7 +93,6 @@ public class ObservableLocalReaderNonBlockingAdapterTest {
     await().atMost(1, TimeUnit.SECONDS);
 
     // card removal is not monitored, no event is thrown
-    assertThat(reader.getCurrentMonitoringState())
-        .isEqualTo(AbstractObservableStateAdapter.MonitoringState.WAIT_FOR_CARD_PROCESSING);
+    assertThat(reader.getCurrentState()).isEqualTo(FsmState.State.WAIT_FOR_CARD_PROCESSING);
   }
 }

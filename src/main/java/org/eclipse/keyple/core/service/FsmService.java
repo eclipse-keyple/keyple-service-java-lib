@@ -11,7 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import static org.eclipse.keyple.core.service.AbstractObservableStateAdapter.MonitoringState.*;
+import static org.eclipse.keyple.core.service.FsmState.State.*;
 
 import java.util.EnumMap;
 import java.util.concurrent.ExecutorService;
@@ -24,32 +24,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Manages the internal state of an {@link ObservableLocalReaderAdapter} Process InternalEvent
- * against the current state
+ * Manages the internal state of an {@link ObservableLocalReaderAdapter} Process Trigger against the
+ * current state
  *
  * @since 2.0.0
  */
-final class ObservableReaderStateServiceAdapter {
+final class FsmService {
 
-  /** logger */
-  private static final Logger logger =
-      LoggerFactory.getLogger(ObservableReaderStateServiceAdapter.class);
+  private static final Logger logger = LoggerFactory.getLogger(FsmService.class);
 
-  /** ObservableLocalReaderAdapter to manage event and states */
   private final ObservableLocalReaderAdapter reader;
-
   private final ObservableReaderSpi readerSpi;
 
   /** Executor service to provide a unique thread used by the various monitoring jobs */
   private final ExecutorService executorService;
 
-  /** Map of all instantiated states possible */
-  private final EnumMap<
-          AbstractObservableStateAdapter.MonitoringState, AbstractObservableStateAdapter>
-      states;
+  private final EnumMap<FsmState.State, FsmState> states;
 
-  /** Current currentState of the Observable Reader */
-  private AbstractObservableStateAdapter currentState;
+  private FsmState currentState;
 
   /**
    * Initializes the states according to the interfaces implemented by the provided reader.
@@ -57,38 +49,38 @@ final class ObservableReaderStateServiceAdapter {
    * @param reader The observable local reader adapter.
    * @since 2.0.0
    */
-  ObservableReaderStateServiceAdapter(ObservableLocalReaderAdapter reader) {
+  FsmService(ObservableLocalReaderAdapter reader) {
     this.reader = reader;
     readerSpi = reader.getObservableReaderSpi();
 
-    states = new EnumMap<>(AbstractObservableStateAdapter.MonitoringState.class);
+    states = new EnumMap<>(FsmState.State.class);
     executorService = Executors.newSingleThreadExecutor();
 
     // initialize states for each case:
 
     // wait for start
-    states.put(WAIT_FOR_START_DETECTION, new WaitForStartDetectStateAdapter(this.reader));
+    states.put(WAIT_FOR_START_DETECTION, new FsmStateWaitForStartDetection(this.reader));
 
     // insertion
     if (readerSpi instanceof CardInsertionWaiterAsynchronousSpi) {
-      states.put(WAIT_FOR_CARD_INSERTION, new WaitForCardInsertionStateAdapter(this.reader));
+      states.put(WAIT_FOR_CARD_INSERTION, new FsmStateWaitForCardInsertion(this.reader));
     } else if (readerSpi instanceof CardInsertionWaiterNonBlockingSpi) {
       int sleepDurationMillis =
           ((CardInsertionWaiterNonBlockingSpi) readerSpi).getCardInsertionMonitoringSleepDuration();
-      CardPresenceActiveMonitoringJobAdapter cardPresenceActiveMonitoringJobAdapter =
-          new CardPresenceActiveMonitoringJobAdapter(
+      FsmJobCardPresenceActiveMonitoring fsmJobCardPresenceActiveMonitoring =
+          new FsmJobCardPresenceActiveMonitoring(
               reader, sleepDurationMillis, WAIT_FOR_CARD_INSERTION);
       states.put(
           WAIT_FOR_CARD_INSERTION,
-          new WaitForCardInsertionStateAdapter(
-              this.reader, cardPresenceActiveMonitoringJobAdapter, executorService));
+          new FsmStateWaitForCardInsertion(
+              this.reader, fsmJobCardPresenceActiveMonitoring, executorService));
     } else if (readerSpi instanceof CardInsertionWaiterBlockingSpi) {
-      final CardPresencePassiveMonitoringJobAdapter cardPresencePassiveMonitoringJobAdapter =
-          new CardPresencePassiveMonitoringJobAdapter(reader, WAIT_FOR_CARD_INSERTION);
+      final FsmJobCardPresencePassiveMonitoring fsmJobCardPresencePassiveMonitoring =
+          new FsmJobCardPresencePassiveMonitoring(reader, WAIT_FOR_CARD_INSERTION);
       states.put(
           WAIT_FOR_CARD_INSERTION,
-          new WaitForCardInsertionStateAdapter(
-              this.reader, cardPresencePassiveMonitoringJobAdapter, executorService));
+          new FsmStateWaitForCardInsertion(
+              this.reader, fsmJobCardPresencePassiveMonitoring, executorService));
     } else {
       throw new IllegalStateException(
           "Cannot cast the provided reader extension to a valid WaitForCardInsertion interface. "
@@ -98,37 +90,37 @@ final class ObservableReaderStateServiceAdapter {
 
     // processing
     if (readerSpi instanceof CardPresenceMonitorBlockingSpi) {
-      final CardPresencePassiveMonitoringJobAdapter cardPresencePassiveMonitoringJobAdapter =
-          new CardPresencePassiveMonitoringJobAdapter(reader, WAIT_FOR_CARD_PROCESSING);
+      final FsmJobCardPresencePassiveMonitoring fsmJobCardPresencePassiveMonitoring =
+          new FsmJobCardPresencePassiveMonitoring(reader, WAIT_FOR_CARD_PROCESSING);
       states.put(
           WAIT_FOR_CARD_PROCESSING,
-          new WaitForCardProcessingStateAdapter(
-              this.reader, cardPresencePassiveMonitoringJobAdapter, executorService));
+          new FsmStateWaitForCardProcessing(
+              this.reader, fsmJobCardPresencePassiveMonitoring, executorService));
     } else {
-      states.put(WAIT_FOR_CARD_PROCESSING, new WaitForCardProcessingStateAdapter(this.reader));
+      states.put(WAIT_FOR_CARD_PROCESSING, new FsmStateWaitForCardProcessing(this.reader));
     }
 
     // removal
     if (readerSpi instanceof CardRemovalWaiterAsynchronousSpi) {
-      states.put(WAIT_FOR_CARD_REMOVAL, new WaitForCardRemovalStateAdapter(this.reader));
+      states.put(WAIT_FOR_CARD_REMOVAL, new FsmStateWaitForCardRemoval(this.reader));
 
     } else if (readerSpi instanceof CardRemovalWaiterNonBlockingSpi) {
       int sleepDurationMillis =
           ((CardRemovalWaiterNonBlockingSpi) readerSpi).getCardRemovalMonitoringSleepDuration();
-      CardPresenceActiveMonitoringJobAdapter cardPresenceActiveMonitoringJobAdapter =
-          new CardPresenceActiveMonitoringJobAdapter(
+      FsmJobCardPresenceActiveMonitoring fsmJobCardPresenceActiveMonitoring =
+          new FsmJobCardPresenceActiveMonitoring(
               this.reader, sleepDurationMillis, WAIT_FOR_CARD_REMOVAL);
       states.put(
           WAIT_FOR_CARD_REMOVAL,
-          new WaitForCardRemovalStateAdapter(
-              this.reader, cardPresenceActiveMonitoringJobAdapter, executorService));
+          new FsmStateWaitForCardRemoval(
+              this.reader, fsmJobCardPresenceActiveMonitoring, executorService));
     } else if (readerSpi instanceof CardRemovalWaiterBlockingSpi) {
-      final CardPresencePassiveMonitoringJobAdapter cardPresencePassiveMonitoringJobAdapter =
-          new CardPresencePassiveMonitoringJobAdapter(reader, WAIT_FOR_CARD_REMOVAL);
+      final FsmJobCardPresencePassiveMonitoring fsmJobCardPresencePassiveMonitoring =
+          new FsmJobCardPresencePassiveMonitoring(reader, WAIT_FOR_CARD_REMOVAL);
       states.put(
           WAIT_FOR_CARD_REMOVAL,
-          new WaitForCardRemovalStateAdapter(
-              this.reader, cardPresencePassiveMonitoringJobAdapter, executorService));
+          new FsmStateWaitForCardRemoval(
+              this.reader, fsmJobCardPresencePassiveMonitoring, executorService));
     } else {
       throw new IllegalStateException(
           "Cannot cast the provided reader extension to a valid WaitForCardRemoval interface. "
@@ -143,22 +135,21 @@ final class ObservableReaderStateServiceAdapter {
    * Thread safe method to communicate an internal event to this reader Use this method to inform
    * the reader of external event like a tag discovered or a card inserted
    *
-   * @param event internal event
+   * @param trigger internal event
    * @since 2.0.0
    */
-  synchronized void onEvent(ObservableLocalReaderAdapter.InternalEvent event) {
-    switch (event) {
+  synchronized void onTrigger(Trigger trigger) {
+    switch (trigger) {
       case CARD_INSERTED:
       case CARD_REMOVED:
-      case CARD_PROCESSED:
-      case STOP_DETECT: // Manage during the switchState() method call
-      case TIME_OUT:
+      case CARD_PROCESSING_ENDED:
+      case CARD_DETECTION_STOP_REQUESTED: // Manage during the switchState() method call
         break;
-      case START_DETECT:
+      case CARD_DETECTION_START_REQUESTED:
         readerSpi.onStartDetection();
         break;
     }
-    currentState.onEvent(event);
+    currentState.onTrigger(trigger);
   }
 
   /**
@@ -168,7 +159,7 @@ final class ObservableReaderStateServiceAdapter {
    * @param stateId next state to onActivate
    * @since 2.0.0
    */
-  synchronized void switchState(AbstractObservableStateAdapter.MonitoringState stateId) {
+  synchronized void switchState(FsmState.State stateId) {
 
     if (currentState != null) {
       if (logger.isTraceEnabled()) {
@@ -208,12 +199,10 @@ final class ObservableReaderStateServiceAdapter {
   }
 
   /**
-   * Get the current reader monitoring state
-   *
-   * @return current monitoring state
+   * @return the current FSM state.
    * @since 2.0.0
    */
-  synchronized AbstractObservableStateAdapter.MonitoringState getCurrentMonitoringState() {
+  synchronized FsmState.State getCurrentState() {
     return currentState.getMonitoringState();
   }
 
@@ -227,5 +216,43 @@ final class ObservableReaderStateServiceAdapter {
    */
   void shutdown() {
     executorService.shutdown();
+  }
+
+  /**
+   * The events that drive the card's observation state machine.
+   *
+   * @since 2.0.0
+   */
+  enum Trigger {
+    /**
+     * A card has been inserted
+     *
+     * @since 2.0.0
+     */
+    CARD_INSERTED,
+    /**
+     * The card has been removed
+     *
+     * @since 2.0.0
+     */
+    CARD_REMOVED,
+    /**
+     * The application has completed the processing of the card
+     *
+     * @since 2.0.0
+     */
+    CARD_PROCESSING_ENDED,
+    /**
+     * The application has requested the start of card detection
+     *
+     * @since 2.0.0
+     */
+    CARD_DETECTION_START_REQUESTED,
+    /**
+     * The application has requested that card detection is to be stopped.
+     *
+     * @since 2.0.0
+     */
+    CARD_DETECTION_STOP_REQUESTED,
   }
 }
