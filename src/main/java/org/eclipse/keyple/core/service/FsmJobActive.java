@@ -40,10 +40,10 @@ final class FsmJobActive implements FsmJob {
   private static final String JOB_ID = "ACTIVE";
 
   private final long sleepDurationMillis;
-  private FsmState fsmState;
-  private FsmState.State state;
+  private FsmState state;
+  private FsmState.StateId stateId;
   private ObservableReaderSpi readerSpi;
-  private final AtomicBoolean loop = new AtomicBoolean();
+  private final AtomicBoolean running = new AtomicBoolean();
 
   /**
    * Creates a polling monitoring job.
@@ -62,9 +62,9 @@ final class FsmJobActive implements FsmJob {
    * @since 4.0.0
    */
   @Override
-  public void init(FsmState fsmState, ObservableReaderSpi readerSpi) {
-    this.fsmState = fsmState;
-    this.state = fsmState.getState();
+  public void initialize(FsmState fsmState, ObservableReaderSpi readerSpi) {
+    this.state = fsmState;
+    this.stateId = fsmState.getStateId();
     this.readerSpi = readerSpi;
   }
 
@@ -74,16 +74,16 @@ final class FsmJobActive implements FsmJob {
    * @since 2.0.0
    */
   @Override
-  public Runnable getRunnableTask() {
+  public Runnable getTask() {
     return new Runnable() {
       /**
-       * Runs the polling loop until a card insertion or removal is detected, or until the stop
-       * method is called.
+       * Runs the polling loop until a card insertion or removal is detected, or until stop is
+       * called.
        *
-       * <p>In state {@link FsmState.State#WAIT_FOR_CARD_INSERTION}, the loop dispatches {@link
+       * <p>In state {@link FsmState.StateId#WAIT_FOR_CARD_INSERTION}, the loop dispatches {@link
        * FsmService.Trigger#CARD_INSERTED} via {@link FsmState#fire(FsmService.Trigger)} as soon as
        * {@code isCardPresent()} returns {@code true}. In state {@link
-       * FsmState.State#WAIT_FOR_CARD_REMOVAL}, it dispatches {@link
+       * FsmState.StateId#WAIT_FOR_CARD_REMOVAL}, it dispatches {@link
        * FsmService.Trigger#CARD_REMOVED} as soon as {@code isCardPresent()} returns {@code false}.
        *
        * <p>Triggers are dispatched through {@link FsmState#fire(FsmService.Trigger)} rather than
@@ -99,30 +99,30 @@ final class FsmJobActive implements FsmJob {
         try {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, fsmService={}] Monitoring job started [state={}]",
+                "[fsmJob={}, fsmService={}] Monitoring job started [stateId={}]",
                 JOB_ID,
-                fsmState.getFsmServiceId(),
-                state);
+                state.getServiceId(),
+                stateId);
           }
-          // re-init loop value to true
-          loop.set(true);
-          while (loop.get()) {
+          // re-init running flag to true
+          running.set(true);
+          while (running.get()) {
             // polls for CARD_INSERTED
-            if (state == FsmState.State.WAIT_FOR_CARD_INSERTION && readerSpi.isCardPresent()) {
+            if (stateId == FsmState.StateId.WAIT_FOR_CARD_INSERTION && readerSpi.isCardPresent()) {
               if (logger.isTraceEnabled()) {
                 logger.trace(
-                    "[fsmJob={}, fsmService={}] Card detected", JOB_ID, fsmState.getFsmServiceId());
+                    "[fsmJob={}, fsmService={}] Card detected", JOB_ID, state.getServiceId());
               }
-              fsmState.fire(FsmService.Trigger.CARD_INSERTED);
+              state.fire(FsmService.Trigger.CARD_INSERTED);
               return;
             }
             // polls for CARD_REMOVED
-            if (state == FsmState.State.WAIT_FOR_CARD_REMOVAL && !readerSpi.isCardPresent()) {
+            if (stateId == FsmState.StateId.WAIT_FOR_CARD_REMOVAL && !readerSpi.isCardPresent()) {
               if (logger.isTraceEnabled()) {
                 logger.trace(
-                    "[fsmJob={}, fsmService={}] Card removed", JOB_ID, fsmState.getFsmServiceId());
+                    "[fsmJob={}, fsmService={}] Card removed", JOB_ID, state.getServiceId());
               }
-              fsmState.fire(FsmService.Trigger.CARD_REMOVED);
+              state.fire(FsmService.Trigger.CARD_REMOVED);
               return;
             }
             // wait a bit
@@ -131,22 +131,20 @@ final class FsmJobActive implements FsmJob {
             } catch (InterruptedException ignored) {
               // Restore interrupted state...
               Thread.currentThread().interrupt();
-              loop.set(false);
+              running.set(false);
             }
           }
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, fsmService={}] Monitoring job stopped",
-                JOB_ID,
-                fsmState.getFsmServiceId());
+                "[fsmJob={}, fsmService={}] Monitoring job stopped", JOB_ID, state.getServiceId());
           }
         } catch (ReaderIOException | RuntimeException e) {
           logger.warn(
               "[fsmJob={}, fsmService={}] Monitoring job failure [reason={}]",
               JOB_ID,
-              fsmState.getFsmServiceId(),
+              state.getServiceId(),
               e.getMessage());
-          fsmState.onError(e);
+          state.onError(e);
         }
       }
     };
@@ -161,11 +159,11 @@ final class FsmJobActive implements FsmJob {
   public void stop() {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[fsmJob={}, fsmService={}] Stopping monitoring job [state={}]",
+          "[fsmJob={}, fsmService={}] Stopping monitoring job [stateId={}]",
           JOB_ID,
-          fsmState.getFsmServiceId(),
-          state);
+          state.getServiceId(),
+          stateId);
     }
-    loop.set(false);
+    running.set(false);
   }
 }

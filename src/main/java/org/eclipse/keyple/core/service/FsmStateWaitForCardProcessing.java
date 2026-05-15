@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * FSM state implementation for the {@link FsmState.State#WAIT_FOR_CARD_PROCESSING} phase.
+ * FSM state implementation for the {@link FsmState.StateId#WAIT_FOR_CARD_PROCESSING} phase.
  *
  * <p>In this state the card is present and the application is processing it. If the reader
  * implements {@link
@@ -27,17 +27,17 @@ import org.slf4j.LoggerFactory;
  *
  * <ul>
  *   <li>Upon {@link FsmService.Trigger#CARD_PROCESSING_ENDED}, the machine transitions to {@link
- *       FsmState.State#WAIT_FOR_CARD_REMOVAL} when the detection mode is {@link
+ *       FsmState.StateId#WAIT_FOR_CARD_REMOVAL} when the detection mode is {@link
  *       ObservableCardReader.DetectionMode#REPEATING}, or to {@link
- *       FsmState.State#WAIT_FOR_START_DETECTION} otherwise.
+ *       FsmState.StateId#WAIT_FOR_START_DETECTION} otherwise.
  *   <li>Upon {@link FsmService.Trigger#CARD_REMOVED} (raised by the passive monitoring job when the
  *       card is unexpectedly removed), the machine transitions to {@link
- *       FsmState.State#WAIT_FOR_CARD_INSERTION} when the detection mode is {@link
+ *       FsmState.StateId#WAIT_FOR_CARD_INSERTION} when the detection mode is {@link
  *       ObservableCardReader.DetectionMode#REPEATING}, or to {@link
- *       FsmState.State#WAIT_FOR_START_DETECTION} otherwise. The card removal is also notified to
+ *       FsmState.StateId#WAIT_FOR_START_DETECTION} otherwise. The card removal is also notified to
  *       observers.
  *   <li>Upon {@link FsmService.Trigger#CARD_DETECTION_STOP_REQUESTED}, the machine transitions to
- *       {@link FsmState.State#WAIT_FOR_START_DETECTION}.
+ *       {@link FsmState.StateId#WAIT_FOR_START_DETECTION}.
  *   <li>All other triggers are silently ignored.
  * </ul>
  *
@@ -47,7 +47,7 @@ final class FsmStateWaitForCardProcessing extends FsmState {
 
   private static final Logger logger = LoggerFactory.getLogger(FsmStateWaitForCardProcessing.class);
 
-  static final State STATE = State.WAIT_FOR_CARD_PROCESSING;
+  static final StateId STATE_ID = StateId.WAIT_FOR_CARD_PROCESSING;
 
   /**
    * Creates an instance without a background monitoring job.
@@ -75,7 +75,7 @@ final class FsmStateWaitForCardProcessing extends FsmState {
       ObservableLocalReaderAdapter reader,
       FsmJob monitoringJob,
       ExecutorService executorService) {
-    super(STATE, fsmService, reader, monitoringJob, executorService);
+    super(STATE_ID, fsmService, reader, monitoringJob, executorService);
   }
 
   /**
@@ -88,44 +88,44 @@ final class FsmStateWaitForCardProcessing extends FsmState {
     if (logger.isTraceEnabled()) {
       logger.trace(
           "[fsmState={}, fsmService={}] Processing internal event [type={}]",
-          getState(),
-          getFsmServiceId(),
+          getStateId(),
+          getServiceId(),
           trigger);
     }
     switch (trigger) {
       case CARD_PROCESSING_ENDED:
         if (getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
-          switchState(State.WAIT_FOR_CARD_REMOVAL);
+          switchState(StateId.WAIT_FOR_CARD_REMOVAL);
         } else {
-          switchState(State.WAIT_FOR_START_DETECTION);
+          switchState(StateId.WAIT_FOR_START_DETECTION);
         }
         break;
 
       case CARD_REMOVED:
         if (getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
-          switchState(State.WAIT_FOR_CARD_INSERTION);
+          switchState(StateId.WAIT_FOR_CARD_INSERTION);
         } else {
-          switchState(State.WAIT_FOR_START_DETECTION);
+          switchState(StateId.WAIT_FOR_START_DETECTION);
         }
         getReader().processCardRemoved();
         break;
 
       case CARD_DETECTION_STOP_REQUESTED:
-        switchState(State.WAIT_FOR_START_DETECTION);
+        switchState(StateId.WAIT_FOR_START_DETECTION);
         break;
 
       default:
         if (logger.isTraceEnabled()) {
           logger.trace(
-              "[fsmState={}, fsmService={}] Internal event ignored", getState(), getFsmServiceId());
+              "[fsmState={}, fsmService={}] Internal event ignored", getStateId(), getServiceId());
         }
         break;
     }
     if (logger.isTraceEnabled()) {
       logger.trace(
           "[fsmState={}, fsmService={}] Internal event processed [type={}]",
-          getState(),
-          getFsmServiceId(),
+          getStateId(),
+          getServiceId(),
           trigger);
     }
   }

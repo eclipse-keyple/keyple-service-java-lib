@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * FSM state implementation for the {@link FsmState.State#WAIT_FOR_CARD_INSERTION} phase.
+ * FSM state implementation for the {@link FsmState.StateId#WAIT_FOR_CARD_INSERTION} phase.
  *
  * <p>In this state the reader actively monitors for a card to be presented. On activation, {@link
  * org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi#onStartDetection()} is
@@ -26,12 +26,12 @@ import org.slf4j.LoggerFactory;
  * <ul>
  *   <li>Upon {@link FsmService.Trigger#CARD_INSERTED}, the configured default card selection is
  *       executed if one is set. If a {@link org.eclipse.keypop.reader.CardReaderEvent} is produced,
- *       the machine transitions to {@link FsmState.State#WAIT_FOR_CARD_PROCESSING} and observers
+ *       the machine transitions to {@link FsmState.StateId#WAIT_FOR_CARD_PROCESSING} and observers
  *       are notified. If no event is produced (card did not match the selection filter), the
- *       machine transitions to {@link FsmState.State#WAIT_FOR_CARD_REMOVAL} to wait for the
+ *       machine transitions to {@link FsmState.StateId#WAIT_FOR_CARD_REMOVAL} to wait for the
  *       unmatched card to be removed before resuming detection.
  *   <li>Upon {@link FsmService.Trigger#CARD_DETECTION_STOP_REQUESTED}, the machine transitions to
- *       {@link FsmState.State#WAIT_FOR_START_DETECTION}.
+ *       {@link FsmState.StateId#WAIT_FOR_START_DETECTION}.
  *   <li>All other triggers are silently ignored.
  * </ul>
  *
@@ -41,7 +41,7 @@ final class FsmStateWaitForCardInsertion extends FsmState {
 
   private static final Logger logger = LoggerFactory.getLogger(FsmStateWaitForCardInsertion.class);
 
-  static final State STATE = State.WAIT_FOR_CARD_INSERTION;
+  static final StateId STATE_ID = StateId.WAIT_FOR_CARD_INSERTION;
 
   /**
    * Creates an instance without a background monitoring job.
@@ -69,7 +69,7 @@ final class FsmStateWaitForCardInsertion extends FsmState {
       ObservableLocalReaderAdapter reader,
       FsmJob monitoringJob,
       ExecutorService executorService) {
-    super(STATE, fsmService, reader, monitoringJob, executorService);
+    super(STATE_ID, fsmService, reader, monitoringJob, executorService);
   }
 
   /**
@@ -97,8 +97,8 @@ final class FsmStateWaitForCardInsertion extends FsmState {
     if (logger.isTraceEnabled()) {
       logger.trace(
           "[fsmState={}, fsmService={}] Processing internal event [type={}]",
-          getState(),
-          getFsmServiceId(),
+          getStateId(),
+          getServiceId(),
           trigger);
     }
     switch (trigger) {
@@ -107,7 +107,7 @@ final class FsmStateWaitForCardInsertion extends FsmState {
         CardReaderEvent cardEvent = getReader().processCardInserted();
         if (cardEvent != null) {
           // switch internal state
-          switchState(State.WAIT_FOR_CARD_PROCESSING);
+          switchState(StateId.WAIT_FOR_CARD_PROCESSING);
           // notify the external observer of the event
           getReader().notifyObservers(cardEvent);
         } else {
@@ -117,29 +117,29 @@ final class FsmStateWaitForCardInsertion extends FsmState {
           if (logger.isTraceEnabled()) {
             logger.trace(
                 "[fsmState={}, fsmService={}] Inserted card hasn't matched",
-                getState(),
-                getFsmServiceId());
+                getStateId(),
+                getServiceId());
           }
-          switchState(State.WAIT_FOR_CARD_REMOVAL);
+          switchState(StateId.WAIT_FOR_CARD_REMOVAL);
         }
         break;
 
       case CARD_DETECTION_STOP_REQUESTED:
-        switchState(State.WAIT_FOR_START_DETECTION);
+        switchState(StateId.WAIT_FOR_START_DETECTION);
         break;
 
       default:
         if (logger.isTraceEnabled()) {
           logger.trace(
-              "[fsmState={}, fsmService={}] Internal event ignored", getState(), getFsmServiceId());
+              "[fsmState={}, fsmService={}] Internal event ignored", getStateId(), getServiceId());
         }
         break;
     }
     if (logger.isTraceEnabled()) {
       logger.trace(
           "[fsmState={}, fsmService={}] Internal event processed [type={}]",
-          getState(),
-          getFsmServiceId(),
+          getStateId(),
+          getServiceId(),
           trigger);
     }
   }

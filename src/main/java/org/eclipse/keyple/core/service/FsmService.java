@@ -11,7 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import static org.eclipse.keyple.core.service.FsmState.State.*;
+import static org.eclipse.keyple.core.service.FsmState.StateId.*;
 
 import java.util.EnumMap;
 import java.util.concurrent.ExecutorService;
@@ -42,8 +42,8 @@ final class FsmService {
 
   private final int id;
   private final ExecutorService executorService;
-  private final EnumMap<FsmState.State, FsmState> states;
-  private FsmState currentFsmState;
+  private final EnumMap<FsmState.StateId, FsmState> states;
+  private FsmState currentState;
 
   /**
    * Initializes the states according to the interfaces implemented by the provided reader.
@@ -53,7 +53,7 @@ final class FsmService {
    */
   FsmService(ObservableLocalReaderAdapter reader) {
     id = reader.getName().hashCode();
-    states = new EnumMap<>(FsmState.State.class);
+    states = new EnumMap<>(FsmState.StateId.class);
     executorService = Executors.newSingleThreadExecutor();
 
     // initialize states for each case:
@@ -63,7 +63,7 @@ final class FsmService {
      * START DETECTION
      */
     states.put(
-        FsmStateWaitForStartDetection.STATE, new FsmStateWaitForStartDetection(this, reader));
+        FsmStateWaitForStartDetection.STATE_ID, new FsmStateWaitForStartDetection(this, reader));
 
     /*
      * INSERTION
@@ -71,21 +71,21 @@ final class FsmService {
     if (readerSpi instanceof CardInsertionWaiterAsynchronousSpi) {
 
       states.put(
-          FsmStateWaitForCardInsertion.STATE, new FsmStateWaitForCardInsertion(this, reader));
+          FsmStateWaitForCardInsertion.STATE_ID, new FsmStateWaitForCardInsertion(this, reader));
 
     } else if (readerSpi instanceof CardInsertionWaiterNonBlockingSpi) {
 
       int sleepDurationMillis =
           ((CardInsertionWaiterNonBlockingSpi) readerSpi).getCardInsertionMonitoringSleepDuration();
       states.put(
-          FsmStateWaitForCardInsertion.STATE,
+          FsmStateWaitForCardInsertion.STATE_ID,
           new FsmStateWaitForCardInsertion(
               this, reader, new FsmJobActive(sleepDurationMillis), executorService));
 
     } else if (readerSpi instanceof CardInsertionWaiterBlockingSpi) {
 
       states.put(
-          FsmStateWaitForCardInsertion.STATE,
+          FsmStateWaitForCardInsertion.STATE_ID,
           new FsmStateWaitForCardInsertion(this, reader, new FsmJobPassive(), executorService));
 
     } else {
@@ -101,12 +101,12 @@ final class FsmService {
     if (readerSpi instanceof CardPresenceMonitorBlockingSpi) {
 
       states.put(
-          FsmStateWaitForCardProcessing.STATE,
+          FsmStateWaitForCardProcessing.STATE_ID,
           new FsmStateWaitForCardProcessing(this, reader, new FsmJobPassive(), executorService));
 
     } else {
       states.put(
-          FsmStateWaitForCardProcessing.STATE, new FsmStateWaitForCardProcessing(this, reader));
+          FsmStateWaitForCardProcessing.STATE_ID, new FsmStateWaitForCardProcessing(this, reader));
     }
 
     /*
@@ -114,21 +114,21 @@ final class FsmService {
      */
     if (readerSpi instanceof CardRemovalWaiterAsynchronousSpi) {
 
-      states.put(FsmStateWaitForCardRemoval.STATE, new FsmStateWaitForCardRemoval(this, reader));
+      states.put(FsmStateWaitForCardRemoval.STATE_ID, new FsmStateWaitForCardRemoval(this, reader));
 
     } else if (readerSpi instanceof CardRemovalWaiterNonBlockingSpi) {
 
       int sleepDurationMillis =
           ((CardRemovalWaiterNonBlockingSpi) readerSpi).getCardRemovalMonitoringSleepDuration();
       states.put(
-          FsmStateWaitForCardRemoval.STATE,
+          FsmStateWaitForCardRemoval.STATE_ID,
           new FsmStateWaitForCardRemoval(
               this, reader, new FsmJobActive(sleepDurationMillis), executorService));
 
     } else if (readerSpi instanceof CardRemovalWaiterBlockingSpi) {
 
       states.put(
-          FsmStateWaitForCardRemoval.STATE,
+          FsmStateWaitForCardRemoval.STATE_ID,
           new FsmStateWaitForCardRemoval(this, reader, new FsmJobPassive(), executorService));
 
     } else {
@@ -165,7 +165,7 @@ final class FsmService {
    * @since 2.0.0
    */
   synchronized void fire(Trigger trigger) {
-    currentFsmState.onTrigger(trigger);
+    currentState.onTrigger(trigger);
   }
 
   /**
@@ -173,32 +173,32 @@ final class FsmService {
    *
    * <p>This method should only be invoked by the FSM service itself or by one of its states.
    *
-   * @param state The target state to activate; must not be null.
+   * @param targetStateId The target state to activate; must not be null.
    * @since 2.0.0
    */
-  synchronized void switchState(FsmState.State state) {
-    if (currentFsmState != null) {
+  synchronized void switchState(FsmState.StateId targetStateId) {
+    if (currentState != null) {
       if (logger.isTraceEnabled()) {
         logger.trace(
             "[fsmService={}] Switching state [from={}, to={}]",
             id,
-            currentFsmState.getState(),
-            state);
+            currentState.getStateId(),
+            targetStateId);
       }
-      currentFsmState.onDeactivate();
+      currentState.onDeactivate();
     } else {
       if (logger.isTraceEnabled()) {
-        logger.trace("[fsmService={}] Switching state [from=null, to={}]", id, state);
+        logger.trace("[fsmService={}] Switching state [from=null, to={}]", id, targetStateId);
       }
     }
-    currentFsmState = states.get(state);
-    currentFsmState.onActivate();
+    currentState = states.get(targetStateId);
+    currentState.onActivate();
     if (logger.isTraceEnabled()) {
       logger.trace(
           "[fsmService={}] State switched [current={}, expected={}]",
           id,
-          currentFsmState.getState(),
-          state);
+          currentState.getStateId(),
+          targetStateId);
     }
   }
 

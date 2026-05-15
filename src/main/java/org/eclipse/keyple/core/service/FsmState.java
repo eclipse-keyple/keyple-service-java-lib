@@ -26,37 +26,37 @@ import java.util.concurrent.Future;
  */
 abstract class FsmState {
 
-  private final State state;
+  private final StateId stateId;
   private final ObservableLocalReaderAdapter reader;
-  private final FsmService fsmService;
-  private final FsmJob fsmJob;
+  private final FsmService service;
+  private final FsmJob monitoringJob;
   private final ExecutorService executorService;
   private Future<?> monitoringTask;
 
   /**
    * Creates a new state with a state identifier and an optional background monitoring job.
    *
-   * @param state The state identifier; must not be null.
+   * @param stateId The state identifier; must not be null.
    * @param fsmService The FSM service that owns this state; must not be null.
    * @param reader The observable local reader adapter associated with this state; must not be null.
-   * @param fsmJob The background monitoring job to run while this state is active, or {@code null}
-   *     if no background job is required.
+   * @param monitoringJob The background monitoring job to run while this state is active, or {@code
+   *     null} if no background job is required.
    * @param executorService The executor service used to submit the monitoring job, or {@code null}
-   *     when {@code fsmJob} is {@code null}.
+   *     when {@code monitoringJob} is {@code null}.
    * @since 2.0.0
    */
   FsmState(
-      State state,
+      StateId stateId,
       FsmService fsmService,
       ObservableLocalReaderAdapter reader,
-      FsmJob fsmJob,
+      FsmJob monitoringJob,
       ExecutorService executorService) {
     this.reader = reader;
-    this.fsmService = fsmService;
-    this.state = state;
-    this.fsmJob = fsmJob;
-    if (this.fsmJob != null) {
-      this.fsmJob.init(this, reader.getObservableReaderSpi());
+    this.service = fsmService;
+    this.stateId = stateId;
+    this.monitoringJob = monitoringJob;
+    if (this.monitoringJob != null) {
+      this.monitoringJob.initialize(this, reader.getObservableReaderSpi());
     }
     this.executorService = executorService;
   }
@@ -67,8 +67,8 @@ abstract class FsmState {
    * @return A not null reference.
    * @since 2.0.0
    */
-  final State getState() {
-    return state;
+  final StateId getStateId() {
+    return stateId;
   }
 
   /**
@@ -87,18 +87,18 @@ abstract class FsmState {
    * @return A non-zero integer.
    * @since 4.0.0
    */
-  final int getFsmServiceId() {
-    return fsmService.getId();
+  final int getServiceId() {
+    return service.getId();
   }
 
   /**
    * Requests the parent FSM service to transition to the given state.
    *
-   * @param stateId The target state; must not be null.
+   * @param targetStateId The target state; must not be null.
    * @since 2.0.0
    */
-  final void switchState(State stateId) {
-    fsmService.switchState(stateId);
+  final void switchState(StateId targetStateId) {
+    service.switchState(targetStateId);
   }
 
   /**
@@ -114,7 +114,7 @@ abstract class FsmState {
    * @since 4.0.0
    */
   final void fire(FsmService.Trigger trigger) {
-    fsmService.fire(trigger);
+    service.fire(trigger);
   }
 
   /**
@@ -129,11 +129,11 @@ abstract class FsmState {
    * @since 2.0.0
    */
   void onActivate() {
-    if (fsmJob != null) {
+    if (monitoringJob != null) {
       if (executorService == null) {
         throw new IllegalStateException("ExecutorService is not set. Cannot launch monitoring job");
       }
-      monitoringTask = executorService.submit(fsmJob.getRunnableTask());
+      monitoringTask = executorService.submit(monitoringJob.getTask());
     }
   }
 
@@ -141,7 +141,7 @@ abstract class FsmState {
    * Invoked when this state is deactivated.
    *
    * <p>If a monitoring job is running, {@link FsmJob#stop()} is called first so that the job can
-   * release its blocking resource (e.g. cancel a blocking SPI call or clear a loop flag). The
+   * release its blocking resource (e.g. cancel a blocking SPI call or clear the running flag). The
    * future is then cancelled with interruption enabled ({@code mayInterruptIfRunning = true}) so
    * that a thread sleeping in an active polling loop wakes up immediately rather than waiting for
    * the next poll interval to elapse.
@@ -150,7 +150,7 @@ abstract class FsmState {
    */
   final void onDeactivate() {
     if (monitoringTask != null && !monitoringTask.isDone()) {
-      fsmJob.stop();
+      monitoringJob.stop();
       monitoringTask.cancel(true);
     }
   }
@@ -167,13 +167,13 @@ abstract class FsmState {
    * Forwards an unexpected exception raised during monitoring to the configured observation
    * exception handler.
    *
-   * @param e The exception to forward; must not be null.
+   * @param throwable The exception to forward; must not be null.
    * @since 2.0.0
    */
-  final void onError(Throwable e) {
+  final void onError(Throwable throwable) {
     reader
         .getObservationExceptionHandler()
-        .onReaderObservationError(getReader().getPluginName(), getReader().getName(), e);
+        .onReaderObservationError(getReader().getPluginName(), getReader().getName(), throwable);
   }
 
   /**
@@ -181,7 +181,7 @@ abstract class FsmState {
    *
    * @since 2.0.0
    */
-  enum State {
+  enum StateId {
     /**
      * The reader is idle and waiting for a start signal to enter the card detection mode.
      *

@@ -36,7 +36,7 @@ interface FsmJob {
    *     null.
    * @since 4.0.0
    */
-  void init(FsmState fsmState, ObservableReaderSpi readerSpi);
+  void initialize(FsmState fsmState, ObservableReaderSpi readerSpi);
 
   /**
    * Returns the {@link Runnable} task that performs the monitoring work.
@@ -47,12 +47,12 @@ interface FsmJob {
    * @return A not null reference.
    * @since 2.0.0
    */
-  Runnable getRunnableTask();
+  Runnable getTask();
 
   /**
    * Requests the monitoring job to stop.
    *
-   * <p>For active (polling) jobs this clears the loop flag; for passive (blocking) jobs this
+   * <p>For active (polling) jobs this clears the running flag; for passive (blocking) jobs this
    * delegates to the corresponding SPI cancellation method.
    *
    * @since 2.0.0
