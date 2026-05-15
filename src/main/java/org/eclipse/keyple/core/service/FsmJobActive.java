@@ -14,16 +14,21 @@ package org.eclipse.keyple.core.service;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.keyple.core.plugin.ReaderIOException;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
-import org.eclipse.keypop.reader.CardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This monitoring job polls the {@link CardReader#isCardPresent()} method to detect a card
- * insertion or a card removal.
+ * Monitoring job that detects card insertion or removal by repeatedly polling {@link
+ * org.eclipse.keypop.reader.CardReader#isCardPresent()}.
  *
- * <p>All runtime exceptions that may occur during the monitoring process are caught and notified at
- * the application level through the {@link
+ * <p>This strategy is used for readers that implement {@link
+ * org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterNonBlockingSpi}
+ * or {@link
+ * org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterNonBlockingSpi}.
+ * The poll interval is provided at construction time by the corresponding SPI method.
+ *
+ * <p>All runtime exceptions that may occur during the monitoring process are caught and forwarded
+ * to the application through the {@link
  * org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi} mechanism.
  *
  * @since 2.0.0
@@ -41,9 +46,10 @@ final class FsmJobActive implements FsmJob {
   private final AtomicBoolean loop = new AtomicBoolean();
 
   /**
-   * Build a monitoring job to detect a card insertion or a card removal.
+   * Creates a polling monitoring job.
    *
-   * @param sleepDurationMillis time interval between two presence polls.
+   * @param sleepDurationMillis The time interval in milliseconds between two consecutive {@code
+   *     isCardPresent()} polls; must be positive.
    * @since 2.0.0
    */
   FsmJobActive(long sleepDurationMillis) {
@@ -63,24 +69,24 @@ final class FsmJobActive implements FsmJob {
   }
 
   /**
-   * Gets the monitoring process.
+   * {@inheritDoc}
    *
-   * @return A not null reference.
    * @since 2.0.0
    */
   @Override
   public Runnable getRunnableTask() {
     return new Runnable() {
-
       /**
-       * Executes the monitoring loop for the card reader.
+       * Runs the polling loop until a card insertion or removal is detected, or until {@link
+       * #stop()} is called.
        *
-       * <p>The method continuously polls the card reader to detect card insertion or removal
-       * events. If a card is detected or removed based on the current monitoring state, the
-       * respective event is triggered, and the monitoring loop exits.
+       * <p>In state {@link FsmState.State#WAIT_FOR_CARD_INSERTION}, the loop fires {@link
+       * FsmService.Trigger#CARD_INSERTED} as soon as {@code isCardPresent()} returns {@code true}.
+       * In state {@link FsmState.State#WAIT_FOR_CARD_REMOVAL}, the loop fires {@link
+       * FsmService.Trigger#CARD_REMOVED} as soon as {@code isCardPresent()} returns {@code false}.
        *
-       * <p>Exceptions: - Handles {@link ReaderIOException} and {@link RuntimeException}, notifying
-       * the application through the configured exception handler.
+       * <p>{@link ReaderIOException} and {@link RuntimeException} are caught and forwarded to the
+       * application through the configured observation exception handler.
        */
       @Override
       public void run() {
@@ -141,7 +147,7 @@ final class FsmJobActive implements FsmJob {
   }
 
   /**
-   * Terminates the monitoring process.
+   * {@inheritDoc}
    *
    * @since 2.0.0
    */

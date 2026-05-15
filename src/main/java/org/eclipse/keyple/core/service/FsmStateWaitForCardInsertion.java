@@ -17,16 +17,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Wait for card insertion state implementation.
+ * FSM state implementation for the {@link FsmState.State#WAIT_FOR_CARD_INSERTION} phase.
  *
- * <p>The state during which the insertion of a card is expected.
+ * <p>In this state the reader actively monitors for a card to be presented. On activation, {@link
+ * org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi#onStartDetection()} is
+ * called to notify the underlying hardware that detection has started.
  *
  * <ul>
- *   <li>Upon CARD_INSERTED event, the default selection is processed if required and if the
- *       conditions are met (ALWAYS or CARD_MATCHED) the machine changes state for
- *       WAIT_FOR_CARD_PROCESSING.
- *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_CARD_DETECTION.
- *   <li>Upon CARD_REMOVED event, the machine changes state for WAIT_FOR_CARD_DETECTION.
+ *   <li>Upon {@link FsmService.Trigger#CARD_INSERTED}, the configured default card selection is
+ *       executed if one is set. If a {@link org.eclipse.keypop.reader.CardReaderEvent} is produced,
+ *       the machine transitions to {@link FsmState.State#WAIT_FOR_CARD_PROCESSING} and observers
+ *       are notified. If no event is produced (card did not match the selection filter), the
+ *       machine transitions to {@link FsmState.State#WAIT_FOR_CARD_REMOVAL} to wait for the
+ *       unmatched card to be removed before resuming detection.
+ *   <li>Upon {@link FsmService.Trigger#CARD_DETECTION_STOP_REQUESTED}, the machine transitions to
+ *       {@link FsmState.State#WAIT_FOR_START_DETECTION}.
+ *   <li>All other triggers are silently ignored.
  * </ul>
  *
  * @since 2.0.0
@@ -38,9 +44,10 @@ final class FsmStateWaitForCardInsertion extends FsmState {
   static final State STATE = State.WAIT_FOR_CARD_INSERTION;
 
   /**
-   * Creates an instance.
+   * Creates an instance without a background monitoring job.
    *
-   * @param reader The observable local reader adapter.
+   * @param fsmService The FSM service that owns this state; must not be null.
+   * @param reader The observable local reader adapter; must not be null.
    * @since 2.0.0
    */
   FsmStateWaitForCardInsertion(FsmService fsmService, ObservableLocalReaderAdapter reader) {
@@ -48,12 +55,13 @@ final class FsmStateWaitForCardInsertion extends FsmState {
   }
 
   /**
-   * Creates an instance.
+   * Creates an instance with an optional background monitoring job.
    *
-   * @param fsmService
-   * @param reader The observable local reader adapter.
-   * @param monitoringJob The monitoring job.
-   * @param executorService The executor service to use.
+   * @param fsmService The FSM service that owns this state; must not be null.
+   * @param reader The observable local reader adapter; must not be null.
+   * @param monitoringJob The background monitoring job, or {@code null} if none is required.
+   * @param executorService The executor service used to submit the job, or {@code null} when {@code
+   *     monitoringJob} is {@code null}.
    * @since 2.0.0
    */
   FsmStateWaitForCardInsertion(
@@ -66,6 +74,10 @@ final class FsmStateWaitForCardInsertion extends FsmState {
 
   /**
    * {@inheritDoc}
+   *
+   * <p>Also calls {@link
+   * org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi#onStartDetection()} to
+   * notify the underlying hardware that card detection has started.
    *
    * @since 4.0.0
    */

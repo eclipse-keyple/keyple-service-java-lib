@@ -24,8 +24,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Manages the internal state of an {@link ObservableLocalReaderAdapter} Process Trigger against the
- * current state
+ * Manages the finite state machine (FSM) that drives the card monitoring lifecycle of an {@link
+ * ObservableLocalReaderAdapter}.
+ *
+ * <p>This service instantiates and owns the four FSM states ({@link FsmStateWaitForStartDetection},
+ * {@link FsmStateWaitForCardInsertion}, {@link FsmStateWaitForCardProcessing}, {@link
+ * FsmStateWaitForCardRemoval}), selects the appropriate monitoring strategy ({@link FsmJobActive}
+ * or {@link FsmJobPassive}) based on the SPI interfaces implemented by the underlying reader, and
+ * dispatches {@link Trigger} events to the currently active state.
  *
  * @since 2.0.0
  */
@@ -139,7 +145,12 @@ final class FsmService {
   }
 
   /**
-   * @return the FSM service id
+   * Returns the unique identifier of this FSM service.
+   *
+   * <p>The identifier is derived from the hash code of the reader name and is used in log traces to
+   * correlate FSM events with a specific reader instance.
+   *
+   * @return A non-zero integer.
    * @since 4.0.0
    */
   int getId() {
@@ -147,10 +158,9 @@ final class FsmService {
   }
 
   /**
-   * Thread safe method to communicate an internal event to this reader Use this method to inform
-   * the reader of external event like a tag discovered or a card inserted
+   * Thread-safe method that dispatches the given trigger to the currently active state.
    *
-   * @param trigger internal event
+   * @param trigger The trigger event to dispatch; must not be null.
    * @since 2.0.0
    */
   synchronized void fire(Trigger trigger) {
@@ -158,10 +168,11 @@ final class FsmService {
   }
 
   /**
-   * Thread safe method to switch the state of this reader should only be invoked by this reader or
-   * its state
+   * Thread-safe method that deactivates the current state and activates the target state.
    *
-   * @param state next state to onActivate
+   * <p>This method should only be invoked by the FSM service itself or by one of its states.
+   *
+   * @param state The target state to activate; must not be null.
    * @since 2.0.0
    */
   synchronized void switchState(FsmState.State state) {
@@ -203,37 +214,37 @@ final class FsmService {
   }
 
   /**
-   * The events that drive the card's observation state machine.
+   * Defines the set of internal events that drive the card observation state machine.
    *
    * @since 2.0.0
    */
   enum Trigger {
     /**
-     * A card has been inserted
+     * A card has been inserted into the reader.
      *
      * @since 2.0.0
      */
     CARD_INSERTED,
     /**
-     * The card has been removed
+     * The card has been removed from the reader.
      *
      * @since 2.0.0
      */
     CARD_REMOVED,
     /**
-     * The application has completed the processing of the card
+     * The application has finished processing the card and released it for further observation.
      *
      * @since 2.0.0
      */
     CARD_PROCESSING_ENDED,
     /**
-     * The application has requested the start of card detection
+     * The application has requested that card detection be started.
      *
      * @since 2.0.0
      */
     CARD_DETECTION_START_REQUESTED,
     /**
-     * The application has requested that card detection is to be stopped.
+     * The application has requested that card detection be stopped.
      *
      * @since 2.0.0
      */
