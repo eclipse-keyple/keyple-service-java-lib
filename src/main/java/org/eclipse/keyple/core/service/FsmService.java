@@ -16,6 +16,7 @@ import static org.eclipse.keyple.core.service.FsmState.State.*;
 import java.util.EnumMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.*;
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.CardPresenceMonitorBlockingSpi;
@@ -202,15 +203,28 @@ final class FsmService {
   }
 
   /**
-   * Shuts down the {@link ExecutorService} of this reader.
+   * Shuts down the {@link ExecutorService} of this reader and waits for any running monitoring job
+   * to terminate.
    *
-   * <p>This method should be invoked when the reader monitoring ends in order to stop any remaining
-   * threads.
+   * <p>This method should be invoked when the reader monitoring ends. It initiates an orderly
+   * shutdown, then waits up to one second for the background thread to finish. If the thread has
+   * not stopped within that window (e.g. because the job was not properly stopped beforehand),
+   * {@link ExecutorService#shutdownNow()} is called to interrupt it. If the calling thread is
+   * itself interrupted while waiting, the executor is also forced down and the interrupted status
+   * is restored.
    *
    * @since 2.0.0
    */
   void shutdown() {
     executorService.shutdown();
+    try {
+      if (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
+        executorService.shutdownNow();
+      }
+    } catch (InterruptedException e) {
+      executorService.shutdownNow();
+      Thread.currentThread().interrupt();
+    }
   }
 
   /**

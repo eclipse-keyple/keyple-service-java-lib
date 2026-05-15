@@ -77,13 +77,19 @@ final class FsmJobActive implements FsmJob {
   public Runnable getRunnableTask() {
     return new Runnable() {
       /**
-       * Runs the polling loop until a card insertion or removal is detected, or until {@link
-       * #stop()} is called.
+       * Runs the polling loop until a card insertion or removal is detected, or until the stop
+       * method is called.
        *
-       * <p>In state {@link FsmState.State#WAIT_FOR_CARD_INSERTION}, the loop fires {@link
-       * FsmService.Trigger#CARD_INSERTED} as soon as {@code isCardPresent()} returns {@code true}.
-       * In state {@link FsmState.State#WAIT_FOR_CARD_REMOVAL}, the loop fires {@link
+       * <p>In state {@link FsmState.State#WAIT_FOR_CARD_INSERTION}, the loop dispatches {@link
+       * FsmService.Trigger#CARD_INSERTED} via {@link FsmState#fire(FsmService.Trigger)} as soon as
+       * {@code isCardPresent()} returns {@code true}. In state {@link
+       * FsmState.State#WAIT_FOR_CARD_REMOVAL}, it dispatches {@link
        * FsmService.Trigger#CARD_REMOVED} as soon as {@code isCardPresent()} returns {@code false}.
+       *
+       * <p>Triggers are dispatched through {@link FsmState#fire(FsmService.Trigger)} rather than
+       * {@link FsmState#onTrigger(FsmService.Trigger)} directly, so that they are serialized
+       * through the FSM service's synchronized dispatch method and cannot race with triggers
+       * originating from external threads.
        *
        * <p>{@link ReaderIOException} and {@link RuntimeException} are caught and forwarded to the
        * application through the configured observation exception handler.
@@ -107,7 +113,7 @@ final class FsmJobActive implements FsmJob {
                 logger.trace(
                     "[fsmJob={}, fsmService={}] Card detected", JOB_ID, fsmState.getFsmServiceId());
               }
-              fsmState.onTrigger(FsmService.Trigger.CARD_INSERTED);
+              fsmState.fire(FsmService.Trigger.CARD_INSERTED);
               return;
             }
             // polls for CARD_REMOVED
@@ -116,7 +122,7 @@ final class FsmJobActive implements FsmJob {
                 logger.trace(
                     "[fsmJob={}, fsmService={}] Card removed", JOB_ID, fsmState.getFsmServiceId());
               }
-              fsmState.onTrigger(FsmService.Trigger.CARD_REMOVED);
+              fsmState.fire(FsmService.Trigger.CARD_REMOVED);
               return;
             }
             // wait a bit

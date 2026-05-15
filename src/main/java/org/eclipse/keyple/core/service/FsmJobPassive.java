@@ -80,8 +80,14 @@ final class FsmJobPassive implements FsmJob {
   public Runnable getRunnableTask() {
     return new Runnable() {
       /**
-       * Invokes the appropriate blocking SPI method for the current state, then fires the
-       * corresponding {@link FsmService.Trigger} when the blocking call returns.
+       * Invokes the appropriate blocking SPI method for the current state, then dispatches the
+       * corresponding {@link FsmService.Trigger} via {@link FsmState#fire(FsmService.Trigger)} when
+       * the blocking call returns.
+       *
+       * <p>Triggers are dispatched through {@link FsmState#fire(FsmService.Trigger)} rather than
+       * {@link FsmState#onTrigger(FsmService.Trigger)} directly, so that they are serialized
+       * through the FSM service's synchronized dispatch method and cannot race with triggers
+       * originating from external threads.
        *
        * <p>A {@link org.eclipse.keyple.core.plugin.TaskCanceledException} causes the job to exit
        * silently. Any other {@link ReaderIOException} or {@link RuntimeException} is forwarded to
@@ -104,7 +110,7 @@ final class FsmJobPassive implements FsmJob {
                 logger.trace(
                     "[fsmJob={}, fsmService={}] Card detected", JOB_ID, fsmState.getFsmServiceId());
               }
-              fsmState.onTrigger(FsmService.Trigger.CARD_INSERTED);
+              fsmState.fire(FsmService.Trigger.CARD_INSERTED);
               return;
             case WAIT_FOR_CARD_PROCESSING:
               ((CardPresenceMonitorBlockingSpi) readerSpi).monitorCardPresenceDuringProcessing();
@@ -112,7 +118,7 @@ final class FsmJobPassive implements FsmJob {
                 logger.trace(
                     "[fsmJob={}, fsmService={}] Card removed", JOB_ID, fsmState.getFsmServiceId());
               }
-              fsmState.onTrigger(FsmService.Trigger.CARD_REMOVED);
+              fsmState.fire(FsmService.Trigger.CARD_REMOVED);
               return;
             case WAIT_FOR_CARD_REMOVAL:
               ((CardRemovalWaiterBlockingSpi) readerSpi).waitForCardRemoval();
@@ -120,7 +126,7 @@ final class FsmJobPassive implements FsmJob {
                 logger.trace(
                     "[fsmJob={}, fsmService={}] Card removed", JOB_ID, fsmState.getFsmServiceId());
               }
-              fsmState.onTrigger(FsmService.Trigger.CARD_REMOVED);
+              fsmState.fire(FsmService.Trigger.CARD_REMOVED);
               return;
             default:
           }
