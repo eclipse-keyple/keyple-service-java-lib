@@ -35,27 +35,44 @@ final class FsmStateWaitForCardInsertion extends FsmState {
 
   private static final Logger logger = LoggerFactory.getLogger(FsmStateWaitForCardInsertion.class);
 
+  static final State STATE = State.WAIT_FOR_CARD_INSERTION;
+
   /**
    * Creates an instance.
    *
    * @param reader The observable local reader adapter.
    * @since 2.0.0
    */
-  FsmStateWaitForCardInsertion(ObservableLocalReaderAdapter reader) {
-    this(reader, null, null);
+  FsmStateWaitForCardInsertion(FsmService fsmService, ObservableLocalReaderAdapter reader) {
+    this(fsmService, reader, null, null);
   }
 
   /**
    * Creates an instance.
    *
+   * @param fsmService
    * @param reader The observable local reader adapter.
    * @param monitoringJob The monitoring job.
    * @param executorService The executor service to use.
    * @since 2.0.0
    */
   FsmStateWaitForCardInsertion(
-      ObservableLocalReaderAdapter reader, FsmJob monitoringJob, ExecutorService executorService) {
-    super(State.WAIT_FOR_CARD_INSERTION, reader, monitoringJob, executorService);
+      FsmService fsmService,
+      ObservableLocalReaderAdapter reader,
+      FsmJob monitoringJob,
+      ExecutorService executorService) {
+    super(STATE, fsmService, reader, monitoringJob, executorService);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 4.0.0
+   */
+  @Override
+  void onActivate() {
+    super.onActivate();
+    getReader().getObservableReaderSpi().onStartDetection();
   }
 
   /**
@@ -67,9 +84,9 @@ final class FsmStateWaitForCardInsertion extends FsmState {
   void onTrigger(FsmService.Trigger trigger) {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[fsmState={}, reader={}] Processing internal event [type={}]",
-          getMonitoringState(),
-          getReader().getName(),
+          "[fsmState={}, fsmService={}] Processing internal event [type={}]",
+          getState(),
+          getFsmServiceId(),
           trigger);
     }
     switch (trigger) {
@@ -87,9 +104,9 @@ final class FsmStateWaitForCardInsertion extends FsmState {
           // the monitoring job
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmState={}, reader={}] Inserted card hasn't matched",
-                getMonitoringState(),
-                getReader().getName());
+                "[fsmState={}, fsmService={}] Inserted card hasn't matched",
+                getState(),
+                getFsmServiceId());
           }
           switchState(State.WAIT_FOR_CARD_REMOVAL);
         }
@@ -102,17 +119,15 @@ final class FsmStateWaitForCardInsertion extends FsmState {
       default:
         if (logger.isTraceEnabled()) {
           logger.trace(
-              "[fsmState={}, reader={}] Internal event ignored",
-              getMonitoringState(),
-              getReader().getName());
+              "[fsmState={}, fsmService={}] Internal event ignored", getState(), getFsmServiceId());
         }
         break;
     }
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[fsmState={}, reader={}] Internal event processed [type={}]",
-          getMonitoringState(),
-          getReader().getName(),
+          "[fsmState={}, fsmService={}] Internal event processed [type={}]",
+          getState(),
+          getFsmServiceId(),
           trigger);
     }
   }

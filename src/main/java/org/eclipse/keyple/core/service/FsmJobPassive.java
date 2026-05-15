@@ -43,28 +43,32 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0.0
  */
-final class FsmJobCardPresencePassiveMonitoring extends FsmJob {
+final class FsmJobPassive implements FsmJob {
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(FsmJobCardPresencePassiveMonitoring.class);
+  private static final Logger logger = LoggerFactory.getLogger(FsmJobPassive.class);
 
-  private static final String JOB_ID = "PASSIVE_MONITOR";
-
-  private final ObservableReaderSpi readerSpi;
-
-  private final FsmState.State state;
+  private static final String JOB_ID = "PASSIVE";
+  private FsmState fsmState;
+  private FsmState.State state;
+  private ObservableReaderSpi readerSpi;
 
   /**
    * Constructor.
    *
-   * @param reader reference to the reader
    * @since 2.0.0
    */
-  public FsmJobCardPresencePassiveMonitoring(
-      ObservableLocalReaderAdapter reader, FsmState.State state) {
-    super(reader);
-    readerSpi = reader.getObservableReaderSpi();
-    this.state = state;
+  FsmJobPassive() {}
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 4.0.0
+   */
+  @Override
+  public void init(FsmState fsmState, ObservableReaderSpi readerSpi) {
+    this.fsmState = fsmState;
+    this.state = fsmState.getState();
+    this.readerSpi = readerSpi;
   }
 
   /**
@@ -74,7 +78,7 @@ final class FsmJobCardPresencePassiveMonitoring extends FsmJob {
    * @since 2.0.0
    */
   @Override
-  Runnable getRunnableTask(final FsmState fsmState) {
+  public Runnable getRunnableTask() {
     return new Runnable() {
       /**
        * Monitoring loop
@@ -89,30 +93,33 @@ final class FsmJobCardPresencePassiveMonitoring extends FsmJob {
         try {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, reader={}] Monitoring job started [state={}]",
+                "[fsmJob={}, fsmService={}] Monitoring job started [state={}]",
                 JOB_ID,
-                getReader().getName(),
+                fsmState.getFsmServiceId(),
                 state);
           }
           switch (state) {
             case WAIT_FOR_CARD_INSERTION:
               ((CardInsertionWaiterBlockingSpi) readerSpi).waitForCardInsertion();
               if (logger.isTraceEnabled()) {
-                logger.trace("[fsmJob={}, reader={}] Card detected", JOB_ID, getReader().getName());
+                logger.trace(
+                    "[fsmJob={}, fsmService={}] Card detected", JOB_ID, fsmState.getFsmServiceId());
               }
               fsmState.onTrigger(FsmService.Trigger.CARD_INSERTED);
               return;
             case WAIT_FOR_CARD_PROCESSING:
               ((CardPresenceMonitorBlockingSpi) readerSpi).monitorCardPresenceDuringProcessing();
               if (logger.isTraceEnabled()) {
-                logger.trace("[fsmJob={}, reader={}] Card removed", JOB_ID, getReader().getName());
+                logger.trace(
+                    "[fsmJob={}, fsmService={}] Card removed", JOB_ID, fsmState.getFsmServiceId());
               }
               fsmState.onTrigger(FsmService.Trigger.CARD_REMOVED);
               return;
             case WAIT_FOR_CARD_REMOVAL:
               ((CardRemovalWaiterBlockingSpi) readerSpi).waitForCardRemoval();
               if (logger.isTraceEnabled()) {
-                logger.trace("[fsmJob={}, reader={}] Card removed", JOB_ID, getReader().getName());
+                logger.trace(
+                    "[fsmJob={}, fsmService={}] Card removed", JOB_ID, fsmState.getFsmServiceId());
               }
               fsmState.onTrigger(FsmService.Trigger.CARD_REMOVED);
               return;
@@ -121,20 +128,18 @@ final class FsmJobCardPresencePassiveMonitoring extends FsmJob {
         } catch (TaskCanceledException e) {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, reader={}] Monitoring job stopped [reason={}]",
+                "[fsmJob={}, fsmService={}] Monitoring job stopped [reason={}]",
                 JOB_ID,
-                getReader().getName(),
+                fsmState.getFsmServiceId(),
                 e.getMessage());
           }
         } catch (ReaderIOException | RuntimeException e) {
           logger.warn(
-              "[fsmJob={}, reader={}] Monitoring job failure [reason={}]",
+              "[fsmJob={}, fsmService={}] Monitoring job failure [reason={}]",
               JOB_ID,
-              getReader().getName(),
+              fsmState.getFsmServiceId(),
               e.getMessage());
-          getReader()
-              .getObservationExceptionHandler()
-              .onReaderObservationError(getReader().getPluginName(), getReader().getName(), e);
+          fsmState.onError(e);
         }
       }
     };
@@ -146,12 +151,12 @@ final class FsmJobCardPresencePassiveMonitoring extends FsmJob {
    * @since 2.0.0
    */
   @Override
-  void stop() {
+  public void stop() {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[fsmJob={}, reader={}] Monitoring job stop requested [state={}]",
+          "[fsmJob={}, fsmService={}] Monitoring job stop requested [state={}]",
           JOB_ID,
-          getReader().getName(),
+          fsmState.getFsmServiceId(),
           state);
     }
     switch (state) {

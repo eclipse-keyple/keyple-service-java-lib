@@ -11,48 +11,36 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi;
+
 /**
- * Abstract class for all monitoring jobs.
+ * Interface for all monitoring jobs.
  *
  * @since 2.0.0
  */
-abstract class FsmJob {
-
-  private final ObservableLocalReaderAdapter reader;
+interface FsmJob {
 
   /**
-   * Creates an instance.
+   * Initializes the monitoring job.
    *
-   * @param reader The reader.
-   * @since 2.0.0
+   * @param fsmState
+   * @param readerSpi
+   * @since 4.0.0
    */
-  FsmJob(ObservableLocalReaderAdapter reader) {
-    this.reader = reader;
-  }
-
-  /**
-   * Gets the reader.
-   *
-   * @return A not null reference.
-   * @since 2.0.0
-   */
-  final ObservableLocalReaderAdapter getReader() {
-    return reader;
-  }
+  void init(FsmState fsmState, ObservableReaderSpi readerSpi);
 
   /**
    * Gets the task of the monitoring job.
    *
-   * @param fsmState reference to the state the monitoring job in running against.
    * @return A not null reference.
    * @since 2.0.0
    */
-  abstract Runnable getRunnableTask(FsmState fsmState);
+  Runnable getRunnableTask();
 
   /**
    * Stops/interrupts the monitoring job
    *
    * @since 2.0.0
    */
-  abstract void stop();
+  void stop();
 }

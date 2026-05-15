@@ -34,14 +34,16 @@ final class FsmStateWaitForCardProcessing extends FsmState {
 
   private static final Logger logger = LoggerFactory.getLogger(FsmStateWaitForCardProcessing.class);
 
+  static final State STATE = State.WAIT_FOR_CARD_PROCESSING;
+
   /**
    * Creates an instance.
    *
    * @param reader The observable local reader adapter.
    * @since 2.0.0
    */
-  FsmStateWaitForCardProcessing(ObservableLocalReaderAdapter reader) {
-    this(reader, null, null);
+  FsmStateWaitForCardProcessing(FsmService fsmService, ObservableLocalReaderAdapter reader) {
+    this(fsmService, reader, null, null);
   }
 
   /**
@@ -53,8 +55,11 @@ final class FsmStateWaitForCardProcessing extends FsmState {
    * @since 2.0.0
    */
   FsmStateWaitForCardProcessing(
-      ObservableLocalReaderAdapter reader, FsmJob monitoringJob, ExecutorService executorService) {
-    super(State.WAIT_FOR_CARD_PROCESSING, reader, monitoringJob, executorService);
+      FsmService fsmService,
+      ObservableLocalReaderAdapter reader,
+      FsmJob monitoringJob,
+      ExecutorService executorService) {
+    super(STATE, fsmService, reader, monitoringJob, executorService);
   }
 
   /**
@@ -66,9 +71,9 @@ final class FsmStateWaitForCardProcessing extends FsmState {
   void onTrigger(FsmService.Trigger trigger) {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[fsmState={}, reader={}] Processing internal event [type={}]",
-          getMonitoringState(),
-          getReader().getName(),
+          "[fsmState={}, fsmService={}] Processing internal event [type={}]",
+          getState(),
+          getFsmServiceId(),
           trigger);
     }
     switch (trigger) {
@@ -96,17 +101,15 @@ final class FsmStateWaitForCardProcessing extends FsmState {
       default:
         if (logger.isTraceEnabled()) {
           logger.trace(
-              "[fsmState={}, reader={}] Internal event ignored",
-              getMonitoringState(),
-              getReader().getName());
+              "[fsmState={}, fsmService={}] Internal event ignored", getState(), getFsmServiceId());
         }
         break;
     }
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[fsmState={}, reader={}] Internal event processed [type={}]",
-          getMonitoringState(),
-          getReader().getName(),
+          "[fsmState={}, fsmService={}] Internal event processed [type={}]",
+          getState(),
+          getFsmServiceId(),
           trigger);
     }
   }

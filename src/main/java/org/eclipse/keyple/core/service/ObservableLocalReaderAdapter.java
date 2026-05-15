@@ -106,14 +106,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * @return the current FSM state.
-   * @since 2.0.0
-   */
-  final FsmState.State getCurrentState() {
-    return fsmService.getCurrentState();
-  }
-
-  /**
    * This method is invoked by the card insertion monitoring process when a card is inserted.
    *
    * <p>It will return a {@link CardReaderEvent} or null:
@@ -249,16 +241,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
           new ReaderEventAdapter(
               getPluginName(), getName(), CardReaderEvent.Type.CARD_REMOVED, null));
     }
-  }
-
-  /**
-   * Changes the state of the state machine
-   *
-   * @param stateId new stateId
-   * @since 2.0.0
-   */
-  final void switchState(FsmState.State stateId) {
-    fsmService.switchState(stateId);
   }
 
   /**
@@ -414,7 +396,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
         "[reader={}] Starting card monitoring [detectionMode={}]", getName(), detectionMode);
     Assert.getInstance().notNull(detectionMode, "detectionMode");
     this.detectionMode = detectionMode;
-    fsmService.onTrigger(FsmService.Trigger.CARD_DETECTION_START_REQUESTED);
+    fsmService.fire(FsmService.Trigger.CARD_DETECTION_START_REQUESTED);
   }
 
   /**
@@ -426,7 +408,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   public final void stopCardDetection() {
     // RL-DET-REMCTRL.1
     logger.info("[reader={}] Stopping card monitoring", getName());
-    fsmService.onTrigger(FsmService.Trigger.CARD_DETECTION_STOP_REQUESTED);
+    fsmService.fire(FsmService.Trigger.CARD_DETECTION_STOP_REQUESTED);
   }
 
   /**
@@ -442,7 +424,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
       throw new ReaderCommunicationException(
           "Failed to communicate with reader. Unable to deselect card", e);
     }
-    fsmService.onTrigger(FsmService.Trigger.CARD_PROCESSING_ENDED);
+    fsmService.fire(FsmService.Trigger.CARD_PROCESSING_ENDED);
   }
 
   /**
@@ -464,7 +446,7 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public final void onCardInserted() {
-    fsmService.onTrigger(FsmService.Trigger.CARD_INSERTED);
+    fsmService.fire(FsmService.Trigger.CARD_INSERTED);
   }
 
   /**
@@ -474,6 +456,6 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
    */
   @Override
   public final void onCardRemoved() {
-    fsmService.onTrigger(FsmService.Trigger.CARD_REMOVED);
+    fsmService.fire(FsmService.Trigger.CARD_REMOVED);
   }
 }
