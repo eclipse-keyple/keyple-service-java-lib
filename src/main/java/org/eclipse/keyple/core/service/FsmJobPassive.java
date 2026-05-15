@@ -48,15 +48,10 @@ final class FsmJobPassive implements FsmJob {
   private static final Logger logger = LoggerFactory.getLogger(FsmJobPassive.class);
 
   private static final String JOB_ID = "PASSIVE";
-  private FsmState fsmState;
-  private FsmState.State state;
+  private FsmState state;
+  private FsmState.StateId stateId;
   private ObservableReaderSpi readerSpi;
 
-  /**
-   * Constructor.
-   *
-   * @since 2.0.0
-   */
   FsmJobPassive() {}
 
   /**
@@ -65,9 +60,9 @@ final class FsmJobPassive implements FsmJob {
    * @since 4.0.0
    */
   @Override
-  public void init(FsmState fsmState, ObservableReaderSpi readerSpi) {
-    this.fsmState = fsmState;
-    this.state = fsmState.getState();
+  public void initialize(FsmState fsmState, ObservableReaderSpi readerSpi) {
+    this.state = fsmState;
+    this.stateId = fsmState.getStateId();
     this.readerSpi = readerSpi;
   }
 
@@ -77,7 +72,7 @@ final class FsmJobPassive implements FsmJob {
    * @since 2.0.0
    */
   @Override
-  public Runnable getRunnableTask() {
+  public Runnable getTask() {
     return new Runnable() {
       /**
        * Invokes the appropriate blocking SPI method for the current state, then dispatches the
@@ -98,35 +93,35 @@ final class FsmJobPassive implements FsmJob {
         try {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, fsmService={}] Monitoring job started [state={}]",
+                "[fsmJob={}, fsmService={}] Monitoring job started [stateId={}]",
                 JOB_ID,
-                fsmState.getFsmServiceId(),
-                state);
+                state.getServiceId(),
+                stateId);
           }
-          switch (state) {
+          switch (stateId) {
             case WAIT_FOR_CARD_INSERTION:
               ((CardInsertionWaiterBlockingSpi) readerSpi).waitForCardInsertion();
               if (logger.isTraceEnabled()) {
                 logger.trace(
-                    "[fsmJob={}, fsmService={}] Card detected", JOB_ID, fsmState.getFsmServiceId());
+                    "[fsmJob={}, fsmService={}] Card detected", JOB_ID, state.getServiceId());
               }
-              fsmState.fire(FsmService.Trigger.CARD_INSERTED);
+              state.fire(FsmService.Trigger.CARD_INSERTED);
               return;
             case WAIT_FOR_CARD_PROCESSING:
               ((CardPresenceMonitorBlockingSpi) readerSpi).monitorCardPresenceDuringProcessing();
               if (logger.isTraceEnabled()) {
                 logger.trace(
-                    "[fsmJob={}, fsmService={}] Card removed", JOB_ID, fsmState.getFsmServiceId());
+                    "[fsmJob={}, fsmService={}] Card removed", JOB_ID, state.getServiceId());
               }
-              fsmState.fire(FsmService.Trigger.CARD_REMOVED);
+              state.fire(FsmService.Trigger.CARD_REMOVED);
               return;
             case WAIT_FOR_CARD_REMOVAL:
               ((CardRemovalWaiterBlockingSpi) readerSpi).waitForCardRemoval();
               if (logger.isTraceEnabled()) {
                 logger.trace(
-                    "[fsmJob={}, fsmService={}] Card removed", JOB_ID, fsmState.getFsmServiceId());
+                    "[fsmJob={}, fsmService={}] Card removed", JOB_ID, state.getServiceId());
               }
-              fsmState.fire(FsmService.Trigger.CARD_REMOVED);
+              state.fire(FsmService.Trigger.CARD_REMOVED);
               return;
             default:
           }
@@ -135,16 +130,16 @@ final class FsmJobPassive implements FsmJob {
             logger.trace(
                 "[fsmJob={}, fsmService={}] Monitoring job stopped [reason={}]",
                 JOB_ID,
-                fsmState.getFsmServiceId(),
+                state.getServiceId(),
                 e.getMessage());
           }
         } catch (ReaderIOException | RuntimeException e) {
           logger.warn(
               "[fsmJob={}, fsmService={}] Monitoring job failure [reason={}]",
               JOB_ID,
-              fsmState.getFsmServiceId(),
+              state.getServiceId(),
               e.getMessage());
-          fsmState.onError(e);
+          state.onError(e);
         }
       }
     };
@@ -159,12 +154,12 @@ final class FsmJobPassive implements FsmJob {
   public void stop() {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[fsmJob={}, fsmService={}] Monitoring job stop requested [state={}]",
+          "[fsmJob={}, fsmService={}] Monitoring job stop requested [stateId={}]",
           JOB_ID,
-          fsmState.getFsmServiceId(),
-          state);
+          state.getServiceId(),
+          stateId);
     }
-    switch (state) {
+    switch (stateId) {
       case WAIT_FOR_CARD_INSERTION:
         ((CardInsertionWaiterBlockingSpi) readerSpi).stopWaitForCardInsertion();
         break;

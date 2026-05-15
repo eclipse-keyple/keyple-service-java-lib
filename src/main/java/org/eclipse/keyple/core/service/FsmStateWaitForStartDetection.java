@@ -11,11 +11,12 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
+import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * FSM state implementation for the {@link FsmState.State#WAIT_FOR_START_DETECTION} phase.
+ * FSM state implementation for the {@link FsmState.StateId#WAIT_FOR_START_DETECTION} phase.
  *
  * <p>In this idle state the reader does not monitor for card presence; it waits for the application
  * to request the start of card detection. On activation, {@link
@@ -24,7 +25,7 @@ import org.slf4j.LoggerFactory;
  *
  * <ul>
  *   <li>Upon {@link FsmService.Trigger#CARD_DETECTION_START_REQUESTED}, the machine transitions to
- *       {@link FsmState.State#WAIT_FOR_CARD_INSERTION}.
+ *       {@link FsmState.StateId#WAIT_FOR_CARD_INSERTION}.
  *   <li>All other triggers are silently ignored.
  * </ul>
  *
@@ -34,7 +35,7 @@ final class FsmStateWaitForStartDetection extends FsmState {
 
   private static final Logger logger = LoggerFactory.getLogger(FsmStateWaitForStartDetection.class);
 
-  static final State STATE = State.WAIT_FOR_START_DETECTION;
+  static final StateId STATE_ID = StateId.WAIT_FOR_START_DETECTION;
 
   /**
    * Creates an instance without a background monitoring job.
@@ -44,7 +45,25 @@ final class FsmStateWaitForStartDetection extends FsmState {
    * @since 2.0.0
    */
   FsmStateWaitForStartDetection(FsmService fsmService, ObservableLocalReaderAdapter reader) {
-    super(STATE, fsmService, reader, null, null);
+    this(fsmService, reader, null, null);
+  }
+
+  /**
+   * Creates an instance with an optional background monitoring job.
+   *
+   * @param fsmService The FSM service that owns this state; must not be null.
+   * @param reader The observable local reader adapter; must not be null.
+   * @param monitoringJob The background monitoring job, or {@code null} if none is required.
+   * @param executorService The executor service used to submit the job, or {@code null} when {@code
+   *     monitoringJob} is {@code null}.
+   * @since 2.0.0
+   */
+  FsmStateWaitForStartDetection(
+      FsmService fsmService,
+      ObservableLocalReaderAdapter reader,
+      FsmJob monitoringJob,
+      ExecutorService executorService) {
+    super(STATE_ID, fsmService, reader, monitoringJob, executorService);
   }
 
   /**
@@ -72,26 +91,26 @@ final class FsmStateWaitForStartDetection extends FsmState {
     if (logger.isTraceEnabled()) {
       logger.trace(
           "[fsmState={}, fsmService={}] Processing internal event [type={}]",
-          getState(),
-          getFsmServiceId(),
+          getStateId(),
+          getServiceId(),
           trigger);
     }
     switch (trigger) {
       case CARD_DETECTION_START_REQUESTED:
-        switchState(State.WAIT_FOR_CARD_INSERTION);
+        switchState(StateId.WAIT_FOR_CARD_INSERTION);
         break;
       default:
         if (logger.isTraceEnabled()) {
           logger.trace(
-              "[fsmState={}, fsmService={}] Internal event ignored", getState(), getFsmServiceId());
+              "[fsmState={}, fsmService={}] Internal event ignored", getStateId(), getServiceId());
         }
         break;
     }
     if (logger.isTraceEnabled()) {
       logger.trace(
           "[fsmState={}, fsmService={}] Internal event processed [type={}]",
-          getState(),
-          getFsmServiceId(),
+          getStateId(),
+          getServiceId(),
           trigger);
     }
   }
