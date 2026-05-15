@@ -37,7 +37,7 @@ abstract class FsmState {
    * Creates a new state with a state identifier and an optional background monitoring job.
    *
    * @param stateId The state identifier; must not be null.
-   * @param fsmService The FSM service that owns this state; must not be null.
+   * @param service The FSM service that owns this state; must not be null.
    * @param reader The observable local reader adapter associated with this state; must not be null.
    * @param monitoringJob The background monitoring job to run while this state is active, or {@code
    *     null} if no background job is required.
@@ -47,12 +47,12 @@ abstract class FsmState {
    */
   FsmState(
       StateId stateId,
-      FsmService fsmService,
+      FsmService service,
       ObservableLocalReaderAdapter reader,
       FsmJob monitoringJob,
       ExecutorService executorService) {
     this.reader = reader;
-    this.service = fsmService;
+    this.service = service;
     this.stateId = stateId;
     this.monitoringJob = monitoringJob;
     if (this.monitoringJob != null) {
