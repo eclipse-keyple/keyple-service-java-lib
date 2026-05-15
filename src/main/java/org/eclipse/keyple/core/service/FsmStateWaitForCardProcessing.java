@@ -17,15 +17,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Wait for card processing state implementation.
+ * FSM state implementation for the {@link FsmState.State#WAIT_FOR_CARD_PROCESSING} phase.
  *
- * <p>The state during which the card is being processed by the application.
+ * <p>In this state the card is present and the application is processing it. If the reader
+ * implements {@link
+ * org.eclipse.keyple.core.plugin.spi.reader.observable.state.processing.CardPresenceMonitorBlockingSpi},
+ * a passive monitoring job runs concurrently to detect an unexpected card removal during
+ * processing.
  *
  * <ul>
- *   <li>Upon CARD_PROCESSED event, the machine changes state for WAIT_FOR_CARD_REMOVAL or
- *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableCardReader.DetectionMode}
- *       setting.
- *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_CARD_DETECTION.
+ *   <li>Upon {@link FsmService.Trigger#CARD_PROCESSING_ENDED}, the machine transitions to {@link
+ *       FsmState.State#WAIT_FOR_CARD_REMOVAL} when the detection mode is {@link
+ *       ObservableCardReader.DetectionMode#REPEATING}, or to {@link
+ *       FsmState.State#WAIT_FOR_START_DETECTION} otherwise.
+ *   <li>Upon {@link FsmService.Trigger#CARD_REMOVED} (raised by the passive monitoring job when the
+ *       card is unexpectedly removed), the machine transitions to {@link
+ *       FsmState.State#WAIT_FOR_CARD_INSERTION} when the detection mode is {@link
+ *       ObservableCardReader.DetectionMode#REPEATING}, or to {@link
+ *       FsmState.State#WAIT_FOR_START_DETECTION} otherwise. The card removal is also notified to
+ *       observers.
+ *   <li>Upon {@link FsmService.Trigger#CARD_DETECTION_STOP_REQUESTED}, the machine transitions to
+ *       {@link FsmState.State#WAIT_FOR_START_DETECTION}.
+ *   <li>All other triggers are silently ignored.
  * </ul>
  *
  * @since 2.0.0
@@ -37,9 +50,10 @@ final class FsmStateWaitForCardProcessing extends FsmState {
   static final State STATE = State.WAIT_FOR_CARD_PROCESSING;
 
   /**
-   * Creates an instance.
+   * Creates an instance without a background monitoring job.
    *
-   * @param reader The observable local reader adapter.
+   * @param fsmService The FSM service that owns this state; must not be null.
+   * @param reader The observable local reader adapter; must not be null.
    * @since 2.0.0
    */
   FsmStateWaitForCardProcessing(FsmService fsmService, ObservableLocalReaderAdapter reader) {
@@ -47,11 +61,13 @@ final class FsmStateWaitForCardProcessing extends FsmState {
   }
 
   /**
-   * Creates an instance.
+   * Creates an instance with an optional background monitoring job.
    *
-   * @param reader The observable local reader adapter.
-   * @param monitoringJob The monitoring job.
-   * @param executorService The executor service to use.
+   * @param fsmService The FSM service that owns this state; must not be null.
+   * @param reader The observable local reader adapter; must not be null.
+   * @param monitoringJob The background monitoring job, or {@code null} if none is required.
+   * @param executorService The executor service used to submit the job, or {@code null} when {@code
+   *     monitoringJob} is {@code null}.
    * @since 2.0.0
    */
   FsmStateWaitForCardProcessing(

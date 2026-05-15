@@ -15,7 +15,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 /**
- * Abstract class for all states of a {@link ObservableLocalReaderAdapter}.
+ * Abstract base class for all states of the card monitoring FSM owned by an {@link
+ * ObservableLocalReaderAdapter}.
+ *
+ * <p>Each concrete subclass represents one phase of the card lifecycle. States may optionally carry
+ * a background monitoring job ({@link FsmJob}) that is started on {@link #onActivate()} and
+ * cancelled on {@link #onDeactivate()}.
  *
  * @since 2.0.0
  */
@@ -29,14 +34,15 @@ abstract class FsmState {
   private Future<?> monitoringTask;
 
   /**
-   * Create a new state with a state identifier and a monitor job
+   * Creates a new state with a state identifier and an optional background monitoring job.
    *
-   * @param state the state identifier
-   * @param fsmService
-   * @param reader the current reader
-   * @param fsmJob the job to be executed in background (may be null if no background job is
-   *     required)
-   * @param executorService the executor service
+   * @param state The state identifier; must not be null.
+   * @param fsmService The FSM service that owns this state; must not be null.
+   * @param reader The observable local reader adapter associated with this state; must not be null.
+   * @param fsmJob The background monitoring job to run while this state is active, or {@code null}
+   *     if no background job is required.
+   * @param executorService The executor service used to submit the monitoring job, or {@code null}
+   *     when {@code fsmJob} is {@code null}.
    * @since 2.0.0
    */
   FsmState(
@@ -56,9 +62,9 @@ abstract class FsmState {
   }
 
   /**
-   * Get the current state identifier of the state machine
+   * Returns the state identifier of this FSM state.
    *
-   * @return the current state identifier
+   * @return A not null reference.
    * @since 2.0.0
    */
   final State getState() {
@@ -76,7 +82,9 @@ abstract class FsmState {
   }
 
   /**
-   * @return the fsmServiceId
+   * Returns the unique identifier of the parent FSM service.
+   *
+   * @return A non-zero integer.
    * @since 4.0.0
    */
   final int getFsmServiceId() {
@@ -84,9 +92,9 @@ abstract class FsmState {
   }
 
   /**
-   * Switch state in the parent reader
+   * Requests the parent FSM service to transition to the given state.
    *
-   * @param stateId the new state
+   * @param stateId The target state; must not be null.
    * @since 2.0.0
    */
   final void switchState(State stateId) {
@@ -94,10 +102,15 @@ abstract class FsmState {
   }
 
   /**
-   * Invoked when activated, a custom behaviour can be added here.
+   * Invoked when this state becomes active.
    *
+   * <p>If a monitoring job is configured, it is submitted to the executor service. Subclasses may
+   * override this method to perform additional initialization, and must call {@code
+   * super.onActivate()}.
+   *
+   * @throws IllegalStateException if a monitoring job is defined but no executor service was
+   *     provided.
    * @since 2.0.0
-   * @throws IllegalStateException if a job is defined with a null executor service.
    */
   void onActivate() {
     if (fsmJob != null) {
@@ -109,7 +122,7 @@ abstract class FsmState {
   }
 
   /**
-   * Invoked when deactivated. Cancel the monitoringJob is necessary.
+   * Invoked when this state is deactivated. Cancels the monitoring job if one is running.
    *
    * @since 2.0.0
    */
@@ -121,13 +134,20 @@ abstract class FsmState {
   }
 
   /**
-   * Handle Internal Event.
+   * Handles the given trigger event and transitions to the appropriate next state.
    *
-   * @param trigger internal event received by reader
+   * @param trigger The trigger event to handle; must not be null.
    * @since 2.0.0
    */
   abstract void onTrigger(FsmService.Trigger trigger);
 
+  /**
+   * Forwards an unexpected exception raised during monitoring to the configured observation
+   * exception handler.
+   *
+   * @param e The exception to forward; must not be null.
+   * @since 2.0.0
+   */
   final void onError(Throwable e) {
     reader
         .getObservationExceptionHandler()
@@ -135,7 +155,7 @@ abstract class FsmState {
   }
 
   /**
-   * The states that the reader monitoring state machine can have
+   * Enumerates the states that the reader monitoring state machine can have.
    *
    * @since 2.0.0
    */

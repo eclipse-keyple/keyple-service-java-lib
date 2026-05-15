@@ -21,25 +21,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Detect the card removal thanks to the method {@link
- * CardRemovalWaiterBlockingSpi#waitForCardRemoval()} or {@link
- * CardPresenceMonitorBlockingSpi#monitorCardPresenceDuringProcessing()} depending on the provided
- * SPI.
+ * Monitoring job that delegates card detection to a blocking SPI call, allowing the thread to
+ * remain idle until the hardware signals an event.
  *
- * <p>This method is invoked in another thread
+ * <p>This strategy is used for readers that implement one of the following blocking SPIs:
  *
- * <p>This job should be used by readers who have the ability to natively detect the disappearance
- * of the card during a communication session with an ES (between two APDU exchanges).
+ * <ul>
+ *   <li>{@link CardInsertionWaiterBlockingSpi} — for card insertion detection;
+ *   <li>{@link CardPresenceMonitorBlockingSpi} — for card presence monitoring during processing;
+ *   <li>{@link CardRemovalWaiterBlockingSpi} — for card removal detection.
+ * </ul>
  *
- * <p>PC/SC readers have this capability.
+ * <p>PC/SC readers typically have this capability, as they can natively detect card
+ * insertion/removal events without polling.
  *
- * <p>If the card is removed during processing, then an internal CARD_REMOVED event is triggered.
- *
- * <p>If a communication problem with the reader occurs (KeypleReaderIOException) an internal
- * STOP_DETECT event is fired.
- *
- * <p>All runtime exceptions that may occur during the monitoring process are caught and notified at
- * the application level through the appropriate exception handler.
+ * <p>The blocking SPI call runs in a dedicated thread. When the call returns normally, the
+ * appropriate {@link FsmService.Trigger} ({@link FsmService.Trigger#CARD_INSERTED} or {@link
+ * FsmService.Trigger#CARD_REMOVED}) is fired. If the call is cancelled (throws {@link
+ * org.eclipse.keyple.core.plugin.TaskCanceledException}), the job exits silently. Any other
+ * exception is forwarded to the application through the configured observation exception handler.
  *
  * @since 2.0.0
  */
@@ -72,21 +72,20 @@ final class FsmJobPassive implements FsmJob {
   }
 
   /**
-   * Gets the monitoring process.
+   * {@inheritDoc}
    *
-   * @return A not null reference.
    * @since 2.0.0
    */
   @Override
   public Runnable getRunnableTask() {
     return new Runnable() {
       /**
-       * Monitoring loop
+       * Invokes the appropriate blocking SPI method for the current state, then fires the
+       * corresponding {@link FsmService.Trigger} when the blocking call returns.
        *
-       * <p>Waits for the removal of the card until no card is absent. <br>
-       * Triggers a CARD_REMOVED event and exits when the card is no longer present.
-       *
-       * <p>Any exceptions are notified to the application using the exception handler.
+       * <p>A {@link org.eclipse.keyple.core.plugin.TaskCanceledException} causes the job to exit
+       * silently. Any other {@link ReaderIOException} or {@link RuntimeException} is forwarded to
+       * the application through the configured observation exception handler.
        */
       @Override
       public void run() {
@@ -146,7 +145,7 @@ final class FsmJobPassive implements FsmJob {
   }
 
   /**
-   * Terminates the monitoring process.
+   * {@inheritDoc}
    *
    * @since 2.0.0
    */

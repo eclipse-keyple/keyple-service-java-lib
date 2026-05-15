@@ -17,15 +17,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Wait for card removal state implementation.
+ * FSM state implementation for the {@link FsmState.State#WAIT_FOR_CARD_REMOVAL} phase.
  *
- * <p>The state in which the card is still present and awaiting removal.
+ * <p>In this state the card is still physically present in the reader and the machine waits for it
+ * to be removed before resuming detection. This state is entered either after processing has ended
+ * (in {@link ObservableCardReader.DetectionMode#REPEATING} mode) or after a card was inserted but
+ * did not match the configured selection filter.
  *
  * <ul>
- *   <li>Upon CARD_REMOVED event, the machine changes state for WAIT_FOR_CARD_INSERTION or
- *       WAIT_FOR_CARD_DETECTION according to the {@link ObservableCardReader.DetectionMode}
- *       setting.
- *   <li>Upon STOP_DETECT event, the machine changes state for WAIT_FOR_CARD_DETECTION.
+ *   <li>Upon {@link FsmService.Trigger#CARD_REMOVED}, the machine transitions to {@link
+ *       FsmState.State#WAIT_FOR_CARD_INSERTION} when the detection mode is {@link
+ *       ObservableCardReader.DetectionMode#REPEATING}, or to {@link
+ *       FsmState.State#WAIT_FOR_START_DETECTION} otherwise. The card removal is also notified to
+ *       observers.
+ *   <li>Upon {@link FsmService.Trigger#CARD_DETECTION_STOP_REQUESTED}, the machine transitions to
+ *       {@link FsmState.State#WAIT_FOR_START_DETECTION}.
+ *   <li>All other triggers are silently ignored.
  * </ul>
  *
  * @since 2.0.0
@@ -37,9 +44,10 @@ final class FsmStateWaitForCardRemoval extends FsmState {
   static final State STATE = State.WAIT_FOR_CARD_REMOVAL;
 
   /**
-   * Creates an instance.
+   * Creates an instance without a background monitoring job.
    *
-   * @param reader The observable local reader adapter.
+   * @param fsmService The FSM service that owns this state; must not be null.
+   * @param reader The observable local reader adapter; must not be null.
    * @since 2.0.0
    */
   FsmStateWaitForCardRemoval(FsmService fsmService, ObservableLocalReaderAdapter reader) {
@@ -47,11 +55,13 @@ final class FsmStateWaitForCardRemoval extends FsmState {
   }
 
   /**
-   * Creates an instance.
+   * Creates an instance with an optional background monitoring job.
    *
-   * @param reader The observable local reader adapter.
-   * @param monitoringJob The monitoring job.
-   * @param executorService The executor service to use.
+   * @param fsmService The FSM service that owns this state; must not be null.
+   * @param reader The observable local reader adapter; must not be null.
+   * @param monitoringJob The background monitoring job, or {@code null} if none is required.
+   * @param executorService The executor service used to submit the job, or {@code null} when {@code
+   *     monitoringJob} is {@code null}.
    * @since 2.0.0
    */
   FsmStateWaitForCardRemoval(

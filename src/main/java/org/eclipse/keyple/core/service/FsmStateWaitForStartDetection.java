@@ -11,57 +11,48 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Wait for start the card detection state implementation.
+ * FSM state implementation for the {@link FsmState.State#WAIT_FOR_START_DETECTION} phase.
  *
- * <p>The state during which the reader does not wait for a card to be inserted but for a signal
- * from the application to do so (switch to the WAIT_FOR_CARD_INSERTION state).
+ * <p>In this idle state the reader does not monitor for card presence; it waits for the application
+ * to request the start of card detection. On activation, {@link
+ * org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi#onStopDetection()} is
+ * called to notify the underlying hardware that detection is paused.
  *
  * <ul>
- *   <li>Upon START_DETECT event, the machine changes state for WAIT_FOR_CARD_INSERTION.
+ *   <li>Upon {@link FsmService.Trigger#CARD_DETECTION_START_REQUESTED}, the machine transitions to
+ *       {@link FsmState.State#WAIT_FOR_CARD_INSERTION}.
+ *   <li>All other triggers are silently ignored.
  * </ul>
  *
  * @since 2.0.0
  */
 final class FsmStateWaitForStartDetection extends FsmState {
 
-  /** logger */
   private static final Logger logger = LoggerFactory.getLogger(FsmStateWaitForStartDetection.class);
 
   static final State STATE = State.WAIT_FOR_START_DETECTION;
 
   /**
-   * Creates an instance.
+   * Creates an instance without a background monitoring job.
    *
-   * @param reader The observable local reader adapter.
+   * @param fsmService The FSM service that owns this state; must not be null.
+   * @param reader The observable local reader adapter; must not be null.
    * @since 2.0.0
    */
   FsmStateWaitForStartDetection(FsmService fsmService, ObservableLocalReaderAdapter reader) {
-    this(fsmService, reader, null, null);
-  }
-
-  /**
-   * Creates an instance.
-   *
-   * @param reader The observable local reader adapter.
-   * @param monitoringJob The monitoring job.
-   * @param executorService The executor service to use.
-   * @since 2.0.0
-   */
-  FsmStateWaitForStartDetection(
-      FsmService fsmService,
-      ObservableLocalReaderAdapter reader,
-      FsmJob monitoringJob,
-      ExecutorService executorService) {
-    super(STATE, fsmService, reader, monitoringJob, executorService);
+    super(STATE, fsmService, reader, null, null);
   }
 
   /**
    * {@inheritDoc}
+   *
+   * <p>Also calls {@link
+   * org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi#onStopDetection()} to
+   * notify the underlying hardware that card detection is now paused.
    *
    * @since 4.0.0
    */
