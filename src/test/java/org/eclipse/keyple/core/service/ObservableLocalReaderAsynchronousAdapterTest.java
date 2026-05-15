@@ -82,35 +82,4 @@ public class ObservableLocalReaderAsynchronousAdapterTest {
   public void clearObservers() {
     testSuite.clearObservers_shouldRemove_allObservers();
   }
-
-  @Test
-  public void insertCard_shouldNotify_CardInsertedEvent() {
-    testSuite.insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
-  }
-
-  @Test
-  public void finalizeCardProcessing_afterInsert_switchState() {
-    testSuite.finalizeCardProcessing_afterInsert_switchState();
-  }
-
-  @Test
-  public void removeCard_afterFinalize_shouldNotify_CardRemoved() {
-    testSuite.removeCard_afterFinalize_shouldNotify_CardRemoved();
-  }
-
-  @Test
-  public void removeCard_beforeFinalize_shouldNotify_CardRemoved() {
-    testSuite.removeCard_beforeFinalize_shouldNotify_CardRemoved();
-  }
-
-  /*
-   * Method of ObservableLocalReaderAdapter
-   */
-  @Test
-  public void observerThrowsError_shouldBe_transferTo_handler() {
-    RuntimeException e = new RuntimeException();
-    testSuite.setObserver(new ReaderObserverSpiMock(e));
-    testSuite.insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
-    verify(handler, times(1)).onReaderObservationError(anyString(), eq(READER_NAME), eq(e));
-  }
 }

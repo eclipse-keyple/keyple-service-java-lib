@@ -33,15 +33,10 @@ final class FsmService {
 
   private static final Logger logger = LoggerFactory.getLogger(FsmService.class);
 
-  private final ObservableLocalReaderAdapter reader;
-  private final ObservableReaderSpi readerSpi;
-
-  /** Executor service to provide a unique thread used by the various monitoring jobs */
+  private final int id;
   private final ExecutorService executorService;
-
   private final EnumMap<FsmState.State, FsmState> states;
-
-  private FsmState currentState;
+  private FsmState currentFsmState;
 
   /**
    * Initializes the states according to the interfaces implemented by the provided reader.
@@ -50,37 +45,42 @@ final class FsmService {
    * @since 2.0.0
    */
   FsmService(ObservableLocalReaderAdapter reader) {
-    this.reader = reader;
-    readerSpi = reader.getObservableReaderSpi();
-
+    id = reader.getName().hashCode();
     states = new EnumMap<>(FsmState.State.class);
     executorService = Executors.newSingleThreadExecutor();
 
     // initialize states for each case:
+    ObservableReaderSpi readerSpi = reader.getObservableReaderSpi();
 
-    // wait for start
-    states.put(WAIT_FOR_START_DETECTION, new FsmStateWaitForStartDetection(this.reader));
+    /*
+     * START DETECTION
+     */
+    states.put(
+        FsmStateWaitForStartDetection.STATE, new FsmStateWaitForStartDetection(this, reader));
 
-    // insertion
+    /*
+     * INSERTION
+     */
     if (readerSpi instanceof CardInsertionWaiterAsynchronousSpi) {
-      states.put(WAIT_FOR_CARD_INSERTION, new FsmStateWaitForCardInsertion(this.reader));
+
+      states.put(
+          FsmStateWaitForCardInsertion.STATE, new FsmStateWaitForCardInsertion(this, reader));
+
     } else if (readerSpi instanceof CardInsertionWaiterNonBlockingSpi) {
+
       int sleepDurationMillis =
           ((CardInsertionWaiterNonBlockingSpi) readerSpi).getCardInsertionMonitoringSleepDuration();
-      FsmJobCardPresenceActiveMonitoring fsmJobCardPresenceActiveMonitoring =
-          new FsmJobCardPresenceActiveMonitoring(
-              reader, sleepDurationMillis, WAIT_FOR_CARD_INSERTION);
       states.put(
-          WAIT_FOR_CARD_INSERTION,
+          FsmStateWaitForCardInsertion.STATE,
           new FsmStateWaitForCardInsertion(
-              this.reader, fsmJobCardPresenceActiveMonitoring, executorService));
+              this, reader, new FsmJobActive(sleepDurationMillis), executorService));
+
     } else if (readerSpi instanceof CardInsertionWaiterBlockingSpi) {
-      final FsmJobCardPresencePassiveMonitoring fsmJobCardPresencePassiveMonitoring =
-          new FsmJobCardPresencePassiveMonitoring(reader, WAIT_FOR_CARD_INSERTION);
+
       states.put(
-          WAIT_FOR_CARD_INSERTION,
-          new FsmStateWaitForCardInsertion(
-              this.reader, fsmJobCardPresencePassiveMonitoring, executorService));
+          FsmStateWaitForCardInsertion.STATE,
+          new FsmStateWaitForCardInsertion(this, reader, new FsmJobPassive(), executorService));
+
     } else {
       throw new IllegalStateException(
           "Cannot cast the provided reader extension to a valid WaitForCardInsertion interface. "
@@ -88,39 +88,42 @@ final class FsmService {
               + readerSpi.getClass().getName());
     }
 
-    // processing
+    /*
+     * PROCESSING
+     */
     if (readerSpi instanceof CardPresenceMonitorBlockingSpi) {
-      final FsmJobCardPresencePassiveMonitoring fsmJobCardPresencePassiveMonitoring =
-          new FsmJobCardPresencePassiveMonitoring(reader, WAIT_FOR_CARD_PROCESSING);
+
       states.put(
-          WAIT_FOR_CARD_PROCESSING,
-          new FsmStateWaitForCardProcessing(
-              this.reader, fsmJobCardPresencePassiveMonitoring, executorService));
+          FsmStateWaitForCardProcessing.STATE,
+          new FsmStateWaitForCardProcessing(this, reader, new FsmJobPassive(), executorService));
+
     } else {
-      states.put(WAIT_FOR_CARD_PROCESSING, new FsmStateWaitForCardProcessing(this.reader));
+      states.put(
+          FsmStateWaitForCardProcessing.STATE, new FsmStateWaitForCardProcessing(this, reader));
     }
 
-    // removal
+    /*
+     * REMOVAL
+     */
     if (readerSpi instanceof CardRemovalWaiterAsynchronousSpi) {
-      states.put(WAIT_FOR_CARD_REMOVAL, new FsmStateWaitForCardRemoval(this.reader));
+
+      states.put(FsmStateWaitForCardRemoval.STATE, new FsmStateWaitForCardRemoval(this, reader));
 
     } else if (readerSpi instanceof CardRemovalWaiterNonBlockingSpi) {
+
       int sleepDurationMillis =
           ((CardRemovalWaiterNonBlockingSpi) readerSpi).getCardRemovalMonitoringSleepDuration();
-      FsmJobCardPresenceActiveMonitoring fsmJobCardPresenceActiveMonitoring =
-          new FsmJobCardPresenceActiveMonitoring(
-              this.reader, sleepDurationMillis, WAIT_FOR_CARD_REMOVAL);
       states.put(
-          WAIT_FOR_CARD_REMOVAL,
+          FsmStateWaitForCardRemoval.STATE,
           new FsmStateWaitForCardRemoval(
-              this.reader, fsmJobCardPresenceActiveMonitoring, executorService));
+              this, reader, new FsmJobActive(sleepDurationMillis), executorService));
+
     } else if (readerSpi instanceof CardRemovalWaiterBlockingSpi) {
-      final FsmJobCardPresencePassiveMonitoring fsmJobCardPresencePassiveMonitoring =
-          new FsmJobCardPresencePassiveMonitoring(reader, WAIT_FOR_CARD_REMOVAL);
+
       states.put(
-          WAIT_FOR_CARD_REMOVAL,
-          new FsmStateWaitForCardRemoval(
-              this.reader, fsmJobCardPresencePassiveMonitoring, executorService));
+          FsmStateWaitForCardRemoval.STATE,
+          new FsmStateWaitForCardRemoval(this, reader, new FsmJobPassive(), executorService));
+
     } else {
       throw new IllegalStateException(
           "Cannot cast the provided reader extension to a valid WaitForCardRemoval interface. "
@@ -129,6 +132,18 @@ final class FsmService {
     }
 
     switchState(WAIT_FOR_START_DETECTION);
+
+    if (logger.isTraceEnabled()) {
+      logger.trace("[fsmService={}] FSM service initialized [reader={}]", id, reader.getName());
+    }
+  }
+
+  /**
+   * @return the FSM service id
+   * @since 4.0.0
+   */
+  int getId() {
+    return id;
   }
 
   /**
@@ -138,72 +153,41 @@ final class FsmService {
    * @param trigger internal event
    * @since 2.0.0
    */
-  synchronized void onTrigger(Trigger trigger) {
-    switch (trigger) {
-      case CARD_INSERTED:
-      case CARD_REMOVED:
-      case CARD_PROCESSING_ENDED:
-      case CARD_DETECTION_STOP_REQUESTED: // Manage during the switchState() method call
-        break;
-      case CARD_DETECTION_START_REQUESTED:
-        readerSpi.onStartDetection();
-        break;
-    }
-    currentState.onTrigger(trigger);
+  synchronized void fire(Trigger trigger) {
+    currentFsmState.onTrigger(trigger);
   }
 
   /**
    * Thread safe method to switch the state of this reader should only be invoked by this reader or
    * its state
    *
-   * @param stateId next state to onActivate
+   * @param state next state to onActivate
    * @since 2.0.0
    */
-  synchronized void switchState(FsmState.State stateId) {
-
-    if (currentState != null) {
+  synchronized void switchState(FsmState.State state) {
+    if (currentFsmState != null) {
       if (logger.isTraceEnabled()) {
         logger.trace(
             "[fsmService={}] Switching state [from={}, to={}]",
-            reader.getName(),
-            currentState.getMonitoringState(),
-            stateId);
+            id,
+            currentFsmState.getState(),
+            state);
       }
-      currentState.onDeactivate();
+      currentFsmState.onDeactivate();
     } else {
       if (logger.isTraceEnabled()) {
-        logger.trace(
-            "[fsmService={}] Switching state [from=null, to={}]", reader.getName(), stateId);
+        logger.trace("[fsmService={}] Switching state [from=null, to={}]", id, state);
       }
     }
-
-    // switch currentState
-    currentState = states.get(stateId);
-
-    // As soon as the state machine returns to the WAIT_FOR_START_DETECTION state,
-    // we deactivate card detection in the plugin.
-    if (stateId == WAIT_FOR_START_DETECTION) {
-      readerSpi.onStopDetection();
-    }
-
-    // onActivate the new current state
-    currentState.onActivate();
-
+    currentFsmState = states.get(state);
+    currentFsmState.onActivate();
     if (logger.isTraceEnabled()) {
       logger.trace(
           "[fsmService={}] State switched [current={}, expected={}]",
-          reader.getName(),
-          currentState.getMonitoringState(),
-          stateId);
+          id,
+          currentFsmState.getState(),
+          state);
     }
-  }
-
-  /**
-   * @return the current FSM state.
-   * @since 2.0.0
-   */
-  synchronized FsmState.State getCurrentState() {
-    return currentState.getMonitoringState();
   }
 
   /**

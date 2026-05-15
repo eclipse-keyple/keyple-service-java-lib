@@ -28,32 +28,38 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0.0
  */
-final class FsmJobCardPresenceActiveMonitoring extends FsmJob {
+final class FsmJobActive implements FsmJob {
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(FsmJobCardPresenceActiveMonitoring.class);
+  private static final Logger logger = LoggerFactory.getLogger(FsmJobActive.class);
 
-  private static final String JOB_ID = "ACTIVE_MONITOR";
+  private static final String JOB_ID = "ACTIVE";
 
   private final long sleepDurationMillis;
-  private final FsmState.State state;
+  private FsmState fsmState;
+  private FsmState.State state;
+  private ObservableReaderSpi readerSpi;
   private final AtomicBoolean loop = new AtomicBoolean();
-  private final ObservableReaderSpi readerSpi;
 
   /**
    * Build a monitoring job to detect a card insertion or a card removal.
    *
-   * @param reader reader that will be polled with the method isCardPresent()
    * @param sleepDurationMillis time interval between two presence polls.
-   * @param state the associated monitoring state
    * @since 2.0.0
    */
-  public FsmJobCardPresenceActiveMonitoring(
-      ObservableLocalReaderAdapter reader, long sleepDurationMillis, FsmState.State state) {
-    super(reader);
+  FsmJobActive(long sleepDurationMillis) {
     this.sleepDurationMillis = sleepDurationMillis;
-    readerSpi = reader.getObservableReaderSpi();
-    this.state = state;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 4.0.0
+   */
+  @Override
+  public void init(FsmState fsmState, ObservableReaderSpi readerSpi) {
+    this.fsmState = fsmState;
+    this.state = fsmState.getState();
+    this.readerSpi = readerSpi;
   }
 
   /**
@@ -63,7 +69,7 @@ final class FsmJobCardPresenceActiveMonitoring extends FsmJob {
    * @since 2.0.0
    */
   @Override
-  Runnable getRunnableTask(final FsmState fsmState) {
+  public Runnable getRunnableTask() {
     return new Runnable() {
 
       /**
@@ -81,9 +87,9 @@ final class FsmJobCardPresenceActiveMonitoring extends FsmJob {
         try {
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, reader={}] Monitoring job started [state={}]",
+                "[fsmJob={}, fsmService={}] Monitoring job started [state={}]",
                 JOB_ID,
-                getReader().getName(),
+                fsmState.getFsmServiceId(),
                 state);
           }
           // re-init loop value to true
@@ -92,7 +98,8 @@ final class FsmJobCardPresenceActiveMonitoring extends FsmJob {
             // polls for CARD_INSERTED
             if (state == FsmState.State.WAIT_FOR_CARD_INSERTION && readerSpi.isCardPresent()) {
               if (logger.isTraceEnabled()) {
-                logger.trace("[fsmJob={}, reader={}] Card detected", JOB_ID, getReader().getName());
+                logger.trace(
+                    "[fsmJob={}, fsmService={}] Card detected", JOB_ID, fsmState.getFsmServiceId());
               }
               fsmState.onTrigger(FsmService.Trigger.CARD_INSERTED);
               return;
@@ -100,7 +107,8 @@ final class FsmJobCardPresenceActiveMonitoring extends FsmJob {
             // polls for CARD_REMOVED
             if (state == FsmState.State.WAIT_FOR_CARD_REMOVAL && !readerSpi.isCardPresent()) {
               if (logger.isTraceEnabled()) {
-                logger.trace("[fsmJob={}, reader={}] Card removed", JOB_ID, getReader().getName());
+                logger.trace(
+                    "[fsmJob={}, fsmService={}] Card removed", JOB_ID, fsmState.getFsmServiceId());
               }
               fsmState.onTrigger(FsmService.Trigger.CARD_REMOVED);
               return;
@@ -116,17 +124,17 @@ final class FsmJobCardPresenceActiveMonitoring extends FsmJob {
           }
           if (logger.isTraceEnabled()) {
             logger.trace(
-                "[fsmJob={}, reader={}] Monitoring job stopped", JOB_ID, getReader().getName());
+                "[fsmJob={}, fsmService={}] Monitoring job stopped",
+                JOB_ID,
+                fsmState.getFsmServiceId());
           }
         } catch (ReaderIOException | RuntimeException e) {
           logger.warn(
-              "[fsmJob={}, reader={}] Monitoring job failure [reason={}]",
+              "[fsmJob={}, fsmService={}] Monitoring job failure [reason={}]",
               JOB_ID,
-              getReader().getName(),
+              fsmState.getFsmServiceId(),
               e.getMessage());
-          getReader()
-              .getObservationExceptionHandler()
-              .onReaderObservationError(getReader().getPluginName(), getReader().getName(), e);
+          fsmState.onError(e);
         }
       }
     };
@@ -138,12 +146,12 @@ final class FsmJobCardPresenceActiveMonitoring extends FsmJob {
    * @since 2.0.0
    */
   @Override
-  void stop() {
+  public void stop() {
     if (logger.isTraceEnabled()) {
       logger.trace(
-          "[fsmJob={}, reader={}] Stopping monitoring job [state={}]",
+          "[fsmJob={}, fsmService={}] Stopping monitoring job [state={}]",
           JOB_ID,
-          getReader().getName(),
+          fsmState.getFsmServiceId(),
           state);
     }
     loop.set(false);

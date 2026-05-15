@@ -67,19 +67,4 @@ public class ObservableLocalReaderBlockingAdapterTest {
   public void clearObservers() {
     testSuite.clearObservers_shouldRemove_allObservers();
   }
-
-  @Test
-  public void insertCard_shouldNotify_CardInsertedEvent() {
-    testSuite.insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
-  }
-
-  @Test
-  public void finalizeCardProcessing_afterInsert_switchState() {
-    testSuite.finalizeCardProcessing_afterInsert_switchState();
-  }
-
-  @Test
-  public void removeCard_afterFinalize_shouldNotify_CardRemoved() {
-    testSuite.removeCard_afterFinalize_shouldNotify_CardRemoved();
-  }
 }

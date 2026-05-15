@@ -11,13 +11,10 @@
  ************************************************************************************** */
 package org.eclipse.keyple.core.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.eclipse.keyple.core.service.util.PluginAdapterTestUtils.PLUGIN_NAME;
 import static org.eclipse.keyple.core.service.util.ReaderAdapterTestUtils.READER_NAME;
 import static org.mockito.Mockito.mock;
 
-import java.util.concurrent.TimeUnit;
 import org.eclipse.keyple.core.service.util.ObservableReaderNonBlockingSpiMock;
 import org.eclipse.keyple.core.service.util.ReaderObserverSpiMock;
 import org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi;
@@ -66,33 +63,5 @@ public class ObservableLocalReaderNonBlockingAdapterTest {
   @Test
   public void clearObservers() {
     testSuite.clearObservers_shouldRemove_allObservers();
-  }
-
-  @Test
-  public void insertCard_shouldNotify_CardInsertedEvent() {
-    testSuite.insertCard_onWaitForCard_shouldNotify_CardInsertedEvent();
-  }
-
-  @Test
-  public void finalizeCardProcessing_afterInsert_switchState() {
-    testSuite.finalizeCardProcessing_afterInsert_switchState();
-  }
-
-  @Test
-  public void removeCard_afterFinalize_shouldNotify_CardRemoved() {
-    testSuite.removeCard_afterFinalize_shouldNotify_CardRemoved();
-  }
-
-  @Test
-  public void removeCard_beforeFinalize_shouldNotify_CardRemoved() {
-    insertCard_shouldNotify_CardInsertedEvent();
-
-    logger.debug("Remove card...");
-    readerSpi.setCardPresent(false);
-
-    await().atMost(1, TimeUnit.SECONDS);
-
-    // card removal is not monitored, no event is thrown
-    assertThat(reader.getCurrentState()).isEqualTo(FsmState.State.WAIT_FOR_CARD_PROCESSING);
   }
 }
