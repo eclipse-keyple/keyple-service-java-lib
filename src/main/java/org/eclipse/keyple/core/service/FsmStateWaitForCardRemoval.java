@@ -12,6 +12,7 @@
 package org.eclipse.keyple.core.service;
 
 import java.util.concurrent.ExecutorService;
+import org.eclipse.keypop.reader.CardReaderEvent;
 import org.eclipse.keypop.reader.ObservableCardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,12 +89,15 @@ final class FsmStateWaitForCardRemoval extends FsmState {
     }
     switch (trigger) {
       case CARD_REMOVED:
+        CardReaderEvent cardEvent = getReader().processCardRemoved();
         if (getReader().getDetectionMode() == ObservableCardReader.DetectionMode.REPEATING) {
           switchState(StateId.WAIT_FOR_CARD_INSERTION);
         } else {
           switchState(StateId.WAIT_FOR_START_DETECTION);
         }
-        getReader().processCardRemoved();
+        if (cardEvent != null) {
+          getReader().notifyObservers(cardEvent);
+        }
         break;
 
       case CARD_DETECTION_STOP_REQUESTED:

@@ -20,7 +20,7 @@ import org.eclipse.keypop.reader.selection.ScheduledCardSelectionsResponse;
  *
  * @since 2.0.0
  */
-class ScheduledCardSelectionsResponseAdapter implements ScheduledCardSelectionsResponse {
+final class ScheduledCardSelectionsResponseAdapter implements ScheduledCardSelectionsResponse {
 
   private final List<CardSelectionResponseApi> cardSelectionResponses;
 

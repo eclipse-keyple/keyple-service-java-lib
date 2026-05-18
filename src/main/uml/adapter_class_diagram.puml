@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 3.3.6 (2025-07-17)
+    Keyple - Adapter of keyple-service-java-lib - 4.0.0 (2026-05-19)
 end title
 
 ' == THEME ==
@@ -107,7 +107,7 @@ package "org.eclipse.keyple.core.service" as service {
         --
         ~{static} SmartCardServiceAdapter getInstance ()
 
-        ~<color:blue>void boolean isAutomaticStatusCodeHandlingEnabled()
+        ~boolean isAutomaticStatusCodeHandlingEnabled()
         -- **SmartCardService** --
         +Plugin registerPlugin (<back:cyan>KeyplePluginExtensionFactory</back> pluginFactory)
         +void unregisterPlugin (String pluginName)
@@ -384,19 +384,17 @@ package "org.eclipse.keyple.core.service" as service {
         ~MultiSelectionProcessing getMultiSelectionProcessing ()
         ~<back:lightGreen>ChannelControl</back> getChannelControl ()
     }
-    ~class "<<<Back:Yellow>ObservableCardReader</Back>>>\n<<<back:pink>CardInsertionWaiterAsynchronousApi</back>>>\n<<<back:pink>CardRemovalWaiterAsynchronousApi</back>>>\n<<<back:pink>WaitForCardInsertionAutonomousReaderApi</back>>>\n<<<back:pink>WaitForCardRemovalAutonomousReaderApi</back>>>\nObservableLocalReaderAdapter" as ObservableLocalReaderAdapter extends LocalReaderAdapter {
+    ~class "<<<Back:Yellow>ObservableCardReader</Back>>>\n<<<back:pink>CardInsertionWaiterAsynchronousApi</back>>>\n<<<back:pink>CardRemovalWaiterAsynchronousApi</back>>>\nObservableLocalReaderAdapter" as ObservableLocalReaderAdapter extends LocalReaderAdapter {
         --
         ~ObservableLocalReaderAdapter (<back:pink>ObservableReaderSpi</back> observableReaderSpi, String pluginName)
 
         ~**final** <back:pink>ObservableReaderSpi</back> getObservableReaderSpi ()
         ~**final** <back:yellow>CardReaderObservationExceptionHandlerSpi</back> getObservationExceptionHandler ()
         ~**final** <back:yellow>DetectionMode</back> getDetectionMode ()
-        ~**final** MonitoringState getCurrentMonitoringState ()
         ~**final** boolean isCardPresentPing ()
 
         ~**final** <Back:Yellow>CardReaderEvent</Back> processCardInserted ()
-        ~**final** void processCardRemoved ()
-        ~**final** void switchState (MonitoringState stateId)
+        ~**final** <Back:Yellow>CardReaderEvent</Back> processCardRemoved ()
         ~**final** void notifyObservers (<Back:Yellow>CardReaderEvent</Back> event)
 
         ~**final** void scheduleCardSelectionScenario (
@@ -414,18 +412,10 @@ package "org.eclipse.keyple.core.service" as service {
         +**final** void startCardDetection (<back:yellow>DetectionMode</back> detectionMode)
         +**final** void stopCardDetection ()
         +**final** void finalizeCardProcessing ()
-        -- **WaitForCardInsertionAutonomousReaderApi** --
+        -- **CardInsertionWaiterAsynchronousApi** --
         +**final** void onCardInserted ()
-        -- **WaitForCardRemovalAutonomousReaderApi** --
+        -- **CardRemovalWaiterAsynchronousApi** --
         +**final** void onCardRemoved ()
-    }
-    ~enum InternalEvent {
-        CARD_INSERTED
-        CARD_REMOVED
-        SE_PROCESSED
-        START_DETECT
-        STOP_DETECT
-        TIME_OUT
     }
     ~class "<<<Back:Yellow>ConfigurableCardReader</Back>>>\n**final** ObservableLocalConfigurableReaderAdapter" as ObservableLocalConfigurableReaderAdapter extends ObservableLocalReaderAdapter {
         --
@@ -480,133 +470,104 @@ package "org.eclipse.keyple.core.service" as service {
         +<back:yellow>ScheduledCardSelectionsResponse</back> getScheduledCardSelectionsResponse ()
     }
 
-    ' AUTOMATE
-    ~class "**final** ObservableReaderStateServiceAdapter" as ObservableReaderStateServiceAdapter {
+    ' FSM
+    ~class "**final** FsmService" as FsmService {
         --
-        ~ObservableReaderStateServiceAdapter (ObservableLocalReaderAdapter reader)
+        ~FsmService (ObservableLocalReaderAdapter reader)
 
-        ~void onEvent (InternalEvent event)
-        ~void switchState (MonitoringState stateId)
-        ~MonitoringState getCurrentMonitoringState ()
+        ~int getId ()
+        ~synchronized void fire (Trigger trigger)
+        ~synchronized void switchState (FsmState.StateId targetStateId)
         ~void shutdown ()
     }
-    ~abstract class AbstractObservableStateAdapter {
+    ~enum "Trigger" as FsmTrigger {
+        CARD_INSERTED
+        CARD_REMOVED
+        CARD_PROCESSING_ENDED
+        CARD_DETECTION_START_REQUESTED
+        CARD_DETECTION_STOP_REQUESTED
+    }
+    ~interface FsmJob {
+        ~void initialize (FsmState state, <back:pink>ObservableReaderSpi</back> readerSpi)
+        ~Runnable getTask ()
+        ~void stop ()
+    }
+    ~abstract class FsmState {
         --
-        ~AbstractObservableStateAdapter (MonitoringState monitoringState, ObservableLocalReaderAdapter reader, AbstractMonitoringJobAdapter monitoringJob, ExecutorService executorService)
-        ~AbstractObservableStateAdapter (MonitoringState monitoringState, ObservableLocalReaderAdapter reader)
+        ~FsmState (FsmState.StateId stateId, FsmService service,\n\tObservableLocalReaderAdapter reader,\n\tFsmJob monitoringJob, ExecutorService executorService)
 
-        ~**final** MonitoringState getMonitoringState ()
+        ~**final** FsmState.StateId getStateId ()
         ~**final** ObservableLocalReaderAdapter getReader ()
-
-        ~**final** void switchState (MonitoringState stateId)
-
-        ~**final** void onActivate ()
+        ~**final** int getServiceId ()
+        ~**final** void switchState (FsmState.StateId targetStateId)
+        ~**final** void fire (FsmService.Trigger trigger)
+        ~void onActivate ()
         ~**final** void onDeactivate ()
-
-        ~{abstract} **abstract** void onEvent (InternalEvent event)
+        ~{abstract} **abstract** void onTrigger (FsmService.Trigger trigger)
+        ~**final** void onError (Throwable throwable)
     }
-    ~enum MonitoringState {
+    ~enum "StateId" as FsmStateId {
         WAIT_FOR_START_DETECTION
-        WAIT_FOR_SE_INSERTION
-        WAIT_FOR_SE_PROCESSING
-        WAIT_FOR_SE_REMOVAL
+        WAIT_FOR_CARD_INSERTION
+        WAIT_FOR_CARD_PROCESSING
+        WAIT_FOR_CARD_REMOVAL
     }
-
-    ~class "**final** WaitForCardInsertionStateAdapter" as WaitForCardInsertionStateAdapter extends AbstractObservableStateAdapter {
+    ~class "**final** FsmJobActive" as FsmJobActive implements FsmJob {
         --
-        ~WaitForCardInsertionStateAdapter (
-            \tObservableLocalReaderAdapter reader,
-            \tAbstractMonitoringJobAdapter monitoringJob,
-            \tExecutorService executorService)
-        ~WaitForCardInsertionStateAdapter (
-            \tObservableLocalReaderAdapter reader)
-        -- **AbstractObservableStateAdapter** --
-        ~void onEvent (InternalEvent event)
-    }
-    ~class "**final** WaitForCardProcessingStateAdapter" as WaitForCardProcessingStateAdapter extends AbstractObservableStateAdapter {
-        --
-        ~WaitForCardProcessingStateAdapter (
-            \tObservableLocalReaderAdapter reader,
-            \tAbstractMonitoringJobAdapter monitoringJob,
-            \tExecutorService executorService)
-        ~WaitForCardProcessingStateAdapter (
-            \tObservableLocalReaderAdapter reader)
-        -- **AbstractObservableStateAdapter** --
-        ~void onEvent (InternalEvent event)
-    }
-    ~class "**final** WaitForCardRemovalStateAdapter" as WaitForCardRemovalStateAdapter extends AbstractObservableStateAdapter {
-        --
-        ~WaitForCardRemovalStateAdapter (
-            \tObservableLocalReaderAdapter reader,
-            \tAbstractMonitoringJobAdapter monitoringJob,
-            \tExecutorService executorService)
-        ~WaitForCardRemovalStateAdapter (
-            \tObservableLocalReaderAdapter reader)
-        -- **AbstractObservableStateAdapter** --
-        ~void onEvent (InternalEvent event)
-    }
-    ~class "**final** WaitForStartDetectStateAdapter" as WaitForStartDetectStateAdapter extends AbstractObservableStateAdapter {
-        --
-        ~WaitForStartDetectStateAdapter (
-            \tObservableLocalReaderAdapter reader,
-            \tAbstractMonitoringJobAdapter monitoringJob,
-            \tExecutorService executorService)
-        ~WaitForStartDetectStateAdapter (
-            \tObservableLocalReaderAdapter reader)
-        -- **AbstractObservableStateAdapter** --
-        ~void onEvent (InternalEvent event)
-    }
-
-    ~abstract class AbstractMonitoringJobAdapter {
-        --
-        ~AbstractMonitoringJobAdapter (ObservableLocalReaderAdapter reader)
-
-        ~**final** ObservableLocalReaderAdapter getReader ()
-
-        ~{abstract} **abstract** Runnable getMonitoringJob (AbstractObservableStateAdapter monitoringState)
-        ~{abstract} **abstract** void stop ()
-    }
-    ~class "**final** CardRemovalActiveMonitoringJobAdapter" as CardRemovalActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
-        --
-        ~CardRemovalActiveMonitoringJobAdapter (
-            \tObservableLocalReaderAdapter reader,
-            \tlong cycleDurationMillis)
-        -- **AbstractMonitoringJobAdapter** --
-        ~Runnable getMonitoringJob (
-            \tAbstractObservableStateAdapter monitoringState)
+        ~FsmJobActive (long sleepDurationMillis)
+        -- **FsmJob** --
+        ~void initialize (FsmState state, <back:pink>ObservableReaderSpi</back> readerSpi)
+        ~Runnable getTask ()
         ~void stop ()
     }
-    ~class "**final** CardInsertionActiveMonitoringJobAdapter" as CardInsertionActiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+    ~class "**final** FsmJobPassive" as FsmJobPassive implements FsmJob {
         --
-        ~CardInsertionActiveMonitoringJobAdapter (
-            \tObservableLocalReaderAdapter reader,
-            \tlong cycleDurationMillis,
-            \tboolean monitorInsertion)
-        -- **AbstractMonitoringJobAdapter** --
-        ~Runnable getMonitoringJob (
-            \tAbstractObservableStateAdapter monitoringState)
+        ~FsmJobPassive ()
+        -- **FsmJob** --
+        ~void initialize (FsmState state, <back:pink>ObservableReaderSpi</back> readerSpi)
+        ~Runnable getTask ()
         ~void stop ()
     }
-    ~class "**final** CardInsertionPassiveMonitoringJobAdapter" as CardInsertionPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+    ~class "**final** FsmStateWaitForStartDetection" as FsmStateWaitForStartDetection extends FsmState {
         --
-        ~CardInsertionPassiveMonitoringJobAdapter (
-            \tObservableLocalReaderAdapter reader)
-        -- **AbstractMonitoringJobAdapter** --
-        ~Runnable getMonitoringJob (
-            \tAbstractObservableStateAdapter monitoringState)
-        ~void stop ()
+        ~FsmStateWaitForStartDetection (FsmService service,\n\tObservableLocalReaderAdapter reader)
+        ~FsmStateWaitForStartDetection (FsmService service,\n\tObservableLocalReaderAdapter reader,\n\tFsmJob monitoringJob,\n\tExecutorService executorService)
+        -- **FsmState** --
+        ~void onActivate ()
+        ~void onTrigger (FsmService.Trigger trigger)
     }
-    ~class "**final** CardRemovalPassiveMonitoringJobAdapter" as CardRemovalPassiveMonitoringJobAdapter extends AbstractMonitoringJobAdapter {
+    ~class "**final** FsmStateWaitForCardInsertion" as FsmStateWaitForCardInsertion extends FsmState {
         --
-        ~CardRemovalPassiveMonitoringJobAdapter (
-            \tObservableLocalReaderAdapter reader)
-        -- **AbstractMonitoringJobAdapter** --
-        ~Runnable getMonitoringJob (
-            \tAbstractObservableStateAdapter monitoringState)
-        ~void stop ()
+        ~FsmStateWaitForCardInsertion (FsmService service,\n\tObservableLocalReaderAdapter reader)
+        ~FsmStateWaitForCardInsertion (FsmService service,\n\tObservableLocalReaderAdapter reader,\n\tFsmJob monitoringJob,\n\tExecutorService executorService)
+        -- **FsmState** --
+        ~void onActivate ()
+        ~void onTrigger (FsmService.Trigger trigger)
+    }
+    ~class "**final** FsmStateWaitForCardProcessing" as FsmStateWaitForCardProcessing extends FsmState {
+        --
+        ~FsmStateWaitForCardProcessing (FsmService service,\n\tObservableLocalReaderAdapter reader)
+        ~FsmStateWaitForCardProcessing (FsmService service,\n\tObservableLocalReaderAdapter reader,\n\tFsmJob monitoringJob,\n\tExecutorService executorService)
+        -- **FsmState** --
+        ~void onTrigger (FsmService.Trigger trigger)
+    }
+    ~class "**final** FsmStateWaitForCardRemoval" as FsmStateWaitForCardRemoval extends FsmState {
+        --
+        ~FsmStateWaitForCardRemoval (FsmService service,\n\tObservableLocalReaderAdapter reader)
+        ~FsmStateWaitForCardRemoval (FsmService service,\n\tObservableLocalReaderAdapter reader,\n\tFsmJob monitoringJob,\n\tExecutorService executorService)
+        -- **FsmState** --
+        ~void onTrigger (FsmService.Trigger trigger)
     }
 
     ' ADAPTERS
+    ~class "<<<back:yellow>ReaderApiFactory</back>>>\n**final** ReaderApiFactoryAdapter" as ReaderApiFactoryAdapter {
+        --
+        ~ReaderApiFactoryAdapter ()
+        -- **ReaderApiFactory** --
+        +<back:yellow>CardSelectionManager</back> createCardSelectionManager ()
+        +<back:yellow>BasicCardSelector</back> createBasicCardSelector ()
+        +<back:yellow>IsoCardSelector</back> createIsoCardSelector ()
+    }
     ~class "<<<back:yellow>CardSelectionManager</back>>>\n**final** CardSelectionManagerAdapter" as CardSelectionManagerAdapter {
         --
         ~CardSelectionManagerAdapter (MultiSelectionProcessing multiSelectionProcessing)
@@ -689,26 +650,27 @@ AbstractObservableLocalPluginAdapter *-- "1" ObservationManagerAdapter #C_LINK
 
 ObservableRemotePluginAdapter *-- "1" ObservationManagerAdapter #C_LINK
 
-ObservableLocalReaderAdapter +-- InternalEvent
 ObservableLocalReaderAdapter *-- "1" ObservationManagerAdapter #C_LINK
-ObservableLocalReaderAdapter "1" *--* "1" ObservableReaderStateServiceAdapter #C_LINK
+ObservableLocalReaderAdapter "1" *---* "1" FsmService #C_LINK
 ObservableLocalReaderAdapter ..> CardSelectionScenarioAdapter #C_USE : use >
 
-ObservableReaderStateServiceAdapter *-- "1..N" AbstractObservableStateAdapter #C_LINK
+FsmService +-right- FsmTrigger
+FsmService "1" *--* "1..N" FsmState #C_LINK
 
-AbstractObservableStateAdapter +-- MonitoringState
-AbstractObservableStateAdapter *-- "1" MonitoringState #C_LINK
-AbstractObservableStateAdapter *-- "1" ObservableLocalReaderAdapter #C_LINK
-AbstractObservableStateAdapter *-- "0..1" AbstractMonitoringJobAdapter #C_LINK
-
-AbstractMonitoringJobAdapter *-- "1" ObservableLocalReaderAdapter #C_LINK
+FsmState *-up-- "1" ObservableLocalReaderAdapter #C_LINK
+FsmState +-right- FsmStateId
+FsmState "1" *---* "0..1" FsmJob #C_LINK
 
 AbstractPluginAdapter *-- "0..N" AbstractReaderAdapter #C_LINK
 
 ObservableRemoteReaderAdapter *-- "1" ObservationManagerAdapter #C_LINK
 ObservableRemoteReaderAdapter ..> CardSelectionScenarioAdapter #C_USE : use >
 
-SmartCardServiceAdapter .right.> CardSelectionManagerAdapter #C_LINK : create >
+SmartCardServiceAdapter .right.> ReaderApiFactoryAdapter #C_LINK : create >
+
+ReaderApiFactoryAdapter .up.> CardSelectionManagerAdapter #C_LINK : create >
+ReaderApiFactoryAdapter .up.> BasicCardSelectorAdapter #C_LINK : create >
+ReaderApiFactoryAdapter .up.> IsoCardSelectorAdapter #C_LINK : create >
 
 CardSelectionManagerAdapter ..> CardSelectionResultAdapter #C_LINK : create >
 CardSelectionManagerAdapter ..> ScheduledCardSelectionsResponseAdapter #C_USE : use >
@@ -720,7 +682,6 @@ CardResponseAdapter *-- "1..N" ApduResponseAdapter #C_LINK
 
 ' == LAYOUT ==
 
-WaitForStartDetectStateAdapter -[hidden]- AbstractMonitoringJobAdapter
 ObservationManagerAdapter -[hidden]- PluginEventAdapter
 PluginEventAdapter -[hidden]- ReaderEventAdapter
 ReaderEventAdapter -[hidden]- CardSelectionResponseAdapter
@@ -747,19 +708,17 @@ class service.ObservableLocalReaderAdapter <<blue>>
 class service.ObservableLocalConfigurableReaderAdapter <<blue>>
 class service.ObservableRemoteReaderAdapter <<blue>>
 class service.CardSelectionScenarioAdapter <<blue>>
-enum service.InternalEvent <<blue>>
-abstract class service.AbstractObservableStateAdapter <<blue>>
-enum service.MonitoringState <<blue>>
-abstract class service.AbstractMonitoringJobAdapter <<blue>>
-class service.CardRemovalActiveMonitoringJobAdapter <<blue>>
-class service.CardInsertionActiveMonitoringJobAdapter <<blue>>
-class service.CardInsertionPassiveMonitoringJobAdapter <<blue>>
-class service.CardRemovalPassiveMonitoringJobAdapter <<blue>>
-class service.WaitForCardInsertionStateAdapter <<blue>>
-class service.WaitForCardProcessingStateAdapter <<blue>>
-class service.WaitForCardRemovalStateAdapter <<blue>>
-class service.WaitForStartDetectStateAdapter <<blue>>
-class service.ObservableReaderStateServiceAdapter <<blue>>
+class service.FsmService <<blue>>
+enum service.FsmTrigger <<blue>>
+interface service.FsmJob <<blue>>
+abstract class service.FsmState <<blue>>
+enum service.FsmStateId <<blue>>
+class service.FsmJobActive <<blue>>
+class service.FsmJobPassive <<blue>>
+class service.FsmStateWaitForStartDetection <<blue>>
+class service.FsmStateWaitForCardInsertion <<blue>>
+class service.FsmStateWaitForCardProcessing <<blue>>
+class service.FsmStateWaitForCardRemoval <<blue>>
 
 class service.ObservationManagerAdapter <<blue>>
 
@@ -779,6 +738,7 @@ enum service.JsonProperty <<blue>>
 enum service.PluginService <<blue>>
 enum service.ReaderService <<blue>>
 
+class service.ReaderApiFactoryAdapter <<blue>>
 class service.CardSelectionManagerAdapter <<blue>>
 class service.CardSelectionResultAdapter <<blue>>
 class service.ScheduledCardSelectionsResponseAdapter <<blue>>
