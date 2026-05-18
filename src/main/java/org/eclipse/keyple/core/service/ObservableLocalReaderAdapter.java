@@ -229,18 +229,16 @@ class ObservableLocalReaderAdapter extends LocalReaderAdapter
   }
 
   /**
-   * This method is invoked when a card is removed to notify the application of the {@link
-   * CardReaderEvent.Type#CARD_REMOVED} event.
+   * This method is invoked by the card removal monitoring process when a card is removed.
    *
    * @since 2.0.0
    */
-  final void processCardRemoved() {
+  final CardReaderEvent processCardRemoved() {
     // RL-DET-REMNOTIF.1
-    if (isCardRemovedEventNotificationEnabled) {
-      notifyObservers(
-          new ReaderEventAdapter(
-              getPluginName(), getName(), CardReaderEvent.Type.CARD_REMOVED, null));
-    }
+    return isCardRemovedEventNotificationEnabled
+        ? new ReaderEventAdapter(
+            getPluginName(), getName(), CardReaderEvent.Type.CARD_REMOVED, null)
+        : null;
   }
 
   /**

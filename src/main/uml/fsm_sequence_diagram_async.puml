@@ -1,0 +1,249 @@
+@startuml
+title
+    Keyple - FSM Sequence Diagram: Card Insertion, asynchronous observer (REPEATING mode) - keyple-service-java-lib
+end title
+
+' == THEME ==
+
+'Couleurs issues de : https://htmlcolorcodes.com/fr/tableau-de-couleur/tableau-de-couleur-design-plat/
+!define C_GREY1 F8F9F9
+!define C_GREY2 F2F3F4
+!define C_GREY3 E5E7E9
+!define C_GREY4 D7DBDD
+!define C_GREY5 CACFD2
+!define C_GREY6 BDC3C7
+!define C_LINK 3498DB
+!define C_USE 27AE60
+
+' Thread color palette (used on activation bars)
+!define T_APP   AED6F1
+!define T_MON   FAD7A0
+!define T_NOTIF A9DFBF
+
+skinparam BackgroundColor #C_GREY1
+skinparam ArrowThickness 2
+
+skinparam participant {
+    BackgroundColor #EBF5FB
+}
+skinparam actor {
+    BackgroundColor #FEFECE
+    BorderColor #D4AC0D
+    BorderThickness 2
+}
+skinparam sequence {
+    ArrowThickness 2
+    ArrowColor #2C3E50
+    LifeLineBorderColor #3498DB
+    LifeLineBorderThickness 2
+    GroupBorderThickness 2
+    GroupBorderColor #BDC3C7
+    DividerBorderThickness 2
+    DividerBorderColor #BDC3C7
+}
+skinparam note {
+    BackgroundColor #FEFECE
+    BorderColor #D4AC0D
+}
+
+' == CONTENT ==
+
+legend right
+    __Thread color coding__ :
+    * <back:#AED6F1>  Application Thread   </back>
+    * <back:#FAD7A0>  Monitoring Thread    </back>
+    * <back:#A9DFBF>  Notification Thread  </back>
+
+    __Key consequence of the asynchronous observer__ :
+    * notifyObservers() dispatches to a dedicated notification thread and returns immediately.
+    * The monitoring thread exits run() once fire(CARD_INSERTED) returns.
+    * finalizeCardProcessing() is called from the notification thread — acquires the FSM
+      lock independently, after the monitoring thread has released it.
+end legend
+
+actor "Application" as App #FEFECE
+participant "CardReaderObserverSpi\n(observer)" as Observer #FEFECE
+
+participant "ObservableLocalReaderAdapter" as Adapter #EBF5FB
+participant "FsmService\n<<synchronized>>" as FSM #EBF5FB
+participant "FsmState" as State #EBF5FB
+
+box "Monitoring Thread" #FAD7A0
+    participant "FsmJobActive\n(insertion)" as Job #EBF5FB
+    participant "FsmJob\n(removal)" as NewJob #EBF5FB
+end box
+
+participant "ObservableReaderSpi\n(hardware)" as Spi #FDEDEC
+
+' ─── startCardDetection ────────────────────────────────────────────────────────
+
+== startCardDetection (Application Thread) ==
+
+App -> Adapter : startCardDetection(REPEATING)
+activate Adapter #T_APP
+
+Adapter -> FSM : fire(CARD_DETECTION_START_REQUESTED)
+activate FSM #T_APP
+note right of FSM : **synchronized** — acquires FSM lock
+
+FSM -> State : onTrigger(CARD_DETECTION_START_REQUESTED)
+activate State #T_APP
+note right of State : current state:\nWAIT_FOR_START_DETECTION
+
+State -> FSM : switchState(WAIT_FOR_CARD_INSERTION)
+activate FSM #T_APP
+note right of FSM : deactivates WaitForStartDetection\nactivates WaitForCardInsertion
+
+FSM -> Job : submit getTask()
+activate Job #T_MON
+note right : Called from FsmState.onActivate()\nMonitoring job starts in background executor thread
+
+FSM -> Spi : onStartDetection()
+note right : Called from\nWaitForCardInsertion.onActivate()
+
+FSM --> State
+deactivate FSM
+
+State --> FSM
+deactivate State
+
+FSM --> Adapter
+deactivate FSM
+
+Adapter --> App
+deactivate Adapter
+
+' ─── Card detection loop ───────────────────────────────────────────────────────
+
+== Card detection (Monitoring Thread) ==
+
+loop until card detected
+    Job -> Spi : isCardPresent()
+    activate Spi
+    Spi --> Job : false
+    deactivate Spi
+    Job -> Job : sleep(pollIntervalMs)
+end
+
+note over Spi : Card inserted
+
+Job -> Spi : isCardPresent()
+activate Spi
+Spi --> Job : true
+deactivate Spi
+
+' ─── CARD_INSERTED trigger ─────────────────────────────────────────────────────
+
+== CARD_INSERTED trigger (Monitoring Thread) ==
+
+Job -> State : fire(CARD_INSERTED)
+activate State #T_MON
+note right of State : FsmState.fire() — delegates\nto service.fire()
+
+State -> FSM : fire(CARD_INSERTED)
+activate FSM #T_MON
+note right of FSM : **synchronized** — acquires FSM lock\nMonitoring thread holds the lock\nfor the entire trigger processing
+
+FSM -> State : onTrigger(CARD_INSERTED)
+activate State #T_MON
+note right of State : current state:\nWAIT_FOR_CARD_INSERTION
+
+State -> Adapter : processCardInserted()
+activate Adapter #T_MON
+note right : Executes scheduled card\nselection scenario (if any)
+Adapter -> Spi : transmit card selection requests
+activate Spi
+Spi --> Adapter : card selection responses
+deactivate Spi
+Adapter --> State : CardReaderEvent
+deactivate Adapter
+
+State -> FSM : switchState(WAIT_FOR_CARD_PROCESSING)
+activate FSM #T_MON
+note right of FSM : FsmState.onDeactivate() called\non WaitForCardInsertion —\nthen WaitForCardProcessing activated
+
+FSM -> Job : stop()
+activate Job #T_MON
+note right : running = false\nMonitoring thread is still\nexecuting inside fire()
+Job --> FSM
+deactivate Job
+
+FSM -> FSM : monitoringTask.cancel(true)
+note right : Interrupt flag set on monitoring thread\n(no immediate effect — thread is executing\nsynchronized code, not sleeping)
+
+FSM --> State
+deactivate FSM
+
+State -> Adapter : notifyObservers(CardReaderEvent)
+activate Adapter #T_MON
+note right : Asynchronous dispatch\nto notification thread —\nreturns immediately
+Adapter ->> Observer : onReaderEvent(CARD_INSERTED event)
+activate Observer #T_NOTIF
+Adapter --> State
+deactivate Adapter
+
+State --> FSM
+deactivate State
+
+FSM --> State : (service.fire() returns)
+deactivate FSM
+
+State --> Job : (state.fire() returns)
+deactivate State
+
+note over Job : run() exits naturally\n(fire() has returned,\ntask execution is complete)
+deactivate Job
+
+' ─── Observer processes card ───────────────────────────────────────────────────
+
+== Observer processes card (Notification Thread) ==
+
+note over Observer : Business logic\n(e.g. ticketing application\nprocesses the card)
+
+Observer -> Adapter : finalizeCardProcessing()
+activate Adapter #T_NOTIF
+note right : Called by the observer once\ncard processing is complete
+
+Adapter -> FSM : fire(CARD_PROCESSING_ENDED)
+activate FSM #T_NOTIF
+note right of FSM : **synchronized** — acquires FSM lock\n(now free: monitoring thread has exited)
+
+FSM -> State : onTrigger(CARD_PROCESSING_ENDED)
+activate State #T_NOTIF
+note right of State : current state:\nWAIT_FOR_CARD_PROCESSING\n[REPEATING] → switchState(WAIT_FOR_CARD_REMOVAL)
+
+State -> FSM : switchState(WAIT_FOR_CARD_REMOVAL)
+activate FSM #T_NOTIF
+note right of FSM : deactivates WaitForCardProcessing\nactivates WaitForCardRemoval:\n  new monitoring job submitted
+
+FSM -> NewJob : submit getTask()
+note right : Monitoring thread is already idle\n— new task starts immediately
+
+FSM --> State
+deactivate FSM
+
+State --> FSM
+deactivate State
+
+FSM --> Adapter
+deactivate FSM
+
+Adapter --> Observer
+deactivate Adapter
+
+deactivate Observer
+
+' ─── Next monitoring job ───────────────────────────────────────────────────────
+
+== Next monitoring job starts (Monitoring Thread) ==
+
+activate NewJob #T_MON
+note over NewJob : Monitoring thread was already idle;\nremoval job starts immediately
+
+NewJob -> Spi : isCardPresent() / waitForCardRemoval()
+activate Spi
+note right : Monitoring for card removal
+Spi --> NewJob
+deactivate Spi
+
+@enduml

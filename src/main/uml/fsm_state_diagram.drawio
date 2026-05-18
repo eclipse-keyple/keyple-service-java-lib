@@ -1,0 +1,173 @@
+<mxfile host="Electron">
+  <diagram name="FSM State Diagram" id="fsm-state-diagram">
+    <mxGraphModel dx="1030" dy="1453" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="stFxkW6RNNFT0NWJiz85-19" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;gradientColor=none;swimlaneFillColor=#FAFAFA;" value="CARD_DETECTION_ACTIVE" vertex="1">
+          <mxGeometry height="360" width="920" x="120" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-20" parent="stFxkW6RNNFT0NWJiz85-19" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=0;resizeLast=1;container=0;fontColor=#000000;collapsible=0;rounded=1;arcSize=30;strokeColor=#ff0000;fillColor=#ffffc0;swimlaneFillColor=#ffffc0;dropTarget=0;strokeWidth=1;swimlaneLine=0;" value="WAIT_FOR_CARD_INSERTION" vertex="1">
+          <mxGeometry height="60" width="240" x="340" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-21" parent="stFxkW6RNNFT0NWJiz85-20" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;fontColor=#000000;" value="entry / spi.onStartDetection()&lt;div&gt;entry / start monitoring job&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="240" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-22" edge="1" parent="stFxkW6RNNFT0NWJiz85-19" source="stFxkW6RNNFT0NWJiz85-21" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#ff0000;rounded=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.25;exitY=1;exitDx=0;exitDy=0;strokeWidth=2;curved=0;" target="stFxkW6RNNFT0NWJiz85-23" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="340" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-23" parent="stFxkW6RNNFT0NWJiz85-19" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=0;resizeLast=1;container=0;fontColor=#000000;collapsible=0;rounded=1;arcSize=30;strokeColor=#ff0000;fillColor=#ffffc0;swimlaneFillColor=#ffffc0;dropTarget=0;strokeWidth=1;swimlaneLine=0;" value="WAIT_FOR_CARD_PROCESSING" vertex="1">
+          <mxGeometry height="60" width="240" x="60" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-24" parent="stFxkW6RNNFT0NWJiz85-23" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;fontColor=#000000;" value="entry / start monitoring job if &lt;b style=&quot;&quot;&gt;[MONITORING_DURING_PROCESSING]&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="240" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-37" edge="1" parent="stFxkW6RNNFT0NWJiz85-19" source="stFxkW6RNNFT0NWJiz85-23" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#ff0000;rounded=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;strokeWidth=2;curved=0;dashed=1;" target="stFxkW6RNNFT0NWJiz85-20" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="40" y="310" />
+              <mxPoint x="40" y="110" />
+            </Array>
+            <mxPoint x="230" y="700" as="sourcePoint" />
+            <mxPoint x="290" y="310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-26" parent="stFxkW6RNNFT0NWJiz85-19" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=0;resizeLast=1;container=0;fontColor=#000000;collapsible=0;rounded=1;arcSize=30;strokeColor=#ff0000;fillColor=#ffffc0;swimlaneFillColor=#ffffc0;dropTarget=0;strokeWidth=1;glass=0;swimlaneLine=0;" value="WAIT_FOR_CARD_REMOVAL" vertex="1">
+          <mxGeometry height="60" width="240" x="620" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-27" parent="stFxkW6RNNFT0NWJiz85-26" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;fontColor=#000000;" value="entry / start monitoring job" vertex="1">
+          <mxGeometry height="30" width="240" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-31" edge="1" parent="stFxkW6RNNFT0NWJiz85-19" source="stFxkW6RNNFT0NWJiz85-21" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#ff0000;rounded=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.75;exitY=1;exitDx=0;exitDy=0;strokeWidth=2;curved=0;" target="stFxkW6RNNFT0NWJiz85-26" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="400" y="160" as="sourcePoint" />
+            <mxPoint x="270" y="287" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-25" edge="1" parent="stFxkW6RNNFT0NWJiz85-19" source="stFxkW6RNNFT0NWJiz85-24" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#6c8ebf;rounded=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;curved=0;fillColor=#dae8fc;" target="stFxkW6RNNFT0NWJiz85-26" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="400" y="310" />
+              <mxPoint x="400" y="310" />
+            </Array>
+            <mxPoint x="150" y="357" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-43" edge="1" parent="stFxkW6RNNFT0NWJiz85-19" source="stFxkW6RNNFT0NWJiz85-26" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#ff0000;rounded=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;curved=0;" target="stFxkW6RNNFT0NWJiz85-20" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="880" y="310" />
+              <mxPoint x="880" y="110" />
+            </Array>
+            <mxPoint x="480" y="160" as="sourcePoint" />
+            <mxPoint x="520" y="90" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-52" parent="stFxkW6RNNFT0NWJiz85-19" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;b&gt;&lt;font style=&quot;color: rgb(255, 0, 0);&quot;&gt;CARD_INSERTED&lt;/font&gt;&lt;/b&gt;&lt;div&gt;&lt;b&gt;[&lt;/b&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;&lt;b&gt;CARD_PROCESSABLE&lt;/b&gt;&lt;/span&gt;&lt;b style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;]&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;/ reader.processCardInserted()&lt;/div&gt;&lt;div&gt;/ reader.notifyObservers()&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="190" x="190" y="145" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-53" parent="stFxkW6RNNFT0NWJiz85-19" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" value="&lt;font style=&quot;color: rgb(255, 0, 0);&quot;&gt;CARD_INSERTED&lt;/font&gt;&lt;div&gt;[&lt;span style=&quot;background-color: transparent;&quot;&gt;CARD_NON_PROCESSABLE&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;]&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;/ reader.processCardInserted()&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="210" x="530" y="155" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-54" parent="stFxkW6RNNFT0NWJiz85-19" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" value="&lt;font style=&quot;color: rgb(108, 142, 191);&quot;&gt;CARD_PROCESSING_ENDED&lt;/font&gt;&lt;div&gt;[REPEATING]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="260" x="330" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-56" parent="stFxkW6RNNFT0NWJiz85-19" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;b&gt;&lt;font style=&quot;color: rgb(255, 0, 0);&quot;&gt;CARD_REMOVED&lt;/font&gt;&lt;/b&gt;&lt;div&gt;&lt;b&gt;[MONITORING_DURING_PROCESSING]&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;[REPEATING]&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;/ reader.processCardRemoved()&lt;/div&gt;&lt;div&gt;&lt;/div&gt;/ reader.notifyObservers()&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="340" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-58" parent="stFxkW6RNNFT0NWJiz85-19" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;b&gt;&lt;font style=&quot;color: rgb(255, 0, 0);&quot;&gt;CARD_REMOVED&lt;/font&gt;&lt;/b&gt;&lt;div&gt;&lt;b&gt;[REPEATING]&lt;/b&gt;&lt;div&gt;/ reader.processCardRemoved()&lt;/div&gt;&lt;div&gt;&lt;/div&gt;/ reader.notifyObservers() if&amp;nbsp;&lt;b&gt;[CARD_PROCESSABLE]&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="310" x="590" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;" value="Observable Reader States — FSM State Diagram" vertex="1">
+          <mxGeometry height="30" width="760" x="200" y="-100" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-10" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="Legend" vertex="1">
+          <mxGeometry height="430" width="900" x="130" y="-60" as="geometry">
+            <mxRectangle height="50" width="90" x="170" y="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-11" parent="stFxkW6RNNFT0NWJiz85-10" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="&lt;div&gt;&lt;u&gt;Triggers&lt;/u&gt;&lt;/div&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;&lt;font style=&quot;color: rgb(108, 142, 191);&quot;&gt;CARD_DETECTION_START_REQUESTED&lt;/font&gt;&lt;/b&gt; — application called &lt;i&gt;startCardDetection()&lt;/i&gt;&lt;/li&gt;&lt;li&gt;&lt;b&gt;&lt;font style=&quot;color: rgb(108, 142, 191);&quot;&gt;CARD_DETECTION_STOP_REQUESTED&lt;/font&gt; &lt;/b&gt;— application called &lt;i&gt;stopCardDetection()&lt;/i&gt; — factorized on the composite state boundary&lt;/li&gt;&lt;li&gt;&lt;b&gt;&lt;font style=&quot;color: rgb(108, 142, 191);&quot;&gt;CARD_PROCESSING_ENDED&lt;/font&gt;&amp;nbsp;&lt;/b&gt;— application called&amp;nbsp;&lt;i&gt;finalizeCardProcessing()&lt;/i&gt;&lt;/li&gt;&lt;li&gt;&lt;b&gt;&lt;font style=&quot;color: rgb(255, 0, 0);&quot;&gt;CARD_INSERTED&lt;/font&gt; &lt;/b&gt;— monitoring job detected a card&lt;/li&gt;&lt;li&gt;&lt;b&gt;&lt;font style=&quot;color: rgb(255, 0, 0);&quot;&gt;CARD_REMOVED&lt;/font&gt; &lt;/b&gt;— monitoring job detected card removal&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-decoration-line: underline;&quot;&gt;Reader Capabilities&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;ul&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;b&gt;[MONITORING_DURING_PROCESSING]&lt;/b&gt; — reader can detect card removal while processing is running &lt;b&gt;&amp;amp;&amp;amp;&lt;/b&gt;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;card processing is executed in a dedicated thread&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;u&gt;Card States&lt;/u&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;[CARD_PROCESSABLE]&lt;/b&gt; — inserted card matches current selection policy&amp;nbsp;&lt;b&gt;||&lt;/b&gt; CardPresenceNotificationPolicy == ALWAYS&lt;/li&gt;&lt;li&gt;&lt;b&gt;[CARD_NON_PROCESSABLE]&lt;/b&gt; — inserted card does not match current selection policy&amp;nbsp;&lt;b&gt;&amp;amp;&amp;amp;&lt;/b&gt; CardPresenceNotificationPolicy == MATCHED_ONLY&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;u&gt;Guards&lt;/u&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;[REPEATING]&lt;/b&gt; — DetectionMode == REPEATING&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;b&gt;[SINGLE_SHOT]&lt;/b&gt; — DetectionMode == SINGLE_SHOT&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;u&gt;Actions&lt;/u&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;/ spi.method()&lt;/b&gt; — call on ObservableReaderSpi (hardware notification)&lt;/li&gt;&lt;li&gt;&lt;b&gt;/ reader.method()&lt;/b&gt; — call on ObservableLocalReaderAdapter (event production / observer notification)&lt;/li&gt;&lt;li&gt;&lt;b&gt;/ start job&lt;/b&gt; — monitoring job submitted to background executor&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="380" width="900" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-16" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=0;resizeLast=1;container=0;fontColor=#000000;collapsible=0;rounded=1;arcSize=30;strokeColor=#ff0000;fillColor=#ffffc0;swimlaneFillColor=#ffffc0;dropTarget=0;strokeWidth=1;swimlaneLine=0;" value="WAIT_FOR_START_DETECTION" vertex="1">
+          <mxGeometry height="60" width="240" x="460" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-17" parent="stFxkW6RNNFT0NWJiz85-16" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;fontColor=#000000;" value="entry / spi.onStopDetection()" vertex="1">
+          <mxGeometry height="30" width="240" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-18" edge="1" parent="1" source="stFxkW6RNNFT0NWJiz85-16" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#6c8ebf;rounded=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;curved=0;fillColor=#dae8fc;" target="stFxkW6RNNFT0NWJiz85-20" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="590" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-28" edge="1" parent="1" source="stFxkW6RNNFT0NWJiz85-27" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#ff0000;rounded=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;strokeWidth=2;curved=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="stFxkW6RNNFT0NWJiz85-16" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="860" y="1070" />
+              <mxPoint x="20" y="1070" />
+              <mxPoint x="20" y="495" />
+            </Array>
+            <mxPoint x="700" y="960" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-44" edge="1" parent="1" source="stFxkW6RNNFT0NWJiz85-19" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#6c8ebf;rounded=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;curved=0;fillColor=#dae8fc;" target="stFxkW6RNNFT0NWJiz85-16" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1140" y="780" />
+              <mxPoint x="1140" y="510" />
+            </Array>
+            <mxPoint x="1060" y="920" as="sourcePoint" />
+            <mxPoint x="830" y="730" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-45" parent="1" style="ellipse;html=1;shape=startState;fillColor=#000000;strokeColor=#ff0000;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="30" width="30" x="565" y="399" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-46" edge="1" parent="1" source="stFxkW6RNNFT0NWJiz85-45" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#ff0000;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" target="stFxkW6RNNFT0NWJiz85-16" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="580" y="490" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-47" edge="1" parent="1" source="stFxkW6RNNFT0NWJiz85-24" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#6c8ebf;rounded=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;curved=0;fillColor=#dae8fc;" target="stFxkW6RNNFT0NWJiz85-16" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="1060" />
+              <mxPoint x="30" y="1060" />
+              <mxPoint x="30" y="510" />
+            </Array>
+            <mxPoint x="580" y="900" as="sourcePoint" />
+            <mxPoint x="820" y="900" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-48" edge="1" parent="1" source="stFxkW6RNNFT0NWJiz85-24" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#ff0000;rounded=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;dashed=1;" target="stFxkW6RNNFT0NWJiz85-17" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="300" y="1050" />
+              <mxPoint x="40" y="1050" />
+              <mxPoint x="40" y="525" />
+            </Array>
+            <mxPoint x="410" y="970" as="sourcePoint" />
+            <mxPoint x="690" y="970" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-50" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" value="&lt;font style=&quot;color: rgb(108, 142, 191);&quot;&gt;CARD_DETECTION_START_REQUESTED&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="270" x="570" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-51" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" value="&lt;font style=&quot;color: rgb(108, 142, 191);&quot;&gt;CARD_DETECTION_STOP_REQUESTED&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="890" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-57" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;b&gt;&lt;font style=&quot;color: rgb(255, 0, 0);&quot;&gt;CARD_REMOVED&lt;/font&gt;&lt;/b&gt;&lt;div&gt;&lt;b&gt;[MONITORING_DURING_PROCESSING]&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;[SINGLE_SHOT]&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;/ reader.processCardRemoved()&lt;/div&gt;&lt;div&gt;&lt;/div&gt;/ reader.notifyObservers()&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="200" x="80" y="990" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-59" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;b&gt;&lt;font style=&quot;color: rgb(255, 0, 0);&quot;&gt;CARD_REMOVED&lt;/font&gt;&lt;/b&gt;&lt;div&gt;&lt;b&gt;[SINGLE_SHOT]&lt;/b&gt;&lt;div&gt;/ reader.processCardRemoved()&lt;/div&gt;&lt;div&gt;&lt;/div&gt;/ reader.notifyObservers() if&amp;nbsp;&lt;b&gt;[CARD_PROCESSABLE]&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="310" x="859" y="990" as="geometry" />
+        </mxCell>
+        <mxCell id="stFxkW6RNNFT0NWJiz85-55" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" value="&lt;font style=&quot;color: rgb(108, 142, 191);&quot;&gt;CARD_PROCESSING_ENDED&lt;/font&gt;&lt;div&gt;[SINGLE_SHOT]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="200" x="360" y="980" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

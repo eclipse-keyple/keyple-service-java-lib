@@ -21,7 +21,7 @@ import org.eclipse.keypop.reader.selection.IsoCardSelector;
  *
  * @since 3.0.0
  */
-class ReaderApiFactoryAdapter implements ReaderApiFactory {
+final class ReaderApiFactoryAdapter implements ReaderApiFactory {
 
   /**
    * {@inheritDoc}
