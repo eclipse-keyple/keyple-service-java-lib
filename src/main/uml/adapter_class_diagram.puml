@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 4.0.0 (2026-05-19)
+    Keyple - Adapter of keyple-service-java-lib - 4.0.0 (2026-07-08)
 end title
 
 ' == THEME ==
@@ -103,7 +103,11 @@ package "org.eclipse.keyple.core.service" as service {
         __
         ...
     }
-    ~class "<<SmartCardService>>\n**final** SmartCardServiceAdapter" as SmartCardServiceAdapter {
+    ~class "<color:blue><<<back:yellow>CardDetectionSettings</back>>>\n<color:blue>**final** CardDetectionSettingsAdapter" as CardDetectionSettingsAdapter {
+        __
+        ...
+    }
+    ~class "<<SmartCardService>>\n<color:blue><<<back:yellow>CardReaderProvider</back>>>\n**final** SmartCardServiceAdapter" as SmartCardServiceAdapter {
         --
         ~{static} SmartCardServiceAdapter getInstance ()
 
@@ -115,13 +119,16 @@ package "org.eclipse.keyple.core.service" as service {
         +Set<Plugin> getPlugins ()
         +Plugin getPlugin (String pluginName)
         +Plugin getPlugin (<back:yellow>CardReader</back> reader)
-        +<back:yellow>CardReader</back> getReader (String readerName)
-        +<back:yellow>CardReader</back> findReader (String readerNameRegex)
         +void checkCardExtension (<back:cyan>KeypleCardExtension</back> cardExtension)
         +DistributedLocalService registerDistributedLocalService (<back:cyan>KeypleDistributedLocalServiceExtensionFactory</back> distributedLocalServiceFactory)
         +void unregisterDistributedLocalService (String distributedLocalServiceName)
         +DistributedLocalService getDistributedLocalService (String distributedLocalServiceName)
         +<back:yellow>ReaderApiFactory</back> getReaderApiFactory ()
+        -- **CardReaderProvider** --
+        +<color:blue>Set<String> getReaderNames ()
+        +<color:blue>Set<<Back:Yellow>CardReader</Back>> getReaders ()
+        +<back:yellow>CardReader</back> getReader (String readerName)
+        +<back:yellow>CardReader</back> findReader (String readerNameRegex)
     }
     ' PLUGIN
     ~abstract class "<<Plugin>>\nAbstractPluginAdapter" as AbstractPluginAdapter {
@@ -562,11 +569,13 @@ package "org.eclipse.keyple.core.service" as service {
     ' ADAPTERS
     ~class "<<<back:yellow>ReaderApiFactory</back>>>\n**final** ReaderApiFactoryAdapter" as ReaderApiFactoryAdapter {
         --
-        ~ReaderApiFactoryAdapter ()
+        ~ReaderApiFactoryAdapter (<color:blue><back:yellow>CardReaderProvider</back></color>)
         -- **ReaderApiFactory** --
+        +<color:blue><back:yellow>CardReaderProvider</back> getCardReaderProvider ()
         +<back:yellow>CardSelectionManager</back> createCardSelectionManager ()
         +<back:yellow>BasicCardSelector</back> createBasicCardSelector ()
         +<back:yellow>IsoCardSelector</back> createIsoCardSelector ()
+        +<color:blue><back:yellow>CardDetectionSettings</back> createCardDetectionSettings ()
     }
     ~class "<<<back:yellow>CardSelectionManager</back>>>\n**final** CardSelectionManagerAdapter" as CardSelectionManagerAdapter {
         --
@@ -668,9 +677,11 @@ ObservableRemoteReaderAdapter ..> CardSelectionScenarioAdapter #C_USE : use >
 
 SmartCardServiceAdapter .right.> ReaderApiFactoryAdapter #C_LINK : create >
 
+ReaderApiFactoryAdapter .left.> SmartCardServiceAdapter #C_LINK : provide >
 ReaderApiFactoryAdapter .up.> CardSelectionManagerAdapter #C_LINK : create >
 ReaderApiFactoryAdapter .up.> BasicCardSelectorAdapter #C_LINK : create >
 ReaderApiFactoryAdapter .up.> IsoCardSelectorAdapter #C_LINK : create >
+ReaderApiFactoryAdapter .up.> CardDetectionSettingsAdapter #C_LINK : create >
 
 CardSelectionManagerAdapter ..> CardSelectionResultAdapter #C_LINK : create >
 CardSelectionManagerAdapter ..> ScheduledCardSelectionsResponseAdapter #C_USE : use >
@@ -699,6 +710,7 @@ interface service.InternalCardSelector <<blue>>
 interface service.InternalIsoCardSelector <<blue>>
 class service.BasicCardSelectorAdapter <<blue>>
 class service.IsoCardSelectorAdapter <<blue>>
+class service.CardDetectionSettingsAdapter <<blue>>
 class service.SmartCardServiceAdapter <<blue>>
 abstract class service.AbstractReaderAdapter <<blue>>
 class service.LocalReaderAdapter <<blue>>
