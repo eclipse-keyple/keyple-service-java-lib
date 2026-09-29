@@ -102,6 +102,14 @@ public interface SmartCardService {
    *
    * <p>The verification is based on the comparison of the respective API versions.
    *
+   * <p>The card extension is also registered so that the types it provides (card selection
+   * extensions and smart cards) can be rebuilt from JSON data (e.g. when importing a card selection
+   * scenario or when allocating a reader of a remote pool plugin). Besides the card extensions
+   * provided by the Eclipse Keyple project (package {@code org.eclipse.keyple}), only the classes
+   * belonging to the package of the provided object (or to its sub-packages) are accepted.
+   * Therefore, this method must be invoked for each other card extension whose types are received
+   * as JSON data.
+   *
    * @param cardExtension A not null {@link KeypleCardExtension} reference object
    * @since 2.0.0
    */

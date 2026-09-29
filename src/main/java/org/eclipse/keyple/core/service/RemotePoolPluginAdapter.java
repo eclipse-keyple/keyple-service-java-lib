@@ -23,6 +23,7 @@ import org.eclipse.keyple.core.distributed.remote.spi.RemoteReaderSpi;
 import org.eclipse.keyple.core.plugin.PluginIOException;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.card.spi.SmartCardSpi;
 import org.eclipse.keypop.reader.CardReader;
 import org.eclipse.keypop.reader.selection.spi.SmartCard;
 import org.slf4j.Logger;
@@ -164,13 +165,14 @@ final class RemotePoolPluginAdapter extends AbstractPluginAdapter implements Poo
         String selectedSmartCardClassName =
             output.get(JsonProperty.SELECTED_SMART_CARD_CLASS_NAME.getKey()).getAsString();
         try {
-          Class<?> classOfSelectedSmartCard = Class.forName(selectedSmartCardClassName);
+          Class<? extends SmartCard> classOfSelectedSmartCard =
+              JsonAdapter.loadCardExtensionClass(
+                  selectedSmartCardClassName, SmartCard.class, SmartCardSpi.class);
           selectedSmartCard =
-              (SmartCard)
-                  JsonUtil.getParser().fromJson(selectedSmartCardJson, classOfSelectedSmartCard);
-        } catch (ClassNotFoundException e) {
+              JsonUtil.getParser().fromJson(selectedSmartCardJson, classOfSelectedSmartCard);
+        } catch (ClassNotFoundException | IllegalArgumentException e) {
           logger.error(
-              "[plugin={}] Class not found [className={}]",
+              "[plugin={}] Class not found, not a SmartCard or not belonging to a card extension registered with 'checkCardExtension' [className={}]",
               getName(),
               selectedSmartCardClassName,
               e);

@@ -64,6 +64,11 @@ final class SmartCardServiceAdapter implements SmartCardService {
 
   private boolean isAutomaticStatusCodeHandlingEnabled = true;
 
+  private static final String KEYPLE_PACKAGE_PREFIX = "org.eclipse.keyple.";
+
+  private final Set<String> cardExtensionPackageNames =
+      Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+
   static {
     // Register additional JSON adapters.
     JsonUtil.registerTypeAdapter(AbstractApduException.class, new ApduExceptionJsonAdapter(), true);
@@ -577,6 +582,33 @@ final class SmartCardServiceAdapter implements SmartCardService {
    */
   public void checkCardExtension(KeypleCardExtension cardExtension) {
     checkCardExtensionVersion(cardExtension);
+    String className = cardExtension.getClass().getName();
+    int lastDotIndex = className.lastIndexOf('.');
+    if (lastDotIndex > 0) {
+      cardExtensionPackageNames.add(className.substring(0, lastDotIndex));
+    }
+  }
+
+  /**
+   * Checks if the provided class name belongs to a card extension provided by the Eclipse Keyple
+   * project (package {@code org.eclipse.keyple} or its sub-packages), or to the package (or to a
+   * sub-package) of a card extension registered with {@link
+   * #checkCardExtension(KeypleCardExtension)}.
+   *
+   * @param className The fully qualified class name.
+   * @return True if the class belongs to a supported card extension.
+   * @since 3.5.0
+   */
+  boolean isCardExtensionClass(String className) {
+    if (className.startsWith(KEYPLE_PACKAGE_PREFIX)) {
+      return true;
+    }
+    for (String packageName : cardExtensionPackageNames) {
+      if (className.startsWith(packageName + ".")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

@@ -41,3 +41,7 @@ Thumbs.db:encryptable
 ehthumbs.db
 ehthumbs_vista.db
 *.stackdump
+
+# Draw IO backups
+*.drawio.bkp
+*.drawio.dtmp

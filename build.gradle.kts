@@ -20,7 +20,7 @@ dependencies {
   implementation("org.eclipse.keyple:keyple-plugin-java-api:2.3.2")
   implementation("org.eclipse.keyple:keyple-distributed-remote-java-api:3.1.1")
   implementation("org.eclipse.keyple:keyple-distributed-local-java-api:2.2.1")
-  implementation("org.eclipse.keyple:keyple-util-java-lib:2.4.1")
+  implementation("org.eclipse.keyple:keyple-util-java-lib:2.5.0")
   implementation("com.google.code.gson:gson:2.10.1")
   compileOnly("org.slf4j:slf4j-api:1.7.36")
 

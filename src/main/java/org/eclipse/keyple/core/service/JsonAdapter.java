@@ -39,6 +39,82 @@ final class JsonAdapter {
   private JsonAdapter() {}
 
   /**
+   * Loads the class having the provided name, without initializing it, and checks that it is a
+   * subtype of the expected type.
+   *
+   * <p>Used when the class name is read from JSON data.
+   *
+   * @param className The fully qualified name of the class.
+   * @param expectedType The expected super type.
+   * @param <T> The expected super type.
+   * @return A not null reference.
+   * @throws ClassNotFoundException If the class is not found.
+   * @throws IllegalArgumentException If the class is not a subtype of the expected type.
+   * @since 3.5.0
+   */
+  static <T> Class<? extends T> loadSubclassOf(String className, Class<T> expectedType)
+      throws ClassNotFoundException {
+    Class<?> clazz = Class.forName(className, false, JsonAdapter.class.getClassLoader());
+    if (!expectedType.isAssignableFrom(clazz)) {
+      throw new IllegalArgumentException(
+          "Class '" + className + "' is not a subtype of '" + expectedType.getName() + "'");
+    }
+    return clazz.asSubclass(expectedType);
+  }
+
+  /**
+   * Gets the card selector class having the provided name.
+   *
+   * <p>Only the card selectors provided by the service are supported.
+   *
+   * @param className The fully qualified name of the class.
+   * @return A not null reference.
+   * @throws IllegalArgumentException If the class is not a card selector provided by the service.
+   * @since 3.5.0
+   */
+  @SuppressWarnings("rawtypes")
+  static Class<? extends CardSelector> getCardSelectorClass(String className) {
+    if (BasicCardSelectorAdapter.class.getName().equals(className)) {
+      return BasicCardSelectorAdapter.class;
+    }
+    if (IsoCardSelectorAdapter.class.getName().equals(className)) {
+      return IsoCardSelectorAdapter.class;
+    }
+    throw new IllegalArgumentException("CardSelector type '" + className + "' is not supported");
+  }
+
+  /**
+   * Loads the class having the provided name, without initializing it, and checks that it belongs
+   * to a card extension supported by the service and is a subtype of the expected types.
+   *
+   * <p>Used when the class name is read from JSON data.
+   *
+   * @param className The fully qualified name of the class.
+   * @param expectedType The expected super type.
+   * @param expectedSpiType The expected SPI super type.
+   * @param <T> The expected super type.
+   * @return A not null reference.
+   * @throws ClassNotFoundException If the class is not found or does not belong to a supported card
+   *     extension.
+   * @throws IllegalArgumentException If the class is not a subtype of the expected types.
+   * @since 3.5.0
+   */
+  static <T> Class<? extends T> loadCardExtensionClass(
+      String className, Class<T> expectedType, Class<?> expectedSpiType)
+      throws ClassNotFoundException {
+    if (!SmartCardServiceAdapter.getInstance().isCardExtensionClass(className)) {
+      throw new ClassNotFoundException(
+          "Class '" + className + "' does not belong to a supported card extension");
+    }
+    Class<? extends T> clazz = loadSubclassOf(className, expectedType);
+    if (!expectedSpiType.isAssignableFrom(clazz)) {
+      throw new IllegalArgumentException(
+          "Class '" + className + "' is not a subtype of '" + expectedSpiType.getName() + "'");
+    }
+    return clazz;
+  }
+
+  /**
    * Serializer/De-serializer of a {@link AbstractApduException}.
    *
    * @since 2.0.0
@@ -275,16 +351,11 @@ final class JsonAdapter {
 
       List<CardSelector<?>> cardSelectors = new ArrayList<>(cardSelectorsTypes.size());
       for (int i = 0; i < cardSelectorsTypes.size(); i++) {
-        try {
-          Class<?> classOfCardSelector = Class.forName(cardSelectorsTypes.get(i));
-          cardSelectors.add(
-              (CardSelector<?>)
-                  JsonUtil.getParser()
-                      .fromJson(cardSelectorsJsonArray.get(i), classOfCardSelector));
-        } catch (ClassNotFoundException e) {
-          throw new IllegalArgumentException(
-              "Original CardSelector type '" + cardSelectorsTypes.get(i) + "' is not found", e);
-        }
+        cardSelectors.add(
+            JsonUtil.getParser()
+                .fromJson(
+                    cardSelectorsJsonArray.get(i),
+                    getCardSelectorClass(cardSelectorsTypes.get(i))));
       }
 
       // Card selection requests

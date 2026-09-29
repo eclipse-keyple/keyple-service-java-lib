@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - Adapter of keyple-service-java-lib - 3.3.6 (2025-07-17)
+    Keyple - Adapter of keyple-service-java-lib - 3.5.0 (2026-09-28)
 end title
 
 ' == THEME ==
@@ -108,6 +108,7 @@ package "org.eclipse.keyple.core.service" as service {
         ~{static} SmartCardServiceAdapter getInstance ()
 
         ~<color:blue>void boolean isAutomaticStatusCodeHandlingEnabled()
+        ~<color:blue>boolean isCardExtensionClass (String className)
         -- **SmartCardService** --
         +Plugin registerPlugin (<back:cyan>KeyplePluginExtensionFactory</back> pluginFactory)
         +void unregisterPlugin (String pluginName)
@@ -153,6 +154,9 @@ package "org.eclipse.keyple.core.service" as service {
     ~class "<<<back:plum>RemotePluginApi</back>>>\nRemotePluginAdapter" as RemotePluginAdapter extends AbstractPluginAdapter {
         --
         ~RemotePluginAdapter (<back:plum>RemotePluginSpi</back> remotePluginSpi)
+
+        ~<color:blue>**final** Map<String, Boolean> getLocalReaders ()
+        ~<color:blue>**final** void registerRemoteReader (String localReaderName, boolean isObservable)
         -- **AbstractPluginAdapter** --
         ~**final** void register ()
         ~void unregister ()

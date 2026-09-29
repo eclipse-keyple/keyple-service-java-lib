@@ -373,17 +373,11 @@ final class DistributedLocalServiceAdapter
 
       List<CardSelector<?>> cardSelectors = new ArrayList<>(cardSelectorsTypes.size());
       for (int i = 0; i < cardSelectorsTypes.size(); i++) {
-        CardSelector<?> cardSelector;
-        try {
-          Class<?> classOfCardSelector = Class.forName(cardSelectorsTypes.get(i));
-          cardSelector =
-              (CardSelector<?>)
-                  JsonUtil.getParser().fromJson(cardSelectorsJsonArray.get(i), classOfCardSelector);
-        } catch (ClassNotFoundException e) {
-          throw new IllegalArgumentException(
-              "Original CardSelector type '" + cardSelectorsTypes.get(i) + "' is not found", e);
-        }
-        cardSelectors.add(cardSelector);
+        cardSelectors.add(
+            JsonUtil.getParser()
+                .fromJson(
+                    cardSelectorsJsonArray.get(i),
+                    JsonAdapter.getCardSelectorClass(cardSelectorsTypes.get(i))));
       }
 
       List<CardSelectionRequestSpi> cardSelectionRequests =

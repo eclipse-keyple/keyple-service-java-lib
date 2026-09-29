@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0] - 2026-09-29
+### Changed
+- `SmartCardService.checkCardExtension(...)` now also registers the card extension. For the card extensions not
+  provided by the Eclipse Keyple project (i.e. outside the `org.eclipse.keyple` package), it must be invoked before
+  importing a card selection scenario (`CardSelectionManager.importCardSelectionScenario(...)`) or allocating a reader
+  of a remote pool plugin. Otherwise, the card selections are replaced by a default type and the selected smart cards
+  are not provided.
+### Fixed
+- The remote plugins now provide the readers connected after their registration, and no longer provide the
+  disconnected ones. The observers are notified once the readers are updated.
+### Upgraded
+- `keyple-util-java-lib` from `2.4.1` to `2.5.0`
+
 ## [3.4.1] - 2026-02-20
 ### Changed
 - Normalized logging and error messages using Keyple coding standards.
@@ -235,7 +248,8 @@ It follows the extraction of Keyple 1.0 components contained in the `eclipse-key
 repositories.
 It also brings many major API changes.
 
-[unreleased]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.4.1...HEAD
+[unreleased]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.5.0...HEAD
+[3.5.0]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.4.1...3.5.0
 [3.4.1]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.4.0...3.4.1
 [3.4.0]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.7...3.4.0
 [3.3.7]: https://github.com/eclipse-keyple/keyple-service-java-lib/compare/3.3.6...3.3.7
