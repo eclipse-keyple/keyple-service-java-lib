@@ -15,6 +15,7 @@ import static org.eclipse.keyple.core.service.DistributedUtilAdapter.*;
 
 import com.google.gson.JsonObject;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,6 +45,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
   private final ObservationManagerAdapter<PluginObserverSpi, PluginObservationExceptionHandlerSpi>
       observationManager;
   private final ExecutorService eventNotificationExecutorService;
+  private final ExecutorService pluginEventProcessingExecutorService;
 
   /**
    * Constructor.
@@ -60,6 +62,8 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
         observableRemotePluginSpi.getExecutorService() != null
             ? observableRemotePluginSpi.getExecutorService()
             : Executors.newCachedThreadPool();
+    // Single thread, so that the plugin events are processed in their order of arrival.
+    pluginEventProcessingExecutorService = Executors.newSingleThreadExecutor();
   }
 
   /**
@@ -130,6 +134,7 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
         new PluginEventAdapter(getName(), unregisteredReaderNames, PluginEvent.Type.UNAVAILABLE));
     clearObservers();
     super.unregister();
+    pluginEventProcessingExecutorService.shutdown();
   }
 
   /**
@@ -334,7 +339,60 @@ final class ObservableRemotePluginAdapter extends RemotePluginAdapter
           e);
     }
 
-    // Notify the observers for a plugin event.
-    notifyObservers(pluginEvent);
+    // Update the readers and then notify the observers. This processing is done asynchronously,
+    // since
+    // it may require to execute a remote service while the event is received from the network.
+    final PluginEvent event = pluginEvent;
+    pluginEventProcessingExecutorService.execute(
+        new Runnable() {
+          @Override
+          public void run() {
+            updateReaders(event);
+            notifyObservers(event);
+          }
+        });
+  }
+
+  /**
+   * Registers the remote readers associated to the connected local readers, and unregisters the
+   * remote readers associated to the disconnected local readers.
+   *
+   * @param event The plugin event.
+   */
+  private void updateReaders(PluginEvent event) {
+    try {
+      if (event.getType() == PluginEvent.Type.READER_CONNECTED) {
+        Set<String> newReaderNames = new HashSet<>(event.getReaderNames());
+        newReaderNames.removeAll(getReadersMap().keySet());
+        if (newReaderNames.isEmpty()) {
+          return;
+        }
+        Map<String, Boolean> localReaders = getLocalReaders();
+        if (localReaders == null) {
+          return;
+        }
+        for (String readerName : newReaderNames) {
+          Boolean isObservable = localReaders.get(readerName);
+          if (isObservable != null) {
+            registerRemoteReader(readerName, isObservable);
+          }
+        }
+      } else if (event.getType() == PluginEvent.Type.READER_DISCONNECTED) {
+        for (String readerName : event.getReaderNames()) {
+          CardReader reader = getReadersMap().remove(readerName);
+          if (reader instanceof RemoteReaderAdapter) {
+            ((RemoteReaderAdapter) reader).unregister();
+          }
+        }
+      }
+    } catch (Exception e) {
+      logger.error(
+          "[plugin={}] Failed to update readers [eventType={}, readerNames={}, reason={}]",
+          getName(),
+          event.getType().name(),
+          event.getReaderNames(),
+          e.getMessage(),
+          e);
+    }
   }
 }

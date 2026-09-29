@@ -198,27 +198,25 @@ final class CardSelectionManagerAdapter implements CardSelectionManager {
 
     int index = 0;
     for (int i = 0; i < cardSelectorsTypes.size(); i++) {
-      CardSelector<?> cardSelector;
-      try {
-        Class<?> classOfCardSelector = Class.forName(cardSelectorsTypes.get(i));
-        cardSelector =
-            (CardSelector<?>)
-                JsonUtil.getParser().fromJson(cardSelectorsJsonArray.get(i), classOfCardSelector);
-      } catch (ClassNotFoundException e) {
-        throw new IllegalArgumentException(
-            "Original CardSelector type '" + cardSelectorsTypes.get(i) + "' is not found", e);
-      }
+      CardSelector<?> cardSelector =
+          JsonUtil.getParser()
+              .fromJson(
+                  cardSelectorsJsonArray.get(i),
+                  JsonAdapter.getCardSelectorClass(cardSelectorsTypes.get(i)));
       CardSelectionExtension cardSelection;
       try {
-        Class<?> classOfCardSelection = Class.forName(cardSelectionsTypes.get(i));
+        Class<? extends CardSelectionExtension> classOfCardSelection =
+            JsonAdapter.loadCardExtensionClass(
+                cardSelectionsTypes.get(i),
+                CardSelectionExtension.class,
+                CardSelectionExtensionSpi.class);
         // Original card selection
         cardSelection =
-            (CardSelectionExtension)
-                JsonUtil.getParser().fromJson(cardSelectionsJsonArray.get(i), classOfCardSelection);
+            JsonUtil.getParser().fromJson(cardSelectionsJsonArray.get(i), classOfCardSelection);
       } catch (ClassNotFoundException e) {
         // Default card selection
         logger.warn(
-            "Original CardSelection type '{}' not found. Replaced by default type '{}' for deserialization",
+            "Original CardSelection type '{}' not found or not belonging to a card extension registered with 'checkCardExtension'. Replaced by default type '{}' for deserialization",
             cardSelectionsTypes.get(i),
             CardSelectionAdapter.class.getName());
         cardSelection =

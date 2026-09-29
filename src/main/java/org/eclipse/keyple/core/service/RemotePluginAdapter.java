@@ -73,68 +73,91 @@ class RemotePluginAdapter extends AbstractPluginAdapter implements RemotePluginA
         CORE_API_LEVEL,
         distributedApiLevel);
 
+    // Get the local readers.
+    Map<String, Boolean> localReaders = getLocalReaders();
+    if (localReaders == null) {
+      return;
+    }
+
+    // Build a remote reader for each local reader
+    for (Map.Entry<String, Boolean> entry : localReaders.entrySet()) {
+      registerRemoteReader(entry.getKey(), entry.getValue());
+    }
+
+    logger.info("[plugin={}] Distributed remote plugin registered", getName());
+  }
+
+  /**
+   * Gets the local readers of the remote plugin, by executing the remote service {@link
+   * PluginService#GET_READERS}.
+   *
+   * @return A map of the local reader names associated to their observability, or null if the
+   *     remote service returns no data.
+   * @since 3.5.0
+   */
+  final Map<String, Boolean> getLocalReaders() {
+
     // Build the input JSON data.
     JsonObject input = new JsonObject();
     input.addProperty(JsonProperty.CORE_API_LEVEL.getKey(), CORE_API_LEVEL);
     input.addProperty(JsonProperty.SERVICE.getKey(), PluginService.GET_READERS.name());
 
     // Execute the remote service.
-    Map<String, Boolean> localReaders;
     try {
       JsonObject output = executePluginServiceRemotely(input, remotePluginSpi, getName(), logger);
       if (output == null) {
-        return;
+        return null;
       }
-      localReaders =
-          JsonUtil.getParser()
-              .fromJson(
-                  output.getAsJsonObject(JsonProperty.RESULT.getKey()).toString(),
-                  new TypeToken<HashMap<String, Boolean>>() {}.getType());
+      return JsonUtil.getParser()
+          .fromJson(
+              output.getAsJsonObject(JsonProperty.RESULT.getKey()).toString(),
+              new TypeToken<HashMap<String, Boolean>>() {}.getType());
 
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
       throwRuntimeException(e);
-      return;
+      return null;
     }
+  }
 
-    // Build a remote reader for each local reader
-    for (Map.Entry<String, Boolean> entry : localReaders.entrySet()) {
+  /**
+   * Builds and registers the remote reader associated to the provided local reader.
+   *
+   * @param localReaderName The name of the local reader.
+   * @param isObservable True if the local reader is observable.
+   * @since 3.5.0
+   */
+  final void registerRemoteReader(String localReaderName, boolean isObservable) {
 
-      String localReaderName = entry.getKey();
-      String remoteReaderName = localReaderName + REMOTE_READER_NAME_SUFFIX;
-      boolean isObservable = entry.getValue();
+    String remoteReaderName = localReaderName + REMOTE_READER_NAME_SUFFIX;
 
-      RemoteReaderAdapter remoteReaderAdapter = null;
-      if (isObservable) {
-        try {
-          ObservableRemoteReaderSpi observableRemoteReaderSpi =
-              remotePluginSpi.createObservableRemoteReader(remoteReaderName, localReaderName);
-          remoteReaderAdapter =
-              new ObservableRemoteReaderAdapter(
-                  observableRemoteReaderSpi, getName(), CORE_API_LEVEL);
-        } catch (IllegalStateException e) {
-          logger.warn(
-              "[plugin={}] Failed to create observable remote reader [remoteReader={}, localReader={}, reason={}]",
-              getName(),
-              remoteReaderName,
-              localReaderName,
-              e.getMessage());
-          isObservable = false;
-        }
-      }
-      if (!isObservable) {
-        RemoteReaderSpi remoteReaderSpi =
-            remotePluginSpi.createRemoteReader(remoteReaderName, localReaderName);
+    RemoteReaderAdapter remoteReaderAdapter = null;
+    if (isObservable) {
+      try {
+        ObservableRemoteReaderSpi observableRemoteReaderSpi =
+            remotePluginSpi.createObservableRemoteReader(remoteReaderName, localReaderName);
         remoteReaderAdapter =
-            new RemoteReaderAdapter(remoteReaderSpi, getName(), null, CORE_API_LEVEL);
+            new ObservableRemoteReaderAdapter(observableRemoteReaderSpi, getName(), CORE_API_LEVEL);
+      } catch (IllegalStateException e) {
+        logger.warn(
+            "[plugin={}] Failed to create observable remote reader [remoteReader={}, localReader={}, reason={}]",
+            getName(),
+            remoteReaderName,
+            localReaderName,
+            e.getMessage());
+        isObservable = false;
       }
-
-      getReadersMap().put(localReaderName, remoteReaderAdapter);
-      remoteReaderAdapter.register();
+    }
+    if (!isObservable) {
+      RemoteReaderSpi remoteReaderSpi =
+          remotePluginSpi.createRemoteReader(remoteReaderName, localReaderName);
+      remoteReaderAdapter =
+          new RemoteReaderAdapter(remoteReaderSpi, getName(), null, CORE_API_LEVEL);
     }
 
-    logger.info("[plugin={}] Distributed remote plugin registered", getName());
+    getReadersMap().put(localReaderName, remoteReaderAdapter);
+    remoteReaderAdapter.register();
   }
 
   /**
